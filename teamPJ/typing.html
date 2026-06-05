@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf9fc">
+  <title>タイピング - エンターピング</title>
+  <link rel="stylesheet" href="typing.css">
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- YouTube Iframe Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+  <!-- Header Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">♪</span>
+      <span>エンターピング</span>
+    </div>
+    <nav class="top-nav" aria-label="メニュー">
+      <a href="TPprofile.html">マイページ</a>
+      <a href="typing.html" class="active">タイピング</a>
+      <a href="#">クイズ</a>
+      <a href="#">告知</a>
+      <a href="TPprofile.html">プロフィール</a>
+    </nav>
+  </header>
+
+  <!-- Main Content Page -->
+  <main class="page">
+    <section class="page-head">
+      <span class="label">MUSIC TYPING</span>
+      <h1>タイピング</h1>
+      <p>歌詞をタイピングして高得点を目指しましょう！</p>
+    </section>
+
+    <!-- 2-Row Layout Matching Notion Wireframe -->
+    <div class="game-grid">
+      
+      <!-- TOP ROW -->
+      <!-- Left Card: Typing Stats -->
+      <section class="card stats-card">
+        <h2>タイピング統計</h2>
+        <div class="stats-grid-2x2">
+          <div class="stats-subcard">
+            <small>現在 WPM</small>
+            <strong id="currentWpm">0</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>最高 WPM</small>
+            <strong id="maxWpm">0</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>正確度</small>
+            <strong id="currentAccuracy">100%</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>ミス入力数</small>
+            <strong id="mistakeCount">0</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Card: Video Player -->
+      <section class="game-card player-card" id="game-area">
+        <div class="video-container">
+          <div id="player-wrapper">
+            <div id="youtube-player"></div>
+          </div>
+          
+          <!-- Start Screen Overlay -->
+          <div class="overlay" id="start-overlay">
+            <div class="overlay-content">
+              <span class="icon">🎹</span>
+              <h2>Let's Start!</h2>
+              <p>動画が読み込まれたら「ゲームを始める」ボタンをクリックしてください。</p>
+              <button class="btn btn-start" id="startBtn" type="button">ゲームを始める</button>
+            </div>
+          </div>
+
+          <!-- Pause Screen Overlay -->
+          <div class="overlay" id="pause-overlay" style="display: none;">
+            <div class="overlay-content">
+              <span class="icon">⏸️</span>
+              <h2>一時停止中</h2>
+              <p>動画を再開するとタイピングゲームも再開します。</p>
+              <button class="btn btn-resume" id="resumeBtn" type="button">プレイを再開</button>
+            </div>
+          </div>
+
+          <!-- Result Score Board Overlay -->
+          <div class="overlay" id="result-overlay" style="display: none;">
+            <div class="overlay-content result-content">
+              <span class="icon">🏆</span>
+              <h2>FINISH!</h2>
+              <p class="summary-lead">プレイ結果</p>
+              
+              <div class="result-stats">
+                <div class="res-card">
+                  <small>SCORE</small>
+                  <strong id="resScore">0</strong>
+                </div>
+                <div class="res-card">
+                  <small>精度</small>
+                  <strong id="resAccuracy">0%</strong>
+                </div>
+                <div class="res-card">
+                  <small>WPM</small>
+                  <strong id="resWPM">0</strong>
+                </div>
+                <div class="res-card">
+                  <small>MAX COMBO</small>
+                  <strong id="resCombo">0</strong>
+                </div>
+              </div>
+
+              <!-- Score Submit Form -->
+              <form id="scoreForm" class="score-form">
+                <label for="usernameInput">ランキング登録用ニックネーム:</label>
+                <div class="input-row">
+                  <input type="text" id="usernameInput" placeholder="ニックネームを入力" maxlength="15" required>
+                  <button type="submit" class="btn btn-submit" id="submitScoreBtn">登録</button>
+                </div>
+                <p id="scoreMsg" class="score-msg" role="alert"></p>
+              </form>
+
+              <div class="btn-row">
+                <button class="btn btn-restart" id="restartBtn" type="button">もう一度遊ぶ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Time Progress bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Card: Video Info -->
+      <section class="card video-info-card">
+        <h2>動画情報</h2>
+        <div class="video-info-content">
+          <div class="channel-profile">
+            <span class="channel-avatar">🎬</span>
+            <div>
+              <h3 id="videoTitle">動画タイトル</h3>
+              <p class="channel-name" id="channelName">アーティスト情報</p>
+            </div>
+          </div>
+          <div class="info-details">
+            <div class="info-item">
+              <span class="info-label">再生時間</span>
+              <span class="info-val" id="videoDuration">00:00</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">アップロード日</span>
+              <span class="info-val" id="uploadDate">--</span>
+            </div>
+            <div class="info-item info-tags">
+              <span class="info-label">タグ</span>
+              <div class="tags-container" id="videoTags">
+                <span class="tag">J-POP</span>
+                <span class="tag">タイピング</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM ROW -->
+      <!-- Left Card: Song Jacket/Artwork -->
+      <section class="card jacket-card">
+        <div class="jacket-wrapper">
+          <img src="lemon_cover.png" alt="Lemon Jacket" class="jacket-img">
+        </div>
+      </section>
+
+      <!-- Center Card: Scrolling Lyrics -->
+      <section class="card lyrics-scroll-card" id="typing-board">
+        <div class="lyrics-scroller">
+          
+          <!-- Line 1: Active Line -->
+          <div class="lyric-row-scrolling active">
+            <div class="lyric-ja" id="currentJa">夢ならばどれほどよかったでしょう</div>
+            <div class="lyric-roma" id="currentRoma">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Line 2: Next Line -->
+          <div class="lyric-row-scrolling next">
+            <div class="lyric-ja" id="nextJa">未だにあなたのことを夢にみる</div>
+            <div class="lyric-roma" id="nextRoma">imada ni anata no koto wo yume ni miru</div>
+          </div>
+
+          <!-- Line 3: Next-Next Line -->
+          <div class="lyric-row-scrolling next-next">
+            <div class="lyric-ja" id="nextNextJa">忘れた物を取りに帰るように</div>
+            <div class="lyric-roma" id="nextNextRoma">wasureta mono wo tori ni kaeru you ni</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Right Card: Game Mode -->
+      <section class="card mode-card">
+        <h2>モード: Solo</h2>
+        <div class="mode-content">
+          <div class="form-group">
+            <label for="songSelect">楽曲を選択してください:</label>
+            <div class="select-wrapper">
+              <select id="songSelect">
+                <!-- Dynamically loaded from DB -->
+              </select>
+            </div>
+          </div>
+          <div class="config-instructions">
+            <p>※タイピングは小文字の半角英数字で行います。</p>
+            <p>※スペースキーの入力は自動的にスキップされます。</p>
+          </div>
+          
+          <div class="leaderboard-section">
+            <h3>ランキング (TOP 5)</h3>
+            <ul class="leaderboard-list" id="leaderboardList">
+              <li class="no-scores">ハイスコアなし</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="typing.js"></script>
+</body>
+</html>

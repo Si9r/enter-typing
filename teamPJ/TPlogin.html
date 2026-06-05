@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf9fc">
+  <title>ログイン - エンターピング</title>
+  <link rel="stylesheet" href="TPlogin.css">
+</head>
+<body class="auth-page auth-page--login">
+
+  <header class="auth-header">
+    <a href="TPregister.html" class="auth-logo" aria-label="エンターピング トップ">
+      <span class="auth-logo-icon" aria-hidden="true">♪</span>
+      <span class="auth-logo-name">エンターピング</span>
+    </a>
+    <a href="TPregister.html" class="auth-header-link">会員登録</a>
+  </header>
+
+  <main class="auth-main">
+    <span class="auth-badge">おかえりなさい</span>
+    <h1 class="auth-title">ログイン</h1>
+    <p class="auth-lead">登録済みのアカウントでログインしてください。</p>
+
+    <div class="auth-card">
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="username">ユーザー名</label>
+          <input class="form-input" type="text" id="username" name="username" placeholder="ユーザー名" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">パスワード</label>
+          <input class="form-input" type="password" id="password" name="password" placeholder="パスワード" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn-primary" id="submitBtn">ログイン</button>
+        <a href="TPregister.html" class="btn-outline">新規登録はこちら</a>
+        <p class="auth-message" id="message" role="alert"></p>
+      </form>
+    </div>
+
+    <p class="auth-footer">
+      アカウントをお持ちでない方は <a href="TPregister.html">会員登録</a>
+    </p>
+  </main>
+
+  <script>
+    const API_BASE =
+      location.protocol === "file:"
+        ? "http://127.0.0.1:8000"
+        : "";
+
+    const form = document.getElementById("loginForm");
+    const messageEl = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = "auth-message " + (type === "success" ? "is-success" : "is-error");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!username || !password) {
+        showMessage("ユーザー名とパスワードを入力してください", "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      showMessage("", "");
+
+      try {
+        const res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          showMessage(data.detail || `エラー (${res.status})`, "error");
+          return;
+        }
+
+        showMessage(data.message || "ログイン成功", "success");
+      } catch (err) {
+        showMessage(
+          "サーバーに接続できません。register.py を起動してください。",
+          "error"
+        );
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

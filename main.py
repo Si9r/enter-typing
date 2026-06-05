@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -786,3 +787,14 @@ for f in ["style.css", "typing.css", "script.js", "navbar.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)
+=======
+#FastAPIを呼ぶ
+from fastapi import FastAPI
+#アプリを作る、名前を作る
+app = FastAPI()
+
+@app.get("/")#取得
+def read_roof():
+    return{"message":"Hello World"}
+#関数でこの文字をサイトに移す
+>>>>>>> 51c5ea7 (first commit)

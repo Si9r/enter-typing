@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf9fc">
+  <title>会員登録 - エンターピング</title>
+  <link rel="stylesheet" href="TPlogin.css">
+</head>
+<body class="auth-page auth-page--register">
+
+  <header class="auth-header">
+    <a href="#" class="auth-logo" aria-label="エンターピング トップ">
+      <span class="auth-logo-icon" aria-hidden="true">♪</span>
+      <span class="auth-logo-name">エンターピング</span>
+    </a>
+    <a href="TPlogin.html" class="auth-header-link">ログイン</a>
+  </header>
+
+  <main class="auth-main">
+    <span class="auth-badge">無料で始める</span>
+    <h1 class="auth-title">会員登録</h1>
+    <p class="auth-lead">アカウントを作成して、タイピングを楽しもう！</p>
+
+    <div class="auth-card">
+      <form id="registerForm" novalidate>
+        <div class="form-group">
+          <label for="username">ユーザー名</label>
+          <input class="form-input" type="text" id="username" name="username" placeholder="ユーザー名" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="email">メールアドレス</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="example@email.com" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">パスワード</label>
+          <input class="form-input" type="password" id="password" name="password" placeholder="パスワード" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="btn-primary" id="submitBtn">登録して始める</button>
+        <a href="TPlogin.html" class="btn-outline">ログインして続ける</a>
+        <p class="auth-message" id="message" role="alert"></p>
+      </form>
+    </div>
+
+    <p class="auth-footer">
+      すでにアカウントをお持ちですか？ <a href="TPlogin.html">ログインはこちら</a>
+    </p>
+  </main>
+
+  <script>
+    const API_BASE =
+      location.protocol === "file:"
+        ? "http://127.0.0.1:8000"
+        : "";
+
+    const form = document.getElementById("registerForm");
+    const messageEl = document.getElementById("message");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(text, type) {
+      messageEl.textContent = text;
+      messageEl.className = "auth-message " + (type === "success" ? "is-success" : "is-error");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!username || !email || !password) {
+        showMessage("すべての項目を入力してください", "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      showMessage("", "");
+
+      try {
+        const res = await fetch(`${API_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          showMessage(data.detail || `エラー (${res.status})`, "error");
+          return;
+        }
+
+        showMessage(data.message || "登録完了", "success");
+        form.reset();
+        setTimeout(() => {
+          window.location.href = "TPlogin.html";
+        }, 1200);
+      } catch (err) {
+        showMessage(
+          "サーバーに接続できません。register.py を起動してください。（uvicorn register:app --reload）",
+          "error"
+        );
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

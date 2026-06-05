@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="ko">
 
 <head>
@@ -393,4 +394,100 @@
 
 </body>
 
+=======
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>自己紹介サイト</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ナビゲーション -->
+<nav>
+  <ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#profile">経歴</a></li>
+    <li><a href="#projects">プロジェクト</a></li>
+    <li><a href="#about">人柄</a></li>
+    <li><a href="#future">未来</a></li>
+    <li><a href="#hobby">趣味</a></li>
+    <li><a href="#contact">連絡先</a></li>
+  </ul>
+</nav>
+
+<!-- ホーム -->
+<section id="home" class="section">
+  <h1>挑戦し続けるエンジニア志望</h1>
+  <p>〇〇大学 / 名前</p>
+  <span class="scroll">↓ scroll</span>
+</section>
+
+<!-- 経歴 -->
+<section id="profile" class="section">
+  <h2>経歴</h2>
+  <img src="profile.jpg" class="profile-img">
+  <p>簡単な経歴を書く（3〜4行）</p>
+  <button onclick="toggle('detail1')">詳細を見る</button>
+  <div id="detail1" class="hidden">
+    <p>詳しい経歴を書く</p>
+  </div>
+</section>
+
+<!-- プロジェクト -->
+<section id="projects" class="section">
+  <h2>プロジェクト</h2>
+
+  <div class="card">
+    <h3>〇〇アプリ開発</h3>
+    <p>簡単な説明</p>
+    <button onclick="toggle('p1')">詳細</button>
+
+    <div id="p1" class="hidden">
+      <p><span class="self">自分：</span>フロントエンド担当</p>
+      <p><span class="team">チーム：</span>設計・レビュー</p>
+      <p>工夫：〇〇を改善した</p>
+      <p>ミス→改善：〇〇の問題を解決</p>
+      <p>スキル：HTML / CSS / JS</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- 人柄 -->
+<section id="about" class="section">
+  <h2>自分について</h2>
+  <p>継続力がある人間です</p>
+  <p>理由：〇〇の経験</p>
+</section>
+
+<!-- 未来 -->
+<section id="future" class="section">
+  <h2>未来</h2>
+  <p>エンジニアとして：〇〇</p>
+  <p>人として：〇〇</p>
+</section>
+
+<!-- 趣味 -->
+<section id="hobby" class="section">
+  <h2>趣味</h2>
+  <img src="hobby.jpg" class="hobby-img">
+  <p>バンド・スノボなど</p>
+</section>
+
+<!-- 連絡先 -->
+<section id="contact" class="section">
+  <h2>連絡先</h2>
+  <p>Gmail: example@gmail.com</p>
+</section>
+
+<!-- 感謝 -->
+<section class="section last">
+  <h2>Thank You</h2>
+  <p>最後まで見ていただきありがとうございました。</p>
+</section>
+
+<script src="script.js"></script>
+</body>
+>>>>>>> 51c5ea7 (first commit)
 </html>

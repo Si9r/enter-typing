@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<style>
+body {
+    background-color: #f3f4f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial;
+}
+
+.register-box {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background: black;
+    color: white;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+      <div class="register-box">
+    <input type="text" id="username" placeholder="ユーザー名">
+    <input type="password" id="password" placeholder="パスワード">
+    <input type="email" id="email" placeholder="メールアドレス">
+   
+
+    <button onclick="register()">会員登録</button>
+
+    <p>すでにアカウントを持っていますか？</p>
+    <a href="login.html">ログインはこちら</a>
+
+
+    <script>
+        async function register(){
+        try{
+            const username = document.getElementById("username").value
+            const password = document.getElementById("password").value
+            const email = document.getElementById("email").value
+
+            const response = await fetch(
+            "http://127.0.0.1:8000/register",
+            {
+                method: "POST",
+                headers: {
+                    "Content-type":"application/json"
+                },
+
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    email: email
+                })
+            }
+            )
+            if (!response.ok) {
+                const text = await response.text()
+                alert(`エラー:${response.status} ${text}`)
+                return;
+            }
+            const data = await response.json()
+            alert(data.message)
+            } catch (e) {
+            alert("通信できませんでした:" + e.message)
+        }
+    }
+    </script>
+
+</body>

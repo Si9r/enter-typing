@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>会員API デモ（FastAPI）</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; }
+    body { max-width: 32rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    h1 { font-size: 1.25rem; }
+    label { display: block; margin-top: 0.75rem; font-size: 0.875rem; color: #444; }
+    input { width: 100%; box-sizing: border-box; padding: 0.5rem; margin-top: 0.25rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    button {
+      flex: 1 1 7rem;
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #f8f8f8;
+    }
+    button:hover { background: #eee; }
+    #log {
+      margin-top: 1.25rem;
+      padding: 0.75rem;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 6px;
+      font-size: 0.8125rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 4rem;
+    }
+    .hint { font-size: 0.8125rem; color: #666; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>会員登録・ログイン デモ</h1>
+  <p>このページは FastAPI から配信されています。同じオリジンなので <code>fetch("/register")</code> などがそのまま動きます。</p>
+
+  <label for="username">ユーザー名</label>
+  <input id="username" type="text" autocomplete="username" placeholder="例: taro">
+
+  <label for="password">パスワード（登録・ログイン・削除で使用）</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="現パスワード">
+
+  <label for="newPassword">新しいパスワード（「パスワード更新」のときだけ）</label>
+  <input id="newPassword" type="password" autocomplete="new-password" placeholder="更新後のパスワード">
+
+  <div class="row">
+    <button type="button" id="btnRegister">登録</button>
+    <button type="button" id="btnLogin">ログイン</button>
+    <button type="button" id="btnUpdate">パスワード更新</button>
+    <button type="button" id="btnDelete">削除</button>
+  </div>
+
+  <p class="hint">開き方: サーバー起動後にブラウザで <code>/web/member-app.html</code> を開く（下のログにURL例を出します）。</p>
+  <div id="log" aria-live="polite"></div>
+
+  <script>
+    const logEl = document.getElementById("log");
+
+    function log(msg) {
+      logEl.textContent = typeof msg === "string" ? msg : JSON.stringify(msg, null, 2);
+    }
+
+    function vals() {
+      return {
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value,
+        newPassword: document.getElementById("newPassword").value,
+      };
+    }
+
+    async function api(path, method, body) {
+      const res = await fetch(path, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = { raw: await res.text() };
+      }
+      if (!res.ok) {
+        const detail = data.detail != null ? JSON.stringify(data.detail) : JSON.stringify(data);
+        throw new Error("HTTP " + res.status + " " + res.statusText + " — " + detail);
+      }
+      return data;
+    }
+
+    document.getElementById("btnRegister").addEventListener("click", async () => {
+      const { username, password } = vals();
+      if (!username || !password) return log("ユーザー名とパスワードを入力してください。");
+      try {
+        log(await api("/register", "POST", { username, password }));
+      } catch (e) {
+        log(String(e.message || e));
+      }
+    });
+
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      const { username, password } = vals();
+      if (!username || !password) return log("ユーザー名とパスワードを入力してください。");
+      try {
+        log(await api("/login", "POST", { username, password }));
+      } catch (e) {
+        log(String(e.message || e));
+      }
+    });
+
+    document.getElementById("btnUpdate").addEventListener("click", async () => {
+      const { username, password, newPassword } = vals();
+      if (!username) return log("ユーザー名を入力してください。");
+      const next = newPassword || password;
+      if (!next) return log("新しいパスワード欄か、パスワード欄のどちらかに更新後のパスワードを入れてください。");
+      try {
+        log(await api("/update", "PUT", { username, password: next }));
+      } catch (e) {
+        log(String(e.message || e));
+      }
+    });
+
+    document.getElementById("btnDelete").addEventListener("click", async () => {
+      const { username, password } = vals();
+      if (!username || !password) return log("ユーザー名とパスワードを入力してください。");
+      if (!confirm("本当に削除しますか？")) return;
+      try {
+        log(await api("/delete", "DELETE", { username, password }));
+      } catch (e) {
+        log(String(e.message || e));
+      }
+    });
+
+    log(
+      "準備OK。\n例: http://127.0.0.1:8000/web/member-app.html\n\n" +
+      "（別フォルダの HTML を file で開いても、サーバー側の CORS 設定で /register 等に届くようにしてあります。）"
+    );
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>일본어 타이핑 연습 (유튜브 싱크 + FastAPI 모드)</title>
+    <link rel="stylesheet" href="style/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>일본어 타이핑 연습 (유튜브 싱크)</h2>
+
+      <div class="video-container">
+        <div id="player"></div>
+      </div>
+
+      <div class="stage-indicator" id="stageIndicator">STAGE -</div>
+
+      <div class="toggle-container">
+        <label>스테가나 반드시 한번에 입력 (tta, kya 등) :</label>
+        <label class="switch">
+          <input type="checkbox" id="steganaToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="lyrics-board">
+        <div class="kanji-display" id="kanjiDisplay">-</div>
+        <div class="sentence-display" id="lyricDisplay"></div>
+        <div class="next-preview-display" id="nextPreviewDisplay">
+          <span class="prefix">Next</span> -
+        </div>
+
+        <div class="timer-bar-container">
+          <div class="timer-bar-fill" id="timerBarFill"></div>
+        </div>
+      </div>
+
+      <div class="status-panel" id="statusPanel">
+        유튜브 API 로딩 대기 중...
+      </div>
+
+      <input
+        type="text"
+        id="typeInput"
+        placeholder="영상을 재생하면 활성화됩니다..."
+        autocomplete="off"
+        disabled
+      />
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app/typing_algorithm.js"></script>
+    <script src="app/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,221 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  color: #334155;
+}
+.container {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  max-width: 850px;
+  width: 100%;
+}
+h2 {
+  text-align: center;
+  color: #1e293b;
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+.video-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 25px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+.video-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.stage-indicator {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: #3b82f6;
+  margin-bottom: 25px;
+  background: #eff6ff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  left: 50%;
+  transform: translateX(-50%);
+  position: relative;
+}
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #64748b;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 22px;
+  margin-left: 10px;
+}
+.switch input {
+  display: none;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.3s;
+  border-radius: 22px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #3b82f6;
+}
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+.lyrics-board {
+  background-color: #fcfdfe;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+.kanji-display {
+  font-size: 26px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  word-break: break-all;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 12px;
+}
+.sentence-display {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  line-height: 1.6;
+  word-break: break-all;
+  text-align: left;
+  margin-bottom: 14px;
+}
+.next-preview-display {
+  font-size: 15px;
+  color: #94a3b8;
+  font-weight: 500;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  word-break: break-all;
+  margin-bottom: 15px;
+}
+.next-preview-display .prefix {
+  font-size: 12px;
+  font-weight: bold;
+  color: #cbd5e1;
+  margin-right: 6px;
+  text-transform: uppercase;
+}
+
+/* 🌟 주황색 시간 막대 (Timer Bar) 스타일 추가 */
+.timer-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.timer-bar-fill {
+  height: 100%;
+  width: 0%; /* JS에서 실시간 제어 */
+  background-color: #f97316; /* 이미지와 매칭되는 뚜렷한 주황색 */
+  transition: width 0.1s linear; /* 뚝뚝 끊기지 않고 부드럽게 흐르도록 설정 */
+}
+
+.char-unit {
+  display: inline;
+  transition: color 0.2s;
+}
+.char-unit.typed {
+  color: #cbd5e1;
+}
+.char-unit.current {
+  color: #3b82f6;
+  border-bottom: 3px solid #3b82f6;
+  padding-bottom: 2px;
+}
+.char-unit.pending {
+  color: #1e293b;
+}
+
+.status-panel {
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  font-size: 15px;
+  min-height: 24px;
+  color: #475569;
+}
+.status-panel .highlight {
+  color: #ef4444;
+  font-weight: bold;
+}
+.status-panel .typing-now {
+  color: #3b82f6;
+  font-weight: bold;
+}
+.status-panel .success-text {
+  color: #10b981;
+  font-weight: bold;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 20px;
+  font-family: monospace;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  box-sizing: border-box;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  background-color: #f8fafc;
+}
+input[type="text"]:focus {
+  border-color: #3b82f6;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+input[type="text"]:disabled {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+}

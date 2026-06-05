@@ -753,6 +753,11 @@ def convert_lyrics(req: ConvertRequest):
         if 'じぇ' in h: r = r.replace('jie', 'je')
         if 'しぇ' in h: r = r.replace('shie', 'she')
         if 'ちぇ' in h: r = r.replace('chie', 'che')
+        if 'せぁ' in h: r = r.replace('sea', 'sexa')
+        if 'せぃ' in h: r = r.replace('sei', 'sexi')
+        if 'せぅ' in h: r = r.replace('seu', 'sexu')
+        if 'せぇ' in h: r = r.replace('see', 'sexe')
+        if 'せぉ' in h: r = r.replace('seo', 'sexo')
         
         hiragana += h
         romaji += r

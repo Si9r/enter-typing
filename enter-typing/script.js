@@ -22,6 +22,7 @@ let youtubePlayer = null;
 let currentYoutubeId = null;
 let isYoutubeReady = false;
 let isPlayerReady = false;
+let isLineCompleted = false;
 
 window.onYouTubeIframeAPIReady = function () {
     isYoutubeReady = true;
@@ -71,145 +72,113 @@ function initYoutubePlayer() {
     }
 }
 
-const romajiEquivalents = [
-    { from: 'shi', to: 'si' }, { from: 'si', to: 'shi' },
-    { from: 'chi', to: 'ti' }, { from: 'ti', to: 'chi' },
-    { from: 'tsu', to: 'tu' }, { from: 'tu', to: 'tsu' },
-    { from: 'fu', to: 'hu' }, { from: 'hu', to: 'fu' },
-    { from: 'ji', to: 'zi' }, { from: 'zi', to: 'ji' },
-    { from: 'ji', to: 'di' }, { from: 'di', to: 'ji' },
-    { from: 'zu', to: 'du' }, { from: 'du', to: 'zu' },
-    { from: 'sha', to: 'sya' }, { from: 'sya', to: 'sha' },
-    { from: 'shu', to: 'syu' }, { from: 'syu', to: 'shu' },
-    { from: 'sho', to: 'syo' }, { from: 'syo', to: 'sho' },
-    { from: 'cha', to: 'tya' }, { from: 'tya', to: 'cha' },
-    { from: 'chu', to: 'tyu' }, { from: 'tyu', to: 'chu' },
-    { from: 'cho', to: 'tyo' }, { from: 'tyo', to: 'cho' },
-    { from: 'ja', to: 'zya' }, { from: 'zya', to: 'ja' },
-    { from: 'ju', to: 'zyu' }, { from: 'zyu', to: 'ju' },
-    { from: 'jo', to: 'zyo' }, { from: 'zyo', to: 'jo' },
-    { from: 'ja', to: 'jya' }, { from: 'jya', to: 'ja' },
-    { from: 'ju', to: 'jyu' }, { from: 'jyu', to: 'ju' },
-    { from: 'jo', to: 'jyo' }, { from: 'jyo', to: 'jo' },
-    { from: 'nn', to: 'n' }, { from: 'n', to: 'nn' },
-    // 스테가나 (작은 가나) 및 추가 변환 규칙
-    { from: 'she', to: 'sye' }, { from: 'sye', to: 'she' },
-    { from: 'che', to: 'tye' }, { from: 'tye', to: 'che' },
-    { from: 'che', to: 'cye' }, { from: 'cye', to: 'che' },
-    { from: 'je', to: 'zye' }, { from: 'zye', to: 'je' },
-    { from: 'je', to: 'jye' }, { from: 'jye', to: 'je' },
-    { from: 'ti', to: 'thi' }, { from: 'thi', to: 'ti' },
-    { from: 'di', to: 'dhi' }, { from: 'dhi', to: 'di' },
-    { from: 'fa', to: 'fwa' }, { from: 'fwa', to: 'fa' },
-    { from: 'fi', to: 'fwi' }, { from: 'fwi', to: 'fi' },
-    { from: 'fe', to: 'fwe' }, { from: 'fwe', to: 'fe' },
-    { from: 'fo', to: 'fwo' }, { from: 'fwo', to: 'fo' },
-    { from: 'xa', to: 'la' }, { from: 'la', to: 'xa' },
-    { from: 'xi', to: 'li' }, { from: 'li', to: 'xi' },
-    { from: 'xu', to: 'lu' }, { from: 'lu', to: 'xu' },
-    { from: 'xe', to: 'le' }, { from: 'le', to: 'xe' },
-    { from: 'xo', to: 'lo' }, { from: 'lo', to: 'xo' },
-    { from: 'xya', to: 'lya' }, { from: 'lya', to: 'xya' },
-    { from: 'xyu', to: 'lyu' }, { from: 'lyu', to: 'xyu' },
-    { from: 'xyo', to: 'lyo' }, { from: 'lyo', to: 'xyo' },
-    { from: 'xtu', to: 'ltu' }, { from: 'ltu', to: 'xtu' },
-    { from: 'xtsu', to: 'ltsu' }, { from: 'ltsu', to: 'xtsu' }
-];
+const romajiTable = {
+    あ: ["a"], い: ["i", "yi"], う: ["u", "wu"], え: ["e", "ye"], お: ["o"],
+    か: ["ka"], き: ["ki"], く: ["ku"], け: ["ke"], こ: ["ko"],
+    さ: ["sa"], し: ["shi", "si"], す: ["su"], せ: ["se"], そ: ["so"],
+    た: ["ta"], ち: ["chi", "ti"], つ: ["tsu", "tu"], て: ["te"], と: ["to"],
+    な: ["na"], に: ["ni"], ぬ: ["nu"], ね: ["ne"], の: ["no"],
+    は: ["ha"], ひ: ["hi"], ふ: ["fu", "hu"], へ: ["he"], ほ: ["ho"],
+    ま: ["ma"], み: ["mi"], む: ["mu"], め: ["me"], も: ["mo"],
+    や: ["ya"], ゆ: ["yu"], よ: ["yo"],
+    ら: ["ra"], り: ["ri"], る: ["ru"], れ: ["re"], ろ: ["ro"],
+    わ: ["wa"], を: ["wo"], ん: ["nn", "n", "n'"],
+    が: ["ga"], ぎ: ["gi"], ぐ: ["gu"], げ: ["ge"], ご: ["go"],
+    ざ: ["za"], じ: ["zi", "ji"], ず: ["zu"], ぜ: ["ze"], ぞ: ["zo"],
+    だ: ["da"], ぢ: ["di"], づ: ["du"], で: ["de"], ど: ["do"],
+    ば: ["ba"], び: ["bi"], ぶ: ["bu"], べ: ["be"], ぼ: ["bo"],
+    ぱ: ["pa"], ぴ: ["pi"], ぷ: ["pu"], ぺ: ["pe"], ぽ: ["po"],
+    ぁ: ["xa", "la"], ぃ: ["xi", "li"], ぅ: ["xu", "lu"], ぇ: ["xe", "le"], ぉ: ["xo", "lo"],
+    っ: ["xtsu", "ltsu", "xtu", "ltu"],
+    ゃ: ["xya", "lya"], ゅ: ["xyu", "lyu"], ょ: ["xyo", "lyo"], ゎ: ["xwa", "lwa"],
+    " ": [" "], "、": [","], "。": ["."], "?": ["?"], "!": ["!"],
+    "？": ["?"], "！": ["!"], "〜": ["~"], "~": ["~"]
+};
 
-let hiraColorThresholds = [];
+const combinationRules = {
+    き: { ゃ: ["kya"], ゅ: ["kyu"], ょ: ["kyo"] },
+    し: { ゃ: ["sha", "sya"], ゅ: ["shu", "syu"], ょ: ["sho", "syo"], ぇ: ["she", "sye"] },
+    ち: { ゃ: ["cha", "tya"], ゅ: ["chu", "tyu"], ょ: ["cho", "tyo"], ぇ: ["che", "tye"] },
+    に: { ゃ: ["nya"], ゅ: ["nyu"], ょ: ["nyo"] },
+    ひ: { ゃ: ["hya"], ゅ: ["hyu"], ょ: ["hyo"] },
+    み: { ゃ: ["mya"], ゅ: ["myu"], ょ: ["myo"] },
+    り: { ゃ: ["rya"], ゅ: ["ryu"], ょ: ["ryo"] },
+    ぎ: { ゃ: ["gya"], ゅ: ["gyu"], ょ: ["gyo"] },
+    じ: { ゃ: ["ja", "zya"], ゅ: ["ju", "zyu"], ょ: ["jo", "zyo"], ぇ: ["je", "zye"] },
+    ぢ: { ゃ: ["dya"], ゅ: ["dyu"], ょ: ["dyo"] },
+    び: { ゃ: ["bya"], ゅ: ["byu"], ょ: ["byo"] },
+    ぴ: { ゃ: ["pya"], ゅ: ["pyu"], ょ: ["pyo"] }
+};
 
+function parseKanaToTargetUnits(kanaString, mustCombine) {
+    const rawChars = Array.from(kanaString);
+    const targetUnits = [];
 
+    for (let i = 0; i < rawChars.length; i++) {
+        let char = rawChars[i];
+        let nextChar = rawChars[i + 1];
 
-/**
- * 입력 중인 로마자와 실제 가사(히라가나) 간의 인덱스 매핑을 생성하는 함수입니다.
- * 사용자가 로마자를 타이핑할 때마다 원본 히라가나에서 어디까지 색칠해야 할지 계산합니다.
- */
-function buildMapping() {
-    // 현재 줄의 히라가나와 로마자
-    let hiragana = contentHiraganaLines[currentLineIndex];
-    let romaji = currentText;
-    if (!hiragana || !romaji) return;
-
-    // 로마자 입력 위치 -> 색칠할 히라가나 위치 매핑 테이블
-    hiraColorThresholds = new Array(romaji.length + 1).fill(0);
-
-    let hIdx = 0; // 히라가나 인덱스
-    let rIdx = 0; // 로마자 인덱스
-
-    // 작은 가나(きゃ, しゅ 등) 판별용
-    const smallKana = ['ゃ', 'ゅ', 'ょ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ', 'ゎ'];
-
-    // 로마자 음절의 끝을 찾기 위한 모음
-    const vowels = ['a', 'i', 'u', 'e', 'o'];
-
-    while (hIdx < hiragana.length && rIdx < romaji.length) {
-        let hChar = hiragana[hIdx];
-
-        // 현재 히라가나 음절이 차지하는 길이
-        let rLen = 1; // 대응되는 로마자 길이
-        let hLen = 1; // 대응되는 히라가나 길이
-
-        if (hChar === 'っ') {
-            // 촉음(っ)은 자음 하나 추가(tt) 이거나 명시적 분리입력(xtsu)
-            let sokuons = ['xtsu', 'ltsu', 'xtu', 'ltu'];
-            rLen = 1;
-            for (let sq of sokuons) {
-                if (romaji.startsWith(sq, rIdx)) {
-                    rLen = sq.length;
-                    break;
-                }
-            }
-
-        } else if (hChar === 'ん') {
-            // "ん"은 n 또는 nn, xn, ln으로 입력 가능
-            if (romaji.startsWith('xn', rIdx) || romaji.startsWith('ln', rIdx) || romaji.startsWith('nn', rIdx)) {
-                rLen = 2;
-            } else {
-                rLen = 1;
-            }
-
-        } else {
-            // 다음 문자가 작은 가나면 하나의 음절로 처리
-            if (
-                hIdx + 1 < hiragana.length &&
-                smallKana.includes(hiragana[hIdx + 1])
-            ) {
-                hLen = 2;
-            }
-
-            // 모음이 나올 때까지 읽어서 음절 길이 계산
-            rLen = 0;
-            while (rIdx + rLen < romaji.length) {
-                let c = romaji[rIdx + rLen];
-                rLen++;
-
-                if (vowels.includes(c)) break;
-            }
+        if (char === "っ" && nextChar && mustCombine && romajiTable[nextChar]) {
+            let nextValidRomajis = romajiTable[nextChar];
+            let combinedRomajis = [];
+            nextValidRomajis.forEach((r) => {
+                combinedRomajis.push(r[0] + r);
+                romajiTable["っ"].forEach((s) => {
+                    combinedRomajis.push(s + r);
+                });
+            });
+            targetUnits.push({
+                text: char + nextChar,
+                validInputs: [...new Set(combinedRomajis)],
+            });
+            i++;
+            continue;
         }
 
-        if (rLen === 0) rLen = 1;
+        if (mustCombine && combinationRules[char] && nextChar && combinationRules[char][nextChar]) {
+            let combinedRomajis = [...combinationRules[char][nextChar]];
+            romajiTable[char].forEach((c) => {
+                romajiTable[nextChar].forEach((n) => {
+                    combinedRomajis.push(c + n);
+                });
+            });
+            targetUnits.push({
+                text: char + nextChar,
+                validInputs: [...new Set(combinedRomajis)],
+            });
+            i++;
+            continue;
+        }
 
-        // 음절 입력 중인 구간은 현재 히라가나 위치를 가리킴
-        for (let i = 0; i < rLen; i++) {
-            if (rIdx + i <= romaji.length) {
-                hiraColorThresholds[rIdx + i] = hIdx;
+        targetUnits.push({ text: char, validInputs: romajiTable[char] || [char] });
+    }
+    return targetUnits;
+}
+
+let currentUnits = [];
+
+function findValidPath(units, typedStr, unitIndex = 0, path = []) {
+    if (typedStr.length === 0) return { isValid: true, matchedCount: unitIndex, currentMatch: "", path: path };
+    if (unitIndex >= units.length) return { isValid: false };
+
+    let unit = units[unitIndex];
+
+    for (let val of unit.validInputs) {
+        if (typedStr.startsWith(val)) {
+            let res = findValidPath(units, typedStr.substring(val.length), unitIndex + 1, [...path, val]);
+            if (res.isValid) {
+                return res;
             }
         }
-
-        // 음절이 완성된 시점에는 다음 히라가나까지 색칠
-        if (rIdx + rLen <= romaji.length) {
-            hiraColorThresholds[rIdx + rLen] = hIdx + hLen;
-        }
-
-        // 다음 음절로 이동
-        hIdx += hLen;
-        rIdx += rLen;
     }
 
-    // 남은 구간은 마지막 히라가나 위치로 채움
-    for (let i = rIdx; i <= romaji.length; i++) {
-        hiraColorThresholds[i] = hIdx;
+    for (let val of unit.validInputs) {
+        if (val.startsWith(typedStr)) {
+            return { isValid: true, matchedCount: unitIndex, currentMatch: typedStr, path: [...path, val] };
+        }
     }
+
+    return { isValid: false };
 }
 
 let sessionCorrectChars = 0;
@@ -235,7 +204,7 @@ async function fetchTypingContent(contentId) {
             contentLines = data.lines;
             contentHiraganaLines = data.hiragana_lines || data.lines;
             contentRomajiLines = data.romaji_lines;
-            
+
             // 기존 DB에 저장된 스테가나 로마자 변환 오류 교정 (jie -> je 등)
             for (let i = 0; i < contentHiraganaLines.length; i++) {
                 if (contentHiraganaLines[i] && contentRomajiLines[i]) {
@@ -252,6 +221,14 @@ async function fetchTypingContent(contentId) {
             }
             if (data.timestamps) {
                 contentTimestamps = data.timestamps.split('\n').map(t => parseFloat(t.trim())).filter(t => !isNaN(t));
+
+                // 첫 가사가 나오기 전까지(0.5초 초과) 대기 시간이 있다면 시작 전 간주 더미 추가
+                if (contentTimestamps.length > 0 && contentTimestamps[0] > 0.5) {
+                    contentLines.unshift("🎵");
+                    contentHiraganaLines.unshift("");
+                    contentRomajiLines.unshift("");
+                    contentTimestamps.unshift(0);
+                }
             } else {
                 contentTimestamps = [];
             }
@@ -334,9 +311,10 @@ function renderLines() {
         romaDiv.className = 'lyric-romaji';
 
         if (isCurrent) {
-            currentText = contentRomajiLines[i];
+            currentUnits = parseKanaToTargetUnits(contentHiraganaLines[i], true);
+            currentText = currentUnits.map(u => u.validInputs[0]).join('');
             currentChars = currentText.split('');
-            buildMapping();
+
             currentChars.forEach((char) => {
                 const span = document.createElement('span');
                 span.innerText = char;
@@ -366,7 +344,7 @@ function renderLines() {
             progressBar.style.width = '0%'; // Start at 0%
             progressBar.style.height = '100%';
             progressBar.style.background = 'linear-gradient(90deg, #ff9a9e, #fecfef)';
-            progressBar.style.transition = 'width 0.1s linear';
+            progressBar.style.transition = 'width 0.1s linear, background 0.3s ease';
 
             progressContainer.appendChild(progressBar);
             block.appendChild(progressContainer);
@@ -374,6 +352,7 @@ function renderLines() {
 
         linesContainer.appendChild(block);
     }
+    isLineCompleted = false;
     typingInput.value = '';
     currentIndex = 0;
     correctChars = 0;
@@ -518,115 +497,52 @@ function highlightCurrentChar() {
 
 typingInput.addEventListener('input', (e) => {
     if (!isPlaying) return;
+    if (isLineCompleted) {
+        typingInput.value = currentChars.join('');
+        return;
+    }
+    if (currentUnits.length === 0) {
+        typingInput.value = '';
+        return;
+    }
 
     let typedValue = typingInput.value;
+    let res = findValidPath(currentUnits, typedValue);
 
-    let validPrefixLength = 0;
-    for (let i = 0; i < typedValue.length; i++) {
-        if (typedValue[i] === currentChars[i]) {
-            validPrefixLength++;
+    if (!res.isValid) {
+        // Typo
+        totalTypos++;
+        typingInput.value = typedValue.slice(0, -1);
+        typedValue = typingInput.value;
+        updateStats();
+
+        // Re-evaluate valid path for the reverted string
+        res = findValidPath(currentUnits, typedValue);
+        if (!res.isValid) return; // Should not happen
+    }
+
+    // Update dynamic romaji text to match the chosen path
+    let newText = "";
+    for (let i = 0; i < currentUnits.length; i++) {
+        if (i < res.path.length) {
+            newText += res.path[i];
         } else {
-            break;
+            newText += currentUnits[i].validInputs[0]; // fallback to default
         }
     }
 
-    if (validPrefixLength < typedValue.length) {
-        let replaced = false;
-        for (let k = Math.min(validPrefixLength, 3); k >= 0; k--) {
-            let checkPos = validPrefixLength - k;
-            let textToMatch = currentText.substring(checkPos);
-            for (let eq of romajiEquivalents) {
-                if (textToMatch.startsWith(eq.from)) {
-                    let newText = currentText.substring(0, checkPos) + eq.to + currentText.substring(checkPos + eq.from.length);
-                    if (newText.startsWith(typedValue)) {
-                        currentText = newText;
-                        currentChars = currentText.split('');
-                        replaced = true;
-                        buildMapping();
+    if (newText !== currentText) {
+        currentText = newText;
+        currentChars = currentText.split('');
 
-                        const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-                        if (activeBlock) {
-                            activeBlock.innerHTML = '';
-                            currentChars.forEach((char) => {
-                                const span = document.createElement('span');
-                                span.innerText = char;
-                                activeBlock.appendChild(span);
-                            });
-                        }
-
-                        validPrefixLength = typedValue.length;
-                        break;
-                    }
-                }
-            }
-            if (replaced) break;
-
-            // 동적 촉음(sokuon) 변환 규칙: 연속된 자음(예: tta) <-> 분리 입력(xtsuta, ltsuta 등)
-            // (마이페이지 설정에서 켠 유저만 허용)
-            if (localStorage.getItem('allowSplitSokuon') === 'true') {
-                if (textToMatch.length >= 2 && textToMatch[0] === textToMatch[1] && 'bcdfghjklmnpqrstvwxyz'.includes(textToMatch[0])) {
-                    let rest = textToMatch.substring(1); // 첫 번째 자음을 뺀 나머지
-                    let possibleSokuons = ['xtsu', 'ltsu', 'xtu', 'ltu'];
-                    for (let sokuon of possibleSokuons) {
-                        let newText = currentText.substring(0, checkPos) + sokuon + rest;
-                        if (newText.startsWith(typedValue)) {
-                            currentText = newText;
-                            currentChars = currentText.split('');
-                            replaced = true;
-                            buildMapping();
-                            const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-                            if (activeBlock) {
-                                activeBlock.innerHTML = '';
-                                currentChars.forEach((char) => {
-                                    const span = document.createElement('span');
-                                    span.innerText = char;
-                                    activeBlock.appendChild(span);
-                                });
-                            }
-                            validPrefixLength = typedValue.length;
-                            break;
-                        }
-                    }
-                }
-                if (replaced) break;
-
-                // 분리 입력(xtsuta) -> 연속된 자음(tta) 역변환 규칙
-                let possibleSokuons = ['xtsu', 'ltsu', 'xtu', 'ltu'];
-                for (let sokuon of possibleSokuons) {
-                    if (textToMatch.startsWith(sokuon) && textToMatch.length > sokuon.length) {
-                        let nextChar = textToMatch[sokuon.length];
-                        if ('bcdfghjklmnpqrstvwxyz'.includes(nextChar)) {
-                            let newText = currentText.substring(0, checkPos) + nextChar + textToMatch.substring(sokuon.length);
-                            if (newText.startsWith(typedValue)) {
-                                currentText = newText;
-                                currentChars = currentText.split('');
-                                replaced = true;
-                                buildMapping();
-                                const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-                                if (activeBlock) {
-                                    activeBlock.innerHTML = '';
-                                    currentChars.forEach((char) => {
-                                        const span = document.createElement('span');
-                                        span.innerText = char;
-                                        activeBlock.appendChild(span);
-                                    });
-                                }
-                                validPrefixLength = typedValue.length;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (replaced) break;
-            }
-        }
-
-        if (!replaced) {
-            // A wrong character was typed
-            totalTypos++;
-            typingInput.value = currentChars.slice(0, validPrefixLength).join('');
-            typedValue = typingInput.value;
-            updateStats(); // update typos immediately
+        const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
+        if (activeBlock) {
+            activeBlock.innerHTML = '';
+            currentChars.forEach((char) => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                activeBlock.appendChild(span);
+            });
         }
     }
 
@@ -641,15 +557,16 @@ typingInput.addEventListener('input', (e) => {
 
     spans.forEach((span, index) => {
         span.className = '';
-
         if (index < typedValue.length) {
             span.classList.add('correct');
             correctChars++;
         }
     });
 
-    // Color hiragana progressively based on the exact mora thresholds
-    const hiraCorrectCount = hiraColorThresholds[typedValue.length] || 0;
+    let hiraCorrectCount = 0;
+    for (let i = 0; i < res.matchedCount; i++) {
+        hiraCorrectCount += currentUnits[i].text.length;
+    }
 
     hiraSpans.forEach((span, index) => {
         span.className = '';
@@ -661,18 +578,30 @@ typingInput.addEventListener('input', (e) => {
     currentIndex = typedValue.length;
     highlightCurrentChar();
 
-    if (currentIndex >= currentChars.length) {
-        sessionCorrectChars += correctChars;
-        sessionTotalChars += typedValue.length;
+    if (res.matchedCount === currentUnits.length && res.currentMatch === "") {
+        isLineCompleted = true;
 
-        currentLineIndex++;
+        const activeHiraBlock = linesContainer.querySelector('.lyric-block.active .lyric-hiragana');
+        if (activeHiraBlock) {
+            const hiraSpans = activeHiraBlock.querySelectorAll('span');
+            hiraSpans.forEach(span => {
+                span.style.color = '#27ae60';
+                span.style.textShadow = '0 0 8px rgba(39, 174, 96, 0.4)';
+            });
+        }
 
-        setTimeout(() => {
-            if (isPlaying) {
-                renderLines();
-                startSyncLoop();
-            }
-        }, 300);
+        const progressBar = document.getElementById('line-progress-bar');
+        if (progressBar) {
+            progressBar.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
+        }
+
+        if (!isYoutubeMode) {
+            setTimeout(() => {
+                if (isPlaying) {
+                    transitionNextLine(false);
+                }
+            }, 300);
+        }
     }
 });
 
@@ -717,7 +646,7 @@ function startSyncLoop() {
             let remaining = duration - currentLineElapsed;
 
             if (remaining <= 0) {
-                forceSkipToNextLine();
+                transitionNextLine(!isLineCompleted);
             } else {
                 let percent = (currentLineElapsed / duration) * 100;
                 if (percent < 0) percent = 0;
@@ -732,12 +661,14 @@ function startSyncLoop() {
 }
 
 /**
- * 사용자가 현재 줄의 가사를 시간 내에 다 치지 못했을 때 강제로 다음 가사로 넘기는 함수입니다.
- * 입력하지 못한 글자들은 자동으로 오타(typos) 처리됩니다.
+ * 다음 가사로 넘어가는 트랜지션 함수입니다.
+ * @param {boolean} isForceSkip - 시간 초과로 인해 강제로 넘어가는지 여부
  */
-function forceSkipToNextLine() {
-    if (currentChars && currentIndex < currentChars.length) {
-        totalTypos += (currentChars.length - currentIndex);
+function transitionNextLine(isForceSkip) {
+    if (isForceSkip) {
+        if (currentChars && currentIndex < currentChars.length) {
+            totalTypos += (currentChars.length - currentIndex);
+        }
     }
 
     sessionCorrectChars += correctChars;

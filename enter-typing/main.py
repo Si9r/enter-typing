@@ -7,6 +7,7 @@ import random
 import string
 import os
 import re
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -219,6 +220,15 @@ class TypingContentCreate(BaseModel):
     hiragana: str
     romaji: str
     timestamps: str | None = None
+    difficulty: int = 3
+    youtube_id: str | None = None
+
+class QuizContentCreate(BaseModel):
+    title: str
+    artist: str
+    genre: str
+    description: str
+    quiz_data: str
     difficulty: int = 3
     youtube_id: str | None = None
 
@@ -729,6 +739,94 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
         "raw_lyrics": content.lyrics,
         "raw_hiragana": content.hiragana,
         "raw_romaji": content.romaji
+    }
+
+# ════════════════════════════════════════════════════════════
+# API: 퀴즈 콘텐츠 API
+# ════════════════════════════════════════════════════════════
+@app.get("/api/quiz-contents")
+def get_all_quiz_contents(db: Session = Depends(get_db)):
+    contents = db.query(models.QuizContent).all()
+    result = []
+    for c in contents:
+        quiz_count = 0
+        try:
+            quiz_count = len(json.loads(c.quiz_data)) if c.quiz_data else 0
+        except Exception:
+            pass
+        result.append({
+            "id": c.id,
+            "title": c.title,
+            "artist": c.artist,
+            "genre": c.genre,
+            "description": c.description,
+            "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
+            "difficulty": c.difficulty,
+            "best_score": c.best_score,
+            "quiz_count": quiz_count
+        })
+    return {"success": True, "data": result}
+
+@app.get("/api/my-quiz-contents")
+def get_my_quiz_contents(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    contents = db.query(models.QuizContent).filter(models.QuizContent.creator_id == current_user.id).all()
+    result = []
+    for c in contents:
+        quiz_count = 0
+        try:
+            quiz_count = len(json.loads(c.quiz_data)) if c.quiz_data else 0
+        except Exception:
+            pass
+        result.append({
+            "id": c.id,
+            "title": c.title,
+            "artist": c.artist,
+            "genre": c.genre,
+            "description": c.description,
+            "difficulty": c.difficulty,
+            "best_score": c.best_score,
+            "play_count": c.play_count,
+            "quiz_count": quiz_count
+        })
+    return {"success": True, "data": result}
+
+@app.post("/api/quiz-contents")
+def create_quiz_content(req: QuizContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    new_content = models.QuizContent(
+        title=req.title,
+        artist=req.artist,
+        genre=req.genre,
+        description=req.description,
+        creator_id=current_user.id,
+        youtube_id=req.youtube_id,
+        quiz_data=req.quiz_data,
+        difficulty=req.difficulty,
+        play_count=0,
+        best_score=0
+    )
+    db.add(new_content)
+    db.commit()
+    db.refresh(new_content)
+    return {"success": True, "message": "성공적으로 추가되었습니다.", "id": new_content.id}
+
+@app.get("/api/quiz-content/{content_id}")
+def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    
+    return {
+        "success": True,
+        "title": content.title,
+        "artist": content.artist,
+        "genre": content.genre,
+        "description": content.description,
+        "youtube_id": content.youtube_id,
+        "creator_nickname": content.creator.nickname if content.creator else "엔터핑",
+        "difficulty": content.difficulty,
+        "play_count": content.play_count,
+        "best_score": content.best_score,
+        "quiz_data": content.quiz_data
     }
 
 # ════════════════════════════════════════════════════════════

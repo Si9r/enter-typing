@@ -90,3 +90,22 @@ class TypingContent(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     creator = relationship("User")
+
+# 7. 퀴즈 콘텐츠 테이블
+class QuizContent(Base):
+    __tablename__ = "quiz_contents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)
+    artist = Column(String(255), nullable=True)
+    genre = Column(String(50), nullable=False)
+    description = Column(Text, nullable=True)
+    creator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    youtube_id = Column(String(50), nullable=True)
+    quiz_data = Column(Text, nullable=False) # JSON 형태로 퀴즈 데이터 저장
+    difficulty = Column(Integer, default=3, nullable=False)
+    play_count = Column(Integer, default=0, nullable=False)
+    best_score = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    creator = relationship("User")

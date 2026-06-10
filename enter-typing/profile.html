@@ -1603,6 +1603,34 @@
       }
     }
 
+    async function deleteMyQuiz(id) {
+      if (!confirm("정말 이 퀴즈 콘텐츠를 삭제하시겠습니까?")) return;
+
+      const token = sessionStorage.getItem('ep_token');
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/quiz-contents/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const resData = await res.json();
+
+        if (resData.success) {
+          alert("삭제되었습니다.");
+          loadMyQuizContents(); // 목록 새로고침
+        } else {
+          alert(resData.detail || "삭제에 실패했습니다.");
+        }
+      } catch (e) {
+        console.error("삭제 중 오류가 발생했습니다:", e);
+        alert("오류가 발생했습니다.");
+      }
+    }
+
     // 페이지 로드 시 초기화
     renderCalendar(curYear, curMonth);
     loadAttendanceData();
@@ -1626,7 +1654,8 @@
               <div class="history-result" style="margin-right: 80px;">
                 <div class="score">🏆 최고 점수: ${item.best_score || 0}</div>
               </div>
-              <button onclick="event.stopPropagation(); location.href='quiz_create.html?id=${item.id}'" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
+              <button onclick="event.stopPropagation(); location.href='quiz_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
+              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
             </div>
           `).join('');
         } else {

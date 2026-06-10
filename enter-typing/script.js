@@ -185,6 +185,13 @@ const combinationRules = {
   ぴ: { ゃ: ["pya"], ゅ: ["pyu"], ょ: ["pyo"] },
 };
 
+/**
+ * 주어진 가나(Kana) 문자열을 타이핑 가능한 로마자 입력 단위(TargetUnit) 배열로 파싱하는 함수입니다.
+ * 촉음(っ)이나 요음(ゃ, ゅ, ょ 등)을 처리하여 가능한 모든 로마자 입력 조합을 생성합니다.
+ * @param {string} kanaString - 파싱할 히라가나/가타카나 문자열
+ * @param {boolean} mustCombine - 요음/촉음 결합을 강제할지 여부
+ * @returns {Array} 파싱된 입력 단위 배열
+ */
 function parseKanaToTargetUnits(kanaString, mustCombine = true) {
   const rawChars = Array.from(kanaString);
   const targetUnits = [];
@@ -253,6 +260,10 @@ function parseKanaToTargetUnits(kanaString, mustCombine = true) {
   return targetUnits;
 }
 
+/**
+ * 현재까지 입력 완료된 로마자의 전체 길이를 계산하여 반환하는 함수입니다.
+ * @returns {number} 완료된 로마자의 문자열 길이 합
+ */
 function getCompletedRomajiLength() {
   return targetUnits.slice(0, currentUnitIndex).reduce((sum, unit) => {
     return sum + (unit.validInputs[0]?.length || 0);
@@ -527,6 +538,10 @@ function renderLines() {
   if (typingInput) typingInput.focus();
 }
 
+/**
+ * 한 줄의 가사를 모두 올바르게 입력했을 때 호출되는 처리 함수입니다.
+ * 입력한 글자 수를 통계에 누적하고, 입력창을 비활성화하며 대기 상태를 표시합니다.
+ */
 function handleLineCompletion() {
   if (lineCompleted) return;
   lineCompleted = true;
@@ -731,6 +746,10 @@ function highlightCurrentChar() {
   });
 }
 
+/**
+ * 현재 입력해야 할 가사와 현재까지 입력된 로마자 버퍼의 상태를
+ * 상태 패널(Status Panel)에 업데이트하여 화면에 표시하는 함수입니다.
+ */
 function updateStatus() {
   if (!statusPanel) return;
   if (currentUnitIndex >= targetUnits.length) {

@@ -113,7 +113,7 @@
             background: #fff;
             display: flex;
             flex-direction: column;
-            min-height: 400px;
+            height: 400px;
         }
 
         .chat-messages {
@@ -126,7 +126,6 @@
             background: #fdfdfd;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
-            max-height: 400px;
         }
 
         .chat-bubble {
@@ -620,17 +619,17 @@
 
             if (item.singer && !currentGuessed.singer && checkAnswerMatch(item.singer, normText)) {
                 currentGuessed.singer = true;
-                document.getElementById('board-singer').textContent = item.singer;
+                document.getElementById('board-singer').textContent = item.singer.split(',')[0].trim();
                 addSystemChat("정답입니다! (가수)");
                 foundNew = true;
             } else if (item.title && !currentGuessed.title && checkAnswerMatch(item.title, normText)) {
                 currentGuessed.title = true;
-                document.getElementById('board-title').textContent = item.title;
+                document.getElementById('board-title').textContent = item.title.split(',')[0].trim();
                 addSystemChat("정답입니다! (제목)");
                 foundNew = true;
             } else if (item.lyrics && !currentGuessed.lyrics && checkAnswerMatch(item.lyrics, normText)) {
                 currentGuessed.lyrics = true;
-                document.getElementById('board-lyrics').textContent = item.lyrics;
+                document.getElementById('board-lyrics').textContent = item.lyrics.split(',')[0].trim();
                 addSystemChat("정답입니다! (가사)");
                 foundNew = true;
             }

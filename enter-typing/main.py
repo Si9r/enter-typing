@@ -829,6 +829,16 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
         "quiz_data": content.quiz_data
     }
 
+@app.delete("/api/quiz-contents/{content_id}")
+def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+        
+    db.delete(content)
+    db.commit()
+    return {"success": True, "message": "삭제되었습니다."}
+
 # ════════════════════════════════════════════════════════════
 # API: 가사 자동 변환 (히라가나, 로마자)
 # POST /api/convert

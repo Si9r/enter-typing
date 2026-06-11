@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 목록 - 엔터핑</title>
+    <meta name="description" content="엔터핑 퀴즈 목록 - 일본어 퀴즈로 실력을 테스트해보세요!">
+    <link rel="stylesheet" href="style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ── 퀴즈 카드 썸네일 ── */
+        .quiz-card {
+            background: var(--color-white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--color-blue);
+        }
+
+        .quiz-thumbnail {
+            width: 100%;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .quiz-thumbnail::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(255,255,255,0.15) 100%);
+        }
+
+        .quiz-thumbnail-emoji {
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+        }
+
+        .quiz-body {
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .quiz-card .card-badge {
+            margin-bottom: 10px;
+        }
+
+        .quiz-card .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--color-text-main);
+            line-height: 1.4;
+        }
+
+        .quiz-card .card-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            line-height: 1.5;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--color-border);
+            padding-top: 12px;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            font-weight: 600;
+        }
+
+        .quiz-difficulty {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .quiz-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ── 곧 출시 카드 ── */
+        .quiz-card.coming-soon {
+            opacity: 0.55;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .quiz-card.coming-soon:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.45);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            z-index: 2;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show { opacity: 1; }
+
+        .detail-container {
+            width: 100%; max-width: 820px;
+            background: var(--color-white);
+            border-radius: 24px; padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex; gap: 50px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .detail-container { transform: translateY(0); }
+
+        .modal-close-btn {
+            position: absolute; top: 20px; right: 25px;
+            background: transparent; border: none; font-size: 2rem;
+            cursor: pointer; color: #aaa; transition: color 0.2s;
+        }
+        .modal-close-btn:hover { color: #333; }
+
+        .detail-cover {
+            width: 260px; height: 260px;
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 5rem; font-weight: 900;
+            box-shadow: 0 15px 35px rgba(173,216,230,0.35);
+            flex-shrink: 0; position: relative; overflow: hidden;
+        }
+        .detail-cover::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .detail-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .detail-title { font-size: 2rem; font-weight: 900; color: var(--color-text-main); margin-bottom: 6px; line-height: 1.3; }
+        .detail-sub   { font-size: 1rem; color: var(--color-text-muted); font-weight: 700; margin-bottom: 22px; }
+        .detail-stats { display: flex; gap: 28px; margin-bottom: 25px; padding: 18px 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); }
+        .stat-item { display: flex; flex-direction: column; gap: 6px; }
+        .stat-item .label { font-size: 0.82rem; color: var(--color-text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-item .value { font-size: 1.15rem; font-weight: 900; color: var(--color-text-main); }
+        .detail-desc { font-size: 1rem; color: #555; line-height: 1.7; margin-bottom: 30px; flex-grow: 1; font-weight: 500; }
+        .detail-actions { display: flex; gap: 15px; }
+    </style>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='index.html'">
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="typing_list.html">타이핑</a>
+                <a href="quiz_list.html" class="active">퀴즈</a>
+                <a href="ranking.html">랭킹</a>
+                <a href="notice.html">공지</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='search.html'">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="퀴즈 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
+                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <script src="navbar.js?v=1.0.2"></script>
+
+    <!-- 메인 컨텐츠 -->
+    <main style="margin-top: 80px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
+        <section class="content-section" style="padding-top: 40px; width: 100%; max-width: 1200px;">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>📚 모든 퀴즈 컨텐츠</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-outline" id="admin-mode-btn" onclick="toggleAdminMode()"
+                        style="display: flex; align-items: center; border-radius: 30px; padding: 10px 22px;">
+                        관리자 모드: OFF
+                    </button>
+                    <button class="btn btn-pink" onclick="location.href='quiz_create.html'"
+                        style="display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 10px 22px;">
+                        <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> 퀴즈 만들기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 카테고리 필터 -->
+            <div style="margin-bottom: 40px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-blue-outline" id="filter-all"    style="padding: 8px 20px;" onclick="filterQuiz('all')">전체</button>
+                <button class="btn btn-outline"      id="filter-title"  style="padding: 8px 20px;" onclick="filterQuiz('제목맞추기')">🎵 제목 맞추기</button>
+                <button class="btn btn-outline"      id="filter-artist" style="padding: 8px 20px;" onclick="filterQuiz('가수맞추기')">🎤 가수 맞추기</button>
+                <button class="btn btn-outline"      id="filter-lyrics" style="padding: 8px 20px;" onclick="filterQuiz('가사퀴즈')">📝 가사 퀴즈</button>
+                <button class="btn btn-outline"      id="filter-mixed"  style="padding: 8px 20px;" onclick="filterQuiz('종합')">🏆 종합</button>
+            </div>
+
+            <!-- 카드 그리드 -->
+            <div class="card-grid" id="quiz-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+                <!-- JS로 렌더링 -->
+            </div>
+
+            <div style="text-align: center; margin-top: 60px;">
+                <button class="btn btn-blue-outline btn-large" style="display: inline-flex;">더 많은 퀴즈 보기</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>타이핑</h4>
+                <ul>
+                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
+                    <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
+                    <li><a href="typing_create.html">타이핑 작성하기</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>퀴즈 &amp; 랭킹</h4>
+                <ul>
+                    <li><a href="quiz_list.html">퀴즈 목록</a></li>
+                    <li><a href="quiz_create.html">퀴즈 만들기</a></li>
+                    <li><a href="ranking.html">전체 랭킹</a></li>
+                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="notice.html">공지사항</a></li>
+                    <li><a href="profile.html">마이페이지</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 퀴즈 상세 Modal -->
+    <div class="modal-overlay" id="quiz-modal" onclick="closeModal(event)">
+        <div class="detail-container" onclick="event.stopPropagation()">
+            <button class="modal-close-btn" onclick="closeModal(event)">×</button>
+            <div class="detail-cover" id="modal-cover">🧩</div>
+            <div class="detail-info">
+                <div class="card-badge blue" style="margin-bottom: 15px;" id="modal-category">어휘</div>
+                <h1 class="detail-title" id="modal-title">퀴즈 제목</h1>
+                <div class="detail-sub" id="modal-sub">출제자: 엔터핑</div>
+
+                <div class="detail-stats">
+                    <div class="stat-item">
+                        <span class="label">난이도</span>
+                        <span class="value" id="modal-difficulty">⭐⭐⭐</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">문제 수</span>
+                        <span class="value" id="modal-q-count">10문제</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">참여자</span>
+                        <span class="value" id="modal-players">0명</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">퀴즈 유형</span>
+                        <span class="value" id="modal-type">객관식</span>
+                    </div>
+                </div>
+
+                <p class="detail-desc" id="modal-desc">퀴즈 설명</p>
+
+                <div class="detail-actions">
+                    <button class="btn btn-blue-outline btn-large" style="flex: 1;" id="modal-start-btn">
+                        ▶ 퀴즈 시작하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ── 퀴즈 데이터 (API 연동) ──────────────────────────
+        let quizData = [];
+        let currentFilter = 'all';
+
+        const FILTER_ID_MAP = {
+            '제목맞추기': 'filter-title',
+            '가수맞추기': 'filter-artist',
+            '가사퀴즈':   'filter-lyrics',
+            '종합':       'filter-mixed'
+        };
+        const CAT_COLOR_MAP = {
+            '제목맞추기': 'pink',
+            '가수맞추기': 'blue',
+            '가사퀴즈':   'green',
+            '종합':       'pink',
+            'J-POP':      'green'
+        };
+
+        let isAdminMode = false;
+
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            const btn = document.getElementById('admin-mode-btn');
+            btn.innerText = `관리자 모드: ${isAdminMode ? 'ON' : 'OFF'}`;
+            btn.className = isAdminMode ? 'btn btn-blue-outline' : 'btn btn-outline';
+            btn.style.color = isAdminMode ? 'var(--color-blue)' : '';
+            btn.style.borderColor = isAdminMode ? 'var(--color-blue)' : '';
+            renderCards();
+        }
+
+        async function deleteQuiz(event, id) {
+            event.stopPropagation();
+            if (!confirm('정말로 이 퀴즈를 삭제하시겠습니까?')) return;
+            try {
+                const token = sessionStorage.getItem('ep_token');
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(`/api/quizzes/${id}`, {
+                    method: 'DELETE',
+                    headers: headers
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) throw new Error('로그인이 필요합니다.');
+                    if (response.status === 403) throw new Error('삭제 권한이 없습니다.');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('성공적으로 삭제되었습니다.');
+                    quizData = quizData.filter(item => item.id !== id);
+                    renderCards();
+                } else {
+                    alert('삭제에 실패했습니다: ' + (data.detail || data.message || '알 수 없는 오류'));
+                }
+            } catch (err) {
+                console.error('Failed to delete quiz', err);
+                alert(err.message || '서버 오류로 삭제에 실패했습니다.');
+            }
+        }
+
+        async function fetchQuizzes() {
+            try {
+                const res = await fetch('/api/quizzes');
+                const data = await res.json();
+                if (data.success) {
+                    quizData = data.data.map(q => {
+                        let emoji = '🎵';
+                        let gradient = 'linear-gradient(135deg, #FFD700, #FFA500)';
+                        
+                        if (q.category === '제목맞추기') {
+                            emoji = '🎵';
+                            gradient = 'linear-gradient(135deg, #FFD700, #FFA500)';
+                        } else if (q.category === '가수맞추기') {
+                            emoji = '🎤';
+                            gradient = 'linear-gradient(135deg, #6C3FE8, #FF8FAB)';
+                        } else if (q.category === '가사퀴즈') {
+                            emoji = '📝';
+                            gradient = 'linear-gradient(135deg, #52c41a, #73d13d)';
+                        } else if (q.category === '종합') {
+                            emoji = '🏆';
+                            gradient = 'linear-gradient(135deg, #ff4d4f, #ff7875)';
+                        }
+
+                        return {
+                            id: q.id,
+                            title: q.title,
+                            category: q.category,
+                            description: q.description || '',
+                            emoji: emoji,
+                            gradient: gradient,
+                            difficulty: q.difficulty || 3,
+                            questionCount: q.question_count,
+                            playerCount: 0,
+                            quizType: '주관식 단답형',
+                            comingSoon: false,
+                            creator_nickname: q.creator_nickname || '엔터핑'
+                        };
+                    });
+                    
+                    // 하드코딩된 '준비 중' 카드 제거
+
+                    renderCards();
+                }
+            } catch (err) {
+                console.error("퀴즈 목록 로드 실패:", err);
+            }
+        }
+
+        function filterQuiz(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+                btn.className = 'btn btn-outline';
+                btn.style.padding = '8px 20px';
+            });
+            const activeId = cat === 'all' ? 'filter-all' : (FILTER_ID_MAP[cat] || null);
+            if (activeId) {
+                const activeBtn = document.getElementById(activeId);
+                if (activeBtn) { activeBtn.className = 'btn btn-blue-outline'; activeBtn.style.padding = '8px 20px'; }
+            }
+            renderCards();
+        }
+
+        function diffStars(d) {
+            return '⭐'.repeat(d) + '☆'.repeat(Math.max(0, 5 - d));
+        }
+
+        function catLabel(cat) {
+            if (!cat) return '기타';
+            return cat.replace('맞추기', ' 맞추기').replace('퀴즈', ' 퀴즈');
+        }
+
+        function renderCards() {
+            const grid = document.getElementById('quiz-card-grid');
+            grid.innerHTML = '';
+            const filtered = currentFilter === 'all' ? quizData : quizData.filter(q => q.category === currentFilter);
+
+            filtered.forEach(quiz => {
+                const badgeColor = CAT_COLOR_MAP[quiz.category] || 'blue';
+                const comingSoonBadge = quiz.comingSoon ? `<span class="coming-soon-badge">COMING SOON</span>` : '';
+                const cardHTML = `
+                    <div class="quiz-card${quiz.comingSoon ? ' coming-soon' : ''}" onclick="openModal(${quiz.id})">
+                        <div class="quiz-thumbnail" style="background: ${quiz.gradient};">
+                            ${comingSoonBadge}
+                            <span class="quiz-thumbnail-emoji">${quiz.emoji}</span>
+                        </div>
+                        <div class="quiz-body">
+                            <div class="card-badge ${badgeColor}">${catLabel(quiz.category)}</div>
+                            <h3 class="card-title">${quiz.title}</h3>
+                            <p class="card-desc">${quiz.description.length > 50 ? quiz.description.substring(0, 50) + '...' : quiz.description}</p>
+                            <div class="quiz-meta" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div>
+                                    <span class="quiz-difficulty" title="난이도">${diffStars(quiz.difficulty)}</span>
+                                    <span class="quiz-count">📝 ${quiz.questionCount}문제 &nbsp;·&nbsp; 👥 ${quiz.playerCount.toLocaleString()}명</span>
+                                </div>
+                                ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem; border-radius: 8px; z-index: 10;" onclick="deleteQuiz(event, ${quiz.id})">삭제</button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        function openModal(id) {
+            const quiz = quizData.find(q => q.id === id);
+            if (!quiz) return;
+            const modal = document.getElementById('quiz-modal');
+            const badgeColor = CAT_COLOR_MAP[quiz.category] || 'blue';
+
+            document.getElementById('modal-cover').style.background = quiz.gradient;
+            document.getElementById('modal-cover').innerText = quiz.emoji;
+            document.getElementById('modal-title').innerText = quiz.title;
+            document.getElementById('modal-sub').innerText = '출제자: ' + quiz.creator_nickname;
+
+            const catBadge = document.getElementById('modal-category');
+            catBadge.innerText = catLabel(quiz.category);
+            catBadge.className = `card-badge ${badgeColor}`;
+            catBadge.style.marginBottom = '15px';
+
+            document.getElementById('modal-difficulty').innerText = diffStars(quiz.difficulty);
+            document.getElementById('modal-q-count').innerText = quiz.questionCount + '문제';
+            document.getElementById('modal-players').innerText = quiz.playerCount.toLocaleString() + '명';
+            document.getElementById('modal-type').innerText = quiz.quizType;
+            document.getElementById('modal-desc').innerText = quiz.description;
+
+            const startBtn = document.getElementById('modal-start-btn');
+            if (quiz.comingSoon) {
+                startBtn.innerText = '🔒 준비 중입니다';
+                startBtn.disabled = true;
+                startBtn.style.opacity = '0.5';
+                startBtn.style.cursor = 'not-allowed';
+            } else {
+                startBtn.innerText = '▶ 퀴즈 시작하기';
+                startBtn.disabled = false;
+                startBtn.style.opacity = '1';
+                startBtn.style.cursor = 'pointer';
+                startBtn.onclick = () => location.href = `quiz_detail.html?id=${quiz.id}`;
+            }
+
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal(e) {
+            const modal = document.getElementById('quiz-modal');
+            if (e && e.target !== modal && !e.target.classList.contains('modal-close-btn')) return;
+            modal.classList.remove('show');
+            setTimeout(() => { if (!modal.classList.contains('show')) modal.style.display = 'none'; }, 300);
+        }
+
+        // 초기 렌더링
+        fetchQuizzes();
+    </script>
+</body>
+</html>

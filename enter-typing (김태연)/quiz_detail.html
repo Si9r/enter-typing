@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>퀴즈 - 엔터핑</title>
+<link rel="stylesheet" href="style.css?v=1.0.3">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#f5f0ff;min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── 상단 헤더 ── */
+.quiz-header{background:#fff;border-bottom:1px solid #eee;padding:12px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.quiz-header .logo{font-weight:900;font-size:1.3rem;color:#2C3E50;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.quiz-header .logo img{height:36px;}
+.quiz-title-bar{font-weight:800;font-size:1.1rem;color:#2C3E50;}
+.quiz-back-btn{background:transparent;border:1.5px solid #ddd;border-radius:20px;padding:7px 18px;font-size:0.9rem;font-weight:700;cursor:pointer;color:#555;transition:all .2s;}
+.quiz-back-btn:hover{border-color:#aaa;color:#222;}
+
+/* ── 메인 레이아웃 ── */
+.quiz-layout{flex:1;display:grid;grid-template-columns:220px 1fr 220px;grid-template-rows:1fr auto;gap:20px;padding:24px 30px;max-width:1300px;margin:0 auto;width:100%;}
+
+/* ── 왼쪽 통계 패널 ── */
+.stats-panel{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:16px;}
+.stats-panel h3{font-size:0.9rem;font-weight:900;color:#888;letter-spacing:.5px;text-transform:uppercase;border-bottom:2px solid #f0e6ff;padding-bottom:10px;}
+.stat-box{background:#faf8ff;border-radius:14px;padding:14px 16px;border:1.5px solid #ede8ff;}
+.stat-box .s-label{font-size:0.78rem;font-weight:700;color:#aaa;margin-bottom:6px;}
+.stat-box .s-value{font-size:2rem;font-weight:900;color:#6C3FE8;}
+
+/* ── 중앙 레코드 ── */
+.record-panel{background:#fff;border-radius:24px;padding:30px 20px;box-shadow:0 4px 20px rgba(0,0,0,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;}
+.record-wrap{position:relative;width:320px;height:320px;cursor:pointer;}
+.record{width:320px;height:320px;border-radius:50%;background:conic-gradient(#1a1a2e 0deg,#2d2d44 45deg,#1a1a2e 90deg,#2d2d44 135deg,#1a1a2e 180deg,#2d2d44 225deg,#1a1a2e 270deg,#2d2d44 315deg,#1a1a2e 360deg);box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .1s;position:relative;overflow:hidden;}
+.record::before{content:'';position:absolute;inset:25px;border-radius:50%;border:1px solid rgba(255,255,255,.07);}
+.record::after{content:'';position:absolute;inset:65px;border-radius:50%;border:1px solid rgba(255,255,255,.07);}
+.record-hole{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 12px rgba(0,0,0,.15);}
+.record-hole .q-mark{font-size:2.4rem;font-weight:900;color:#FF8FAB;}
+.record-wrap:hover .record{box-shadow:0 12px 40px rgba(108,63,232,.35);}
+.record-wrap.spinning .record{animation:spin 2s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.record-hint{font-size:1.3rem;color:#aaa;font-weight:700;letter-spacing:.5px;text-align:center;padding:0 10px;}
+.record-hint.active{color:#6C3FE8;}
+
+/* ── 오른쪽 작품정보 ── */
+.info-panel{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:14px;}
+.info-panel h3{font-size:0.9rem;font-weight:900;color:#888;letter-spacing:.5px;text-transform:uppercase;border-bottom:2px solid #f0e6ff;padding-bottom:10px;}
+.album-thumb{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#c9b8ff,#8ec5fc);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+.album-thumb.revealed{background:linear-gradient(135deg,#FFB6C1,#ADD8E6);}
+.info-label{font-size:0.78rem;font-weight:700;color:#aaa;margin-bottom:4px;}
+.info-value{font-size:1rem;font-weight:800;color:#2C3E50;}
+.info-hidden{color:#ccc;letter-spacing:4px;}
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.tag{background:#f0e6ff;color:#6C3FE8;border-radius:10px;padding:4px 10px;font-size:0.75rem;font-weight:700;}
+
+/* ── 힌트 버튼 ── */
+.hint-btn{background:transparent;border:1.5px dashed #6C3FE8;color:#6C3FE8;border-radius:10px;padding:8px 16px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .2s;width:100%;}
+.hint-btn:hover:not(:disabled){background:#f0e6ff;}
+.hint-btn:disabled{border-color:#ccc;color:#999;cursor:not-allowed;}
+.hint-box{background:#faf8ff;border-radius:10px;padding:10px 14px;font-size:0.88rem;color:#555;border-left:3px solid #6C3FE8;display:none;margin-bottom:10px;}
+
+/* ── 하단 답변 영역 ── */
+.bottom-area{grid-column:1/3;display:flex;flex-direction:column;gap:12px;}
+.answer-log{background:#fff;border-radius:20px;padding:20px;height:180px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,.06);font-size:0.95rem;color:#555;display:block;}
+.log-item{padding:8px 14px;border-radius:12px;background:#faf8ff;border-left:3px solid #c9b8ff;margin-bottom:8px;}
+.log-item.correct{background:#f0fff4;border-left-color:#52c41a;color:#237804;}
+.log-item.wrong{background:#fff1f0;border-left-color:#ff4d4f;color:#cf1322;}
+.answer-input-row{display:flex;gap:10px;}
+.answer-input{flex:1;border:2px solid #ede8ff;border-radius:14px;padding:14px 18px;font-size:1rem;font-weight:700;font-family:inherit;outline:none;transition:border-color .2s;color:#2C3E50;}
+.answer-input:focus{border-color:#6C3FE8;}
+.answer-input:disabled{background:#f5f5f5;color:#bbb;}
+.submit-btn{background:#6C3FE8;color:#fff;border:none;border-radius:14px;padding:14px 28px;font-size:1rem;font-weight:900;cursor:pointer;transition:all .2s;font-family:inherit;}
+.submit-btn:hover{background:#5830c8;transform:translateY(-2px);}
+.submit-btn:disabled{background:#ddd;cursor:not-allowed;transform:none;}
+.pass-btn{background:#f0e6ff;color:#6C3FE8;border:none;border-radius:14px;padding:14px 20px;font-size:1rem;font-weight:900;cursor:pointer;transition:all .2s;font-family:inherit;}
+.pass-btn:hover{background:#e2d4ff;transform:translateY(-2px);}
+.pass-btn:disabled{background:#f5f5f5;color:#bbb;cursor:not-allowed;transform:none;}
+
+/* ── 하단 우측 모드 패널 ── */
+.mode-panel{background:#fff;border-radius:20px;padding:22px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.mode-panel h3{font-size:0.9rem;font-weight:900;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;border-bottom:2px solid #f0e6ff;padding-bottom:10px;}
+.mode-label{font-size:1.1rem;font-weight:900;color:#2C3E50;margin-bottom:12px;}
+.player-item{display:flex;align-items:center;gap:10px;padding:8px 0;}
+.player-dot{width:12px;height:12px;border-radius:50%;background:#6C3FE8;flex-shrink:0;}
+.player-name{font-weight:700;font-size:0.95rem;color:#444;}
+
+/* ── 시작 오버레이 ── */
+.start-overlay{position:fixed;inset:0;background:rgba(108,63,232,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:24px;opacity:0;pointer-events:none;transition:opacity .4s;}
+.start-overlay.show{opacity:1;pointer-events:all;}
+.start-overlay h2{font-size:2.5rem;font-weight:900;color:#fff;text-align:center;}
+.start-overlay p{font-size:1.1rem;color:rgba(255,255,255,.8);text-align:center;}
+.start-record{width:180px;height:180px;border-radius:50%;background:conic-gradient(#fff2 0deg,#fff4 45deg,#fff2 90deg,#fff4 135deg,#fff2 180deg,#fff4 225deg,#fff2 270deg,#fff4 315deg,#fff2 360deg);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .3s,box-shadow .3s;box-shadow:0 0 0 rgba(255,255,255,.3);}
+.start-record:hover{transform:scale(1.08);box-shadow:0 0 40px rgba(255,255,255,.4);}
+.start-record .play-icon{font-size:4rem;}
+
+/* ── 로딩 오버레이 ── */
+.loading-overlay{position:fixed;inset:0;background:rgba(108,63,232,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px;}
+.loading-overlay p{font-size:1.2rem;font-weight:700;color:#fff;}
+
+/* ── 결과 배너 ── */
+.result-banner{display:none;background:linear-gradient(135deg,#6C3FE8,#FF8FAB);color:#fff;border-radius:14px;padding:14px 20px;text-align:center;font-weight:900;font-size:1.1rem;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── 재생 상태 ── */
+.playback-status{font-size:1.3rem;font-weight:900;margin-bottom:14px;transition:color .2s;color:#aaa;}
+.playback-status.playing{color:#6C3FE8;}
+/* 볼륨 슬라이더 스타일 */
+.volume-container {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+.volume-icon {
+    font-size: 1.2rem;
+}
+.volume-slider {
+    width: 100px;
+    cursor: pointer;
+    accent-color: var(--color-pink);
+}
+</style>
+</head>
+<body>
+
+<!-- 로딩 오버레이 -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="start-record" style="cursor:default;">
+    <span class="play-icon">🎵</span>
+  </div>
+  <p>퀴즈 불러오는 중...</p>
+</div>
+
+<!-- 헤더 -->
+<header class="quiz-header">
+  <div class="logo" onclick="location.href='index.html'">
+    <img src="assets/logo_icon.png" alt="엔터핑">
+    <span>엔터핑</span>
+  </div>
+  <div class="quiz-title-bar" id="page-title">🎵 뮤직 퀴즈</div>
+  <button class="quiz-back-btn" onclick="location.href='quiz_list.html'">← 목록으로</button>
+</header>
+
+<!-- 시작 오버레이 -->
+<div class="start-overlay" id="start-overlay">
+  <h2 id="overlay-title">🎵 뮤직 퀴즈</h2>
+  <p>레코드를 클릭하면 퀴즈가 시작됩니다</p>
+  <div class="start-record" onclick="startQuiz()">
+    <span class="play-icon">▶</span>
+  </div>
+  <p style="font-size:.9rem;opacity:.7;">총 <span id="overlay-count">?</span>문제 · 주관식 단답형</p>
+</div>
+
+<!-- 메인 그리드 -->
+<div class="quiz-layout">
+
+  <!-- 왼쪽: 통계 -->
+  <aside class="stats-panel">
+    <h3>퀴즈 통계</h3>
+    <div class="stat-box">
+      <div class="s-label">현재 문제</div>
+      <div class="s-value" id="stat-cur">-</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">정답 수</div>
+      <div class="s-value" id="stat-correct">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="s-label">점수</div>
+      <div class="s-value" id="stat-score">0</div>
+    </div>
+  </aside>
+
+  <!-- 중앙: 레코드 -->
+  <section class="record-panel">
+    <div class="playback-status" id="playback-status">대기 중</div>
+    <div class="record-wrap" id="record-wrap" onclick="togglePlay()">
+      <div class="record" id="record-disc">
+        <div class="record-hole">
+          <span class="q-mark" id="record-icon">🎵</span>
+        </div>
+      </div>
+    </div>
+    <div class="volume-container">
+        <span class="volume-icon">🔊</span>
+        <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.05" value="1.0">
+    </div>
+    <div class="record-hint" id="record-hint">레코드를 클릭해 퀴즈를 시작하세요</div>
+    <div class="result-banner" id="result-banner"></div>
+  </section>
+
+  <!-- 숨겨진 YouTube 플레이어 (200x113 코너마) -->
+  <div style="position:fixed; bottom:-250px; left:0; width:200px; height:113px; overflow:hidden; z-index:-1; pointer-events:none;">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- 오른쪽: 작품정보 -->
+  <aside class="info-panel">
+    <h3>작품 정보</h3>
+    <div class="album-thumb" id="album-thumb">🎵</div>
+    <div>
+      <div class="info-label">노래 제목</div>
+      <div class="info-value info-hidden" id="info-title">???</div>
+    </div>
+    <div>
+      <div class="info-label">힌트</div>
+      <div class="hint-box" id="hint-box">-</div>
+      <button class="hint-btn" id="hint-btn" onclick="showHint()" disabled>💡 힌트 보기</button>
+    </div>
+    <div>
+      <div class="info-label">태그</div>
+      <div class="tag-list" id="info-tags">
+        <span class="tag">J-POP</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 하단 중앙: 답변 영역 -->
+  <div class="bottom-area">
+    <div class="answer-log" id="answer-log">
+      <div style="color:#ccc;font-weight:700;text-align:center;margin:auto;">퀴즈를 시작하면 여기에 기록이 남습니다</div>
+    </div>
+    <div class="answer-input-row">
+      <input class="answer-input" id="answer-input" type="text" placeholder="레코드를 클릭해 퀴즈를 시작하세요" disabled>
+      <button class="pass-btn" id="pass-btn" onclick="passQuestion()" disabled>패스</button>
+      <button class="submit-btn" id="submit-btn" onclick="submitAnswer()" disabled>제출</button>
+    </div>
+  </div>
+
+  <!-- 하단 우측: 모드 -->
+  <div class="mode-panel">
+    <h3>모드</h3>
+    <div class="mode-label">솔로 플레이</div>
+    <div class="player-item">
+      <div class="player-dot"></div>
+      <div class="player-name" id="player-name">나</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 외부로 분리된 퀴즈 엔진 -->
+<script src="quiz_engine.js"></script>
+
+</body>
+</html>

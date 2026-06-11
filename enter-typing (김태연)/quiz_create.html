@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 만들기 - EnterPing</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--color-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 100px auto 50px;
+            padding: 40px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: var(--color-navy);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--color-text-muted);
+            margin-bottom: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 24px;
+            background: #fffafa; /* 아주 연한 핑크 바탕 */
+            border-radius: 16px;
+            border: 1px solid rgba(255, 182, 193, 0.3); /* 연한 핑크 테두리 */
+        }
+
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-pink);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text-main);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--color-border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-pink);
+            box-shadow: 0 0 0 4px rgba(255, 182, 193, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .question-card {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--color-pink);
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.15);
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--color-pink);
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed rgba(255, 182, 193, 0.4);
+        }
+
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .row > .form-group {
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--color-pink);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #ff858a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--color-text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-add-question {
+            width: 100%;
+            padding: 14px;
+            background-color: transparent;
+            color: var(--color-pink);
+            border: 2px dashed var(--color-pink);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .btn-add-question:hover {
+            background-color: rgba(255, 182, 193, 0.1);
+        }
+
+        .btn-add-question:disabled {
+            display: none;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-top: 6px;
+            display: block;
+        }
+
+        .alert-info {
+            background-color: #fff0f2;
+            border-left: 4px solid var(--color-pink);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            color: #d6336c;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='index.html'">
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="typing_list.html">타이핑</a>
+                <a href="quiz_list.html" class="active">퀴즈</a>
+                <a href="ranking.html">랭킹</a>
+                <a href="notice.html">공지</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='search.html'">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="퀴즈 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
+                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>J-POP 퀴즈 만들기</h1>
+        <p class="subtitle">나만의 J-POP 퀴즈를 만들고 친구들과 공유해보세요!</p>
+
+        <div class="alert-info">
+            <strong>📢 주관식 퀴즈 작성 안내</strong><br>
+            모든 문제는 <strong>주관식</strong>으로 진행되며 유튜브 음원만 재생됩니다.<br>
+            <strong>정답에 한국어(한글)는 사용할 수 없습니다. 일본어(히라가나, 가타카나, 한자) 및 로마자(영어)만 허용됩니다.</strong><br>
+            정답 판별 시 가타카나와 히라가나는 서로 호환되지만, 띄어쓰기 등 기타 오답을 방지하기 위해 <strong>복수 정답</strong>을 넉넉히 입력해주세요!
+        </div>
+
+        <form id="quizForm">
+            <!-- 퀴즈 기본 정보 -->
+            <div class="form-section">
+                <div class="form-section-title">📝 퀴즈 기본 정보</div>
+                
+                <div class="form-group">
+                    <label for="title">퀴즈 제목</label>
+                    <input type="text" id="title" placeholder="예: [난이도 헬] 2023년 J-POP 메가히트곡 맞추기" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">퀴즈 설명</label>
+                    <textarea id="description" placeholder="이 퀴즈에 대한 간단한 설명을 적어주세요."></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="category">카테고리</label>
+                        <select id="category">
+                            <option value="제목맞추기">🎵 제목 맞추기</option>
+                            <option value="가수맞추기">🎤 가수 맞추기</option>
+                            <option value="가사퀴즈">📝 가사 퀴즈</option>
+                            <option value="종합">🏆 종합</option>
+                        </select>
+                        <span class="help-text">퀴즈의 유형을 선택해주세요.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="difficulty">난이도</label>
+                        <select id="difficulty">
+                            <option value="1">⭐ (매우 쉬움)</option>
+                            <option value="2">⭐⭐ (쉬움)</option>
+                            <option value="3" selected>⭐⭐⭐ (보통)</option>
+                            <option value="4">⭐⭐⭐⭐ (어려움)</option>
+                            <option value="5">⭐⭐⭐⭐⭐ (매우 어려움)</option>
+                        </select>
+                        <span class="help-text">퀴즈의 난이도를 1~5개로 선택해주세요.</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="question_count">목표 문제 수 선택</label>
+                    <select id="question_count" onchange="handleCountChange()">
+                        <option value="1">1개 (테스트용)</option>
+                        <option value="5" selected>5개</option>
+                        <option value="10">10개</option>
+                        <option value="15">15개</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 문제 목록 영역 -->
+            <div class="form-section" style="background: transparent; border: none; padding: 0;">
+                <div class="form-section-title">🎧 문제 구성</div>
+                <div id="questionsContainer">
+                    <!-- JavaScript로 문제 입력 폼들이 렌더링됩니다 -->
+                </div>
+                
+                <button type="button" class="btn-add-question" id="addQuestionBtn" onclick="addQuestionField()">+ 문제 추가 (1/5)</button>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">🚀 퀴즈 생성 완료하기</button>
+        </form>
+    </div>
+
+    <script src="navbar.js"></script>
+    <script>
+        let currentDisplayedCount = 0;
+        let editQuizId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = sessionStorage.getItem('ep_token');
+            if (!token) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                editQuizId = urlParams.get('id');
+                document.getElementById('submitBtn').textContent = '🚀 퀴즈 수정 완료하기';
+                document.querySelector('h1').textContent = 'J-POP 퀴즈 수정하기';
+                await loadQuizData(editQuizId);
+            } else {
+                // 최초 로딩 시 1개의 카드만 보여줍니다.
+                handleCountChange();
+            }
+        });
+
+        async function loadQuizData(id) {
+            try {
+                const res = await fetch(`/api/quizzes/${id}`);
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert('퀴즈를 불러올 수 없습니다.');
+                    return;
+                }
+                
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('category').value = data.category || '제목맞추기';
+                document.getElementById('difficulty').value = data.difficulty || 3;
+                
+                const qCount = data.questions.length;
+                let selectVal = "5";
+                if (qCount <= 1) selectVal = "1";
+                else if (qCount <= 5) selectVal = "5";
+                else if (qCount <= 10) selectVal = "10";
+                else selectVal = "15";
+                
+                document.getElementById('question_count').value = selectVal;
+                
+                const container = document.getElementById('questionsContainer');
+                container.innerHTML = '';
+                currentDisplayedCount = 0;
+                
+                data.questions.forEach((q, idx) => {
+                    addQuestionField();
+                    const i = idx + 1;
+                    document.getElementById(`q${i}_text`).value = q.question_text ?? '';
+                    document.getElementById(`q${i}_url`).value = q.youtube_url ?? '';
+                    document.getElementById(`q${i}_start`).value = (q.start_time != null) ? q.start_time : '';
+                    document.getElementById(`q${i}_end`).value = (q.end_time != null) ? q.end_time : '';
+                    document.getElementById(`q${i}_ans`).value = q.answer ?? '';
+                    document.getElementById(`q${i}_alt`).value = q.alternative_answers ?? '';
+                    document.getElementById(`q${i}_hint`).value = q.hint ?? '';
+                });
+                updateAddButton();
+            } catch (err) {
+                console.error(err);
+                alert('퀴즈 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+
+        function handleCountChange() {
+            // 목표 갯수가 바뀌면 1개로 초기화합니다.
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            currentDisplayedCount = 0;
+            addQuestionField(); // 첫 문제 추가
+            updateAddButton();
+        }
+
+        function updateAddButton() {
+            const targetCount = parseInt(document.getElementById('question_count').value);
+            const btn = document.getElementById('addQuestionBtn');
+            
+            if (currentDisplayedCount >= targetCount) {
+                btn.disabled = true;
+            } else {
+                btn.disabled = false;
+                btn.textContent = `+ 문제 추가 (${currentDisplayedCount}/${targetCount})`;
+            }
+        }
+
+        function addQuestionField() {
+            const targetCount = parseInt(document.getElementById('question_count').value);
+            if (currentDisplayedCount >= targetCount) return;
+
+            currentDisplayedCount++;
+            const container = document.getElementById('questionsContainer');
+            const i = currentDisplayedCount;
+
+            const html = `
+                <div class="question-card" id="questionCard_${i}">
+                    <div class="question-header">문제 ${i}</div>
+                    
+                    <div class="form-group">
+                        <label for="q${i}_text">문제 질문 <span style="color:red">*</span></label>
+                        <input type="text" id="q${i}_text" placeholder="예: 이 노래의 제목은?" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="q${i}_url">유튜브 영상 URL <span style="color:red">*</span></label>
+                        <input type="text" id="q${i}_url" placeholder="https://www.youtube.com/watch?v=..." required>
+                        <span class="help-text">입력한 유튜브 영상의 소리만 추출되어 재생됩니다.</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="q${i}_start">시작 시간 (초 또는 분:초)</label>
+                            <input type="text" id="q${i}_start" placeholder="예: 1:30 또는 90">
+                        </div>
+                        <div class="form-group">
+                            <label for="q${i}_end">종료 시간 (초 또는 분:초)</label>
+                            <input type="text" id="q${i}_end" placeholder="미입력시 5초 뒤">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="q${i}_ans">정답 <span style="color:red">*</span></label>
+                            <input type="text" id="q${i}_ans" placeholder="정확한 정답 입력" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="q${i}_alt">복수 정답 (선택)</label>
+                            <input type="text" id="q${i}_alt" placeholder="세미콜론(;)으로 구분. 예: 아이브;IVE;ive">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="q${i}_hint">힌트 (선택)</label>
+                        <input type="text" id="q${i}_hint" placeholder="문제 풀이 중 보여줄 힌트">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            updateAddButton();
+        }
+
+        function parseTime(val) {
+            if (!val) return 0;
+            const str = String(val).trim();
+            if (str.includes(':')) {
+                const parts = str.split(':');
+                return parseInt(parts[0] || 0) * 60 + parseInt(parts[1] || 0);
+            }
+            return parseInt(str) || 0;
+        }
+
+        document.getElementById('quizForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = sessionStorage.getItem('ep_token');
+            if (!token) {
+                alert('로그인이 만료되었습니다.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const targetCount = parseInt(document.getElementById('question_count').value);
+            
+            if (currentDisplayedCount < targetCount) {
+                alert(`목표 문제 수(${targetCount}개)를 아직 다 채우지 않았습니다. 현재 ${currentDisplayedCount}개 작성 완료.`);
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = editQuizId ? '퀴즈 수정 중...' : '퀴즈 생성 중...';
+
+            const count = targetCount;
+            const questions = [];
+
+            for (let i = 1; i <= count; i++) {
+                let sTime = parseTime(document.getElementById(`q${i}_start`).value);
+                let eTimeStr = document.getElementById(`q${i}_end`).value;
+                let eTime = eTimeStr ? parseTime(eTimeStr) : sTime + 5;
+                
+
+                let ans = document.getElementById(`q${i}_ans`).value;
+                let alt = document.getElementById(`q${i}_alt`).value;
+                
+                const blockedRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+                if (blockedRegex.test(ans) || blockedRegex.test(alt)) {
+                    alert(`[문제 ${i}] 정답에는 한국어를 사용할 수 없습니다. 일본어(히라가나/가타카나/한자) 또는 영어(로마자)로 입력해주세요.`);
+                    btn.disabled = false;
+                    btn.textContent = '🚀 퀴즈 생성 완료하기';
+                    return;
+                }
+
+                questions.push({
+                    question_number: i,
+                    question_text: document.getElementById(`q${i}_text`).value,
+                    youtube_url: document.getElementById(`q${i}_url`).value,
+                    start_time: sTime,
+                    end_time: eTime,
+                    answer: ans,
+                    alternative_answers: alt,
+                    hint: document.getElementById(`q${i}_hint`).value
+                });
+            }
+
+            const payload = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                difficulty: parseInt(document.getElementById('difficulty').value),
+                questions: questions
+            };
+
+            try {
+                const method = editQuizId ? 'PUT' : 'POST';
+                const url = editQuizId ? `/api/quizzes/${editQuizId}` : '/api/quizzes';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(editQuizId ? '퀴즈가 성공적으로 수정되었습니다!' : '퀴즈가 성공적으로 생성되었습니다!');
+                    window.location.href = `quiz_list.html`; // 일단 quiz 목록/메인 페이지로 이동
+                } else {
+                    alert((editQuizId ? '수정 실패: ' : '생성 실패: ') + (data.detail || data.message));
+                    btn.disabled = false;
+                    btn.textContent = editQuizId ? '🚀 퀴즈 수정 완료하기' : '🚀 퀴즈 생성 완료하기';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버와 통신 중 오류가 발생했습니다.');
+                btn.disabled = false;
+                btn.textContent = editQuizId ? '🚀 퀴즈 수정 완료하기' : '🚀 퀴즈 생성 완료하기';
+            }
+        });
+    </script>
+</body>
+</html>

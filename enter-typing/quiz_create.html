@@ -597,6 +597,15 @@
                                     </label>
                                     <input type="text" id="quiz-lyrics" placeholder="맞춰야 할 가사를 입력하세요">
                                 </div>
+                                <div class="answer-input-container">
+                                    <label
+                                        style="width: 100px; font-weight: 700; color: #555; display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                                        <input type="checkbox" id="toggle-hint" checked
+                                            style="width: 16px; height: 16px; accent-color: var(--color-pink); cursor: pointer;">
+                                        힌트
+                                    </label>
+                                    <input type="text" id="quiz-hint" placeholder="힌트를 입력하세요 (선택사항)">
+                                </div>
                             </div>
                             <button class="btn-submit" id="btn-add-quiz"
                                 style="width: 60px; font-size: 2rem; display: flex; align-items: center; justify-content: center;">›</button>
@@ -689,10 +698,12 @@
         const quizSingerInput = document.getElementById('quiz-singer');
         const quizTitleInput = document.getElementById('quiz-title');
         const quizLyricsInput = document.getElementById('quiz-lyrics');
+        const quizHintInput = document.getElementById('quiz-hint');
 
         const toggleSinger = document.getElementById('toggle-singer');
         const toggleTitle = document.getElementById('toggle-title');
         const toggleLyrics = document.getElementById('toggle-lyrics');
+        const toggleHint = document.getElementById('toggle-hint');
 
         function updateAnswerInputsState() {
             quizSingerInput.disabled = !toggleSinger.checked;
@@ -706,11 +717,16 @@
             quizLyricsInput.disabled = !toggleLyrics.checked;
             if (!toggleLyrics.checked) quizLyricsInput.value = '';
             quizLyricsInput.style.backgroundColor = toggleLyrics.checked ? '' : '#f5f5f5';
+
+            quizHintInput.disabled = !toggleHint.checked;
+            if (!toggleHint.checked) quizHintInput.value = '';
+            quizHintInput.style.backgroundColor = toggleHint.checked ? '' : '#f5f5f5';
         }
 
         toggleSinger.addEventListener('change', updateAnswerInputsState);
         toggleTitle.addEventListener('change', updateAnswerInputsState);
         toggleLyrics.addEventListener('change', updateAnswerInputsState);
+        toggleHint.addEventListener('change', updateAnswerInputsState);
 
         updateAnswerInputsState();
 
@@ -975,6 +991,7 @@
                     <div class="quiz-info"><span>가수</span> ${line.singer || '-'}</div>
                     <div class="quiz-info"><span>제목</span> ${line.title || '-'}</div>
                     <div class="quiz-info"><span>가사</span> ${line.lyrics || '-'}</div>
+                    <div class="quiz-info"><span>힌트</span> ${line.hint || '-'}</div>
                     <div class="del-icon" data-index="${index}" title="삭제">🗑️</div>
                 `;
 
@@ -997,6 +1014,7 @@
             const singer = toggleSinger.checked ? quizSingerInput.value.trim() : '';
             const title = toggleTitle.checked ? quizTitleInput.value.trim() : '';
             const lyrics = toggleLyrics.checked ? quizLyricsInput.value.trim() : '';
+            const hint = toggleHint.checked ? quizHintInput.value.trim() : '';
 
             const youtube_id = extractVideoId(ytInput.value);
             if (!youtube_id) return alert("현재 문제에 해당하는 유튜브 URL을 입력해주세요.");
@@ -1006,9 +1024,9 @@
             if (start >= end && end !== 0) return alert("종료 시간은 시작 시간보다 커야 합니다.");
 
             if (editingIndex === -1) {
-                linesData.push({ start, end, singer, title, lyrics, youtube_id });
+                linesData.push({ start, end, singer, title, lyrics, hint, youtube_id });
             } else {
-                linesData[editingIndex] = { start, end, singer, title, lyrics, youtube_id };
+                linesData[editingIndex] = { start, end, singer, title, lyrics, hint, youtube_id };
             }
 
             resetForm();
@@ -1029,10 +1047,12 @@
             toggleSinger.checked = !!line.singer;
             toggleTitle.checked = !!line.title;
             toggleLyrics.checked = !!line.lyrics;
+            toggleHint.checked = !!line.hint;
 
             quizSingerInput.value = line.singer || '';
             quizTitleInput.value = line.title || '';
             quizLyricsInput.value = line.lyrics || '';
+            quizHintInput.value = line.hint || '';
 
             updateAnswerInputsState();
 
@@ -1078,6 +1098,7 @@
             quizSingerInput.value = '';
             quizTitleInput.value = '';
             quizLyricsInput.value = '';
+            quizHintInput.value = '';
 
             btnAddQuiz.style.display = 'flex'; // It's flex in style
             btnConfirmEdit.style.display = 'none';

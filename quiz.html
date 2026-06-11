@@ -1,19 +1,218 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>퀴즈 페이지</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: var(--color-ivory); }
-        h1 { color: var(--color-text-main); margin-bottom: 20px; }
-        a { text-decoration: none; color: var(--color-blue); font-weight: bold; font-size: 1.2rem; padding: 10px 20px; border: 2px solid var(--color-blue); border-radius: 10px; transition: all 0.3s; }
-        a:hover { background-color: var(--color-blue); color: white; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#faf9fc">
+  <title>イントロクイズ - エンターピング</title>
+  <link rel="stylesheet" href="quiz.css">
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- YouTube Iframe Player API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-    <h1>이곳은 퀴즈 페이지입니다.</h1>
-    <a href="index.html">메인으로 돌아가기</a>
+  <!-- Header Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">♪</span>
+      <span>エンターピング</span>
+    </div>
+    <nav class="top-nav" aria-label="メニュー">
+      <a href="TPprofile.html">マイページ</a>
+      <a href="typing.html">タイピング</a>
+      <a href="quiz.html" class="active">クイズ</a>
+      <a href="#">告知</a>
+      <a href="TPprofile.html">プロフィール</a>
+    </nav>
+  </header>
+
+  <!-- Main Content Page -->
+  <main class="page">
+    <section class="page-head">
+      <span class="label">MUSIC QUIZ</span>
+      <h1>J-POP イントロクイズ</h1>
+      <p>YouTubeで流れるメロディを聴いて、正しい曲名をテキスト入力で当てましょう！</p>
+    </section>
+
+    <!-- 2-Row Layout Matching Typing Game Layout -->
+    <div class="game-grid">
+      
+      <!-- TOP ROW -->
+      <!-- Left Card: Quiz Stats -->
+      <section class="card stats-card">
+        <h2>クイズ統計</h2>
+        <div class="stats-grid-2x2">
+          <div class="stats-subcard">
+            <small>問題番号</small>
+            <strong id="currentQuestionNum">0 / 5</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>現在のスコア</small>
+            <strong id="currentScore">0</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>現在の連勝</small>
+            <strong id="currentStreak" class="highlight-color">0</strong>
+          </div>
+          <div class="stats-subcard">
+            <small>お手つき (残ライフ)</small>
+            <strong id="lifeCount">❤️ ❤️ ❤️</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Card: Video Player (Listening Mode) -->
+      <section class="game-card player-card" id="game-area">
+        <div class="video-container">
+          <!-- The actual YouTube video player iframe container -->
+          <div id="player-wrapper">
+            <div id="youtube-player"></div>
+          </div>
+          
+          <!-- Visual Listening Cover overlay to prevent cheating by watching the MV -->
+          <div class="listening-cover" id="listeningCover">
+            <div class="visualizer">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </div>
+            <p class="status-text">Now Listening...</p>
+          </div>
+
+          <!-- Start Screen Overlay -->
+          <div class="overlay" id="start-overlay">
+            <div class="overlay-content">
+              <span class="icon">🎵</span>
+              <h2>Music Quiz</h2>
+              <p>準備ができたら「クイズを始める」ボタンをクリックしてください。（全5問）</p>
+              <button class="btn btn-start" id="startBtn" type="button" disabled>読み込み中...</button>
+            </div>
+          </div>
+
+          <!-- Pause Screen Overlay -->
+          <div class="overlay" id="pause-overlay" style="display: none;">
+            <div class="overlay-content">
+              <span class="icon">⏸️</span>
+              <h2>一時停止中</h2>
+              <button class="btn btn-resume" id="resumeBtn" type="button">プレイを再開</button>
+            </div>
+          </div>
+
+          <!-- Result Score Board Overlay -->
+          <div class="overlay" id="result-overlay" style="display: none;">
+            <div class="overlay-content result-content">
+              <span class="icon">🏆</span>
+              <h2>QUIZ FINISH!</h2>
+              <p class="summary-lead">プレイ結果</p>
+              
+              <div class="result-stats">
+                <div class="res-card">
+                  <small>SCORE</small>
+                  <strong id="resScore">0</strong>
+                </div>
+                <div class="res-card">
+                  <small>正解率</small>
+                  <strong id="resAccuracy">0%</strong>
+                </div>
+                <div class="res-card">
+                  <small>正解数</small>
+                  <strong id="resCorrect">0 / 5</strong>
+                </div>
+                <div class="res-card">
+                  <small>最大連勝</small>
+                  <strong id="resStreak">0</strong>
+                </div>
+              </div>
+
+              <!-- Score Submit Form -->
+              <form id="scoreForm" class="score-form">
+                <label for="usernameInput">ランキング登録用ニックネーム:</label>
+                <div class="input-row">
+                  <input type="text" id="usernameInput" placeholder="ニックネームを入力" maxlength="15" required>
+                  <button type="submit" class="btn btn-submit" id="submitScoreBtn">登録</button>
+                </div>
+                <p id="scoreMsg" class="score-msg" role="alert"></p>
+              </form>
+
+              <div class="btn-row">
+                <button class="btn btn-restart" id="restartBtn" type="button">もう一度挑戦</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Time Progress bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Card: Quiz Info & Instructions -->
+      <section class="card video-info-card">
+        <h2>クイズルール</h2>
+        <div class="video-info-content">
+          <div class="instruction-body">
+            <p>1. 曲が流れたらその曲の曲名を入力してください。</p>
+            <p>2. 漢字・ひらがな・カタカナ・英語・ローマ字入力に対応しています。</p>
+            <p>3. 正解するとスコアが入ります。早く答えるほど高得点！</p>
+            <p>4. 3回間違えるとゲームオーバーです。</p>
+          </div>
+          
+          <div class="hint-section">
+            <button class="btn btn-hint" id="hintBtn" type="button">💡 アーティスト名のヒントを表示</button>
+            <p id="hintText" class="hint-text"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTTOM ROW -->
+      <!-- Left Card: Vinyl Spin Animation -->
+      <section class="card jacket-card">
+        <div class="vinyl-wrapper" id="vinylWrapper">
+          <div class="vinyl-record">
+            <div class="vinyl-label">🎵</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Card: Guess Input Area -->
+      <section class="card guess-input-card" id="input-board">
+        <h2>解答を入力</h2>
+        <form id="guessForm" class="guess-form-container" novalidate>
+          <div class="input-group">
+            <input type="text" id="guessInput" placeholder="曲名を入力してください..." autocomplete="off" required disabled>
+            <button type="submit" class="btn btn-guess" id="submitGuessBtn" disabled>送信</button>
+          </div>
+        </form>
+        <div class="feedback-area" id="feedbackArea">
+          <span class="feedback-icon" id="feedbackIcon"></span>
+          <p class="feedback-text" id="feedbackText">回答を待っています...</p>
+          <p class="official-title-reveal" id="titleReveal"></p>
+          <button type="button" class="btn btn-next" id="nextQuestionBtn" hidden>次の問題へ ▶</button>
+        </div>
+      </section>
+
+      <!-- Right Card: Leaderboard -->
+      <section class="card mode-card">
+        <h2>ランキング (TOP 5)</h2>
+        <div class="mode-content">
+          <div class="leaderboard-section" style="border-top: none; padding-top: 0; margin-top: 0;">
+            <ul class="leaderboard-list" id="leaderboardList">
+              <li class="no-scores">ハイスコアなし</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="quiz.js"></script>
 </body>
 </html>

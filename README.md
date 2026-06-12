@@ -1,221 +1,163 @@
-# 엔터핑
+# Enter Typing
 
-엔터핑은 좋아하는 노래 가사와 엔터테인먼트 콘텐츠를 활용해 타이핑을 연습할 수 있는 웹 플랫폼입니다. 회원가입, 로그인, 출석 체크, 타이핑 콘텐츠 생성, YouTube 영상 연동, 히라가나/로마자 자동 변환 기능을 제공합니다.
+엔터핑은 타이핑 연습과 음악 퀴즈를 함께 제공하는 FastAPI 기반 웹 프로젝트입니다. 사용자는 타이핑/퀴즈 콘텐츠를 플레이하고 결과를 저장할 수 있으며, 마이페이지와 랭킹 화면에서 점수, 정답률, 콤보, 기록을 확인할 수 있습니다.
 
 ## 주요 기능
 
-- 이메일/비밀번호 기반 회원가입 및 로그인
-- JWT 토큰 기반 인증
-- 비밀번호 찾기용 이메일 인증번호 및 임시 비밀번호 발급
-- 닉네임 변경, 회원 탈퇴, 마이페이지 로그인 상태 관리
-- 출석 체크 기록
-- 타이핑 콘텐츠 목록 조회, 생성, 수정, 삭제
-- YouTube URL 또는 영상 ID 분석 및 임베드 정보 생성
-- 일본어 가사 입력 시 히라가나/로마자 자동 변환
-- YouTube IFrame API를 활용한 영상 재생 기반 타이핑 화면
-
-## 기술 스택
-
-### Backend
-
-- Python
-- FastAPI
-- SQLAlchemy
-- Pydantic
-- bcrypt
-- python-jose
-- python-dotenv
-- PyMySQL
-- pykakasi
-
-### Frontend
-
-- HTML
-- CSS
-- JavaScript
-- YouTube IFrame API
-
-### Database
-
-- MySQL
-- SQLite도 `DATABASE_URL` 설정을 통해 로컬 개발용으로 사용할 수 있습니다.
+- 회원가입, 로그인, 이메일 인증, 비밀번호 변경
+- 출석 기록 및 마이페이지 결과 조회
+- 타이핑 콘텐츠 목록, 상세, 제작, 수정, 삭제
+- 타이핑 결과 저장 및 통합 점수 계산
+- 음악 퀴즈 콘텐츠 목록, 플레이, 제작, 수정, 삭제
+- 퀴즈 점수, 콤보, 정답률 업데이트 및 결과 저장
+- 전체/타이핑/퀴즈 랭킹 조회
+- 정적 HTML/CSS/JS 기반 프론트엔드 제공
 
 ## 프로젝트 구조
 
 ```text
-.
-├── main.py                  # FastAPI 앱, API 라우트, 정적 페이지 서빙
-├── database.py              # SQLAlchemy DB 연결 설정
-├── models.py                # SQLAlchemy 모델 정의
-├── requirements.txt         # Python 패키지 의존성
-├── index.html               # 메인 페이지
-├── login.html               # 로그인 페이지
-├── signup.html              # 회원가입 페이지
-├── forgot_password.html     # 비밀번호 찾기 페이지
-├── change_password.html     # 비밀번호 변경 페이지
-├── profile.html             # 마이페이지
-├── typing_list.html         # 타이핑 콘텐츠 목록
-├── typing_create.html       # 타이핑 콘텐츠 생성/편집
-├── typing_detail.html       # 타이핑 콘텐츠 상세
-├── typing.html              # 타이핑 플레이 화면
-├── navbar.js                # 공통 네비게이션 로그인 상태 관리
-├── script.js                # 타이핑 게임 로직
-├── style.css                # 공통 스타일
-├── typing.css               # 타이핑 화면 스타일
-└── assets/                  # 로고 및 이미지 리소스
+enter-typing/
+├─ main.py                  # FastAPI 앱 진입점, API/HTML/static 라우팅
+├─ backend/
+│  ├─ __init__.py
+│  ├─ database.py            # SQLAlchemy DB 연결
+│  ├─ models.py              # DB 모델
+│  └─ scoring.py             # 타이핑/퀴즈 점수 계산 유틸
+├─ pages/                    # HTML 페이지
+│  ├─ index.html
+│  ├─ login.html
+│  ├─ profile.html
+│  ├─ quiz.html
+│  ├─ quiz_create.html
+│  ├─ quiz_list.html
+│  ├─ ranking.html
+│  ├─ ranking_all.html
+│  ├─ ranking_song.html
+│  ├─ typing.html
+│  ├─ typing_create.html
+│  ├─ typing_detail.html
+│  └─ typing_list.html
+├─ static/
+│  ├─ css/
+│  │  ├─ style.css
+│  │  └─ typing.css
+│  ├─ js/
+│  │  ├─ navbar.js
+│  │  ├─ quiz.js
+│  │  ├─ ranking.js
+│  │  └─ script.js
+│  ├─ assets/                # 로고/캐릭터 이미지
+│  └─ images/                # 배경 이미지
+├─ logs/                     # uvicorn 실행 로그
+├─ .env                      # 로컬 환경 변수
+└─ enterping.db              # 로컬 데이터 파일
 ```
 
-## 실행 방법
+기존 화면 링크 호환을 위해 HTML에서는 `style.css`, `navbar.js`, `assets/logo_icon.png` 같은 경로를 그대로 사용합니다. FastAPI가 내부적으로 `static/css`, `static/js`, `static/assets` 위치의 파일을 해당 URL로 서빙합니다.
 
-### 1. 저장소 이동
+## 실행 환경
 
-```powershell
-cd C:\coding\teamPJT_V2
-```
+- Python 3.10 이상 권장
+- MySQL 또는 `DATABASE_URL`로 연결 가능한 SQLAlchemy 지원 DB
+- Windows PowerShell 기준 명령 예시
 
-### 2. 가상환경 생성 및 활성화
+## 설치
+
+프로젝트 루트에서 가상환경을 만들고 필요한 패키지를 설치합니다.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install fastapi uvicorn sqlalchemy pymysql python-dotenv pydantic bcrypt python-jose pykakasi
 ```
 
-### 3. 의존성 설치
+## 환경 변수
 
-```powershell
-pip install -r requirements.txt
-```
-
-### 4. 환경변수 설정
-
-프로젝트 루트에 `.env` 파일을 만들고 아래 값을 설정합니다. 실제 비밀번호, 앱 비밀번호, JWT 시크릿은 외부에 공유하지 마세요.
+`.env` 파일에 아래 값을 설정합니다. 실제 비밀번호나 토큰 값은 저장소에 커밋하지 않습니다.
 
 ```env
-# 빠른 로컬 실행용 SQLite 예시
-DATABASE_URL=sqlite:///./enterping.db
-
-# MySQL 사용 예시
-# DATABASE_URL=mysql+pymysql://사용자명:비밀번호@localhost:3306/enterping_db
-
+DATABASE_URL=mysql+pymysql://USER:PASSWORD@localhost:3306/enterping_db?charset=utf8mb4
 JWT_SECRET=change-this-secret
 
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-gmail-app-password
+SMTP_PASSWORD=your-app-password
 SENDER_NAME=엔터핑
 ```
 
-MySQL을 사용할 경우 먼저 데이터베이스를 생성합니다.
+`DATABASE_URL`은 필수입니다. MySQL을 사용하는 경우 `enterping_db` 데이터베이스를 먼저 생성하면, 앱 시작 시 SQLAlchemy 모델 기준으로 테이블이 생성됩니다.
 
-```sql
-CREATE DATABASE enterping_db
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-```
+## 실행
 
-### 5. 서버 실행
+프로젝트 루트에서 실행합니다.
 
 ```powershell
-uvicorn main:app --reload
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-서버가 실행되면 브라우저에서 아래 주소로 접속합니다.
+브라우저에서 다음 주소로 접속합니다.
 
-```text
-http://127.0.0.1:8000
+- 메인: `http://localhost:8000/`
+- 타이핑: `http://localhost:8000/typing_list.html`
+- 퀴즈: `http://localhost:8000/quiz_list.html`
+- 랭킹: `http://localhost:8000/ranking.html`
+- 마이페이지: `http://localhost:8000/profile.html`
+
+## 주요 API
+
+| 구분 | 메서드/경로 | 설명 |
+| --- | --- | --- |
+| 인증 | `POST /api/signup` | 회원가입 |
+| 인증 | `POST /api/login` | 로그인 및 JWT 발급 |
+| 인증 | `POST /api/send-verification-code` | 이메일 인증 코드 발송 |
+| 인증 | `POST /api/verify-code` | 이메일 인증 코드 확인 |
+| 인증 | `POST /api/change-password` | 비밀번호 변경 |
+| 사용자 | `POST /api/change-nickname` | 닉네임 변경 |
+| 사용자 | `DELETE /api/delete-account` | 계정 삭제 |
+| 출석 | `GET /api/attendance` | 출석 기록 조회 |
+| 출석 | `POST /api/attendance` | 출석 기록 저장 |
+| 결과 | `GET /api/my-results` | 내 타이핑/퀴즈 결과 조회 |
+| 랭킹 | `GET /api/rankings` | 전체/타이핑/퀴즈 랭킹 조회 |
+| 타이핑 | `GET /api/typing-contents` | 타이핑 콘텐츠 목록 |
+| 타이핑 | `GET /api/my-typing-contents` | 내가 만든 타이핑 콘텐츠 |
+| 타이핑 | `POST /api/typing-contents` | 타이핑 콘텐츠 생성 |
+| 타이핑 | `PUT /api/typing-contents/{content_id}` | 타이핑 콘텐츠 수정 |
+| 타이핑 | `DELETE /api/typing-contents/{content_id}` | 타이핑 콘텐츠 삭제 |
+| 타이핑 | `POST /api/typing-results` | 타이핑 결과 저장 |
+| 퀴즈 | `GET /api/quiz-contents` | 퀴즈 콘텐츠 목록 |
+| 퀴즈 | `GET /api/my-quiz-contents` | 내가 만든 퀴즈 콘텐츠 |
+| 퀴즈 | `POST /api/quiz-contents` | 퀴즈 콘텐츠 생성 |
+| 퀴즈 | `PUT /api/quiz-contents/{content_id}` | 퀴즈 콘텐츠 수정 |
+| 퀴즈 | `DELETE /api/quiz-contents/{content_id}` | 퀴즈 콘텐츠 삭제 |
+| 퀴즈 | `POST /api/quiz-results` | 퀴즈 결과 저장 |
+| 변환 | `POST /api/convert` | 일본어 가사 히라가나/로마자 변환 |
+
+## 점수 로직
+
+점수 계산은 `backend/scoring.py`에 모아져 있습니다.
+
+- 타이핑 점수: WPM, 정확도, 오타 수, 난이도를 기반으로 계산합니다.
+- 퀴즈 점수: 가수/제목/가사 정답 슬롯과 콤보 보너스를 기반으로 계산합니다.
+- 랭킹 반영 여부는 결과 저장 시 서버에서 계산한 값과 검증 조건을 기준으로 처리합니다.
+
+## 개발 확인 명령
+
+```powershell
+python -m py_compile .\main.py .\backend\database.py .\backend\models.py .\backend\scoring.py
+node --check .\static\js\script.js
+node --check .\static\js\quiz.js
+node --check .\static\js\ranking.js
+node --check .\static\js\navbar.js
 ```
 
-## API 요약
+서버 실행 후 핵심 URL 응답 확인:
 
-### 인증/회원
-
-| Method | Endpoint | 설명 |
-| --- | --- | --- |
-| POST | `/api/signup` | 회원가입 |
-| POST | `/api/login` | 로그인 및 JWT 발급 |
-| GET | `/api/check-email` | 이메일 중복 확인 |
-| GET | `/api/check-nickname` | 닉네임 중복 확인 |
-| POST | `/api/send-verification-code` | 비밀번호 찾기 인증번호 발송 |
-| POST | `/api/verify-code` | 인증번호 확인 및 임시 비밀번호 발급 |
-| POST | `/api/change-password` | 비밀번호 변경 |
-| POST | `/api/change-nickname` | 닉네임 변경 |
-| DELETE | `/api/delete-account` | 회원 탈퇴 |
-
-### 출석
-
-| Method | Endpoint | 설명 |
-| --- | --- | --- |
-| GET | `/api/attendance` | 내 출석 기록 조회 |
-| POST | `/api/attendance` | 출석 체크 |
-
-### 타이핑 콘텐츠
-
-| Method | Endpoint | 설명 |
-| --- | --- | --- |
-| GET | `/api/typing-contents` | 전체 타이핑 콘텐츠 목록 조회 |
-| GET | `/api/my-typing-contents` | 내가 만든 타이핑 콘텐츠 목록 조회 |
-| POST | `/api/typing-contents` | 타이핑 콘텐츠 생성 |
-| GET | `/api/typing-content/{content_id}` | 타이핑 콘텐츠 상세 조회 |
-| PUT | `/api/typing-contents/{content_id}` | 타이핑 콘텐츠 수정 |
-| DELETE | `/api/typing-contents/{content_id}` | 타이핑 콘텐츠 삭제 |
-
-### 유틸
-
-| Method | Endpoint | 설명 |
-| --- | --- | --- |
-| POST | `/api/youtube/resolve` | YouTube URL 또는 영상 ID 분석 |
-| POST | `/api/convert` | 일본어 텍스트를 히라가나/로마자로 변환 |
-
-## 인증 방식
-
-로그인 성공 시 응답으로 `access_token`이 반환됩니다. 인증이 필요한 API는 아래 형식의 헤더를 포함해야 합니다.
-
-```http
-Authorization: Bearer <access_token>
+```powershell
+Invoke-WebRequest http://localhost:8000/ -UseBasicParsing
+Invoke-WebRequest http://localhost:8000/style.css -UseBasicParsing
+Invoke-WebRequest http://localhost:8000/navbar.js -UseBasicParsing
+Invoke-WebRequest http://localhost:8000/assets/logo_icon.png -UseBasicParsing
+Invoke-WebRequest "http://localhost:8000/api/rankings?mode=all" -UseBasicParsing
 ```
-
-프론트엔드는 로그인 정보를 `sessionStorage`에 저장하며, 공통 네비게이션 상태는 `navbar.js`에서 관리합니다.
-
-## 데이터 모델
-
-- `User`: 회원 이메일, 비밀번호 해시, 닉네임
-- `Attendance`: 회원별 출석 날짜
-- `TypingHistory`: 타이핑 플레이 기록
-- `QuizHistory`: 퀴즈 플레이 기록
-- `TypoStat`: 오타 통계
-- `TypingContent`: 타이핑 콘텐츠, 가사, 히라가나, 로마자, YouTube ID
-
-## 개발 참고
-
-- 앱 시작 시 `models.Base.metadata.create_all(bind=engine)`가 실행되어 정의된 테이블이 자동 생성됩니다.
-- 초기 타이핑 콘텐츠가 4개 미만이면 기본 콘텐츠가 자동 등록됩니다.
-- 이메일 인증번호는 서버 메모리의 `verification_store`에 저장됩니다. 서버 재시작 시 인증 상태는 초기화됩니다.
-- Gmail SMTP를 사용할 경우 일반 계정 비밀번호가 아니라 Google 앱 비밀번호를 사용해야 합니다.
-- 정적 HTML, CSS, JS 파일은 FastAPI의 `FileResponse`로 서빙됩니다.
-
-## 보안 주의사항
-
-- `.env` 파일에는 DB 비밀번호, Gmail 앱 비밀번호, JWT 시크릿이 들어가므로 저장소에 공개하지 마세요.
-- 운영 환경에서는 `JWT_SECRET`을 반드시 강한 랜덤 문자열로 변경하세요.
-- 임시 비밀번호와 인증번호 저장소는 현재 인메모리 방식이므로 운영 환경에서는 Redis 또는 DB 기반 저장소 사용을 권장합니다.
-- `DELETE /api/typing-contents/{content_id}`는 현재 관리자 모드 용도로 권한 검사가 완화되어 있으므로 배포 전 권한 검사를 복구해야 합니다.
-
-## 문제 해결
-
-### `DATABASE_URL is not set in the .env file.`
-
-`.env` 파일에 `DATABASE_URL`이 설정되어 있는지 확인합니다.
-
-### MySQL 연결 실패
-
-- MySQL 서버가 실행 중인지 확인합니다.
-- `enterping_db` 데이터베이스가 생성되어 있는지 확인합니다.
-- 계정명, 비밀번호, 포트 번호가 올바른지 확인합니다.
-- 비밀번호에 특수문자가 포함되어 있다면 URL 인코딩 또는 현재 코드의 자동 인코딩 처리 여부를 확인합니다.
-
-### 이메일 발송 실패
-
-- `SMTP_USER`와 `SMTP_PASSWORD`가 올바른지 확인합니다.
-- Gmail 계정의 2단계 인증과 앱 비밀번호 설정을 확인합니다.
-- 방화벽 또는 네트워크에서 SMTP 포트 `587` 접근이 가능한지 확인합니다.

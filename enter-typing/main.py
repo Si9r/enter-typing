@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import time
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 from database import engine, get_db
 import models
@@ -26,6 +27,39 @@ load_dotenv()
 # MySQL에 enterping_db 라는 이름의 데이터베이스 하나만 생성하면 자동으로 컬럼은 생성 됩니다.
 # 데이터베이스 테이블 자동 생성
 models.Base.metadata.create_all(bind=engine)
+
+def ensure_result_columns():
+    inspector = inspect(engine)
+    table_columns = {
+        table_name: {column["name"] for column in inspector.get_columns(table_name)}
+        for table_name in inspector.get_table_names()
+    }
+
+    migrations = []
+    typing_columns = table_columns.get("typing_histories", set())
+    if "content_id" not in typing_columns:
+        migrations.append("ALTER TABLE typing_histories ADD COLUMN content_id INTEGER")
+    if "score" not in typing_columns:
+        migrations.append("ALTER TABLE typing_histories ADD COLUMN score INTEGER NOT NULL DEFAULT 0")
+    if "typos" not in typing_columns:
+        migrations.append("ALTER TABLE typing_histories ADD COLUMN typos INTEGER NOT NULL DEFAULT 0")
+    if "elapsed_seconds" not in typing_columns:
+        migrations.append("ALTER TABLE typing_histories ADD COLUMN elapsed_seconds INTEGER NOT NULL DEFAULT 0")
+
+    quiz_columns = table_columns.get("quiz_histories", set())
+    if "content_id" not in quiz_columns:
+        migrations.append("ALTER TABLE quiz_histories ADD COLUMN content_id INTEGER")
+    if "accuracy" not in quiz_columns:
+        migrations.append("ALTER TABLE quiz_histories ADD COLUMN accuracy FLOAT NOT NULL DEFAULT 0")
+    if "max_combo" not in quiz_columns:
+        migrations.append("ALTER TABLE quiz_histories ADD COLUMN max_combo INTEGER NOT NULL DEFAULT 0")
+
+    if migrations:
+        with engine.begin() as conn:
+            for migration in migrations:
+                conn.execute(text(migration))
+
+ensure_result_columns()
 
 # ── JWT 토큰 설정 및 유틸 ─────────────────────────
 SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key-enterping-1234!")
@@ -232,8 +266,67 @@ class QuizContentCreate(BaseModel):
     difficulty: int = 3
     youtube_id: str | None = None
 
+class TypingResultCreate(BaseModel):
+    content_id: int
+    wpm: int
+    accuracy: float
+    typos: int = 0
+    elapsed_seconds: int = 0
+    score: int | None = None
+    completed: bool = False
+
+class QuizResultCreate(BaseModel):
+    content_id: int
+    score: int
+    correct_count: int = 0
+    total_questions: int
+    accuracy: float = 0
+    max_combo: int = 0
+
 class ConvertRequest(BaseModel):
     text: str
+
+def clamp_number(value, minimum, maximum):
+    return max(minimum, min(maximum, value))
+
+def calculate_typing_score(wpm: int, accuracy: float, typos: int, difficulty: int) -> int:
+    safe_wpm = clamp_number(int(wpm), 0, 600)
+    safe_accuracy = clamp_number(float(accuracy), 0, 100)
+    safe_typos = clamp_number(int(typos), 0, 10000)
+    safe_difficulty = clamp_number(int(difficulty or 3), 1, 5)
+    difficulty_multiplier = 1 + ((safe_difficulty - 3) * 0.1)
+    accuracy_multiplier = (safe_accuracy / 100) ** 2
+    return max(0, round((safe_wpm * accuracy_multiplier * difficulty_multiplier) - (safe_typos * 2)))
+
+def get_quiz_answer_slot_count(quiz_data: str) -> int:
+    try:
+        parsed = json.loads(quiz_data or "[]")
+    except Exception:
+        return 0
+    total = 0
+    for item in parsed:
+        if item.get("singer"):
+            total += 1
+        if item.get("title"):
+            total += 1
+        if item.get("lyrics"):
+            total += 1
+    return total
+
+def get_quiz_max_score(quiz_data: str) -> int:
+    try:
+        parsed = json.loads(quiz_data or "[]")
+    except Exception:
+        return 0
+    score = 0
+    combo = 0
+    answer_points = {"singer": 50, "title": 70, "lyrics": 100}
+    for item in parsed:
+        for answer_type, points in answer_points.items():
+            if item.get(answer_type):
+                score += points + (combo * 10)
+                combo += 1
+    return score
 
 def validate_email(email: str):
     if not EMAIL_REGEX.match(email):
@@ -597,6 +690,90 @@ def do_attendance(req: AttendanceRequest, current_user: models.User = Depends(ge
 
 # ════════════════════════════════════════════════════════════
 # API: 타이핑 콘텐츠 목록 가져오기
+@app.get("/api/my-results")
+def get_my_results(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    typing_histories = db.query(models.TypingHistory).filter(
+        models.TypingHistory.user_id == current_user.id
+    ).all()
+    quiz_histories = db.query(models.QuizHistory).filter(
+        models.QuizHistory.user_id == current_user.id
+    ).all()
+
+    total_typing = len(typing_histories)
+    total_quiz = len(quiz_histories)
+    total_plays = total_typing + total_quiz
+
+    accuracy_values = [
+        h.accuracy for h in typing_histories if h.accuracy is not None
+    ] + [
+        h.accuracy for h in quiz_histories if h.accuracy is not None
+    ]
+    avg_accuracy = round(sum(accuracy_values) / len(accuracy_values), 1) if accuracy_values else 0
+    avg_wpm = round(sum((h.wpm or 0) for h in typing_histories) / total_typing) if total_typing else 0
+    best_wpm = max(((h.wpm or 0) for h in typing_histories), default=0)
+    best_typing_score = max(((h.score or 0) for h in typing_histories), default=0)
+    best_quiz_score = max(((h.score or 0) for h in quiz_histories), default=0)
+
+    recent_typing = db.query(models.TypingHistory).filter(
+        models.TypingHistory.user_id == current_user.id
+    ).order_by(models.TypingHistory.played_at.desc()).limit(20).all()
+    recent_quiz = db.query(models.QuizHistory).filter(
+        models.QuizHistory.user_id == current_user.id
+    ).order_by(models.QuizHistory.played_at.desc()).limit(20).all()
+
+    content_ids = {h.content_id for h in recent_quiz if h.content_id}
+    quiz_contents = {}
+    if content_ids:
+        quiz_contents = {
+            c.id: c for c in db.query(models.QuizContent).filter(models.QuizContent.id.in_(content_ids)).all()
+        }
+
+    recent = []
+    for history in recent_typing:
+        recent.append({
+            "type": "typing",
+            "content_id": history.content_id,
+            "title": history.content_title,
+            "genre": history.genre,
+            "wpm": history.wpm,
+            "accuracy": history.accuracy,
+            "score": history.score,
+            "typos": history.typos,
+            "elapsed_seconds": history.elapsed_seconds,
+            "played_at": history.played_at.isoformat() if history.played_at else None
+        })
+
+    for history in recent_quiz:
+        content = quiz_contents.get(history.content_id)
+        recent.append({
+            "type": "quiz",
+            "content_id": history.content_id,
+            "title": content.title if content else "Quiz",
+            "genre": history.quiz_category,
+            "score": history.score,
+            "total_questions": history.total_questions,
+            "accuracy": history.accuracy,
+            "max_combo": history.max_combo,
+            "played_at": history.played_at.isoformat() if history.played_at else None
+        })
+
+    recent.sort(key=lambda item: item["played_at"] or "", reverse=True)
+
+    return {
+        "success": True,
+        "summary": {
+            "total_plays": total_plays,
+            "typing_plays": total_typing,
+            "quiz_plays": total_quiz,
+            "avg_accuracy": avg_accuracy,
+            "avg_wpm": avg_wpm,
+            "best_wpm": best_wpm,
+            "best_typing_score": best_typing_score,
+            "best_quiz_score": best_quiz_score
+        },
+        "recent": recent[:20]
+    }
+
 # GET /api/typing-contents
 # ════════════════════════════════════════════════════════════
 @app.get("/api/typing-contents")
@@ -741,6 +918,50 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
         "raw_romaji": content.romaji
     }
 
+@app.post("/api/typing-results")
+def save_typing_result(req: TypingResultCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = db.query(models.TypingContent).filter(models.TypingContent.id == req.content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="Content not found.")
+
+    if req.wpm < 0 or req.wpm > 600:
+        raise HTTPException(status_code=400, detail="Invalid WPM.")
+    if req.accuracy < 0 or req.accuracy > 100:
+        raise HTTPException(status_code=400, detail="Invalid accuracy.")
+    if req.typos < 0 or req.typos > 10000:
+        raise HTTPException(status_code=400, detail="Invalid typo count.")
+    if req.elapsed_seconds < 0 or req.elapsed_seconds > 7200:
+        raise HTTPException(status_code=400, detail="Invalid elapsed time.")
+
+    server_score = calculate_typing_score(req.wpm, req.accuracy, req.typos, content.difficulty)
+    rank_eligible = req.completed and req.elapsed_seconds >= 5 and req.accuracy >= 85 and req.wpm <= 500
+
+    history = models.TypingHistory(
+        user_id=current_user.id,
+        content_id=content.id,
+        content_title=content.title,
+        genre=content.genre,
+        wpm=req.wpm,
+        accuracy=req.accuracy,
+        score=server_score,
+        typos=req.typos,
+        elapsed_seconds=req.elapsed_seconds
+    )
+    content.play_count = (content.play_count or 0) + 1
+    if rank_eligible and req.elapsed_seconds > 0:
+        if not content.best_time or req.elapsed_seconds < content.best_time:
+            content.best_time = req.elapsed_seconds
+
+    db.add(history)
+    db.commit()
+
+    return {
+        "success": True,
+        "score": server_score,
+        "rank_eligible": rank_eligible,
+        "best_time": content.best_time
+    }
+
 # ════════════════════════════════════════════════════════════
 # API: 퀴즈 콘텐츠 API
 # ════════════════════════════════════════════════════════════
@@ -809,6 +1030,26 @@ def create_quiz_content(req: QuizContentCreate, current_user: models.User = Depe
     db.refresh(new_content)
     return {"success": True, "message": "성공적으로 추가되었습니다.", "id": new_content.id}
 
+@app.put("/api/quiz-contents/{content_id}")
+def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+
+    if content.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="수정 권한이 없습니다.")
+
+    content.title = req.title
+    content.artist = req.artist
+    content.genre = req.genre
+    content.description = req.description
+    content.youtube_id = req.youtube_id
+    content.quiz_data = req.quiz_data
+    content.difficulty = req.difficulty
+
+    db.commit()
+    return {"success": True, "message": "수정되었습니다.", "id": content.id}
+
 @app.get("/api/quiz-content/{content_id}")
 def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
     content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
@@ -843,6 +1084,62 @@ def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
 # API: 가사 자동 변환 (히라가나, 로마자)
 # POST /api/convert
 # ════════════════════════════════════════════════════════════
+@app.post("/api/quiz-results")
+def save_quiz_result(req: QuizResultCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == req.content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="Content not found.")
+
+    try:
+        quiz_items = json.loads(content.quiz_data or "[]")
+    except Exception:
+        quiz_items = []
+
+    expected_questions = len(quiz_items)
+    answer_slots = get_quiz_answer_slot_count(content.quiz_data)
+    max_score = get_quiz_max_score(content.quiz_data)
+
+    if req.score < 0:
+        raise HTTPException(status_code=400, detail="Invalid score.")
+    if req.total_questions < 0 or req.total_questions > max(expected_questions, 1):
+        raise HTTPException(status_code=400, detail="Invalid question count.")
+    if req.correct_count < 0 or req.correct_count > max(expected_questions, 1):
+        raise HTTPException(status_code=400, detail="Invalid correct count.")
+    if req.accuracy < 0 or req.accuracy > 100:
+        raise HTTPException(status_code=400, detail="Invalid accuracy.")
+    if req.max_combo < 0 or req.max_combo > max(answer_slots, 1):
+        raise HTTPException(status_code=400, detail="Invalid combo.")
+
+    server_score = min(req.score, max_score)
+    rank_eligible = (
+        expected_questions > 0 and
+        req.total_questions == expected_questions and
+        req.score <= max_score
+    )
+
+    history = models.QuizHistory(
+        user_id=current_user.id,
+        content_id=content.id,
+        quiz_category=content.genre,
+        score=server_score,
+        total_questions=expected_questions,
+        accuracy=req.accuracy,
+        max_combo=req.max_combo
+    )
+    content.play_count = (content.play_count or 0) + 1
+    if rank_eligible and server_score > (content.best_score or 0):
+        content.best_score = server_score
+
+    db.add(history)
+    db.commit()
+
+    return {
+        "success": True,
+        "score": server_score,
+        "rank_eligible": rank_eligible,
+        "best_score": content.best_score
+    }
+
 @app.post("/api/convert")
 def convert_lyrics(req: ConvertRequest):
     text = req.text
@@ -895,7 +1192,7 @@ def serve_html(page: str):
         return FileResponse(path)
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
-for f in ["style.css", "typing.css", "script.js", "navbar.js"]:
+for f in ["style.css", "typing.css", "script.js", "quiz.js", "navbar.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)

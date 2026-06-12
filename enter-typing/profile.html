@@ -843,15 +843,15 @@
     <div class="tab-panel active" id="tab-profile">
       <div class="stats-row">
         <div class="stat-box">
-          <div class="num">247</div>
+          <div class="num" id="profile-total-plays">0</div>
           <div class="lbl">총 플레이 수</div>
         </div>
         <div class="stat-box">
-          <div class="num">89<small style="font-size:1rem;">%</small></div>
+          <div class="num" id="profile-avg-accuracy">0<small style="font-size:1rem;">%</small></div>
           <div class="lbl">평균 정확도</div>
         </div>
         <div class="stat-box">
-          <div class="num">312</div>
+          <div class="num" id="profile-best-wpm">0</div>
           <div class="lbl">최고 WPM</div>
         </div>
       </div>
@@ -908,7 +908,7 @@
         <div class="analysis-card">
           <h4>⌨️ 평균 타이핑 속도</h4>
           <div class="wpm-big">
-            <div class="num">247</div>
+            <div class="num" id="analysis-avg-wpm">0</div>
             <div class="unit">WPM (분당 타수)</div>
           </div>
           <div class="bar-row">
@@ -936,7 +936,7 @@
         <div class="analysis-card">
           <h4>🎯 정확도 통계</h4>
           <div class="acc-ring">
-            <div class="ring-label">89.3%</div>
+            <div class="ring-label" id="analysis-avg-accuracy">0%</div>
           </div>
           <div class="bar-row">
             <div class="bar-label">JPOP</div>
@@ -1125,7 +1125,7 @@
 
     <!-- 탭 3: 히스토리 -->
     <div class="tab-panel" id="tab-history">
-      <div class="history-list">
+      <div class="history-list" id="profile-history-list">
         <div class="history-item" style="cursor:pointer;" onclick="location.href='typing_detail.html'">
           <div class="history-icon typing">⌨️</div>
           <div class="history-info">
@@ -1318,6 +1318,91 @@
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('tab-' + name).classList.add('active');
       document.getElementById('tab-' + name + '-btn').classList.add('active');
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatPlayedDate(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}.${m}.${d}`;
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function renderProfileHistory(items) {
+      const container = document.getElementById('profile-history-list');
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding: 40px; color: #7F8C8D; font-weight: bold;">아직 플레이 기록이 없습니다.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => {
+        const isTyping = item.type === 'typing';
+        const iconClass = isTyping ? 'typing' : 'quiz';
+        const iconText = isTyping ? 'T' : 'Q';
+        const target = item.content_id
+          ? (isTyping ? `typing_detail.html?id=${item.content_id}` : `quiz.html?id=${item.content_id}`)
+          : '#';
+        const scoreText = isTyping
+          ? `${item.score || 0}점 · ${item.wpm || 0} WPM · ${Math.round(item.accuracy || 0)}%`
+          : `${item.score || 0}점 · ${Math.round(item.accuracy || 0)}% · 콤보 ${item.max_combo || 0}`;
+
+        return `
+          <div class="history-item" style="cursor:pointer;" onclick="location.href='${target}'">
+            <div class="history-icon ${iconClass}">${iconText}</div>
+            <div class="history-info">
+              <div class="title">${escapeHTML(item.title || (isTyping ? 'Typing' : 'Quiz'))}</div>
+              <div class="sub">${isTyping ? '타이핑' : '퀴즈'} · ${escapeHTML(item.genre || '-')}</div>
+            </div>
+            <div class="history-result">
+              <div class="score">${escapeHTML(scoreText)}</div>
+              <div class="date">${formatPlayedDate(item.played_at)}</div>
+            </div>
+            <div style="margin-left:12px;color:#ccc;font-size:1.1rem;align-self:center;">›</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadMyResults() {
+      const token = sessionStorage.getItem('ep_token');
+      if (!token) return;
+
+      try {
+        const res = await fetch('/api/my-results', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) return;
+
+        const summary = data.summary || {};
+        setText('profile-total-plays', summary.total_plays || 0);
+        const avgAccuracyEl = document.getElementById('profile-avg-accuracy');
+        if (avgAccuracyEl) avgAccuracyEl.innerHTML = `${summary.avg_accuracy || 0}<small style="font-size:1rem;">%</small>`;
+        setText('profile-best-wpm', summary.best_wpm || 0);
+        setText('analysis-avg-wpm', summary.avg_wpm || 0);
+        setText('analysis-avg-accuracy', `${summary.avg_accuracy || 0}%`);
+        renderProfileHistory(data.recent || []);
+      } catch (e) {
+        console.error('Failed to load profile results:', e);
+      }
     }
 
     // ── 출석 데이터 서버 DB API 연동 ─────────────────────────
@@ -1634,6 +1719,7 @@
     // 페이지 로드 시 초기화
     renderCalendar(curYear, curMonth);
     loadAttendanceData();
+    loadMyResults();
     async function loadMyQuizContents() {
       const token = sessionStorage.getItem('ep_token');
       if (!token) return;

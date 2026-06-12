@@ -36,10 +36,14 @@ class TypingHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content_id = Column(Integer, nullable=True)
     content_title = Column(String(255), nullable=False)
     genre = Column(String(50), nullable=False)
     wpm = Column(Integer, nullable=False)
     accuracy = Column(Float, nullable=False)
+    score = Column(Integer, default=0, nullable=False)
+    typos = Column(Integer, default=0, nullable=False)
+    elapsed_seconds = Column(Integer, default=0, nullable=False)
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="typing_histories")
@@ -50,9 +54,12 @@ class QuizHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content_id = Column(Integer, nullable=True)
     quiz_category = Column(String(50), nullable=False)
     score = Column(Integer, nullable=False)
     total_questions = Column(Integer, nullable=False)
+    accuracy = Column(Float, default=0, nullable=False)
+    max_combo = Column(Integer, default=0, nullable=False)
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="quiz_histories")

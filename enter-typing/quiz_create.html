@@ -687,6 +687,8 @@
         let editingIndex = -1;
         let youtubePlayer = null;
         let isPlayerReady = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
 
         // DOM Elements
         const gridContainer = document.getElementById('quiz-card-grid');
@@ -1112,6 +1114,52 @@
         document.getElementById('close-settings').addEventListener('click', () => modal.style.display = 'none');
         document.getElementById('btn-save-settings').addEventListener('click', () => modal.style.display = 'none');
 
+        async function loadEditQuizContent() {
+            if (!editId) return;
+
+            document.getElementById('btn-save').textContent = '수정하기';
+
+            try {
+                const res = await fetch(`/api/quiz-content/${editId}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.detail || '퀴즈 정보를 불러오지 못했습니다.');
+                    location.href = 'profile.html';
+                    return;
+                }
+
+                document.getElementById('title').value = data.title || '';
+                document.getElementById('artist').value = data.artist || '';
+                document.getElementById('genre').value = data.genre || 'JPOP';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('difficulty').value = data.difficulty || 3;
+
+                const parsedQuizData = JSON.parse(data.quiz_data || '[]');
+                linesData = Array.isArray(parsedQuizData)
+                    ? parsedQuizData.map((line) => ({
+                        start: Number(line.start) || 0,
+                        end: Number(line.end) || 0,
+                        singer: line.singer || '',
+                        title: line.title || '',
+                        lyrics: line.lyrics || '',
+                        hint: line.hint || '',
+                        youtube_id: line.youtube_id || data.youtube_id || ''
+                    }))
+                    : [];
+
+                if (linesData.length > 0 && linesData[0].youtube_id) {
+                    ytInput.value = `https://youtu.be/${linesData[0].youtube_id}`;
+                }
+
+                renderGrid();
+            } catch (err) {
+                console.error(err);
+                alert('퀴즈 정보를 불러오는 중 오류가 발생했습니다.');
+                location.href = 'profile.html';
+            }
+        }
+
         // Save Content (Actual API Call)
         document.getElementById('btn-save').addEventListener('click', async () => {
             const title = document.getElementById('title').value.trim();
@@ -1134,8 +1182,11 @@
             }
 
             try {
-                const res = await fetch('/api/quiz-contents', {
-                    method: 'POST',
+                const method = editId ? 'PUT' : 'POST';
+                const endpoint = editId ? `/api/quiz-contents/${editId}` : '/api/quiz-contents';
+
+                const res = await fetch(endpoint, {
+                    method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -1152,10 +1203,10 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert("퀴즈가 성공적으로 저장되었습니다!");
-                    location.href = 'quiz_list.html';
+                    alert(editId ? "퀴즈가 성공적으로 수정되었습니다!" : "퀴즈가 성공적으로 저장되었습니다!");
+                    location.href = editId ? 'profile.html' : 'quiz_list.html';
                 } else {
-                    alert(data.detail || "저장에 실패했습니다.");
+                    alert(data.detail || (editId ? "수정에 실패했습니다." : "저장에 실패했습니다."));
                 }
             } catch (err) {
                 console.error(err);
@@ -1164,7 +1215,11 @@
         });
 
         // Initialize grid on load
-        renderGrid();
+        if (editId) {
+            loadEditQuizContent();
+        } else {
+            renderGrid();
+        }
     </script>
 </body>
 

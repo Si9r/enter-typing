@@ -3,6 +3,7 @@ const wpmDisplay = document.getElementById("wpm");
 const accuracyDisplay = document.getElementById("accuracy");
 const timeDisplay = document.getElementById("time");
 const typosDisplay = document.getElementById("typos"); // Added for the new UI
+const typingScoreDisplay = document.getElementById("typing-score");
 const stageIndicator = document.getElementById("stageIndicator");
 const kanjiDisplay = document.getElementById("kanjiDisplay");
 const lyricDisplay = document.getElementById("lyricDisplay");
@@ -380,6 +381,15 @@ let contentHiraganaLines = [];
 let contentRomajiLines = [];
 let contentTimestamps = [];
 let currentLineIndex = 0;
+let contentDifficulty = 3;
+let latestTypingStats = {
+  wpm: 0,
+  accuracy: 100,
+  score: 0,
+  typos: 0,
+  elapsed: 0,
+};
+let hasSubmittedTypingResult = false;
 
 /**
  * 백엔드 서버에서 특정 ID의 타이핑 콘텐츠(가사, 시간, 번역 등) 데이터를 불러오는 함수입니다.
@@ -393,6 +403,7 @@ async function fetchTypingContent(contentId) {
       contentLines = data.lines;
       contentHiraganaLines = data.hiragana_lines || data.lines;
       contentRomajiLines = data.romaji_lines;
+      contentDifficulty = data.difficulty || 3;
 
       // 기존 DB에 저장된 스테가나 로마자 변환 오류 교정 (jie -> je 등)
       for (let i = 0; i < contentHiraganaLines.length; i++) {
@@ -572,6 +583,7 @@ function startGame(startedByYoutube = false) {
   sessionTotalChars = 0;
   totalTypos = 0;
   gameTimeElapsed = 0;
+  hasSubmittedTypingResult = false;
   isYoutubeMode = !!(youtubePlayer && isPlayerReady && currentYoutubeId);
 
   if (isYoutubeMode && youtubePlayer.getDuration) {
@@ -585,6 +597,7 @@ function startGame(startedByYoutube = false) {
   wpmDisplay.innerText = 0;
   accuracyDisplay.innerText = "100%";
   if (typosDisplay) typosDisplay.innerText = 0;
+  if (typingScoreDisplay) typingScoreDisplay.innerText = 0;
 
   isPlaying = true;
   typingInput.disabled = false;
@@ -651,12 +664,22 @@ function endGame(completed = false) {
   if (youtubePlayer && isPlayerReady) {
     youtubePlayer.pauseVideo();
   }
+
+  submitTypingResult(completed);
 }
 
 /**
  * 현재까지 입력한 문자 수와 걸린 시간 등을 바탕으로
  * WPM(분당 타자수), 정확도, 오타수 등의 통계 데이터를 갱신하여 화면에 표시하는 함수입니다.
  */
+function calculateTypingScore(wpm, accuracy, typos, difficulty) {
+  const safeDifficulty = Math.min(Math.max(Number(difficulty) || 3, 1), 5);
+  const difficultyMultiplier = 1 + (safeDifficulty - 3) * 0.1;
+  const accuracyMultiplier = Math.pow((Number(accuracy) || 0) / 100, 2);
+  const typoPenalty = (Number(typos) || 0) * 2;
+  return Math.max(0, Math.round(wpm * accuracyMultiplier * difficultyMultiplier - typoPenalty));
+}
+
 function updateStats() {
   const timeElapsed = gameTimeElapsed;
   let wpm = 0;
@@ -675,6 +698,45 @@ function updateStats() {
   }
   accuracyDisplay.innerText = accuracy + "%";
   if (typosDisplay) typosDisplay.innerText = totalTypos;
+
+  const score = calculateTypingScore(wpm, accuracy, totalTypos, contentDifficulty);
+  latestTypingStats = {
+    wpm,
+    accuracy,
+    score,
+    typos: totalTypos,
+    elapsed: timeElapsed,
+  };
+  if (typingScoreDisplay) typingScoreDisplay.innerText = score;
+}
+
+async function submitTypingResult(completed) {
+  if (hasSubmittedTypingResult) return;
+  hasSubmittedTypingResult = true;
+
+  const token = sessionStorage.getItem("ep_token");
+  if (!token || !contentId) return;
+
+  try {
+    await fetch("/api/typing-results", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        content_id: Number(contentId),
+        wpm: latestTypingStats.wpm,
+        accuracy: latestTypingStats.accuracy,
+        typos: latestTypingStats.typos,
+        elapsed_seconds: latestTypingStats.elapsed,
+        score: latestTypingStats.score,
+        completed,
+      }),
+    });
+  } catch (err) {
+    console.warn("Failed to save typing result", err);
+  }
 }
 
 /**

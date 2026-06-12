@@ -249,7 +249,7 @@
                         <div
                             style="border-bottom: 3px solid #999; padding: 5px; font-size: 0.9rem; font-weight: bold; color: #555;">
                             최고 점수</div>
-                        <div style="padding: 10px; font-weight: bold; color: #333;">0</div>
+                        <div id="best-score" style="padding: 10px; font-weight: bold; color: #333;">0</div>
                     </div>
                 </div>
 
@@ -427,7 +427,8 @@
     </footer>
 
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
+    <script src="quiz.js"></script>
+    <script type="text/plain" data-disabled="legacy-quiz-script">
         const urlParams = new URLSearchParams(window.location.search);
         const contentId = urlParams.get('id');
 

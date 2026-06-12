@@ -17,12 +17,22 @@
 
 ```text
 enter-typing/
-├─ main.py                  # FastAPI 앱 진입점, API/HTML/static 라우팅
+├─ main.py                  # FastAPI 앱 조립, 라우터 등록, HTML/static 라우팅
 ├─ backend/
 │  ├─ __init__.py
+│  ├─ auth.py                # JWT, 현재 사용자 조회, 비밀번호 해시
+│  ├─ bootstrap.py           # DB 초기화, 컬럼 보강, 기본 콘텐츠 시드
 │  ├─ database.py            # SQLAlchemy DB 연결
+│  ├─ email_service.py       # 이메일 발송, 인증번호/임시 비밀번호 유틸
 │  ├─ models.py              # DB 모델
-│  └─ scoring.py             # 타이핑/퀴즈 점수 계산 유틸
+│  ├─ schemas.py             # API 요청 모델과 입력 검증
+│  ├─ scoring.py             # 타이핑/퀴즈 점수 계산 유틸
+│  └─ routers/
+│     ├─ users.py            # 회원가입, 로그인, 계정/비밀번호/닉네임 API
+│     ├─ attendance.py       # 출석 API
+│     ├─ results.py          # 마이페이지 결과, 랭킹 API
+│     ├─ typing.py           # 타이핑 콘텐츠/결과 API
+│     └─ quiz.py             # 퀴즈 콘텐츠/결과, 가사 변환 API
 ├─ pages/                    # HTML 페이지
 │  ├─ index.html
 │  ├─ login.html

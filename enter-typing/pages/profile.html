@@ -1641,8 +1641,8 @@
             <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='typing_detail.html?id=${item.id}'">
               <div class="history-icon typing">⌨️</div>
               <div class="history-info">
-                <div class="title">${item.title} — ${item.artist}</div>
-                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)} · 장르: ${item.genre || 'JPOP'}</div>
+                <div class="title">${escapeHTML(item.title || '')} — ${escapeHTML(item.artist || '')}</div>
+                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)} · 장르: ${escapeHTML(item.genre || 'JPOP')}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">
                 <div class="score">⏱️ ${item.best_time || 0}초</div>
@@ -1734,7 +1734,7 @@
             <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='quiz.html?id=${item.id}'">
               <div class="history-icon quiz">🧩</div>
               <div class="history-info">
-                <div class="title">${item.title}</div>
+                <div class="title">${escapeHTML(item.title || '')}</div>
                 <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">

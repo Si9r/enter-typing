@@ -14,15 +14,25 @@ from dotenv import load_dotenv
 import time
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
-from database import engine, get_db
-import models
+from backend.database import engine, get_db, SessionLocal
+from backend import models
 import bcrypt
 from jose import jwt, JWTError
 import pykakasi
+from backend.scoring import (
+    calculate_typing_score,
+    clamp_number,
+    get_quiz_answer_slot_count,
+    get_quiz_max_score,
+)
 
 kks = pykakasi.kakasi()
 
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PAGES_DIR = os.path.join(BASE_DIR, "pages")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 # MySQL에 enterping_db 라는 이름의 데이터베이스 하나만 생성하면 자동으로 컬럼은 생성 됩니다.
 # 데이터베이스 테이블 자동 생성
@@ -45,6 +55,8 @@ def ensure_result_columns():
         migrations.append("ALTER TABLE typing_histories ADD COLUMN typos INTEGER NOT NULL DEFAULT 0")
     if "elapsed_seconds" not in typing_columns:
         migrations.append("ALTER TABLE typing_histories ADD COLUMN elapsed_seconds INTEGER NOT NULL DEFAULT 0")
+    if "rank_eligible" not in typing_columns:
+        migrations.append("ALTER TABLE typing_histories ADD COLUMN rank_eligible BOOLEAN NOT NULL DEFAULT 0")
 
     quiz_columns = table_columns.get("quiz_histories", set())
     if "content_id" not in quiz_columns:
@@ -53,6 +65,8 @@ def ensure_result_columns():
         migrations.append("ALTER TABLE quiz_histories ADD COLUMN accuracy FLOAT NOT NULL DEFAULT 0")
     if "max_combo" not in quiz_columns:
         migrations.append("ALTER TABLE quiz_histories ADD COLUMN max_combo INTEGER NOT NULL DEFAULT 0")
+    if "rank_eligible" not in quiz_columns:
+        migrations.append("ALTER TABLE quiz_histories ADD COLUMN rank_eligible BOOLEAN NOT NULL DEFAULT 0")
 
     if migrations:
         with engine.begin() as conn:
@@ -106,11 +120,11 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup_event():
-    db = next(get_db())
-    if db.query(models.TypingContent).count() < 4:
-        # 기존 데이터 삭제 (중복 방지용 초기화)
-        db.query(models.TypingContent).delete()
-        
+    db = SessionLocal()
+    try:
+        if db.query(models.TypingContent).count() > 0:
+            return
+
         songs = [
             {
                 "id": 1,
@@ -158,9 +172,12 @@ def startup_event():
             content = models.TypingContent(**song)
             db.add(content)
         db.commit()
+    finally:
+        db.close()
 
 # ── 정적 파일 서빙 ─────────────────────────────────────────
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+app.mount("/images", StaticFiles(directory=os.path.join(STATIC_DIR, "images")), name="images")
 
 # ── 인메모리 저장소 (실제 서비스에서는 DB/Redis 사용 권장) ─
 # { email: { "code": "123456", "expires_at": timestamp } }
@@ -285,48 +302,6 @@ class QuizResultCreate(BaseModel):
 
 class ConvertRequest(BaseModel):
     text: str
-
-def clamp_number(value, minimum, maximum):
-    return max(minimum, min(maximum, value))
-
-def calculate_typing_score(wpm: int, accuracy: float, typos: int, difficulty: int) -> int:
-    safe_wpm = clamp_number(int(wpm), 0, 600)
-    safe_accuracy = clamp_number(float(accuracy), 0, 100)
-    safe_typos = clamp_number(int(typos), 0, 10000)
-    safe_difficulty = clamp_number(int(difficulty or 3), 1, 5)
-    difficulty_multiplier = 1 + ((safe_difficulty - 3) * 0.1)
-    accuracy_multiplier = (safe_accuracy / 100) ** 2
-    return max(0, round((safe_wpm * accuracy_multiplier * difficulty_multiplier) - (safe_typos * 2)))
-
-def get_quiz_answer_slot_count(quiz_data: str) -> int:
-    try:
-        parsed = json.loads(quiz_data or "[]")
-    except Exception:
-        return 0
-    total = 0
-    for item in parsed:
-        if item.get("singer"):
-            total += 1
-        if item.get("title"):
-            total += 1
-        if item.get("lyrics"):
-            total += 1
-    return total
-
-def get_quiz_max_score(quiz_data: str) -> int:
-    try:
-        parsed = json.loads(quiz_data or "[]")
-    except Exception:
-        return 0
-    score = 0
-    combo = 0
-    answer_points = {"singer": 50, "title": 70, "lyrics": 100}
-    for item in parsed:
-        for answer_type, points in answer_points.items():
-            if item.get(answer_type):
-                score += points + (combo * 10)
-                combo += 1
-    return score
 
 def validate_email(email: str):
     if not EMAIL_REGEX.match(email):
@@ -774,6 +749,94 @@ def get_my_results(current_user: models.User = Depends(get_current_user), db: Se
         "recent": recent[:20]
     }
 
+@app.get("/api/rankings")
+def get_rankings(mode: str = "all", content_id: int | None = None, limit: int = 50, db: Session = Depends(get_db)):
+    safe_limit = clamp_number(int(limit or 50), 1, 100)
+    requested_mode = (mode or "all").lower()
+    if requested_mode not in {"all", "typing", "quiz"}:
+        raise HTTPException(status_code=400, detail="Invalid ranking mode.")
+
+    rows = []
+
+    if requested_mode in {"all", "typing"}:
+        typing_query = db.query(models.TypingHistory, models.User).join(
+            models.User, models.TypingHistory.user_id == models.User.id
+        ).filter(models.TypingHistory.rank_eligible == True)
+        if content_id is not None:
+            typing_query = typing_query.filter(models.TypingHistory.content_id == content_id)
+        typing_histories = typing_query.order_by(
+            models.TypingHistory.score.desc(),
+            models.TypingHistory.accuracy.desc(),
+            models.TypingHistory.wpm.desc()
+        ).limit(safe_limit).all()
+
+        for history, user in typing_histories:
+            rows.append({
+                "type": "typing",
+                "nickname": user.nickname,
+                "content_id": history.content_id,
+                "title": history.content_title,
+                "genre": history.genre,
+                "score": history.score,
+                "accuracy": history.accuracy,
+                "wpm": history.wpm,
+                "max_combo": None,
+                "played_at": history.played_at.isoformat() if history.played_at else None
+            })
+
+    if requested_mode in {"all", "quiz"}:
+        quiz_query = db.query(models.QuizHistory, models.User).join(
+            models.User, models.QuizHistory.user_id == models.User.id
+        ).filter(models.QuizHistory.rank_eligible == True)
+        if content_id is not None:
+            quiz_query = quiz_query.filter(models.QuizHistory.content_id == content_id)
+        quiz_histories = quiz_query.order_by(
+            models.QuizHistory.score.desc(),
+            models.QuizHistory.accuracy.desc(),
+            models.QuizHistory.max_combo.desc()
+        ).limit(safe_limit).all()
+
+        quiz_content_ids = {history.content_id for history, _ in quiz_histories if history.content_id}
+        quiz_contents = {}
+        if quiz_content_ids:
+            quiz_contents = {
+                c.id: c for c in db.query(models.QuizContent).filter(models.QuizContent.id.in_(quiz_content_ids)).all()
+            }
+
+        for history, user in quiz_histories:
+            content = quiz_contents.get(history.content_id)
+            rows.append({
+                "type": "quiz",
+                "nickname": user.nickname,
+                "content_id": history.content_id,
+                "title": content.title if content else "Quiz",
+                "genre": history.quiz_category,
+                "score": history.score,
+                "accuracy": history.accuracy,
+                "wpm": None,
+                "max_combo": history.max_combo,
+                "played_at": history.played_at.isoformat() if history.played_at else None
+            })
+
+    rows.sort(
+        key=lambda row: (
+            row["score"] or 0,
+            row["accuracy"] or 0,
+            row["wpm"] or row["max_combo"] or 0
+        ),
+        reverse=True
+    )
+    ranked = rows[:safe_limit]
+    for index, row in enumerate(ranked, start=1):
+        row["rank"] = index
+
+    return {
+        "success": True,
+        "mode": requested_mode,
+        "content_id": content_id,
+        "data": ranked
+    }
+
 # GET /api/typing-contents
 # ════════════════════════════════════════════════════════════
 @app.get("/api/typing-contents")
@@ -845,14 +908,13 @@ def create_typing_content(req: TypingContentCreate, current_user: models.User = 
 # DELETE /api/typing-contents/{content_id}
 # ════════════════════════════════════════════════════════════
 @app.delete("/api/typing-contents/{content_id}")
-def delete_typing_content(content_id: int, db: Session = Depends(get_db)):
+def delete_typing_content(content_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = db.query(models.TypingContent).filter(models.TypingContent.id == content_id).first()
     if not content:
         raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
-    
-    # 임시 관리자 모드: 작성자 권한 체크를 무시하고 모두 삭제 허용
-    # if content.creator_id != current_user.id:
-    #     raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
+
+    if content.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
         
     db.delete(content)
     db.commit()
@@ -945,7 +1007,8 @@ def save_typing_result(req: TypingResultCreate, current_user: models.User = Depe
         accuracy=req.accuracy,
         score=server_score,
         typos=req.typos,
-        elapsed_seconds=req.elapsed_seconds
+        elapsed_seconds=req.elapsed_seconds,
+        rank_eligible=rank_eligible
     )
     content.play_count = (content.play_count or 0) + 1
     if rank_eligible and req.elapsed_seconds > 0:
@@ -1071,10 +1134,13 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
     }
 
 @app.delete("/api/quiz-contents/{content_id}")
-def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
+def delete_quiz_content(content_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
     if not content:
         raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+
+    if content.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
         
     db.delete(content)
     db.commit()
@@ -1114,6 +1180,7 @@ def save_quiz_result(req: QuizResultCreate, current_user: models.User = Depends(
     rank_eligible = (
         expected_questions > 0 and
         req.total_questions == expected_questions and
+        req.correct_count == expected_questions and
         req.score <= max_score
     )
 
@@ -1124,7 +1191,8 @@ def save_quiz_result(req: QuizResultCreate, current_user: models.User = Depends(
         score=server_score,
         total_questions=expected_questions,
         accuracy=req.accuracy,
-        max_combo=req.max_combo
+        max_combo=req.max_combo,
+        rank_eligible=rank_eligible
     )
     content.play_count = (content.play_count or 0) + 1
     if rank_eligible and server_score > (content.best_score or 0):
@@ -1183,16 +1251,26 @@ HTML_FILES = [
 
 @app.get("/")
 def root():
-    return FileResponse("index.html")
+    return FileResponse(os.path.join(PAGES_DIR, "index.html"))
 
 @app.get("/{page}.html")
 def serve_html(page: str):
-    path = f"{page}.html"
+    path = os.path.join(PAGES_DIR, f"{page}.html")
     if os.path.exists(path):
         return FileResponse(path)
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
-for f in ["style.css", "typing.css", "script.js", "quiz.js", "navbar.js"]:
-    @app.get(f"/{f}")
-    def serve_static(filename: str = f):
-        return FileResponse(filename)
+STATIC_FILE_PATHS = {
+    "style.css": os.path.join(STATIC_DIR, "css", "style.css"),
+    "typing.css": os.path.join(STATIC_DIR, "css", "typing.css"),
+    "script.js": os.path.join(STATIC_DIR, "js", "script.js"),
+    "quiz.js": os.path.join(STATIC_DIR, "js", "quiz.js"),
+    "ranking.js": os.path.join(STATIC_DIR, "js", "ranking.js"),
+    "navbar.js": os.path.join(STATIC_DIR, "js", "navbar.js"),
+    "hero-bg.jpg": os.path.join(STATIC_DIR, "images", "hero-bg.jpg"),
+}
+
+for filename, file_path in STATIC_FILE_PATHS.items():
+    @app.get(f"/{filename}")
+    def serve_static(path: str = file_path):
+        return FileResponse(path)

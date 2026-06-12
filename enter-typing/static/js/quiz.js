@@ -368,9 +368,9 @@ function updateQuizCountDisplay() {
 
 function updateAnswerBoard() {
   const item = quizData[currentIndex] || {};
-  document.getElementById("board-singer").textContent = item.singer ? "???" : "-";
-  document.getElementById("board-title").textContent = item.title ? "???" : "-";
-  document.getElementById("board-lyrics").textContent = item.lyrics ? "???" : "-";
+  document.getElementById("board-singer").textContent = item.singer ? "정답 대기" : "-";
+  document.getElementById("board-title").textContent = item.title ? "정답 대기" : "-";
+  document.getElementById("board-lyrics").textContent = item.lyrics ? "정답 대기" : "-";
 
   const hintWrapper = document.getElementById("hint-wrapper");
   const hintToggleBtn = document.getElementById("hint-toggle-btn");

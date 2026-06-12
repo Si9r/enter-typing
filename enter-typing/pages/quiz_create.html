@@ -757,6 +757,16 @@
             return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
         function parseTime(timeStr) {
             const parts = timeStr.split(':');
             if (parts.length === 3) {
@@ -990,10 +1000,10 @@
                 card.innerHTML = `
                     ${thumbnailUrl ? `<img src="${thumbnailUrl}" class="card-thumbnail" alt="thumbnail">` : `<div class="card-thumbnail" style="display:flex; align-items:center; justify-content:center; color:#ccc; font-size: 0.9rem;">No Image</div>`}
                     <div class="time-range">⏱ ${formatTime(line.start)} ~ ${formatTime(line.end)}</div>
-                    <div class="quiz-info"><span>가수</span> ${line.singer || '-'}</div>
-                    <div class="quiz-info"><span>제목</span> ${line.title || '-'}</div>
-                    <div class="quiz-info"><span>가사</span> ${line.lyrics || '-'}</div>
-                    <div class="quiz-info"><span>힌트</span> ${line.hint || '-'}</div>
+                    <div class="quiz-info"><span>가수</span> ${escapeHTML(line.singer || '-')}</div>
+                    <div class="quiz-info"><span>제목</span> ${escapeHTML(line.title || '-')}</div>
+                    <div class="quiz-info"><span>가사</span> ${escapeHTML(line.lyrics || '-')}</div>
+                    <div class="quiz-info"><span>힌트</span> ${escapeHTML(line.hint || '-')}</div>
                     <div class="del-icon" data-index="${index}" title="삭제">🗑️</div>
                 `;
 

@@ -454,6 +454,16 @@
             return null;
         }
 
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
         document.getElementById('btn-load-yt').addEventListener('click', () => {
             const vid = extractVideoId(ytInput.value);
             if (!vid) return alert("유효한 유튜브 URL을 입력하세요.");
@@ -533,9 +543,9 @@
                 tr.innerHTML = `
                     <td style="text-align: center; color: #888;">${index + 1}</td>
                     <td style="font-weight: bold; color: var(--color-pink);">${line.time.toFixed(2)}</td>
-                    <td>${line.lyrics}</td>
-                    <td>${line.hiragana}</td>
-                    <td>${line.romaji}</td>
+                    <td>${escapeHTML(line.lyrics)}</td>
+                    <td>${escapeHTML(line.hiragana)}</td>
+                    <td>${escapeHTML(line.romaji)}</td>
                     <td style="text-align: center;">
                         <span class="action-icon edit-icon" data-index="${index}">✏️</span>
                         <span class="action-icon del-icon" data-index="${index}">🗑️</span>

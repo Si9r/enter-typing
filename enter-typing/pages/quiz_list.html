@@ -199,7 +199,7 @@
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-outline" id="admin-mode-btn" onclick="toggleAdminMode()"
                         style="display: flex; align-items: center; border-radius: 30px; padding: 10px 22px;">
-                        관리자 모드: OFF
+                        내 콘텐츠 관리: OFF
                     </button>
                     <button class="btn btn-pink"
                         onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='quiz_create.html'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='login.html'; }"
@@ -333,29 +333,43 @@
 
         // 페이지 로드 시 콘텐츠 불러오기
         let allQuizContents = [];
-        let isAdminMode = false;
+        let manageMode = false;
 
         function toggleAdminMode() {
-            isAdminMode = !isAdminMode;
+            manageMode = !manageMode;
             const btn = document.getElementById('admin-mode-btn');
-            btn.innerText = `관리자 모드: ${isAdminMode ? 'ON' : 'OFF'}`;
-            btn.className = isAdminMode ? 'btn btn-blue-outline' : 'btn btn-outline';
-            btn.style.color = isAdminMode ? 'var(--color-blue)' : '';
-            btn.style.borderColor = isAdminMode ? 'var(--color-blue)' : '';
+            btn.innerText = `내 콘텐츠 관리: ${manageMode ? 'ON' : 'OFF'}`;
+            btn.className = manageMode ? 'btn btn-blue-outline' : 'btn btn-outline';
+            btn.style.color = manageMode ? 'var(--color-blue)' : '';
+            btn.style.borderColor = manageMode ? 'var(--color-blue)' : '';
             renderCards();
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function isOwnedContent(item) {
+            const user = window.NavAuth && window.NavAuth.getUser ? window.NavAuth.getUser() : null;
+            return Boolean(user && item.creator_nickname && item.creator_nickname === user.nickname);
         }
 
         async function deleteQuizContent(id) {
             if (!confirm('정말로 이 퀴즈 콘텐츠를 삭제하시겠습니까?')) return;
 
             try {
-                const token = localStorage.getItem('token');
-                const headers = {};
-                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const token = sessionStorage.getItem('ep_token');
+                if (!token) throw new Error('로그인이 필요합니다.');
 
                 const response = await fetch(`/api/quiz-contents/${id}`, {
                     method: 'DELETE',
-                    headers: headers
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (!response.ok) {
@@ -392,23 +406,24 @@
 
                 const diffStars = '⭐'.repeat(item.difficulty || 3);
                 const bestScore = item.best_score || 0;
+                const canManage = manageMode && isOwnedContent(item);
 
                 const cardHTML = `
                     <div class="card" onclick="openModal(${item.id})">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                            <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${item.genre || 'JPOP'}</div>
+                            <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${escapeHTML(item.genre || 'JPOP')}</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: #666; background: #f5f5f5; padding: 4px 10px; border-radius: 12px; border: 1px solid #e0e0e0; display: flex; align-items: center; gap: 4px;">
                                 📝 ${item.quiz_count || 0}문제
                             </div>
                         </div>
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-desc">${descPreview}</p>
+                        <h3 class="card-title">${escapeHTML(item.title)}</h3>
+                        <p class="card-desc">${escapeHTML(descPreview)}</p>
                         <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                             <div>
                                 <span class="difficulty">${diffStars}</span>
                                 <span class="time" style="margin-left: 10px;">🏆 ${bestScore}점</span>
                             </div>
-                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
+                            ${canManage ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
                         </div>
                     </div>
                 `;

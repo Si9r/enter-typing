@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from database import Base
+from .database import Base
 
 # 1. 회원 정보 테이블
 class User(Base):
@@ -44,6 +44,7 @@ class TypingHistory(Base):
     score = Column(Integer, default=0, nullable=False)
     typos = Column(Integer, default=0, nullable=False)
     elapsed_seconds = Column(Integer, default=0, nullable=False)
+    rank_eligible = Column(Boolean, default=False, nullable=False)
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="typing_histories")
@@ -60,6 +61,7 @@ class QuizHistory(Base):
     total_questions = Column(Integer, nullable=False)
     accuracy = Column(Float, default=0, nullable=False)
     max_combo = Column(Integer, default=0, nullable=False)
+    rank_eligible = Column(Boolean, default=False, nullable=False)
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="quiz_histories")

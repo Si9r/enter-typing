@@ -789,7 +789,7 @@
       </div>
       <nav class="nav-links">
         <a href="typing_list.html">타이핑</a>
-        <a href="quiz.html">퀴즈</a>
+        <a href="quiz_list.html">퀴즈</a>
         <a href="ranking.html">랭킹</a>
         <a href="notice.html">공지</a>
       </nav>
@@ -836,7 +836,7 @@
       <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')">📊 분석</button>
       <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')">📜 히스토리</button>
       <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')">📅 출석체크</button>
-      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')">📝 내 타이핑</button>
+      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')">📦 내 컨텐츠</button>
     </div>
 
     <!-- 탭 1: 프로필 & 뱃지 -->
@@ -1245,9 +1245,16 @@
       </div>
     </div>
 
-    <!-- 탭 5: 내 타이핑 -->
+    <!-- 탭 5: 내 컨텐츠 -->
     <div class="tab-panel" id="tab-mytyping">
+      <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈 컨텐츠</button>
+      </div>
       <div class="history-list" id="mytyping-list">
+        <!-- JS가 데이터를 채워줍니다 -->
+      </div>
+      <div class="history-list" id="myquiz-list" style="display: none;">
         <!-- JS가 데이터를 채워줍니다 -->
       </div>
     </div>
@@ -1510,6 +1517,30 @@
       document.getElementById('attend-total-num').textContent = total;
     }
 
+    function switchSubTab(type) {
+      document.getElementById('mytyping-list').style.display = type === 'typing' ? 'block' : 'none';
+      document.getElementById('myquiz-list').style.display = type === 'quiz' ? 'block' : 'none';
+      
+      const btnTyping = document.getElementById('subtab-typing-btn');
+      const btnQuiz = document.getElementById('subtab-quiz-btn');
+      
+      if (type === 'typing') {
+        btnTyping.className = 'btn btn-pink';
+        btnTyping.style.background = '';
+        btnTyping.style.color = '';
+        btnQuiz.className = 'btn';
+        btnQuiz.style.background = '#f0f0f0';
+        btnQuiz.style.color = '#555';
+      } else {
+        btnQuiz.className = 'btn btn-pink';
+        btnQuiz.style.background = '';
+        btnQuiz.style.color = '';
+        btnTyping.className = 'btn';
+        btnTyping.style.background = '#f0f0f0';
+        btnTyping.style.color = '#555';
+      }
+    }
+
     // ── 내 타이핑 콘텐츠 로드 ──────────────────────────────────
     async function loadMyTypingContents() {
       const token = sessionStorage.getItem('ep_token');
@@ -1572,10 +1603,71 @@
       }
     }
 
+    async function deleteMyQuiz(id) {
+      if (!confirm("정말 이 퀴즈 콘텐츠를 삭제하시겠습니까?")) return;
+
+      const token = sessionStorage.getItem('ep_token');
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/quiz-contents/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const resData = await res.json();
+
+        if (resData.success) {
+          alert("삭제되었습니다.");
+          loadMyQuizContents(); // 목록 새로고침
+        } else {
+          alert(resData.detail || "삭제에 실패했습니다.");
+        }
+      } catch (e) {
+        console.error("삭제 중 오류가 발생했습니다:", e);
+        alert("오류가 발생했습니다.");
+      }
+    }
+
     // 페이지 로드 시 초기화
     renderCalendar(curYear, curMonth);
     loadAttendanceData();
+    async function loadMyQuizContents() {
+      const token = sessionStorage.getItem('ep_token');
+      if (!token) return;
+      try {
+        const res = await fetch('/api/my-quiz-contents', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const resData = await res.json();
+        const container = document.getElementById('myquiz-list');
+        if (resData.success && resData.data.length > 0) {
+          container.innerHTML = resData.data.map(item => `
+            <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='quiz.html?id=${item.id}'">
+              <div class="history-icon quiz">🧩</div>
+              <div class="history-info">
+                <div class="title">${item.title}</div>
+                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)}</div>
+              </div>
+              <div class="history-result" style="margin-right: 80px;">
+                <div class="score">🏆 최고 점수: ${item.best_score || 0}</div>
+              </div>
+              <button onclick="event.stopPropagation(); location.href='quiz_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
+              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding: 40px; color: #7F8C8D; font-weight: bold;">아직 제작한 퀴즈 콘텐츠가 없습니다.</div>';
+        }
+      } catch (e) {
+        console.error("내 퀴즈 콘텐츠를 불러오는 도중 오류가 발생했습니다:", e);
+      }
+    }
+
     loadMyTypingContents();
+    loadMyQuizContents();
   </script>
 
   <!-- ══ 정보 수정 모달 ══════════════════════════════════════════ -->

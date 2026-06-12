@@ -16,12 +16,13 @@
             background: var(--color-white);
             border-radius: 24px;
             padding: 50px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
             display: flex;
             gap: 50px;
             margin-bottom: 60px;
             border: 1px solid rgba(0, 0, 0, 0.02);
         }
+
         .detail-cover {
             width: 320px;
             height: 320px;
@@ -33,11 +34,12 @@
             color: white;
             font-size: 5rem;
             font-weight: 900;
-            box-shadow: 0 15px 35px rgba(255,182,193,0.3);
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.3);
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
         }
+
         .detail-cover::after {
             content: '';
             position: absolute;
@@ -45,14 +47,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
         }
+
         .detail-info {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
+
         .detail-title {
             font-size: 2.5rem;
             font-weight: 900;
@@ -60,12 +64,14 @@
             margin-bottom: 8px;
             line-height: 1.2;
         }
+
         .detail-artist {
             font-size: 1.2rem;
             color: var(--color-text-muted);
             font-weight: 700;
             margin-bottom: 25px;
         }
+
         .detail-stats {
             display: flex;
             gap: 30px;
@@ -74,11 +80,13 @@
             border-top: 1px solid var(--color-border);
             border-bottom: 1px solid var(--color-border);
         }
+
         .stat-item {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
+
         .stat-item .label {
             font-size: 0.85rem;
             color: var(--color-text-muted);
@@ -86,11 +94,13 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
         .stat-item .value {
             font-size: 1.2rem;
             font-weight: 900;
             color: var(--color-text-main);
         }
+
         .detail-desc {
             font-size: 1.05rem;
             color: #555;
@@ -99,6 +109,7 @@
             flex-grow: 1;
             font-weight: 500;
         }
+
         .detail-actions {
             display: flex;
             gap: 15px;
@@ -115,7 +126,7 @@
             </div>
             <nav class="nav-links">
                 <a href="typing_list.html" class="active">타이핑</a>
-                <a href="quiz.html">퀴즈</a>
+                <a href="quiz_list.html">퀴즈</a>
                 <a href="ranking.html">랭킹</a>
                 <a href="notice.html">공지</a>
             </nav>
@@ -137,7 +148,8 @@
 
     <script src="navbar.js?v=1.0.2"></script>
 
-    <main style="margin-top: 120px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
+    <main
+        style="margin-top: 120px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
         <div class="detail-container">
             <div class="detail-cover">
                 🎵
@@ -146,7 +158,7 @@
                 <div class="card-badge pink" style="margin-bottom: 15px;">-</div>
                 <h1 class="detail-title">로딩 중...</h1>
                 <div class="detail-artist">...</div>
-                
+
                 <div class="detail-stats">
                     <div class="stat-item">
                         <span class="label">난이도</span>
@@ -167,7 +179,8 @@
                 </p>
 
                 <div class="detail-actions">
-                    <button id="btn-start-typing" class="btn btn-pink btn-large" style="flex: 1;" onclick="location.href='typing.html'">
+                    <button id="btn-start-typing" class="btn btn-pink btn-large" style="flex: 1;"
+                        onclick="location.href='typing.html'">
                         ▶ 타이핑 시작하기
                     </button>
                     <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
@@ -181,7 +194,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const contentId = urlParams.get('id') || 1;
-            
+
             try {
                 const response = await fetch(`/api/typing-content/${contentId}`);
                 const data = await response.json();
@@ -189,18 +202,18 @@
                     document.querySelector('.detail-title').innerText = data.title;
                     document.querySelector('.detail-artist').innerText = data.artist;
                     document.querySelector('.card-badge').innerText = data.genre || 'JPOP';
-                    
+
                     const diffValue = data.difficulty || 3;
                     document.getElementById('detail-difficulty').innerText = '⭐'.repeat(diffValue);
                     document.getElementById('detail-play-count').innerText = (data.play_count || 0) + '회';
                     document.getElementById('detail-best-time').innerText = (data.best_time || 0) + '초';
-                    
+
                     if (data.description) {
                         document.querySelector('.detail-desc').innerText = data.description;
                     } else {
                         document.querySelector('.detail-desc').innerText = `${data.artist}의 '${data.title}' 가사로 일본어 타자 연습을 시작해보세요!`;
                     }
-                    
+
                     if (data.youtube_id) {
                         const cover = document.querySelector('.detail-cover');
                         cover.style.backgroundImage = `url('https://img.youtube.com/vi/${data.youtube_id}/maxresdefault.jpg')`;
@@ -208,7 +221,7 @@
                         cover.style.backgroundPosition = 'center';
                         cover.innerHTML = ''; // 🎵 이모지 제거
                     }
-                    
+
                     document.getElementById('btn-start-typing').setAttribute('onclick', `location.href='typing.html?id=${contentId}'`);
                 }
             } catch (error) {
@@ -232,7 +245,7 @@
                     <a href="#">DC</a>
                 </div>
             </div>
-            
+
             <div class="footer-col">
                 <h4>타이핑</h4>
                 <ul>
@@ -263,10 +276,11 @@
                 </ul>
             </div>
         </div>
-        
+
         <div class="footer-bottom">
             <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
         </div>
     </footer>
 </body>
+
 </html>

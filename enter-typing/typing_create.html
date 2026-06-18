@@ -319,6 +319,7 @@
                     <label style="font-weight:700; color:#555; width:40px;">시간</label>
                     <input type="number" id="line-time" step="0.01" min="0" placeholder="0.00">
                     <button class="toolbar-btn" id="btn-sync-time" title="현재 영상 시간 가져오기">⏱️ 싱크</button>
+                    <button class="toolbar-btn" id="btn-end-here" title="이 시간에서 타이핑을 종료합니다." style="color: var(--color-pink); border-color: var(--color-pink);">🛑 여기서 종료하기</button>
                 </div>
 
                 <div class="input-group">
@@ -533,9 +534,10 @@
                 tr.innerHTML = `
                     <td style="text-align: center; color: #888;">${index + 1}</td>
                     <td style="font-weight: bold; color: var(--color-pink);">${line.time.toFixed(2)}</td>
+                    ${line.lyrics === '[END]' ? '<td colspan="3" style="text-align: center; font-weight: bold; color: #e67700;">[타이핑 종료 지점]</td>' : `
                     <td>${line.lyrics}</td>
                     <td>${line.hiragana}</td>
-                    <td>${line.romaji}</td>
+                    <td>${line.romaji}</td>`}
                     <td style="text-align: center;">
                         <span class="action-icon edit-icon" data-index="${index}">✏️</span>
                         <span class="action-icon del-icon" data-index="${index}">🗑️</span>
@@ -570,6 +572,14 @@
         }
 
         // Add Line
+        document.getElementById('btn-end-here').addEventListener('click', () => {
+            const time = parseFloat(lineTimeInput.value);
+            if (isNaN(time)) return alert("종료할 시간을 먼저 입력하거나 ⏱️싱크 버튼으로 가져와주세요.");
+            linesData.push({ time, lyrics: "[END]", hiragana: "[END]", romaji: "[END]" });
+            resetForm();
+            renderTable();
+        });
+
         btnAddLine.addEventListener('click', () => {
             const time = parseFloat(lineTimeInput.value) || 0;
             const lyrics = lineLyricsInput.value.trim();

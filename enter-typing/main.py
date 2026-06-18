@@ -235,6 +235,18 @@ class QuizContentCreate(BaseModel):
 class ConvertRequest(BaseModel):
     text: str
 
+class TypingHistoryCreate(BaseModel):
+    content_title: str
+    genre: str
+    wpm: int
+    accuracy: float
+    text: str
+
+class QuizHistoryCreate(BaseModel):
+    quiz_category: str
+    score: int
+    total_questions: int
+
 def validate_email(email: str):
     if not EMAIL_REGEX.match(email):
         raise HTTPException(status_code=422, detail="올바른 이메일 형식이 아닙니다.")
@@ -839,6 +851,26 @@ def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}
 
+@app.put("/api/quiz-contents/{content_id}")
+def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    
+    if content.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="수정 권한이 없습니다.")
+        
+    content.title = req.title
+    content.artist = req.artist
+    content.genre = req.genre
+    content.description = req.description
+    content.youtube_id = req.youtube_id
+    content.quiz_data = req.quiz_data
+    content.difficulty = req.difficulty
+    
+    db.commit()
+    return {"success": True, "message": "수정되었습니다."}
+
 # ════════════════════════════════════════════════════════════
 # API: 가사 자동 변환 (히라가나, 로마자)
 # POST /api/convert
@@ -899,3 +931,82 @@ for f in ["style.css", "typing.css", "script.js", "navbar.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)
+
+# ════════════════════════════════════════════════════════════
+# API: 타이핑 히스토리 저장
+# POST /api/typing-history
+# ════════════════════════════════════════════════════════════
+@app.post("/api/typing-history")
+def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    history = models.TypingHistory(
+        user_id=current_user.id,
+        content_title=req.content_title,
+        genre=req.genre,
+        wpm=req.wpm,
+        accuracy=req.accuracy
+    )
+    db.add(history)
+    db.commit()
+    return {"message": "기록이 저장되었습니다."}
+
+# ════════════════════════════════════════════════════════════
+# API: 퀴즈 히스토리 저장
+# POST /api/quiz-history
+# ════════════════════════════════════════════════════════════
+@app.post("/api/quiz-history")
+def save_quiz_history(req: QuizHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    history = models.QuizHistory(
+        user_id=current_user.id,
+        quiz_category=req.quiz_category,
+        score=req.score,
+        total_questions=req.total_questions
+    )
+    db.add(history)
+    db.commit()
+    return {"message": "퀴즈 기록이 저장되었습니다."}
+
+# ════════════════════════════════════════════════════════════
+# API: 내 플레이 히스토리 조회
+# GET /api/my-history
+# ════════════════════════════════════════════════════════════
+@app.get("/api/my-history")
+def get_my_history(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    typing_histories = db.query(models.TypingHistory).filter(
+        models.TypingHistory.user_id == current_user.id
+    ).order_by(models.TypingHistory.played_at.desc()).limit(20).all()
+    
+    quiz_histories = db.query(models.QuizHistory).filter(
+        models.QuizHistory.user_id == current_user.id
+    ).order_by(models.QuizHistory.played_at.desc()).limit(20).all()
+    
+    combined = []
+    for th in typing_histories:
+        combined.append({
+            "type": "typing",
+            "title": th.content_title,
+            "genre": th.genre,
+            "wpm": th.wpm,
+            "accuracy": th.accuracy,
+            "played_at": th.played_at.strftime("%Y.%m.%d"),
+            "_raw_date": th.played_at
+        })
+        
+    for qh in quiz_histories:
+        combined.append({
+            "type": "quiz",
+            "title": qh.quiz_category,
+            "genre": "퀴즈",
+            "score": qh.score,
+            "total_questions": qh.total_questions,
+            "played_at": qh.played_at.strftime("%Y.%m.%d"),
+            "_raw_date": qh.played_at
+        })
+        
+    # Sort descending by raw datetime
+    combined.sort(key=lambda x: x["_raw_date"], reverse=True)
+    
+    # Remove raw_date
+    for item in combined:
+        del item["_raw_date"]
+        
+    return {"history": combined}

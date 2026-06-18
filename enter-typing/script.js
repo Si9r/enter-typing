@@ -42,6 +42,10 @@ let isYoutubeReady = false;
 let isPlayerReady = false;
 let lineCompleted = false;
 
+// Variables for countdown overlay
+let isCountingDown = false;
+let countdownInterval = null;
+
 window.onYouTubeIframeAPIReady = function () {
   isYoutubeReady = true;
   initYoutubePlayer();
@@ -681,6 +685,11 @@ function startGame(startedByYoutube = false) {
   if (isPlaying) return;
   if (contentLines.length === 0) return;
 
+  if (countdownInterval) clearInterval(countdownInterval);
+  isCountingDown = false;
+  const overlay = document.getElementById("countdown-overlay");
+  if (overlay) overlay.style.display = "none";
+
   if (!startedByYoutube && youtubePlayer && isPlayerReady) {
     youtubePlayer.playVideo();
   }
@@ -757,6 +766,9 @@ function startTimer() {
  */
 function pauseTimer() {
   clearInterval(timer);
+  if (typingInput) {
+    typingInput.disabled = true;
+  }
 }
 
 /**
@@ -765,6 +777,10 @@ function pauseTimer() {
 function resumeTimer() {
   if (isPlaying && timeLeft > 0) {
     startTimer();
+    if (typingInput && !lineCompleted) {
+      typingInput.disabled = false;
+      typingInput.focus({ preventScroll: true });
+    }
   }
 }
 
@@ -776,6 +792,10 @@ function resumeTimer() {
 function endGame(completed = false) {
   clearInterval(timer);
   clearInterval(syncTimer);
+  if (countdownInterval) clearInterval(countdownInterval);
+  isCountingDown = false;
+  const overlay = document.getElementById("countdown-overlay");
+  if (overlay) overlay.style.display = "none";
   isPlaying = false;
   if (typingInput) typingInput.disabled = true;
 
@@ -1445,13 +1465,54 @@ if (typingPanel) {
   });
 }
 
-// Tab skip logic
+// Tab skip and Spacebar pause logic
 document.addEventListener("keydown", function(e) {
-  if (isPlaying && e.key === "Tab") {
-    e.preventDefault();
-    skipTo80Percent();
+  if (isPlaying) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      skipTo80Percent();
+    } else if (e.code === "Space" || e.key === " ") {
+      e.preventDefault();
+      if (isYoutubeMode && youtubePlayer && isPlayerReady) {
+        if (isCountingDown) return; // Ignore spacebar during countdown
+        
+        const state = youtubePlayer.getPlayerState();
+        if (state === YT.PlayerState.PLAYING) {
+          youtubePlayer.pauseVideo();
+        } else if (state === YT.PlayerState.PAUSED) {
+          startCountdownAndPlay();
+        }
+      }
+    }
   }
 });
+
+function startCountdownAndPlay() {
+  const overlay = document.getElementById("countdown-overlay");
+  const text = document.getElementById("countdown-text");
+  
+  if (!overlay || !text) {
+    youtubePlayer.playVideo();
+    return;
+  }
+
+  isCountingDown = true;
+  overlay.style.display = "flex";
+  let count = 3;
+  text.innerText = count;
+
+  countdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      text.innerText = count;
+    } else {
+      clearInterval(countdownInterval);
+      overlay.style.display = "none";
+      isCountingDown = false;
+      youtubePlayer.playVideo();
+    }
+  }, 1000);
+}
 
 function skipTo80Percent() {
   if (!isPlaying || !isYoutubeMode || !youtubePlayer || !isPlayerReady) return;

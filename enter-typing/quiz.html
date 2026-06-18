@@ -1,14 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>퀴즈 - 엔터핑</title>
-    <link rel="stylesheet" href="style.css?v=1.0.3">
-    <link rel="stylesheet" href="typing.css">
+    <link rel="stylesheet" href="style.css?v=1.0.3" />
+    <link rel="stylesheet" href="typing.css" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" />
     <style>
         .vinyl-container {
             width: 100%;
@@ -23,27 +23,27 @@
         }
 
         .vinyl-record::after {
-            content: '';
+            content: "";
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             pointer-events: none;
             z-index: 4;
-            background: conic-gradient(
-                from 105deg,
-                transparent 0deg,
-                rgba(255,255,255,0.1) 15deg,
-                rgba(255,255,255,0.4) 35deg,
-                rgba(255,255,255,0.1) 55deg,
-                transparent 70deg,
-                transparent 180deg,
-                rgba(255,255,255,0.1) 195deg,
-                rgba(255,255,255,0.4) 215deg,
-                rgba(255,255,255,0.1) 235deg,
-                transparent 250deg,
-                transparent 360deg
-            );
+            background: conic-gradient(from 105deg,
+                    transparent 0deg,
+                    rgba(255, 255, 255, 0.1) 15deg,
+                    rgba(255, 255, 255, 0.4) 35deg,
+                    rgba(255, 255, 255, 0.1) 55deg,
+                    transparent 70deg,
+                    transparent 180deg,
+                    rgba(255, 255, 255, 0.1) 195deg,
+                    rgba(255, 255, 255, 0.4) 215deg,
+                    rgba(255, 255, 255, 0.1) 235deg,
+                    transparent 250deg,
+                    transparent 360deg);
         }
 
         .vinyl-record {
@@ -51,18 +51,16 @@
             width: 200px;
             height: 200px;
             background-color: #050505;
-            background-image: repeating-radial-gradient(
-                #111 0px,
-                #050505 2px,
-                #1e1e1e 4px,
-                #050505 6px
-            );
+            background-image: repeating-radial-gradient(#111 0px,
+                    #050505 2px,
+                    #1e1e1e 4px,
+                    #050505 6px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 
-                inset 0 0 0 3px rgba(0,0,0,0.8),
+            box-shadow:
+                inset 0 0 0 3px rgba(0, 0, 0, 0.8),
                 0 4px 10px rgba(0, 0, 0, 0.4);
             animation: spin 3s linear infinite;
         }
@@ -187,8 +185,8 @@
 <body>
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
-                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+            <div class="logo" onclick="location.href = 'index.html'">
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
@@ -199,178 +197,402 @@
             </nav>
         </div>
         <div class="nav-center">
-            <div class="search-bar" onclick="location.href='search.html'">
+            <div class="search-bar" onclick="location.href = 'search.html'">
                 <span class="search-icon">🔍</span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input type="text" placeholder="곡명, 아티스트 검색" readonly />
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+                <button class="auth-login" onclick="location.href = 'login.html'">
+                    로그인
+                </button>
+                <button class="auth-signup" onclick="location.href = 'signup.html'">
+                    회원가입
+                </button>
             </div>
         </div>
     </header>
 
     <script src="navbar.js?v=1.0.2"></script>
 
-    <main
-        style="margin-top: 120px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; margin-bottom: 80px;">
-
+    <main style="
+        margin-top: 120px;
+        flex: 1;
+        padding: 0 40px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 80px;
+      ">
         <!-- 뒤로가기 버튼 -->
-        <div style="width: 100%; margin-bottom: 15px; display: flex; justify-content: flex-start;">
-            <a href="#" onclick="history.back(); return false;"
-                style="display: flex; align-items: center; gap: 5px; color: #666; text-decoration: none; font-weight: 700; font-size: 1.05rem; transition: color 0.2s;"
-                onmouseover="this.style.color='#ff9a9e'" onmouseout="this.style.color='#666'">
+        <div style="
+          width: 100%;
+          margin-bottom: 15px;
+          display: flex;
+          justify-content: flex-start;
+        ">
+            <a href="#" onclick="
+            history.back();
+            return false;
+          " style="
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: color 0.2s;
+          " onmouseover="this.style.color = '#ff9a9e'" onmouseout="this.style.color = '#666'">
                 ← 뒤로가기
             </a>
         </div>
 
-        <div class="layout-grid"
-            style="display: grid; grid-template-columns: 250px 1fr 250px; grid-template-rows: auto auto; gap: 20px; width: 100%;">
-
+        <div class="layout-grid" style="
+          display: grid;
+          grid-template-columns: 250px 1fr 250px;
+          grid-template-rows: auto auto;
+          gap: 20px;
+          width: 100%;
+        ">
             <!-- Top Left: Stats -->
-            <div class="box-panel stats-panel"
-                style="border: 4px solid #999; border-radius: 8px; padding: 15px; background: #fff;">
-                <div class="panel-title"
-                    style="font-weight: bold; border-bottom: 3px solid #999; padding-bottom: 5px; margin-bottom: 25px; width: max-content; color: #555;">
-                    퀴즈 통계</div>
+            <div class="box-panel stats-panel" style="
+            border: 4px solid #999;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fff;
+          ">
+                <div class="panel-title" style="
+              font-weight: bold;
+              border-bottom: 3px solid #999;
+              padding-bottom: 5px;
+              margin-bottom: 25px;
+              width: max-content;
+              color: #555;
+            ">
+                    퀴즈 통계
+                </div>
 
-                <div
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; text-align: center;">
-                    <div style="border: 3px solid #999; border-radius: 4px; overflow: hidden;">
-                        <div
-                            style="border-bottom: 3px solid #999; padding: 5px; font-size: 0.9rem; font-weight: bold; color: #555;">
-                            현재 점수</div>
-                        <div id="score" style="padding: 10px; font-weight: bold; color: #333;">0</div>
+                <div style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-bottom: 15px;
+              text-align: center;
+            ">
+                    <div style="
+                border: 3px solid #999;
+                border-radius: 4px;
+                overflow: hidden;
+              ">
+                        <div style="
+                  border-bottom: 3px solid #999;
+                  padding: 5px;
+                  font-size: 0.9rem;
+                  font-weight: bold;
+                  color: #555;
+                ">
+                            현재 점수
+                        </div>
+                        <div id="score" style="padding: 10px; font-weight: bold; color: #333">
+                            0
+                        </div>
                     </div>
-                    <div style="border: 3px solid #999; border-radius: 4px; overflow: hidden;">
-                        <div
-                            style="border-bottom: 3px solid #999; padding: 5px; font-size: 0.9rem; font-weight: bold; color: #555;">
-                            최고 점수</div>
-                        <div style="padding: 10px; font-weight: bold; color: #333;">0</div>
+                    <div style="
+                border: 3px solid #999;
+                border-radius: 4px;
+                overflow: hidden;
+              ">
+                        <div style="
+                  border-bottom: 3px solid #999;
+                  padding: 5px;
+                  font-size: 0.9rem;
+                  font-weight: bold;
+                  color: #555;
+                ">
+                            최고 점수
+                        </div>
+                        <div style="padding: 10px; font-weight: bold; color: #333">0</div>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center;">
-                    <div style="border: 3px solid #999; border-radius: 4px; overflow: hidden;">
-                        <div
-                            style="border-bottom: 3px solid #999; padding: 5px; font-size: 0.9rem; font-weight: bold; color: #555;">
-                            정답률</div>
-                        <div id="accuracy" style="padding: 10px; font-weight: bold; color: #333;">100%</div>
+                <div style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              text-align: center;
+            ">
+                    <div style="
+                border: 3px solid #999;
+                border-radius: 4px;
+                overflow: hidden;
+              ">
+                        <div style="
+                  border-bottom: 3px solid #999;
+                  padding: 5px;
+                  font-size: 0.9rem;
+                  font-weight: bold;
+                  color: #555;
+                ">
+                            정답률
+                        </div>
+                        <div id="accuracy" style="padding: 10px; font-weight: bold; color: #333">
+                            100%
+                        </div>
                     </div>
-                    <div style="border: 3px solid #999; border-radius: 4px; overflow: hidden;">
-                        <div
-                            style="border-bottom: 3px solid #999; padding: 5px; font-size: 0.9rem; font-weight: bold; color: #555;">
-                            콤보</div>
-                        <div id="combo" style="padding: 10px; font-weight: bold; color: #333;">0</div>
+                    <div style="
+                border: 3px solid #999;
+                border-radius: 4px;
+                overflow: hidden;
+              ">
+                        <div style="
+                  border-bottom: 3px solid #999;
+                  padding: 5px;
+                  font-size: 0.9rem;
+                  font-weight: bold;
+                  color: #555;
+                ">
+                            콤보
+                        </div>
+                        <div id="combo" style="padding: 10px; font-weight: bold; color: #333">
+                            0
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 25px; border-top: 2px dashed #ccc; padding-top: 15px;">
-                    <div
-                        style="font-size: 0.95rem; font-weight: bold; color: #555; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="
+              margin-top: 25px;
+              border-top: 2px dashed #ccc;
+              padding-top: 15px;
+            ">
+                    <div style="
+                font-size: 0.95rem;
+                font-weight: bold;
+                color: #555;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+              ">
                         <span>음량 조절</span>
-                        <span id="volume-display" style="color: var(--color-pink);">50%</span>
+                        <span id="volume-display" style="color: var(--color-pink)">50%</span>
                     </div>
-                    <input type="range" id="volume-slider" min="0" max="100" value="50"
-                        style="width: 100%; cursor: pointer; accent-color: var(--color-pink);">
+                    <input type="range" id="volume-slider" min="0" max="100" value="50" style="
+                width: 100%;
+                cursor: pointer;
+                accent-color: var(--color-pink);
+              " />
                 </div>
             </div>
 
             <!-- Top Center: Video (Vinyl Record for Quiz) -->
-            <div class="box-panel video-panel"
-                style="border: 4px solid #999; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; min-height: 400px; background: #fff; position: relative; overflow: hidden;">
-
+            <div class="box-panel video-panel" style="
+            border: 4px solid #999;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            min-height: 400px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+          ">
                 <!-- 퀴즈 남은 수 표시 -->
-                <div id="quiz-count-display" style="position: absolute; top: 15px; left: 15px; font-weight: bold; font-size: 1.05rem; color: #555; background: rgba(255, 255, 255, 0.9); padding: 5px 12px; border-radius: 20px; border: 2px solid #999; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div id="quiz-count-display" style="
+              position: absolute;
+              top: 15px;
+              left: 15px;
+              font-weight: bold;
+              font-size: 1.05rem;
+              color: #555;
+              background: rgba(255, 255, 255, 0.9);
+              padding: 5px 12px;
+              border-radius: 20px;
+              border: 2px solid #999;
+              z-index: 20;
+              box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            ">
                     남은 퀴즈: -
                 </div>
 
-                <div class="vinyl-container"
-                    style="position: relative; display: flex; justify-content: center; align-items: center;">
-                    <div class="vinyl-record paused" id="vinyl-record" style="z-index: 2;">
-                        <div class="vinyl-label" onclick="startQuiz()" style="cursor: pointer;" title="클릭하여 시작">
-                        </div>
-                        <div class="vinyl-question" onclick="startQuiz()" style="cursor: pointer;" title="클릭하여 시작">?
+                <div class="vinyl-container" style="
+              position: relative;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            ">
+                    <div class="vinyl-record paused" id="vinyl-record" style="z-index: 2">
+                        <div class="vinyl-label" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작"></div>
+                        <div class="vinyl-question" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작">
+                            ?
                         </div>
                     </div>
 
                     <!-- Progress Bar (In the center, outside the spinning record so it doesn't spin) -->
-                    <svg width="70" height="70" style="position: absolute; pointer-events: none; z-index: 5;">
+                    <svg width="70" height="70" style="position: absolute; pointer-events: none; z-index: 5">
                         <circle cx="35" cy="35" r="30" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="4" />
-                        <circle id="vinyl-progress" cx="35" cy="35" r="30" fill="none" stroke="#ffffff"
-                            stroke-width="4" stroke-dasharray="189" stroke-dashoffset="189" stroke-linecap="round"
-                            style="transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.1s linear;" />
+                        <circle id="vinyl-progress" cx="35" cy="35" r="30" fill="none" stroke="#ffffff" stroke-width="4"
+                            stroke-dasharray="189" stroke-dashoffset="189" stroke-linecap="round" style="
+                  transform: rotate(-90deg);
+                  transform-origin: 50% 50%;
+                  transition: stroke-dashoffset 0.1s linear;
+                " />
                     </svg>
                 </div>
 
                 <!-- Hidden Player -->
-                <div id="youtube-player" style="display: none; position: absolute;"></div>
+                <div id="youtube-player" style="display: none; position: absolute"></div>
             </div>
 
             <!-- Top Right: Video Info -->
-            <div class="box-panel info-panel"
-                style="border: 4px solid #999; border-radius: 8px; padding: 15px; background: #fff;">
-                <div class="panel-title"
-                    style="font-weight: bold; border-bottom: 3px solid #999; padding-bottom: 5px; margin-bottom: 25px; width: max-content; color: #555;">
-                    정답 보드</div>
+            <div class="box-panel info-panel" style="
+            border: 4px solid #999;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fff;
+          ">
+                <div class="panel-title" style="
+              font-weight: bold;
+              border-bottom: 3px solid #999;
+              padding-bottom: 5px;
+              margin-bottom: 25px;
+              width: max-content;
+              color: #555;
+            ">
+                    정답 보드
+                </div>
 
-                <div id="answer-board" style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
-                    <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
-                        🎤 가수<br>
-                        <span id="board-singer"
-                            style="color: var(--color-pink); display: inline-block; margin-top: 5px;">???</span>
-                    </div>
-                    <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
-                        🎵 제목<br>
-                        <span id="board-title"
-                            style="color: var(--color-pink); display: inline-block; margin-top: 5px;">???</span>
-                    </div>
-                    <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
-                        📝 가사<br>
-                        <span id="board-lyrics"
-                            style="color: var(--color-pink); display: inline-block; margin-top: 5px; font-size: 1rem; line-height: 1.4;">???</span>
-                    </div>
-                    <div id="hint-wrapper" style="display: none; flex-direction: column; align-items: center; justify-content: center; position: relative; padding-top: 10px; border-top: 1px dashed #ccc; margin-top: 5px;">
-                        <button id="hint-toggle-btn" onclick="toggleHintDisplay()" style="background: var(--color-blue); color: white; border: none; border-radius: 30px; padding: 10px 40px; font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 85%; margin-bottom: 5px;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)';">
+                <div id="answer-board" style="
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+              margin-top: 20px;
+            ">
+                    <div id="board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
+                    <div id="hint-wrapper" style="
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                padding-top: 10px;
+                border-top: 1px dashed #ccc;
+                margin-top: 5px;
+              ">
+                        <button id="hint-toggle-btn" onclick="toggleHintDisplay()" style="
+                  background: var(--color-blue);
+                  color: white;
+                  border: none;
+                  border-radius: 30px;
+                  padding: 10px 40px;
+                  font-size: 1.05rem;
+                  font-weight: 800;
+                  cursor: pointer;
+                  transition:
+                    transform 0.2s,
+                    box-shadow 0.2s;
+                  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                  width: 85%;
+                  margin-bottom: 5px;
+                " onmouseover="
+                  this.style.transform = 'translateY(-2px)';
+                  this.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)';
+                " onmouseout="
+                  this.style.transform = 'translateY(0)';
+                  this.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)';
+                ">
                             💡 힌트 보기
                         </button>
-                        <div id="board-hint" onclick="toggleHintDisplay()" style="display: none; position: absolute; top: -5px; left: 50%; transform: translateX(-50%) rotate(-1.5deg); cursor: pointer; background: #fff7d6; color: #444; padding: 15px 20px; font-size: 1rem; font-weight: 700; line-height: 1.4; border-radius: 2px; box-shadow: 3px 5px 12px rgba(0,0,0,0.15); width: 95%; z-index: 10;">
-                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 60px; height: 20px; background: rgba(255, 154, 158, 0.6); box-shadow: 1px 1px 3px rgba(0,0,0,0.05); mix-blend-mode: multiply;"></div>
-                            <span id="board-hint-text" style="display: block; text-align: center; word-break: keep-all;">???</span>
+                        <div id="board-hint" onclick="toggleHintDisplay()" style="
+                  display: none;
+                  position: absolute;
+                  top: -5px;
+                  left: 50%;
+                  transform: translateX(-50%) rotate(-1.5deg);
+                  cursor: pointer;
+                  background: #fff7d6;
+                  color: #444;
+                  padding: 15px 20px;
+                  font-size: 1rem;
+                  font-weight: 700;
+                  line-height: 1.4;
+                  border-radius: 2px;
+                  box-shadow: 3px 5px 12px rgba(0, 0, 0, 0.15);
+                  width: 95%;
+                  z-index: 10;
+                ">
+                            <div style="
+                    position: absolute;
+                    top: -10px;
+                    left: 50%;
+                    transform: translateX(-50%) rotate(2deg);
+                    width: 60px;
+                    height: 20px;
+                    background: rgba(255, 154, 158, 0.6);
+                    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+                    mix-blend-mode: multiply;
+                  "></div>
+                            <span id="board-hint-text" style="
+                    display: block;
+                    text-align: center;
+                    word-break: keep-all;
+                  ">???</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Left: Empty -->
-            <div class="box-panel empty-panel"
-                style="border: 4px solid #999; border-radius: 8px; min-height: 250px; background: #fff;">
+            <div class="box-panel empty-panel" style="
+            border: 4px solid #999;
+            border-radius: 8px;
+            min-height: 250px;
+            background: #fff;
+          ">
                 <!-- Left empty space -->
             </div>
 
             <!-- Bottom Center: Chat Area -->
             <div class="box-panel chat-panel">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="chat-bubble chat-system">엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.</div>
+                    <div class="chat-bubble chat-system">
+                        엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러
+                        게임을 시작하세요.
+                    </div>
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chat-input" class="chat-input" placeholder="여기에 가수, 제목, 가사를 입력해보세요..."
-                        disabled>
-                    <button id="chat-send-btn" class="chat-send-btn" disabled>전송</button>
+                        disabled />
+                    <button id="chat-send-btn" class="chat-send-btn" disabled>
+                        전송
+                    </button>
                 </div>
             </div>
 
             <!-- Bottom Right: Mode -->
-            <div class="box-panel mode-panel"
-                style="border: 4px solid #999; border-radius: 8px; padding: 15px; background: #fff;">
-                <div
-                    style="font-size: 1.3rem; font-weight: 800; border-bottom: 3px solid #999; padding-bottom: 10px; color: #333;">
-                    모드: Quiz</div>
+            <div class="box-panel mode-panel" style="
+            border: 4px solid #999;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fff;
+          ">
+                <div style="
+              font-size: 1.3rem;
+              font-weight: 800;
+              border-bottom: 3px solid #999;
+              padding-bottom: 10px;
+              color: #333;
+            ">
+                    모드: Quiz
+                </div>
             </div>
-
         </div>
     </main>
 
@@ -378,10 +600,13 @@
         <div class="footer-container">
             <div class="footer-col brand-col">
                 <div class="footer-logo">
-                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height: 32px; width: auto" />
                     <span class="logo-text">엔터핑</span>
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p class="footer-desc">
+                    일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑
+                    플랫폼
+                </p>
                 <div class="social-links">
                     <a href="#">X</a>
                     <a href="#">IG</a>
@@ -426,24 +651,92 @@
         </div>
     </footer>
 
+    <!-- Result Modal -->
+    <div id="quiz-result-modal" style="
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div style="
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        ">
+            <div style="font-size: 1.5rem; font-weight: 900; color: #333; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+                🎉 퀴즈 결과 🎉
+            </div>
+            <div style="font-size: 1.2rem; font-weight: bold; text-align: center; color: var(--color-pink);">
+                총 <span id="modal-total-score">0</span>개의 정답을 맞췄습니다!
+            </div>
+            <div id="modal-log-container" style="
+                flex: 1;
+                overflow-y: auto;
+                background: #f9f9f9;
+                border-radius: 8px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                border: 1px solid #ddd;
+            ">
+            </div>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px;">
+                <button onclick="location.href='quiz_list.html'" style="
+                    background: var(--color-blue);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 25px;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                ">목록으로</button>
+                <button onclick="document.getElementById('quiz-result-modal').style.display='none'" style="
+                    background: #ddd;
+                    color: #333;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 25px;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    cursor: pointer;
+                ">닫기</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const contentId = urlParams.get('id');
+        const contentId = urlParams.get("id");
 
         let player = null;
         let quizData = [];
         let currentIndex = 0;
-        let currentGuessed = { singer: false, title: false, lyrics: false };
+        let currentScore = 0;
+        let quizTitle = "알 수 없는 퀴즈";
+        let currentGuessed = {};
         let isPlayingSegment = false;
         let isPausedManually = false;
         let checkInterval = null;
         let currentLoadedYoutubeId = null;
+        let quizLogs = [];
 
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const chatSendBtn = document.getElementById('chat-send-btn');
-        const vinylRecord = document.getElementById('vinyl-record');
+        const chatMessages = document.getElementById("chat-messages");
+        const chatInput = document.getElementById("chat-input");
+        const chatSendBtn = document.getElementById("chat-send-btn");
+        const vinylRecord = document.getElementById("vinyl-record");
 
         async function initQuiz() {
             if (!contentId) {
@@ -454,7 +747,8 @@
                 const res = await fetch(`/api/quiz-content/${contentId}`);
                 const data = await res.json();
                 if (data.success) {
-                    quizData = JSON.parse(data.quiz_data || '[]');
+                    quizTitle = data.title || "알 수 없는 퀴즈";
+                    quizData = JSON.parse(data.quiz_data || "[]");
                     updateQuizCountDisplay();
                     if (quizData.length > 0 && quizData[0].youtube_id) {
                         currentLoadedYoutubeId = quizData[0].youtube_id;
@@ -475,15 +769,15 @@
 
         function initYoutube(videoId) {
             window.onYouTubeIframeAPIReady = function () {
-                player = new YT.Player('youtube-player', {
-                    height: '1',
-                    width: '1',
+                player = new YT.Player("youtube-player", {
+                    height: "1",
+                    width: "1",
                     videoId: videoId,
-                    playerVars: { 'playsinline': 1, 'controls': 0 },
+                    playerVars: { playsinline: 1, controls: 0 },
                     events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange
-                    }
+                        onReady: onPlayerReady,
+                        onStateChange: onPlayerStateChange,
+                    },
                 });
             };
             if (window.YT && window.YT.Player) {
@@ -493,14 +787,16 @@
 
         function onPlayerStateChange(event) {
             if (event.data === YT.PlayerState.PLAYING) {
-                const currentVol = document.getElementById('volume-slider').value;
+                const currentVol = document.getElementById("volume-slider").value;
                 player.setVolume(currentVol);
             }
         }
 
         function onPlayerReady(event) {
-            player.setVolume(document.getElementById('volume-slider').value);
-            addSystemChat("음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!");
+            player.setVolume(document.getElementById("volume-slider").value);
+            addSystemChat(
+                "음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!",
+            );
         }
 
         function startQuiz() {
@@ -512,13 +808,13 @@
 
             if (isPlayingSegment) {
                 player.pauseVideo();
-                vinylRecord.classList.add('paused');
+                vinylRecord.classList.add("paused");
                 isPlayingSegment = false;
                 isPausedManually = true;
             } else {
                 if (isPausedManually) {
                     player.playVideo();
-                    vinylRecord.classList.remove('paused');
+                    vinylRecord.classList.remove("paused");
                     isPlayingSegment = true;
                     isPausedManually = false;
                 } else {
@@ -529,23 +825,34 @@
 
         function playSegment() {
             const item = quizData[currentIndex];
-            currentGuessed = { singer: false, title: false, lyrics: false };
+            currentGuessed = {};
+            const questionKeys = Object.keys(item)
+                .filter((key) => key.startsWith("question_"))
+                .sort();
+            questionKeys.forEach((key) => {
+                const question = item[key];
+                const answerCount = (question.answer && question.answer.length) || 0;
+                currentGuessed[`guessed_${key}`] = new Array(answerCount).fill(null); // Array of matched answers
+            });
             updateAnswerBoard();
 
             chatInput.disabled = false;
             chatSendBtn.disabled = false;
             chatInput.focus({ preventScroll: true });
 
-            vinylRecord.classList.remove('paused');
+            vinylRecord.classList.remove("paused");
             isPlayingSegment = true;
             isPausedManually = false;
 
             const targetVideoId = item.youtube_id || currentLoadedYoutubeId;
-            const currentVol = document.getElementById('volume-slider').value;
+            const currentVol = document.getElementById("volume-slider").value;
             player.setVolume(currentVol);
 
             if (targetVideoId !== currentLoadedYoutubeId) {
-                player.loadVideoById({ 'videoId': targetVideoId, 'startSeconds': item.start });
+                player.loadVideoById({
+                    videoId: targetVideoId,
+                    startSeconds: item.start,
+                });
                 currentLoadedYoutubeId = targetVideoId;
             } else {
                 player.seekTo(item.start);
@@ -553,9 +860,9 @@
             }
 
             clearInterval(checkInterval);
-            const progressCircle = document.getElementById('vinyl-progress');
+            const progressCircle = document.getElementById("vinyl-progress");
             if (progressCircle) {
-                progressCircle.style.strokeDashoffset = '189'; // reset
+                progressCircle.style.strokeDashoffset = "189"; // reset
             }
 
             checkInterval = setInterval(() => {
@@ -567,13 +874,13 @@
                     let progress = elapsed / totalDuration;
                     if (progress < 0) progress = 0;
                     if (progress > 1) progress = 1;
-                    const dashoffset = 189 - (189 * progress);
+                    const dashoffset = 189 - 189 * progress;
                     progressCircle.style.strokeDashoffset = dashoffset;
                 }
 
                 if (currentTime >= item.end && item.end > item.start) {
                     player.pauseVideo();
-                    vinylRecord.classList.add('paused');
+                    vinylRecord.classList.add("paused");
                     isPlayingSegment = false;
                     clearInterval(checkInterval);
                 }
@@ -581,32 +888,39 @@
         }
 
         function addSystemChat(msg) {
-            const div = document.createElement('div');
-            div.className = 'chat-bubble chat-system';
+            const div = document.createElement("div");
+            div.className = "chat-bubble chat-system";
             div.textContent = msg;
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function addUserChat(msg) {
-            const div = document.createElement('div');
-            div.className = 'chat-bubble chat-user';
+            const div = document.createElement("div");
+            div.className = "chat-bubble chat-user";
             div.textContent = msg;
             chatMessages.appendChild(div);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function normalizeString(str) {
-            if (!str) return '';
-            return str.toLowerCase().replace(/\s+/g, '');
+            if (!str) return "";
+            return str.toLowerCase().replace(/\s+/g, "");
         }
 
-        function checkAnswerMatch(targetAnswersStr, normInput) {
-            if (!targetAnswersStr) return false;
-            const answers = targetAnswersStr.split(',');
-            for (let ans of answers) {
-                if (normalizeString(ans) === normInput) {
-                    return true;
+        function checkAnswerMatch(targetAnswer, normInput) {
+            if (!targetAnswer) return false;
+            // targetAnswer is always an array now
+            const answers = Array.isArray(targetAnswer)
+                ? targetAnswer
+                : [targetAnswer];
+            for (let ansGroup of answers) {
+                // Each array element may contain comma-separated variations
+                const variations = ansGroup.split(",").map((v) => v.trim());
+                for (let ans of variations) {
+                    if (normalizeString(ans) === normInput) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -617,30 +931,57 @@
             if (!text) return;
 
             addUserChat(text);
-            chatInput.value = '';
+            chatInput.value = "";
 
             if (currentIndex >= quizData.length) return;
 
             const item = quizData[currentIndex];
             const normText = normalizeString(text);
+            const questionKeys = Object.keys(item)
+                .filter((key) => key.startsWith("question_"))
+                .sort();
 
             let foundNew = false;
 
-            if (item.singer && !currentGuessed.singer && checkAnswerMatch(item.singer, normText)) {
-                currentGuessed.singer = true;
-                document.getElementById('board-singer').textContent = item.singer.split(',')[0].trim();
-                addSystemChat("정답입니다! (가수)");
-                foundNew = true;
-            } else if (item.title && !currentGuessed.title && checkAnswerMatch(item.title, normText)) {
-                currentGuessed.title = true;
-                document.getElementById('board-title').textContent = item.title.split(',')[0].trim();
-                addSystemChat("정답입니다! (제목)");
-                foundNew = true;
-            } else if (item.lyrics && !currentGuessed.lyrics && checkAnswerMatch(item.lyrics, normText)) {
-                currentGuessed.lyrics = true;
-                document.getElementById('board-lyrics').textContent = item.lyrics.split(',')[0].trim();
-                addSystemChat("정답입니다! (가사)");
-                foundNew = true;
+            for (const key of questionKeys) {
+                const question = item[key];
+                const guessedKey = `guessed_${key}`;
+                const guessedArray = currentGuessed[guessedKey];
+
+                // Find which answer index matches
+                let matchedIndex = -1;
+                let matchedAnswer = null;
+                for (let i = 0; i < question.answer.length; i++) {
+                    const ansGroup = question.answer[i];
+                    const variations = ansGroup.split(",").map((v) => v.trim());
+                    const found = variations.find(
+                        (ans) => normalizeString(ans) === normText,
+                    );
+                    if (found) {
+                        matchedIndex = i;
+                        matchedAnswer = found;
+                        break;
+                    }
+                }
+
+                // Only process if this specific answer hasn't been guessed yet
+                if (matchedIndex !== -1 && guessedArray[matchedIndex] === null) {
+                    guessedArray[matchedIndex] = matchedAnswer;
+                    updateBoardItem(key, matchedIndex, matchedAnswer);
+                    addSystemChat(`정답입니다! (${question.question || "질문"})`);
+                    
+                    quizLogs.push({
+                        quizIndex: currentIndex + 1,
+                        questionLabel: question.question || "질문",
+                        matchedAnswer: matchedAnswer
+                    });
+
+                    currentScore += 1;
+                    document.getElementById('score').innerText = currentScore;
+                    
+                    foundNew = true;
+                    break;
+                }
             }
 
             if (foundNew) {
@@ -650,37 +991,51 @@
 
         function checkSegmentComplete() {
             const item = quizData[currentIndex];
-            let allGuessed = true;
-            if (item.singer && !currentGuessed.singer) allGuessed = false;
-            if (item.title && !currentGuessed.title) allGuessed = false;
-            if (item.lyrics && !currentGuessed.lyrics) allGuessed = false;
+            const questionKeys = Object.keys(item)
+                .filter((key) => key.startsWith("question_"))
+                .sort();
 
-            if (!item.singer && !item.title && !item.lyrics) allGuessed = true;
+            let allGuessed = true;
+            for (const key of questionKeys) {
+                const guessedKey = `guessed_${key}`;
+                const guessedArray = currentGuessed[guessedKey];
+                // Check if all answers in this question are guessed (no null values)
+                if (guessedArray.includes(null)) {
+                    allGuessed = false;
+                    break;
+                }
+            }
 
             if (allGuessed) {
-                addSystemChat("모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다.");
                 player.pauseVideo();
-                vinylRecord.classList.add('paused');
+                vinylRecord.classList.add("paused");
                 clearInterval(checkInterval);
                 isPlayingSegment = false;
 
                 chatInput.disabled = true;
                 chatSendBtn.disabled = true;
 
-                setTimeout(() => {
+                if (currentIndex >= quizData.length - 1) {
+                    addSystemChat("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다🎉");
                     currentIndex++;
                     updateQuizCountDisplay();
-                    if (currentIndex >= quizData.length) {
-                        addSystemChat("퀴즈가 모두 끝났습니다! 축하합니다🎉");
-                    } else {
+                    saveQuizHistory();
+                    showQuizResult();
+                } else {
+                    addSystemChat(
+                        "모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다.",
+                    );
+                    setTimeout(() => {
+                        currentIndex++;
+                        updateQuizCountDisplay();
                         playSegment();
-                    }
-                }, 3000);
+                    }, 3000);
+                }
             }
         }
 
         function updateQuizCountDisplay() {
-            const display = document.getElementById('quiz-count-display');
+            const display = document.getElementById("quiz-count-display");
             if (!display || quizData.length === 0) return;
             const remaining = quizData.length - currentIndex;
             if (remaining > 0) {
@@ -692,72 +1047,186 @@
 
         function updateAnswerBoard() {
             const item = quizData[currentIndex] || {};
-            document.getElementById('board-singer').textContent = item.singer ? '???' : '-';
-            document.getElementById('board-title').textContent = item.title ? '???' : '-';
-            document.getElementById('board-lyrics').textContent = item.lyrics ? '???' : '-';
-            
-            const hintWrapper = document.getElementById('hint-wrapper');
-            const hintToggleBtn = document.getElementById('hint-toggle-btn');
-            const boardHint = document.getElementById('board-hint');
-            const boardHintText = document.getElementById('board-hint-text');
+            const boardItems = document.getElementById("board-items");
+            boardItems.innerHTML = "";
+
+            const questionKeys = Object.keys(item)
+                .filter((key) => key.startsWith("question_"))
+                .sort();
+
+            questionKeys.forEach((key) => {
+                const question = item[key];
+                const guessedKey = `guessed_${key}`;
+                const guessedArray = currentGuessed[guessedKey];
+                const displayTexts = guessedArray.map((ans, idx) =>
+                    ans !== null ? ans : "???",
+                );
+                const displayText = displayTexts.join(", ");
+
+                const itemEl = document.createElement("div");
+                itemEl.style = "display:flex;flex-direction:column;gap:6px;";
+                itemEl.setAttribute("data-question-key", key);
+                itemEl.innerHTML = `
+                    <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
+                        ${question.question || "질문"}<br>
+                        <span style="color: var(--color-pink); display: inline-block; margin-top: 5px;">${displayText || "-"}</span>
+                    </div>
+                `;
+                boardItems.appendChild(itemEl);
+            });
+
+            const hintWrapper = document.getElementById("hint-wrapper");
+            const hintToggleBtn = document.getElementById("hint-toggle-btn");
+            const boardHint = document.getElementById("board-hint");
+            const boardHintText = document.getElementById("board-hint-text");
             if (item.hint) {
-                hintWrapper.style.display = 'flex';
-                hintToggleBtn.style.visibility = 'visible';
-                boardHint.style.display = 'none';
+                hintWrapper.style.display = "flex";
+                hintToggleBtn.style.visibility = "visible";
+                boardHint.style.display = "none";
                 boardHintText.textContent = item.hint;
             } else {
-                hintWrapper.style.display = 'none';
+                hintWrapper.style.display = "none";
             }
         }
 
         function toggleHintDisplay() {
-            const btn = document.getElementById('hint-toggle-btn');
-            const boardHint = document.getElementById('board-hint');
-            if (boardHint.style.display === 'none') {
-                boardHint.style.display = 'block';
-                btn.style.visibility = 'hidden';
+            const btn = document.getElementById("hint-toggle-btn");
+            const boardHint = document.getElementById("board-hint");
+            if (boardHint.style.display === "none") {
+                boardHint.style.display = "block";
+                btn.style.visibility = "hidden";
             } else {
-                boardHint.style.display = 'none';
-                btn.style.visibility = 'visible';
+                boardHint.style.display = "none";
+                btn.style.visibility = "visible";
             }
         }
 
-        chatSendBtn.addEventListener('click', handleChat);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleChat();
+        function updateBoardItem(key, answerIndex, answeredText) {
+            const boardItems = document.getElementById("board-items");
+            const targetEl = boardItems.querySelector(
+                `[data-question-key="${key}"]`,
+            );
+            if (targetEl) {
+                const guessedKey = `guessed_${key}`;
+                const guessedArray = currentGuessed[guessedKey];
+                const displayTexts = guessedArray.map((ans, idx) =>
+                    ans !== null ? ans : "???",
+                );
+                const span = targetEl.querySelector("span");
+                if (span) {
+                    span.textContent = displayTexts.join(", ");
+                }
+            }
+        }
+
+        chatSendBtn.addEventListener("click", handleChat);
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleChat();
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === ']' && currentIndex < quizData.length && !chatInput.disabled) {
+        document.addEventListener("keydown", (e) => {
+            if (
+                e.key === "]" &&
+                currentIndex < quizData.length &&
+                !chatInput.disabled
+            ) {
                 e.preventDefault();
-                
-                addSystemChat("노래를 스킵하셨습니다. 다음 문제로 넘어갑니다.");
+
                 if (player && player.pauseVideo) player.pauseVideo();
-                vinylRecord.classList.add('paused');
+                vinylRecord.classList.add("paused");
                 clearInterval(checkInterval);
                 isPlayingSegment = false;
 
                 chatInput.disabled = true;
                 chatSendBtn.disabled = true;
 
-                setTimeout(() => {
+                if (currentIndex >= quizData.length - 1) {
+                    addSystemChat("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다🎉");
                     currentIndex++;
                     updateQuizCountDisplay();
-                    if (currentIndex >= quizData.length) {
-                        addSystemChat("퀴즈가 모두 끝났습니다! 축하합니다🎉");
-                    } else {
+                    saveQuizHistory();
+                    showQuizResult();
+                } else {
+                    addSystemChat("노래를 스킵하셨습니다. 다음 문제로 넘어갑니다.");
+                    setTimeout(() => {
+                        currentIndex++;
+                        updateQuizCountDisplay();
                         playSegment();
-                    }
-                }, 1500);
+                    }, 1500);
+                }
             }
         });
 
-        document.getElementById('volume-slider').addEventListener('input', (e) => {
-            document.getElementById('volume-display').textContent = e.target.value + '%';
-            if (player && player.setVolume) {
-                player.setVolume(e.target.value);
+        document
+            .getElementById("volume-slider")
+            .addEventListener("input", (e) => {
+                document.getElementById("volume-display").textContent =
+                    e.target.value + "%";
+                if (player && player.setVolume) {
+                    player.setVolume(e.target.value);
+                }
+            });
+
+        function showQuizResult() {
+            const modal = document.getElementById('quiz-result-modal');
+            document.getElementById('modal-total-score').innerText = currentScore;
+            
+            const logContainer = document.getElementById('modal-log-container');
+            logContainer.innerHTML = '';
+            
+            if (quizLogs.length === 0) {
+                logContainer.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">맞춘 정답이 없습니다 😢</div>';
+            } else {
+                // Group by quizIndex
+                const grouped = {};
+                quizLogs.forEach(log => {
+                    if(!grouped[log.quizIndex]) grouped[log.quizIndex] = [];
+                    grouped[log.quizIndex].push(log);
+                });
+                
+                Object.keys(grouped).forEach(qIdx => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.style.cssText = "background: #fff; border: 1px solid #eaeaea; border-radius: 6px; padding: 10px;";
+                    
+                    const header = document.createElement('div');
+                    header.style.cssText = "font-weight: bold; color: #555; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;";
+                    header.innerText = `문제 ${qIdx}`;
+                    groupDiv.appendChild(header);
+                    
+                    grouped[qIdx].forEach(log => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.style.cssText = "font-size: 0.95rem; margin-bottom: 4px;";
+                        itemDiv.innerHTML = `<span style="color: #888; display: inline-block; width: 80px;">${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink);">${log.matchedAnswer}</span>`;
+                        groupDiv.appendChild(itemDiv);
+                    });
+                    
+                    logContainer.appendChild(groupDiv);
+                });
             }
-        });
+            
+            modal.style.display = 'flex';
+        }
+
+        function saveQuizHistory() {
+            const token = sessionStorage.getItem("ep_token");
+            if (!token) return;
+
+            fetch("/api/quiz-history", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify({
+                    quiz_category: quizTitle,
+                    score: currentScore,
+                    total_questions: quizData.length
+                })
+            })
+            .then(res => res.json())
+            .then(data => console.log("퀴즈 기록 저장:", data))
+            .catch(err => console.error("퀴즈 기록 저장 오류:", err));
+        }
 
         initQuiz();
     </script>

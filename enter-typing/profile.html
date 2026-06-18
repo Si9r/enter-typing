@@ -1248,8 +1248,11 @@
     <!-- 탭 5: 내 컨텐츠 -->
     <div class="tab-panel" id="tab-mytyping">
       <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
-        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈 컨텐츠</button>
+        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')"
+          style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')"
+          style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈
+          컨텐츠</button>
       </div>
       <div class="history-list" id="mytyping-list">
         <!-- JS가 데이터를 채워줍니다 -->
@@ -1520,10 +1523,10 @@
     function switchSubTab(type) {
       document.getElementById('mytyping-list').style.display = type === 'typing' ? 'block' : 'none';
       document.getElementById('myquiz-list').style.display = type === 'quiz' ? 'block' : 'none';
-      
+
       const btnTyping = document.getElementById('subtab-typing-btn');
       const btnQuiz = document.getElementById('subtab-quiz-btn');
-      
+
       if (type === 'typing') {
         btnTyping.className = 'btn btn-pink';
         btnTyping.style.background = '';

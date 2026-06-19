@@ -35,9 +35,9 @@
             gap: 15px;
             background: var(--color-white);
             padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid #ffe3e4;
         }
 
         .editor-top-bar input {
@@ -56,12 +56,12 @@
 
         .toolbar-btn {
             background: transparent;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border: 1.5px solid #ffe3e4;
+            border-radius: 10px;
             padding: 8px 12px;
             cursor: pointer;
-            font-weight: 600;
-            color: var(--color-text-main);
+            font-weight: 700;
+            color: #555;
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -69,7 +69,9 @@
         }
 
         .toolbar-btn:hover {
-            background: #f5f5f5;
+            background: #fff0f2;
+            color: var(--color-pink);
+            border-color: var(--color-pink);
         }
 
         .btn-primary {
@@ -95,9 +97,9 @@
         .editor-main {
             background: var(--color-white);
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid #ffe3e4;
             display: none;
             flex-direction: column;
             gap: 30px;
@@ -128,12 +130,13 @@
             width: 100%;
             aspect-ratio: 16/9;
             background: #000;
-            border-radius: 4px;
+            border-radius: 16px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
 
         .url-input-container {
@@ -295,9 +298,9 @@
         /* Registered Quiz Grid */
         .registered-section {
             background: var(--color-white);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid #ffe3e4;
             margin-bottom: 30px;
             padding: 20px;
         }
@@ -311,8 +314,8 @@
 
         .quiz-edit-card {
             background: #fff;
-            border: 1px solid #eaeaea;
-            border-radius: 8px;
+            border: 1.5px solid #ffe3e4;
+            border-radius: 12px;
             padding: 15px;
             position: relative;
             cursor: pointer;
@@ -334,8 +337,8 @@
 
         .quiz-add-card {
             background: #fafafa;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
+            border: 2px dashed #ffe3e4;
+            border-radius: 12px;
             padding: 15px;
             cursor: pointer;
             transition: all 0.2s;
@@ -344,7 +347,7 @@
             justify-content: center;
             min-height: 120px;
             font-size: 3rem;
-            color: #ccc;
+            color: #ffb6b9;
         }
 
         .quiz-add-card:hover {
@@ -416,12 +419,23 @@
         .modal-content {
             background: #fff;
             padding: 30px;
-            border-radius: 16px;
+            border-radius: 20px;
             width: 100%;
             max-width: 500px;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .modal-content code {
+            font-weight: 900;
+            color: var(--color-pink);
+            background: #fff0f2;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            border: 1px solid #ffe3e4;
         }
 
         .modal-header {
@@ -481,6 +495,7 @@
         <div class="editor-top-bar">
             <input type="text" id="title" placeholder="퀴즈 제목을 입력하세요" required />
             <div style="display: flex; gap: 10px; align-items: center">
+                <button class="toolbar-btn" id="btn-show-guide" title="퀴즈 제작 가이드 보기">❓ 가이드</button>
                 <button class="toolbar-btn" id="btn-settings" title="추가 정보 설정">
                     ⚙️ 설정
                 </button>
@@ -671,27 +686,32 @@
                     gap: 10px;
                   "></div>
 
-                            <div style="display: flex; flex-direction: column; gap: 10px">
+                            <div style="display: flex; flex-direction: column; gap: 10px; width: 280px; justify-content: flex-end;">
                                 <div class="answer-input-container"
                                     style="display: flex; gap: 10px; align-items: center">
-                                    <label style="width: 60px; font-weight: 700; color: #555">힌트</label>
-                                    <input type="text" id="quiz-hint" placeholder="힌트를 입력하세요 (선택사항)" style="
+                                    <label style="width: 40px; font-weight: 700; color: #555">힌트</label>
+                                    <input type="text" id="quiz-hint" placeholder="선택사항" style="
                         padding: 10px;
-                        border: 1px solid var(--color-pink);
-                        border-radius: 4px;
+                        border: 1.5px solid #ffe3e4;
+                        border-radius: 8px;
                         outline: none;
                         flex: 1;
-                      " />
+                        transition: all 0.2s;
+                      " onfocus="this.style.borderColor='var(--color-pink)'; this.style.boxShadow='0 0 0 3px rgba(255,154,158,0.2)'" onblur="this.style.borderColor='#ffe3e4'; this.style.boxShadow='none'" />
                                 </div>
                                 <button class="btn-submit" id="btn-add-quiz" style="
-                      flex: 1;
                       width: 100%;
-                      font-size: 1.5rem;
+                      padding: 12px;
+                      font-size: 1.1rem;
+                      border-radius: 12px;
                       display: flex;
                       align-items: center;
                       justify-content: center;
+                      gap: 5px;
+                      font-weight: 800;
+                      box-shadow: 0 4px 12px rgba(255, 154, 158, 0.3);
                     ">
-                                    ›
+                                    등록
                                 </button>
                             </div>
                         </div>
@@ -712,6 +732,38 @@
             <div class="bottom-actions">
                 <button class="btn btn-pink" id="btn-confirm-edit">확인</button>
                 <button class="btn btn-outline" id="btn-cancel-edit">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guide Modal -->
+    <div class="modal-overlay" id="guide-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>✨ 퀴즈 제작 가이드</span>
+                <span class="close-modal" id="close-guide">✕</span>
+            </div>
+            
+            <div style="font-size: 0.95rem; color: #444; line-height: 1.6;">
+                <p><strong>1. 영상 불러오기</strong><br>
+                YouTube 영상의 URL을 입력하면 자동으로 영상이 불러와집니다.</p>
+
+                <p><strong>2. 구간 및 정답 설정</strong><br>
+                퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.</p>
+
+                <p><strong>3. 개별 퀴즈 추가 및 수정</strong><br>
+                우측 하단의 <code>등록</code> 버튼이나 하단 <code>확인</code> 버튼을 눌러 개별 퀴즈를 목록에 등록하세요.</p>
+
+                <p style="margin-top: 15px; color: var(--color-pink); font-weight: bold;">
+                원하는 만큼 퀴즈 등록을 마친 후 우측 상단의 <code>✨ 전체 저장</code> 버튼을 누르면 퀴즈 세트 등록이 완료됩니다!
+                </p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid #eee;">
+                <label style="font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
+                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루 동안 보지 않기
+                </label>
+                <button class="toolbar-btn btn-primary" id="btn-close-guide" style="padding: 8px 20px; font-weight: bold;">닫기</button>
             </div>
         </div>
     </div>
@@ -1439,6 +1491,38 @@
         } else {
             renderGrid();
         }
+
+        // Guide Modal Logic
+        const guideModal = document.getElementById('guide-modal');
+        const hideGuideCheckbox = document.getElementById('hide-guide-today');
+        
+        function showGuideModal() {
+            const hideUntil = localStorage.getItem('hideQuizGuideUntil');
+            const now = new Date().getTime();
+            
+            if (editContentId) return;
+
+            if (!hideUntil || now > parseInt(hideUntil)) {
+                guideModal.style.display = 'flex';
+            }
+        }
+
+        function closeGuideModal() {
+            if (hideGuideCheckbox.checked) {
+                const now = new Date();
+                now.setHours(now.getHours() + 24);
+                localStorage.setItem('hideQuizGuideUntil', now.getTime());
+            }
+            guideModal.style.display = 'none';
+        }
+
+        document.getElementById('close-guide').addEventListener('click', closeGuideModal);
+        document.getElementById('btn-close-guide').addEventListener('click', closeGuideModal);
+        document.getElementById('btn-show-guide').addEventListener('click', () => {
+            guideModal.style.display = 'flex';
+        });
+
+        window.addEventListener('DOMContentLoaded', showGuideModal);
     </script>
 </body>
 

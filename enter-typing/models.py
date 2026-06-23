@@ -109,3 +109,20 @@ class QuizContent(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     creator = relationship("User")
+
+# 8. 대전 히스토리 테이블
+class BattleHistory(Base):
+    __tablename__ = "battle_histories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    room_id = Column(String(50), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    opponent_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    content_title = Column(String(255), nullable=False)
+    wpm = Column(Integer, nullable=False)
+    accuracy = Column(Float, nullable=False)
+    is_winner = Column(Integer, nullable=False) # 1: 승리, 0: 패배, -1: 무승부
+    played_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", foreign_keys=[user_id], backref="battle_histories")
+    opponent = relationship("User", foreign_keys=[opponent_id])

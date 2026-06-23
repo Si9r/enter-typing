@@ -991,7 +991,7 @@ def serve_html(page: str):
         return FileResponse(path)
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
-for f in ["style.css", "typing.css", "script.js", "navbar.js"]:
+for f in ["style.css", "typing.css", "script.js", "navbar.js", "battle.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)
@@ -1074,3 +1074,168 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
         del item["_raw_date"]
         
     return {"history": combined}
+
+# ════════════════════════════════════════════════════════════
+# API: 대전 기능 (웹소켓 & Redis)
+# ════════════════════════════════════════════════════════════
+
+import uuid
+from fastapi import WebSocket, WebSocketDisconnect
+from database import get_redis
+from battle_manager import BattleManager
+import json
+
+_battle_manager = None
+def get_battle_manager():
+    global _battle_manager
+    if _battle_manager is None:
+        _battle_manager = BattleManager(get_redis())
+    return _battle_manager
+
+from typing import Optional
+
+class RoomCreateRequest(BaseModel):
+    title: str
+    content_id: int
+    max_players: int = 2
+    is_private: bool = False
+    room_code: Optional[str] = None
+
+@app.post("/api/battle/rooms")
+async def create_battle_room(req: RoomCreateRequest, current_user: models.User = Depends(get_current_user)):
+    bm = get_battle_manager()
+    room_id = uuid.uuid4().hex[:8]
+    room_data = await bm.create_room(
+        room_id, req.title, current_user.nickname, req.content_id, req.max_players, req.is_private, req.room_code
+    )
+    return {"success": True, "room": room_data}
+
+@app.get("/api/battle/rooms")
+async def get_battle_rooms():
+    bm = get_battle_manager()
+    all_rooms = await bm.get_rooms()
+    rooms = [r for r in all_rooms if not r.get("is_private")]
+    return {"success": True, "rooms": rooms}
+
+class RoomVerifyRequest(BaseModel):
+    room_code: str
+
+@app.post("/api/battle/verify-code")
+async def verify_room_code(req: RoomVerifyRequest):
+    bm = get_battle_manager()
+    all_rooms = await bm.get_rooms()
+    for r in all_rooms:
+        if r.get("is_private") and r.get("room_code") == req.room_code:
+            return {"success": True, "room_id": r["id"]}
+    return {"success": False, "detail": "방 코드가 올바르지 않거나 존재하지 않습니다."}
+
+@app.websocket("/ws/battle/{room_id}")
+async def battle_websocket(websocket: WebSocket, room_id: str, nickname: str):
+    bm = get_battle_manager()
+    await bm.connect(websocket, room_id)
+    await bm.start_listening()
+    
+    # Notify others that someone joined
+    room_data = await bm.get_room(room_id)
+    if room_data:
+        player_exists = any(p["nickname"] == nickname for p in room_data["players"])
+        if not player_exists:
+            max_players = room_data.get("max_players", 2)
+            if len(room_data["players"]) >= max_players:
+                await websocket.close(code=1008)
+                return
+            room_data["players"].append({
+                "nickname": nickname,
+                "ready": False,
+                "progress": 0,
+                "section_progress": 0,
+                "wpm": 0,
+                "score": 0
+            })
+            await bm.update_room(room_id, room_data)
+        
+        await bm.publish(room_id, {"type": "room_state", "room": room_data})
+    
+    try:
+        while True:
+            data = await websocket.receive_text()
+            message = json.loads(data)
+            msg_type = message.get("type")
+            
+            if msg_type == "ready":
+                room_data = await bm.get_room(room_id)
+                if room_data:
+                    for p in room_data["players"]:
+                        if p["nickname"] == nickname:
+                            p["ready"] = message.get("ready", True)
+                            
+                    await bm.update_room(room_id, room_data)
+                    await bm.publish(room_id, {"type": "room_state", "room": room_data})
+                    
+            elif msg_type == "start_game_request":
+                room_data = await bm.get_room(room_id)
+                if room_data and room_data["creator"] == nickname:
+                    other_players = [p for p in room_data["players"] if p["nickname"] != nickname and not p.get("disconnected")]
+                    # 다른 참가자가 최소 1명 이상 있고, 모두 ready 상태여야 시작 가능
+                    if len(other_players) >= 1 and all(p.get("ready", False) for p in other_players):
+                        room_data["status"] = "playing"
+                        await bm.update_room(room_id, room_data)
+                        await bm.publish(room_id, {"type": "start_game"})
+                        
+            elif msg_type == "chat":
+                message_text = message.get("message", "").strip()
+                if message_text:
+                    await bm.publish(room_id, {
+                        "type": "chat_message",
+                        "nickname": nickname,
+                        "message": message_text
+                    })
+                    
+            elif msg_type == "progress":
+                progress = message.get("progress", 0)
+                section_progress = message.get("section_progress", 0)
+                wpm = message.get("wpm", 0)
+                score = message.get("score", 0)
+                room_data = await bm.get_room(room_id)
+                if room_data:
+                    for p in room_data["players"]:
+                        if p["nickname"] == nickname:
+                            p["progress"] = progress
+                            p["section_progress"] = section_progress
+                            p["wpm"] = wpm
+                            p["score"] = score
+                            
+                    await bm.update_room(room_id, room_data)
+                    await bm.publish(room_id, {"type": "progress_update", "nickname": nickname, "progress": progress, "section_progress": section_progress, "wpm": wpm, "score": score})
+                    
+            elif msg_type == "finish":
+                room_data = await bm.get_room(room_id)
+                if room_data and room_data["status"] != "finished":
+                    await bm.publish(room_id, {"type": "game_over", "winner": nickname})
+                    room_data["status"] = "finished"
+                    await bm.update_room(room_id, room_data)
+                    
+            elif msg_type == "leave":
+                room_data = await bm.get_room(room_id)
+                if room_data:
+                    room_data["players"] = [p for p in room_data["players"] if p["nickname"] != nickname]
+                    if not room_data["players"]:
+                        await bm.delete_room(room_id)
+                    else:
+                        if room_data["creator"] == nickname:
+                            room_data["creator"] = room_data["players"][0]["nickname"]
+                        await bm.update_room(room_id, room_data)
+                        await bm.publish(room_id, {"type": "room_state", "room": room_data})
+                    
+    except WebSocketDisconnect:
+        bm.disconnect(websocket, room_id)
+        room_data = await bm.get_room(room_id)
+        if room_data:
+            room_data["players"] = [p for p in room_data["players"] if p["nickname"] != nickname]
+            if not room_data["players"]:
+                await bm.delete_room(room_id)
+            else:
+                if room_data["creator"] == nickname:
+                    room_data["creator"] = room_data["players"][0]["nickname"]
+                await bm.update_room(room_id, room_data)
+                await bm.publish(room_id, {"type": "room_state", "room": room_data})

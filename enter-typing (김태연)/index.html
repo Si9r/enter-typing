@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이핑 플랫폼 메인</title>
+    <link rel="stylesheet" href="style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='index.html'">
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="typing_list.html">타이핑</a>
+                <a href="quiz_list.html">퀴즈</a>
+                <a href="ranking.html">랭킹</a>
+                <a href="battle.html">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='search.html'">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
+                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 공통 navbar 상태 관리 -->
+    <script src="navbar.js?v=1.0.2"></script>
+
+    <!-- 메인 히어로 섹션 -->
+    <main class="hero">
+        <div class="hero-left">
+            <div class="badge" style="display: inline-block;">🔥 즐거운 타이핑 플랫폼</div>
+            <h1 class="hero-title">
+                좋아하는 콘텐츠로<br>
+                <span class="highlight">타이핑</span>을 즐겨라
+            </h1>
+            <p class="hero-desc">
+                다양한 노래 가사, 퀴즈 — 좋아하는 콘텐츠를 타이핑하며<br>
+                자연스럽게 타자 실력과 집중력을 키워보세요
+            </p>
+            <div class="hero-buttons">
+                <button class="btn btn-large btn-pink" onclick="location.href='signup.html'">
+                    회원가입하고 시작하기
+                </button>
+                <button class="btn btn-large btn-blue-outline" onclick="location.href='login.html'">
+                    로그인하고 이어하기
+                </button>
+            </div>
+        </div>
+        <div class="hero-right">
+            <img src="assets/a2.png" class="hero-anime-girl" alt="엔터핑 캐릭터">
+            <div class="jp-typing-wrapper">
+                <div class="jp-typing-bg">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg-h-typed" class="typed-text"></span><span id="bg-h-untyped" class="untyped-text">ゆめならばどれほどよかったでしょう</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg-r-typed" class="typed-text"></span><span id="bg-r-untyped" class="untyped-text">yumenarabadorehodoyokattadesyou</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        夢ならばどれほどよかったでしょう
+                    </div>
+                </div>
+
+                <div class="jp-typing-bg jp-typing-bg2">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg2-h-typed" class="typed-text"></span><span id="bg2-h-untyped" class="untyped-text">ありがとうございます</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg2-r-typed" class="typed-text"></span><span id="bg2-r-untyped" class="untyped-text">arigatougozaimasu</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        有難う御座います
+                    </div>
+                </div>
+
+                <div class="jp-typing-bg jp-typing-bg3">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg3-h-typed" class="typed-text"></span><span id="bg3-h-untyped" class="untyped-text">きらきらひかるほしの</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg3-r-typed" class="typed-text"></span><span id="bg3-r-untyped" class="untyped-text">kirakirahikaruhoshino</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        きらきら光る星の
+                    </div>
+                </div>
+
+                <div class="jp-typing-box">
+                    <div class="jp-line hiragana-line">
+                        <span id="h-typed" class="typed-text"></span><span id="h-untyped" class="untyped-text">しずむようにとけてゆくように</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="r-typed" class="typed-text"></span><span class="cursor">_</span><span id="r-untyped" class="untyped-text">sizumuyounitoketeyukuyouni</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        沈むように溶けてゆくように
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Foreground sequence
+            const romajiStr = "sizumuyounitoketeyukuyouni";
+            const hiraganaStr = "しずむようにとけてゆくように";
+            const sequence = [
+                { r: 's', h: '' }, { r: 'i', h: 'し' },
+                { r: 'z', h: '' }, { r: 'u', h: 'ず' },
+                { r: 'm', h: '' }, { r: 'u', h: 'む' },
+                { r: 'y', h: '' }, { r: 'o', h: 'よ' },
+                { r: 'u', h: 'う' },
+                { r: 'n', h: '' }, { r: 'i', h: 'に' },
+                { r: 't', h: '' }, { r: 'o', h: 'と' },
+                { r: 'k', h: '' }, { r: 'e', h: 'け' },
+                { r: 't', h: '' }, { r: 'e', h: 'て' },
+                { r: 'y', h: '' }, { r: 'u', h: 'ゆ' },
+                { r: 'k', h: '' }, { r: 'u', h: 'く' },
+                { r: 'y', h: '' }, { r: 'o', h: 'よ' },
+                { r: 'u', h: 'う' },
+                { r: 'n', h: '' }, { r: 'i', h: 'に' }
+            ];
+
+            // Background sequence 1
+            const bgRomajiStr = "yumenarabadorehodoyokattadesyou";
+            const bgHiraganaStr = "ゆめならばどれほどよかったでしょう";
+            const bgSequence = [
+                { r: 'y', h: '' }, { r: 'u', h: 'ゆ' },
+                { r: 'm', h: '' }, { r: 'e', h: 'め' },
+                { r: 'n', h: '' }, { r: 'a', h: 'な' },
+                { r: 'r', h: '' }, { r: 'a', h: 'ら' },
+                { r: 'b', h: '' }, { r: 'a', h: 'ば' },
+                { r: 'd', h: '' }, { r: 'o', h: 'ど' },
+                { r: 'r', h: '' }, { r: 'e', h: 'れ' },
+                { r: 'h', h: '' }, { r: 'o', h: 'ほ' },
+                { r: 'd', h: '' }, { r: 'o', h: 'ど' },
+                { r: 'y', h: '' }, { r: 'o', h: 'よ' },
+                { r: 'k', h: '' }, { r: 'a', h: 'か' },
+                { r: 't', h: '' }, { r: 't', h: 'っ' }, { r: 'a', h: 'た' },
+                { r: 'd', h: '' }, { r: 'e', h: 'で' },
+                { r: 's', h: '' }, { r: 'y', h: '' }, { r: 'o', h: 'しょ' }, { r: 'u', h: 'う' }
+            ];
+
+            // Background sequence 2
+            const bg2Romaji = "arigatougozaimasu";
+            const bg2Hiragana = "ありがとうございます";
+            const bg2Seq = [
+                {r:'a', h:'あ'}, {r:'r', h:''}, {r:'i', h:'り'}, {r:'g', h:''}, {r:'a', h:'が'},
+                {r:'t', h:''}, {r:'o', h:'と'}, {r:'u', h:'う'}, {r:'g', h:''}, {r:'o', h:'ご'},
+                {r:'z', h:''}, {r:'a', h:'ざ'}, {r:'i', h:'い'}, {r:'m', h:''}, {r:'a', h:'ま'},
+                {r:'s', h:''}, {r:'u', h:'す'}
+            ];
+
+            // Background sequence 3
+            const bg3Romaji = "kirakirahikaruhoshino";
+            const bg3Hiragana = "きらきらひかるほしの";
+            const bg3Seq = [
+                {r:'k', h:''}, {r:'i', h:'き'}, {r:'r', h:''}, {r:'a', h:'ら'},
+                {r:'k', h:''}, {r:'i', h:'き'}, {r:'r', h:''}, {r:'a', h:'ら'},
+                {r:'h', h:''}, {r:'i', h:'ひ'}, {r:'k', h:''}, {r:'a', h:'か'}, {r:'r', h:''}, {r:'u', h:'る'},
+                {r:'h', h:''}, {r:'o', h:'ほ'}, {r:'s', h:''}, {r:'i', h:'し'},
+                {r:'n', h:''}, {r:'o', h:'の'}
+            ];
+
+            let rTyped = "", hTyped = ""; let seqIdx = 0;
+            let bgRTyped = "", bgHTyped = ""; let bgSeqIdx = 0;
+            let bg2RTyped = "", bg2HTyped = ""; let bg2SeqIdx = 0;
+            let bg3RTyped = "", bg3HTyped = ""; let bg3SeqIdx = 0;
+
+            function typeNext() {
+                if (seqIdx >= sequence.length) {
+                    setTimeout(() => { rTyped = ""; hTyped = ""; seqIdx = 0; updateDOM(); setTimeout(typeNext, 1500); }, 3000);
+                    return;
+                }
+                rTyped += sequence[seqIdx].r; hTyped += sequence[seqIdx].h; updateDOM(); seqIdx++;
+                setTimeout(typeNext, 50 + Math.random() * 100);
+            }
+
+            function typeBgNext() {
+                if (bgSeqIdx >= bgSequence.length) {
+                    setTimeout(() => { bgRTyped = ""; bgHTyped = ""; bgSeqIdx = 0; updateBgDOM(); setTimeout(typeBgNext, 2000); }, 3500);
+                    return;
+                }
+                bgRTyped += bgSequence[bgSeqIdx].r; bgHTyped += bgSequence[bgSeqIdx].h; updateBgDOM(); bgSeqIdx++;
+                setTimeout(typeBgNext, 40 + Math.random() * 80);
+            }
+
+            function typeBg2Next() {
+                if (bg2SeqIdx >= bg2Seq.length) {
+                    setTimeout(() => { bg2RTyped = ""; bg2HTyped = ""; bg2SeqIdx = 0; updateBg2DOM(); setTimeout(typeBg2Next, 2200); }, 3200);
+                    return;
+                }
+                bg2RTyped += bg2Seq[bg2SeqIdx].r; bg2HTyped += bg2Seq[bg2SeqIdx].h; updateBg2DOM(); bg2SeqIdx++;
+                setTimeout(typeBg2Next, 45 + Math.random() * 90);
+            }
+
+            function typeBg3Next() {
+                if (bg3SeqIdx >= bg3Seq.length) {
+                    setTimeout(() => { bg3RTyped = ""; bg3HTyped = ""; bg3SeqIdx = 0; updateBg3DOM(); setTimeout(typeBg3Next, 1800); }, 2800);
+                    return;
+                }
+                bg3RTyped += bg3Seq[bg3SeqIdx].r; bg3HTyped += bg3Seq[bg3SeqIdx].h; updateBg3DOM(); bg3SeqIdx++;
+                setTimeout(typeBg3Next, 55 + Math.random() * 75);
+            }
+
+            function updateDOM() {
+                document.getElementById("r-typed").innerText = rTyped;
+                document.getElementById("r-untyped").innerText = romajiStr.substring(rTyped.length);
+                document.getElementById("h-typed").innerText = hTyped;
+                document.getElementById("h-untyped").innerText = hiraganaStr.substring(hTyped.length);
+            }
+
+            function updateBgDOM() {
+                document.getElementById("bg-r-typed").innerText = bgRTyped;
+                document.getElementById("bg-r-untyped").innerText = bgRomajiStr.substring(bgRTyped.length);
+                document.getElementById("bg-h-typed").innerText = bgHTyped;
+                document.getElementById("bg-h-untyped").innerText = bgHiraganaStr.substring(bgHTyped.length);
+            }
+
+            function updateBg2DOM() {
+                document.getElementById("bg2-r-typed").innerText = bg2RTyped;
+                document.getElementById("bg2-r-untyped").innerText = bg2Romaji.substring(bg2RTyped.length);
+                document.getElementById("bg2-h-typed").innerText = bg2HTyped;
+                document.getElementById("bg2-h-untyped").innerText = bg2Hiragana.substring(bg2HTyped.length);
+            }
+
+            function updateBg3DOM() {
+                document.getElementById("bg3-r-typed").innerText = bg3RTyped;
+                document.getElementById("bg3-r-untyped").innerText = bg3Romaji.substring(bg3RTyped.length);
+                document.getElementById("bg3-h-typed").innerText = bg3HTyped;
+                document.getElementById("bg3-h-untyped").innerText = bg3Hiragana.substring(bg3HTyped.length);
+            }
+            
+            setTimeout(typeNext, 1000);
+            setTimeout(typeBgNext, 500);
+            setTimeout(typeBg2Next, 1200);
+            setTimeout(typeBg3Next, 200);
+        </script>
+    </main>
+
+    <!-- 콘텐츠 목록 섹션 -->
+    <section class="content-section">
+        <div class="section-header">
+            <h2>🔥 인기 타이핑 콘텐츠</h2>
+            <a href="typing_popular.html" class="view-all">전체보기 ></a>
+        </div>
+        <div class="card-grid">
+            <div class="card" onclick="location.href='typing_detail.html'">
+                <div class="card-badge pink">JPOP</div>
+                <h3 class="card-title">夜に駆ける (밤을 달리다)</h3>
+                <p class="card-desc">YOASOBI의 히트곡 가사로 타이핑 연습하기</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 120k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='typing_detail.html'">
+                <div class="card-badge blue">애니메이션</div>
+                <h3 class="card-title">너의 이름은. 명대사</h3>
+                <p class="card-desc">감동적인 명대사를 직접 타이핑하며 되새겨보세요.</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 85k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='typing_detail.html'">
+                <div class="card-badge green">문학</div>
+                <h3 class="card-title">윤동주 - 별 헤는 밤</h3>
+                <p class="card-desc">한국인이 가장 사랑하는 시를 차분히 연습해보세요.</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 54k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='typing_detail.html'">
+                <div class="card-badge pink">KPOP</div>
+                <h3 class="card-title">Ditto - NewJeans</h3>
+                <p class="card-desc">인기 KPOP 가사로 타자 속도를 높여보세요.</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 210k+</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section" style="margin-bottom: 60px;">
+        <div class="section-header">
+            <h2>💡 추천 퀴즈</h2>
+            <a href="quiz_list.html" class="view-all">전체보기 ></a>
+        </div>
+        <div class="card-grid">
+            <div class="card" onclick="location.href='quiz.html'">
+                <div class="card-badge blue">일본어</div>
+                <h3 class="card-title">히라가나/가타카나 마스터</h3>
+                <p class="card-desc">기초부터 탄탄하게! 일본어 문자를 퀴즈로 학습하세요.</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 32k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='quiz.html'">
+                <div class="card-badge green">상식</div>
+                <h3 class="card-title">IT 기본 용어 퀴즈</h3>
+                <p class="card-desc">프론트엔드, 백엔드 기초 용어 알아맞히기</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 15k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='quiz.html'">
+                <div class="card-badge pink">넌센스</div>
+                <h3 class="card-title">두뇌 회전 넌센스 퀴즈</h3>
+                <p class="card-desc">재미있는 넌센스 퀴즈로 쉬어가는 타임!</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 48k+</span>
+                </div>
+            </div>
+            <div class="card" onclick="location.href='quiz.html'">
+                <div class="card-badge blue">영어</div>
+                <h3 class="card-title">필수 영단어 100선</h3>
+                <p class="card-desc">가장 많이 쓰이는 필수 영단어를 퀴즈로 암기!</p>
+                <div class="card-footer">
+                    <span class="plays">▶ 92k+</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Sitemap -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h4>타이핑</h4>
+                <ul>
+                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
+                    <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
+                    <li><a href="typing_create.html">타이핑 작성하기</a></li>
+                    <li><a href="battle.html">실시간 대전</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>퀴즈 & 랭킹</h4>
+                <ul>
+                    <li><a href="quiz_list.html">퀴즈 리스트</a></li>
+                    <li><a href="quiz_create.html">퀴즈 작성하기</a></li>
+                    <li><a href="ranking.html">전체 랭킹</a></li>
+                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="notice.html">공지사항</a></li>
+                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

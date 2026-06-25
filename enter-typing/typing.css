@@ -271,12 +271,12 @@ h1 {
 }
 
 .sentence-display .lyric-unit.current {
-  background: rgba(255, 154, 158, 0.2);
-  color: #c92a2a;
+  background: rgba(255, 182, 193, 0.2);
+  color: #D84B6B; /* Deep pink for current word */
 }
 
 .sentence-display .lyric-unit.typed {
-  color: #3a6b3a;
+  color: var(--color-correct); /* Green for completed words */
 }
 .sentence-display .lyric-unit.typed .roma-text {
   opacity: 0.5;
@@ -295,7 +295,7 @@ h1 {
 }
 
 .sentence-display .lyric-unit.current .roma-text span.typed {
-  color: #c92a2a;
+  color: var(--color-correct);
   font-weight: 700;
 }
 
@@ -362,3 +362,138 @@ h1 {
 }
 
 /* Removed old text-display specific stuff since we use lyric-block now */
+
+/* ========== 오타 분석 결과 UI ========== */
+.result-typo-analysis {
+  margin-top: 18px;
+  width: 100%;
+}
+
+.typo-analysis-perfect {
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #3a8e3a;
+  padding: 14px;
+  background: rgba(144,238,144,0.15);
+  border: 1.5px solid rgba(144,238,144,0.5);
+  border-radius: 12px;
+}
+
+.typo-analysis-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.typo-section {
+  background: #f9f9fb;
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.typo-section-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #D84B6B;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* 가나 Top5 바 차트 */
+.typo-kana-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.typo-kana-item {
+  display: grid;
+  grid-template-columns: 28px 48px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.typo-rank {
+  font-size: 1rem;
+  text-align: center;
+}
+
+.typo-kana {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #2C3E50;
+  text-align: center;
+}
+
+.typo-bar-wrap {
+  height: 10px;
+  background: #e8e8e8;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.typo-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9a9e, #f06595);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.typo-cnt {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c92a2a;
+  text-align: right;
+}
+
+/* 취약 줄 목록 */
+.typo-line-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.typo-line-item {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.typo-line-num {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #ff9a9e, #f06595);
+  border-radius: 6px;
+  text-align: center;
+  padding: 2px 4px;
+}
+
+.typo-line-text {
+  font-size: 0.85rem;
+  color: #444;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.typo-line-cnt {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c92a2a;
+  text-align: right;
+}
+
+/* 결과 모달 스크롤 허용 */
+.result-modal-card {
+  max-height: 90vh;
+  overflow-y: auto;
+}

@@ -168,10 +168,9 @@
             </div>
             <nav class="nav-links">
                 <a href="typing_list.html">타이핑</a>
-                <a href="quiz_list.html">퀴즈</a>
-                <a href="battle_list.html">대전</a>
+                <a href="quiz_list.html" class="active">퀴즈</a>
                 <a href="ranking.html">랭킹</a>
-                <a href="notice.html">공지</a>
+                <a href="battle.html">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
@@ -182,6 +181,7 @@
             </div>
         </div>
         <div class="nav-right">
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -253,7 +253,7 @@
                     <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
                     <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
                     <li><a href="typing_create.html">타이핑 작성하기</a></li>
-                    <li><a href="multi_match.html">실시간 대전</a></li>
+                    <li><a href="battle.html">실시간 대전</a></li>
                 </ul>
             </div>
 
@@ -350,7 +350,7 @@
             if (!confirm('정말로 이 퀴즈 콘텐츠를 삭제하시겠습니까?')) return;
 
             try {
-                const token = localStorage.getItem('token');
+                const token = sessionStorage.getItem('ep_token');
                 const headers = {};
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 

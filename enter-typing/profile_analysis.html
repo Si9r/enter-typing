@@ -290,12 +290,11 @@
         <span class="logo-text">엔터핑</span>
       </div>
       <nav class="nav-links">
-                <a href="typing_list.html">타이핑</a>
-                <a href="quiz_list.html">퀴즈</a>
-                <a href="battle_list.html">대전</a>
-                <a href="ranking.html">랭킹</a>
-                <a href="notice.html">공지</a>
-            </nav>
+        <a href="typing_list.html">타이핑</a>
+        <a href="quiz_list.html">퀴즈</a>
+        <a href="ranking.html">랭킹</a>
+        <a href="battle.html">실시간 대전</a>
+      </nav>
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='search.html'">
@@ -305,6 +304,7 @@
       </div>
     </div>
     <div class="nav-right">
+      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -327,15 +327,15 @@
     <!-- 요약 통계 -->
     <div class="summary-row">
       <div class="summary-box red">
-        <div class="s-val">11.3%</div>
+        <div class="s-val" id="avg-error-rate-val">11.3%</div>
         <div class="s-lbl">전체 평균 오타율</div>
       </div>
       <div class="summary-box blue">
-        <div class="s-val">247회</div>
+        <div class="s-val" id="total-typos-val">247회</div>
         <div class="s-lbl">총 오타 발생 횟수</div>
       </div>
       <div class="summary-box green">
-        <div class="s-val">+2.1%</div>
+        <div class="s-val" id="improvement-val">+2.1%</div>
         <div class="s-lbl">지난 달 대비 개선</div>
       </div>
     </div>
@@ -444,7 +444,7 @@
           <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
           <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
           <li><a href="typing_create.html">타이핑 작성하기</a></li>
-          <li><a href="multi_match.html">실시간 대전</a></li>
+          <li><a href="battle.html">실시간 대전</a></li>
         </ul>
       </div>
 
@@ -475,108 +475,183 @@
   </footer>
 
   <script>
-    // ── 데이터 ──────────────────────────────────────────────
-    const typoData = [
-      { char: 'つ', roma: 'tsu', pct: 28, level: 'high' },
-      { char: 'ん', roma: 'n/nn', pct: 15, level: 'high' },
-      { char: 'っ', roma: 'xtsu/촉음', pct: 12, level: 'high' },
-      { char: 'ぢ', roma: 'di', pct: 8, level: 'med' },
-      { char: 'を', roma: 'wo', pct: 7, level: 'med' },
-      { char: 'ゐ', roma: 'wi', pct: 5, level: 'med' },
-      { char: 'ぜ', roma: 'ze', pct: 4, level: 'med' },
-      { char: 'づ', roma: 'du', pct: 3, level: 'low' },
-      { char: 'ぱ', roma: 'pa', pct: 3, level: 'low' },
-      { char: 'びゃ', roma: 'bya', pct: 2, level: 'low' },
+    const token = sessionStorage.getItem("ep_token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      location.href = "login.html";
+    }
+
+    const romajiLookup = {
+      'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+      'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+      'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+      'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+      '나': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+      'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+      'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+      '야': 'ya', '유': 'yu', '요': 'yo',
+      'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+      'わ': 'wa', 'を': 'wo', 'ん': 'n/nn', 'っ': 'xtsu',
+      'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+      'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+      '다': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+      '바': 'ba', '비': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+      'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po'
+    };
+
+    const baseChars = [
+      'あ','い','う','え','お',
+      'か','き','く','け','こ',
+      'さ','し','す','せ','そ',
+      'た','ち','つ','て','と',
+      'な','に','ぬ','ね','の',
+      'は','ひ','ふ','へ','ほ',
+      'ま','み','む','め','も',
+      'や','유','よ','ん','っ',
+      'ら','り','る','れ','ろ',
+      'わ','을','ぢ','づ','ぜ'
     ];
 
-    const pairData = [
-      { a: 'ぢ', b: 'じ', aRoma: 'di', bRoma: 'ji', rate: '8.2%', desc: '모양이 비슷해 혼동 자주 발생' },
-      { a: 'づ', b: 'ず', aRoma: 'du', bRoma: 'zu', rate: '3.1%', desc: '발음이 동일해 혼동' },
-      { a: 'ぬ', b: 'め', aRoma: 'nu', bRoma: 'me', rate: '2.7%', desc: '자형이 비슷해 혼동' },
-      { a: 'を', b: 'お', aRoma: 'wo', bRoma: 'o', rate: '2.4%', desc: '입력 방법 혼동' },
-      { a: 'っ', b: 'つ', aRoma: 'xtsu', bRoma: 'tsu', rate: '6.3%', desc: '크기 차이를 놓침' },
-      { a: 'へ', b: 'え', aRoma: 'he', bRoma: 'e', rate: '1.8%', desc: '자형 유사' },
-    ];
+    // Convert any Korean/placeholders to standard Japanese in baseChars
+    for (let i = 0; i < baseChars.length; i++) {
+      if (baseChars[i] === '유') baseChars[i] = 'ゆ';
+      if (baseChars[i] === '을') baseChars[i] = 'を';
+    }
 
-    const romajiData = [
-      { char: 'つ', correct: 'tsu', wrong: 'tu', freq: 68, pct: '28%' },
-      { char: 'ち', correct: 'chi', wrong: 'ti', freq: 31, pct: '9%' },
-      { char: 'ん', correct: 'nn (모음 앞)', wrong: 'n', freq: 38, pct: '15%' },
-      { char: 'っ', correct: '다음자음×2', wrong: 'xtsu 단독', freq: 29, pct: '12%' },
-      { char: 'じ', correct: 'ji', wrong: 'zi', freq: 19, pct: '7%' },
-      { char: 'し', correct: 'shi', wrong: 'si', freq: 15, pct: '6%' },
-      { char: 'ぢ', correct: 'di', wrong: 'ji', freq: 20, pct: '8%' },
-      { char: 'きゃ', correct: 'kya', wrong: 'kia', freq: 11, pct: '4%' },
-    ];
-
-    const heatmapChars = [
-      { ch:'あ', pct:1 },{ ch:'い', pct:2 },{ ch:'う', pct:3 },{ ch:'え', pct:1 },{ ch:'お', pct:2 },
-      { ch:'か', pct:2 },{ ch:'き', pct:4 },{ ch:'く', pct:3 },{ ch:'け', pct:2 },{ ch:'こ', pct:1 },
-      { ch:'さ', pct:3 },{ ch:'し', pct:6 },{ ch:'す', pct:4 },{ ch:'せ', pct:2 },{ ch:'そ', pct:1 },
-      { ch:'た', pct:2 },{ ch:'ち', pct:9 },{ ch:'つ', pct:28},{ ch:'て', pct:3 },{ ch:'と', pct:2 },
-      { ch:'な', pct:1 },{ ch:'に', pct:2 },{ ch:'ぬ', pct:5 },{ ch:'ね', pct:2 },{ ch:'の', pct:1 },
-      { ch:'は', pct:1 },{ ch:'ひ', pct:3 },{ ch:'ふ', pct:4 },{ ch:'へ', pct:3 },{ ch:'ほ', pct:1 },
-      { ch:'ま', pct:1 },{ ch:'み', pct:2 },{ ch:'む', pct:3 },{ ch:'め', pct:4 },{ ch:'も', pct:1 },
-      { ch:'や', pct:2 },{ ch:'ゆ', pct:3 },{ ch:'よ', pct:1 },{ ch:'ん', pct:15},{ ch:'っ', pct:12},
-      { ch:'ら', pct:1 },{ ch:'り', pct:2 },{ ch:'る', pct:3 },{ ch:'れ', pct:2 },{ ch:'ろ', pct:1 },
-      { ch:'わ', pct:2 },{ ch:'を', pct:7 },{ ch:'ぢ', pct:8 },{ ch:'づ', pct:3 },{ ch:'ぜ', pct:4 },
-    ];
-
-    // ── 히트맵 렌더 ──────────────────────────────────────────
-    const hm = document.getElementById('heatmap');
-    heatmapChars.forEach(d => {
-      const cell = document.createElement('div');
-      cell.className = 'hm-cell ' + (d.pct >= 10 ? 'hm-high' : d.pct >= 5 ? 'hm-med' : d.pct > 0 ? 'hm-low' : 'hm-none');
-      cell.title = `${d.ch} — 오타율 ${d.pct}%`;
-      cell.innerHTML = `<span class="hm-char">${d.ch}</span><span class="hm-rate">${d.pct > 0 ? d.pct + '%' : '-'}</span>`;
-      hm.appendChild(cell);
+    fetch("/api/typo-stats", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("인증 실패");
+      return res.json();
+    })
+    .then(result => {
+      if (result.success) {
+        renderAnalysis(result);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("데이터를 가져오는 중 오류가 발생했습니다.");
+      location.href = "login.html";
     });
 
-    // ── 오타 바 렌더 ─────────────────────────────────────────
-    const barsEl = document.getElementById('typo-bars');
-    typoData.forEach(d => {
-      const fillCls = d.level === 'high' ? '' : d.level === 'med' ? ' med' : ' low';
-      const pctCls  = d.level === 'high' ? '' : d.level === 'med' ? ' med' : ' low';
-      barsEl.innerHTML += `
-        <div class="typo-row">
-          <div class="typo-char">${d.char}<small>${d.roma}</small></div>
-          <div class="typo-bar-bg">
-            <div class="typo-bar-fill${fillCls}" style="width:${d.pct}%;"></div>
-          </div>
-          <div class="typo-pct${pctCls}">${d.pct}%</div>
-        </div>`;
-    });
+    function renderAnalysis(result) {
+      // 1. 요약 통계 렌더
+      document.getElementById('avg-error-rate-val').innerText = result.summary.avg_error_rate.toFixed(1) + "%";
+      document.getElementById('total-typos-val').innerText = result.summary.total_typos + "회";
+      
+      const imp = result.summary.improvement;
+      const impValEl = document.getElementById('improvement-val');
+      if (imp > 0) {
+        impValEl.innerText = "+" + imp.toFixed(1) + "%";
+        impValEl.parentElement.className = "summary-box green";
+      } else if (imp < 0) {
+        impValEl.innerText = imp.toFixed(1) + "%";
+        impValEl.parentElement.className = "summary-box red";
+      } else {
+        impValEl.innerText = "0.0%";
+        impValEl.parentElement.className = "summary-box blue";
+      }
 
-    // ── 혼동 쌍 렌더 ─────────────────────────────────────────
-    const pairEl = document.getElementById('pair-grid');
-    pairData.forEach(d => {
-      pairEl.innerHTML += `
-        <div class="pair-item">
-          <div class="pair-chars">
-            <span>${d.a}</span>
-            <span class="pair-arrow">→</span>
-            <span style="color:#FF9EAB;">${d.b}</span>
-          </div>
-          <div class="pair-desc">
-            <b>${d.a}</b>(${d.aRoma}) 입력해야 할 때 <b>${d.b}</b>(${d.bRoma})를 입력<br>
-            ${d.desc}
-          </div>
-          <div class="pair-rate">${d.rate} 혼동률</div>
-        </div>`;
-    });
+      // 2. 히트맵 렌더
+      const dataMap = {};
+      result.data.forEach(item => {
+        dataMap[item.kana] = item;
+      });
 
-    // ── 로마자 테이블 렌더 ───────────────────────────────────
-    const tbody = document.getElementById('romaji-tbody');
-    romajiData.forEach(d => {
-      tbody.innerHTML += `
-        <tr>
-          <td><b>${d.char}</b></td>
-          <td><span class="tag-correct">${d.correct}</span></td>
-          <td><span class="tag-wrong">${d.wrong}</span></td>
-          <td>${d.freq}회</td>
-          <td><b style="color:#FF9EAB;">${d.pct}</b></td>
-        </tr>`;
-    });
+      const hm = document.getElementById('heatmap');
+      hm.innerHTML = '';
+      
+      baseChars.forEach(ch => {
+        const item = dataMap[ch];
+        const pct = item && item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
+        
+        const cell = document.createElement('div');
+        cell.className = 'hm-cell ' + (pct >= 10 ? 'hm-high' : pct >= 5 ? 'hm-med' : pct > 0 ? 'hm-low' : 'hm-none');
+        cell.title = `${ch} — 오타율 ${pct}% (오타 ${item ? item.error_count : 0}/${item ? item.total_count : 0})`;
+        cell.innerHTML = `<span class="hm-char">${ch}</span><span class="hm-rate">${pct > 0 ? pct + '%' : '-'}</span>`;
+        hm.appendChild(cell);
+      });
+
+      // 3. 오타 TOP 10 렌더
+      const barsEl = document.getElementById('typo-bars');
+      barsEl.innerHTML = '';
+      
+      const sortedStats = result.data
+        .map(item => {
+          const rate = item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
+          return { ...item, pct: rate };
+        })
+        .filter(item => item.total_count >= 1 && item.error_count > 0)
+        .sort((a, b) => b.pct - a.pct || b.error_count - a.error_count)
+        .slice(0, 10);
+
+      if (sortedStats.length > 0) {
+        sortedStats.forEach(d => {
+          const level = d.pct >= 10 ? 'high' : d.pct >= 5 ? 'med' : 'low';
+          const fillCls = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
+          const pctCls  = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
+          const roma = romajiLookup[d.kana] || '';
+          
+          barsEl.innerHTML += `
+            <div class="typo-row">
+              <div class="typo-char">${d.kana}<small>${roma}</small></div>
+              <div class="typo-bar-bg">
+                <div class="typo-bar-fill${fillCls}" style="width:${d.pct}%;"></div>
+              </div>
+              <div class="typo-pct${pctCls}">${d.pct}%</div>
+            </div>`;
+        });
+      } else {
+        barsEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center;">오타 기록이 없습니다. 완벽한 타이핑입니다! 🎉</div>';
+      }
+
+      // 4. 혼동 쌍 렌더
+      const pairEl = document.getElementById('pair-grid');
+      pairEl.innerHTML = '';
+      if (result.pairs && result.pairs.length > 0) {
+        result.pairs.forEach(d => {
+          pairEl.innerHTML += `
+            <div class="pair-item">
+              <div class="pair-chars">
+                <span>${d.a}</span>
+                <span class="pair-arrow">→</span>
+                <span style="color:#FF9EAB;">${d.b}</span>
+              </div>
+              <div class="pair-desc">
+                <b>${d.a}</b>(${romajiLookup[d.a] || d.aRoma}) 입력해야 할 때 <b>${d.b}</b>(${romajiLookup[d.b] || d.bRoma})를 입력<br>
+                ${d.desc}
+              </div>
+              <div class="pair-rate">${d.rate}</div>
+            </div>`;
+        });
+      } else {
+        pairEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center; grid-column:span 2;">충분한 분석 데이터가 없거나 혼동하는 문자 쌍이 없습니다.</div>';
+      }
+
+      // 5. 로마자 테이블 렌더
+      const tbody = document.getElementById('romaji-tbody');
+      tbody.innerHTML = '';
+      if (result.romaji_patterns && result.romaji_patterns.length > 0) {
+        result.romaji_patterns.forEach(d => {
+          const statItem = dataMap[d.char];
+          const errorCount = statItem ? statItem.error_count : 0;
+          tbody.innerHTML += `
+            <tr>
+              <td><b>${d.char}</b></td>
+              <td><span class="tag-correct">${d.correct}</span></td>
+              <td><span class="tag-wrong">${d.wrong}</span></td>
+              <td>${errorCount}회</td>
+              <td><b style="color:#FF9EAB;">${d.pct}%</b></td>
+            </tr>`;
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--color-text-muted);">로마자 입력 실수 패턴 데이터가 없습니다.</td></tr>';
+      }
+    }
   </script>
 </body>
 </html>

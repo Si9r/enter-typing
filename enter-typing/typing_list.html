@@ -167,11 +167,10 @@
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="typing_list.html">타이핑</a>
+                <a href="typing_list.html" class="active">타이핑</a>
                 <a href="quiz_list.html">퀴즈</a>
-                <a href="battle_list.html">대전</a>
                 <a href="ranking.html">랭킹</a>
-                <a href="notice.html">공지</a>
+                <a href="battle.html">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
@@ -182,6 +181,7 @@
             </div>
         </div>
         <div class="nav-right">
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -426,8 +426,8 @@
                     : (item.description || '가사 타이핑 연습하기');
 
                 const diffStars = '⭐'.repeat(item.difficulty || 3);
-                let totalSeconds = 0;
-                if (item.timestamps) {
+                let totalSeconds = item.best_time || 0;
+                if (totalSeconds === 0 && item.timestamps) {
                     try {
                         let tArr = [];
                         if (item.timestamps.trim().startsWith('[')) {
@@ -511,8 +511,8 @@
                     document.getElementById('modal-difficulty').innerText = '⭐'.repeat(diffValue);
                     document.getElementById('modal-play-count').innerText = (data.play_count || 0) + '회';
                     
-                    let mTotalSeconds = 0;
-                    if (data.timestamps) {
+                    let mTotalSeconds = data.best_time || 0;
+                    if (mTotalSeconds === 0 && data.timestamps) {
                         try {
                             let mtArr = [];
                             if (data.timestamps.trim().startsWith('[')) {

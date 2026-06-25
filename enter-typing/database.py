@@ -3,14 +3,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-import redis.asyncio as redis
 
 # .env 파일에서 설정 로드
 load_dotenv()
 
 # 환경 변수에서 DB URL 가져오기
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 if not SQLALCHEMY_DATABASE_URL:
     raise ValueError("DATABASE_URL이 .env 파일에 설정되지 않았습니다.")
@@ -31,9 +29,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-# Redis 연결 풀 설정 (health_check_interval 추가하여 타임아웃 방지)
-redis_pool = redis.ConnectionPool.from_url(REDIS_URL, decode_responses=True, health_check_interval=30)
-
-def get_redis() -> redis.Redis:
-    return redis.Redis(connection_pool=redis_pool)

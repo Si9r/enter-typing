@@ -1,4 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, WebSocket, WebSocketDisconnect, Query
+from fastapi.responses import JSONResponse
+import asyncio
+import redis.asyncio as aioredis
+from typing import Dict, List, Optional
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -222,6 +226,7 @@ class TypingContentCreate(BaseModel):
     timestamps: str | None = None
     difficulty: int = 3
     youtube_id: str | None = None
+    best_time: int = 0
 
 class QuizContentCreate(BaseModel):
     title: str
@@ -243,6 +248,7 @@ class TypingHistoryCreate(BaseModel):
     text: str
 
 class QuizHistoryCreate(BaseModel):
+    quiz_id: Optional[int] = None
     quiz_category: str
     score: int
     total_questions: int
@@ -624,7 +630,12 @@ def get_all_typing_contents(db: Session = Depends(get_db)):
             "description": c.description,
             "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
             "difficulty": c.difficulty,
-            "best_time": c.best_time
+            "best_time": c.best_time,
+            "lyrics": c.lyrics,
+            "hiragana": c.hiragana,
+            "romaji": c.romaji,
+            "youtube_id": c.youtube_id,
+            "timestamps": c.timestamps
         })
     return {"success": True, "data": result}
 
@@ -668,7 +679,7 @@ def create_typing_content(req: TypingContentCreate, current_user: models.User = 
         timestamps=req.timestamps,
         difficulty=req.difficulty,
         play_count=0,
-        best_time=0
+        best_time=req.best_time
     )
     db.add(new_content)
     db.commit()
@@ -716,6 +727,7 @@ def update_typing_content(content_id: int, req: TypingContentCreate, current_use
     content.romaji = req.romaji
     content.timestamps = req.timestamps
     content.difficulty = req.difficulty
+    content.best_time = req.best_time
     
     db.commit()
     return {"success": True, "message": "수정되었습니다."}
@@ -948,6 +960,7 @@ def convert_lyrics(req: ConvertRequest):
     converted = kks.convert(text)
     
     hiragana = ""
+    romaji = ""
     for item in converted:
         h = item['hira']
         r = item['hepburn']
@@ -991,29 +1004,108 @@ def serve_html(page: str):
         return FileResponse(path)
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
-for f in ["style.css", "typing.css", "script.js", "navbar.js", "battle.js"]:
+for f in ["style.css", "typing.css", "script.js", "navbar.js", "battle.js", "shared_typing_engine.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)
 
-# ════════════════════════════════════════════════════════════
-# API: 타이핑 히스토리 저장
+# ── 가나 파서 구현 ───────────────────────────────────
+def parse_kana_to_units(kana_str: str) -> list[str]:
+    units = []
+    chars = list(kana_str)
+    i = 0
+    small_kana = {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"}
+    combination_rules = {
+        "き": {"ゃ", "ゅ", "ょ"},
+        "し": {"ゃ", "ゅ", "ょ"},
+        "せ": {"ぃ"},
+        "ち": {"ゃ", "ゅ", "ょ"},
+        "に": {"ゃ", "ゅ", "ょ"},
+        "ひ": {"ゃ", "ゅ", "ょ"},
+        "み": {"ゃ", "ゅ", "ょ"},
+        "り": {"ゃ", "ゅ", "ょ"},
+        "ぎ": {"ゃ", "ゅ", "ょ"},
+        "じ": {"ゃ", "ゅ", "ょ"},
+        "ぢ": {"ゃ", "ゅ", "ょ"},
+        "び": {"ゃ", "ゅ", "ょ"},
+        "ぴ": {"ゃ", "ゅ", "ょ"},
+    }
+    
+    while i < len(chars):
+        char = chars[i]
+        next_char = chars[i + 1] if i + 1 < len(chars) else None
+        
+        if char in ["\n", "\r", " "]:
+            i += 1
+            continue
+            
+        # 1. 촉음(っ) 결합
+        if char == "っ" and next_char and next_char not in ["\n", "\r", " "]:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 2. 요음 combination rules
+        if char in combination_rules and next_char in combination_rules[char]:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 3. 기타 작은 가나 결합
+        if next_char in small_kana:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 4. 단일 문자
+        units.append(char)
+        i += 1
+        
+    return units
+
+# API: 타이핑 히스토리 저장 (오직 "타이핑" 장르에서만 오타 통계 반영)
 # POST /api/typing-history
 # ════════════════════════════════════════════════════════════
 @app.post("/api/typing-history")
 def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # 1. 곡(Content) 조회하여 ID 매핑
+    content = db.query(models.TypingContent).filter(models.TypingContent.title == req.content_title).first()
+    content_id = content.id if content else None
+
     history = models.TypingHistory(
         user_id=current_user.id,
+        content_id=content_id,
         content_title=req.content_title,
         genre=req.genre,
         wpm=req.wpm,
         accuracy=req.accuracy
     )
     db.add(history)
+    
+    # 2. 오타 분석을 위해 "타이핑" 모드 완료 시에만 total_count 업데이트
+    # req.genre가 "타이핑" 혹은 "J-POP" 등 일반 타이핑 연습 모드일 때만 적용
+    if content and req.genre in ["타이핑", "J-POP", "ANI", "GAME", "ETC"]:
+        try:
+            units = parse_kana_to_units(content.hiragana)
+            for unit in units:
+                existing = db.query(models.TypoStat).filter(
+                    models.TypoStat.user_id == current_user.id,
+                    models.TypoStat.character_typed == unit
+                ).first()
+                if existing:
+                    existing.total_count += 1
+                else:
+                    db.add(models.TypoStat(
+                        user_id=current_user.id,
+                        character_typed=unit,
+                        error_count=0,
+                        total_count=1
+                    ))
+        except Exception as e:
+            print(f"Error updating total_count from hiragana: {e}")
+
     db.commit()
     return {"message": "기록이 저장되었습니다."}
-
-# ════════════════════════════════════════════════════════════
 # API: 퀴즈 히스토리 저장
 # POST /api/quiz-history
 # ════════════════════════════════════════════════════════════
@@ -1021,11 +1113,22 @@ def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db),
 def save_quiz_history(req: QuizHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     history = models.QuizHistory(
         user_id=current_user.id,
+        quiz_id=req.quiz_id,
         quiz_category=req.quiz_category,
         score=req.score,
         total_questions=req.total_questions
     )
     db.add(history)
+    
+    if req.quiz_id:
+        quiz_content = db.query(models.QuizContent).filter(models.QuizContent.id == req.quiz_id).first()
+        if quiz_content:
+            if quiz_content.play_count is None:
+                quiz_content.play_count = 0
+            quiz_content.play_count += 1
+            if req.score > (quiz_content.best_score or 0):
+                quiz_content.best_score = req.score
+
     db.commit()
     return {"message": "퀴즈 기록이 저장되었습니다."}
 
@@ -1042,28 +1145,59 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
     quiz_histories = db.query(models.QuizHistory).filter(
         models.QuizHistory.user_id == current_user.id
     ).order_by(models.QuizHistory.played_at.desc()).limit(20).all()
+
+    battle_histories = db.query(models.BattleHistory).filter(
+        models.BattleHistory.user_id == current_user.id
+    ).order_by(models.BattleHistory.played_at.desc()).limit(20).all()
     
     combined = []
     for th in typing_histories:
         combined.append({
             "type": "typing",
+            "content_id": th.content_id,
             "title": th.content_title,
             "genre": th.genre,
             "wpm": th.wpm,
             "accuracy": th.accuracy,
-            "played_at": th.played_at.strftime("%Y.%m.%d"),
+            "score_str": f"{th.score}점 · {th.wpm} WPM · {int(th.accuracy)}%",
+            "played_at": th.played_at.isoformat(),
             "_raw_date": th.played_at
         })
         
     for qh in quiz_histories:
         combined.append({
             "type": "quiz",
+            "content_id": qh.quiz_id,
             "title": qh.quiz_category,
             "genre": "퀴즈",
             "score": qh.score,
             "total_questions": qh.total_questions,
-            "played_at": qh.played_at.strftime("%Y.%m.%d"),
+            "score_str": f"{qh.score} / {qh.total_questions} 정답",
+            "played_at": qh.played_at.isoformat(),
             "_raw_date": qh.played_at
+        })
+
+    for bh in battle_histories:
+        song_title = "알 수 없음"
+        if bh.content_id:
+            content = db.query(models.TypingContent).filter(models.TypingContent.id == bh.content_id).first()
+            if content:
+                song_title = content.title
+        rank_labels = {1: "🥇 1위", 2: "🥈 2위", 3: "🥉 3위"}
+        rank_str = rank_labels.get(bh.rank, f"{bh.rank}위")
+        combined.append({
+            "type": "battle",
+            "content_id": bh.content_id,
+            "title": song_title,
+            "genre": "실시간 대전",
+            "rank": bh.rank,
+            "wpm": bh.wpm,
+            "accuracy": bh.accuracy,
+            "score": bh.score,
+            "room_code": bh.room_code,
+            "score_str": f"{rank_str} · {bh.score}점 · {bh.wpm} WPM · {int(bh.accuracy)}%",
+            "played_at": bh.played_at.isoformat(),
+            "_raw_date": bh.played_at
         })
         
     # Sort descending by raw datetime
@@ -1073,169 +1207,663 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
     for item in combined:
         del item["_raw_date"]
         
-    return {"history": combined}
+    return {"success": True, "data": combined}
+
 
 # ════════════════════════════════════════════════════════════
-# API: 대전 기능 (웹소켓 & Redis)
+# 실시간 대전 시스템 - Redis + WebSocket
 # ════════════════════════════════════════════════════════════
 
-import uuid
-from fastapi import WebSocket, WebSocketDisconnect
-from database import get_redis
-from battle_manager import BattleManager
-import json
+# Redis 연결
+redis_client: Optional[aioredis.Redis] = None
 
-_battle_manager = None
-def get_battle_manager():
-    global _battle_manager
-    if _battle_manager is None:
-        _battle_manager = BattleManager(get_redis())
-    return _battle_manager
+async def get_redis() -> aioredis.Redis:
+    global redis_client
+    if redis_client is None:
+        redis_client = aioredis.from_url("redis://localhost:6379", decode_responses=True, protocol=2)
+    return redis_client
 
-from typing import Optional
 
-class RoomCreateRequest(BaseModel):
+# WebSocket 연결 관리자
+class BattleConnectionManager:
+    def __init__(self):
+        # room_code → list of (websocket, nickname)
+        self.rooms: Dict[str, List[tuple]] = {}
+
+    async def connect(self, room_code: str, ws: WebSocket, nickname: str):
+        await ws.accept()
+        if room_code not in self.rooms:
+            self.rooms[room_code] = []
+        self.rooms[room_code].append((ws, nickname))
+
+    def disconnect(self, room_code: str, ws: WebSocket):
+        if room_code in self.rooms:
+            self.rooms[room_code] = [(w, n) for w, n in self.rooms[room_code] if w != ws]
+            if not self.rooms[room_code]:
+                del self.rooms[room_code]
+
+    async def broadcast(self, room_code: str, message: dict, exclude: WebSocket = None):
+        if room_code not in self.rooms:
+            return
+        dead = []
+        for ws, nick in self.rooms[room_code]:
+            if ws == exclude:
+                continue
+            try:
+                await ws.send_json(message)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self.disconnect(room_code, ws)
+
+    async def broadcast_all(self, room_code: str, message: dict):
+        await self.broadcast(room_code, message, exclude=None)
+
+    def get_connections(self, room_code: str) -> int:
+        return len(self.rooms.get(room_code, []))
+
+
+battle_manager = BattleConnectionManager()
+lobby_manager = BattleConnectionManager()
+
+REDIS_ROOM_TTL = 7200  # 2시간
+
+
+async def get_room_data(redis: aioredis.Redis, room_code: str) -> Optional[dict]:
+    raw = await redis.get(f"battle:room:{room_code}")
+    if raw:
+        return json.loads(raw)
+    return None
+
+
+async def save_room_data(redis: aioredis.Redis, room_code: str, data: dict):
+    await redis.set(f"battle:room:{room_code}", json.dumps(data, ensure_ascii=False), ex=REDIS_ROOM_TTL)
+
+
+async def delete_room(redis: aioredis.Redis, room_code: str):
+    await redis.delete(f"battle:room:{room_code}")
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+
+# ── 방 생성 API ────────────────────────────────────────────
+class BattleRoomCreate(BaseModel):
     title: str
-    content_id: int
-    max_players: int = 2
-    is_private: bool = False
-    room_code: Optional[str] = None
+    song_id: int
+    max_players: int = 4
+
 
 @app.post("/api/battle/rooms")
-async def create_battle_room(req: RoomCreateRequest, current_user: models.User = Depends(get_current_user)):
-    bm = get_battle_manager()
-    room_id = uuid.uuid4().hex[:8]
-    room_data = await bm.create_room(
-        room_id, req.title, current_user.nickname, req.content_id, req.max_players, req.is_private, req.room_code
-    )
-    return {"success": True, "room": room_data}
+async def create_battle_room(req: BattleRoomCreate, authorization: str = Header(None), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorization, db)
+    redis = await get_redis()
+
+    # 4자리 방 코드 생성 (중복 방지)
+    for _ in range(10):
+        code = str(random.randint(1000, 9999))
+        existing = await redis.get(f"battle:room:{code}")
+        if not existing:
+            break
+
+    # 곡 정보 조회
+    content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="곡을 찾을 수 없습니다.")
+
+    room_data = {
+        "code": code,
+        "title": req.title,
+        "host": current_user.nickname,
+        "song_id": content.id,
+        "song_title": content.title,
+        "song_artist": content.artist,
+        "max_players": min(req.max_players, 4),
+        "status": "waiting",  # waiting | countdown | playing | finished
+        "players": {}
+    }
+
+    await save_room_data(redis, code, room_data)
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+    return {"success": True, "room_code": code, "room": room_data}
+
 
 @app.get("/api/battle/rooms")
-async def get_battle_rooms():
-    bm = get_battle_manager()
-    all_rooms = await bm.get_rooms()
-    rooms = [r for r in all_rooms if not r.get("is_private")]
+async def list_battle_rooms():
+    redis = await get_redis()
+    keys = await redis.keys("battle:room:*")
+    rooms = []
+    for key in keys:
+        raw = await redis.get(key)
+        if raw:
+            room = json.loads(raw)
+            if room.get("status") in ("waiting", "playing"):
+                rooms.append({
+                    "code": room["code"],
+                    "title": room["title"],
+                    "host": room["host"],
+                    "song_title": room["song_title"],
+                    "song_artist": room["song_artist"],
+                    "player_count": len(room.get("players", {})),
+                    "max_players": room["max_players"],
+                    "status": room["status"]
+                })
     return {"success": True, "rooms": rooms}
 
-class RoomVerifyRequest(BaseModel):
-    room_code: str
-
-@app.post("/api/battle/verify-code")
-async def verify_room_code(req: RoomVerifyRequest):
-    bm = get_battle_manager()
-    all_rooms = await bm.get_rooms()
-    for r in all_rooms:
-        if r.get("is_private") and r.get("room_code") == req.room_code:
-            return {"success": True, "room_id": r["id"]}
-    return {"success": False, "detail": "방 코드가 올바르지 않거나 존재하지 않습니다."}
-
-@app.websocket("/ws/battle/{room_id}")
-async def battle_websocket(websocket: WebSocket, room_id: str, nickname: str):
-    bm = get_battle_manager()
-    await bm.connect(websocket, room_id)
-    await bm.start_listening()
-    
-    # Notify others that someone joined
-    room_data = await bm.get_room(room_id)
-    if room_data:
-        player_exists = any(p["nickname"] == nickname for p in room_data["players"])
-        if not player_exists:
-            max_players = room_data.get("max_players", 2)
-            if len(room_data["players"]) >= max_players:
-                await websocket.close(code=1008)
-                return
-            room_data["players"].append({
-                "nickname": nickname,
-                "ready": False,
-                "progress": 0,
-                "section_progress": 0,
-                "wpm": 0,
-                "score": 0
-            })
-            await bm.update_room(room_id, room_data)
-        
-        await bm.publish(room_id, {"type": "room_state", "room": room_data})
-    
+@app.websocket("/ws/lobby")
+async def lobby_websocket(websocket: WebSocket):
+    await lobby_manager.connect("lobby", websocket, "guest")
     try:
         while True:
-            data = await websocket.receive_text()
-            message = json.loads(data)
-            msg_type = message.get("type")
-            
-            if msg_type == "ready":
-                room_data = await bm.get_room(room_id)
-                if room_data:
-                    for p in room_data["players"]:
-                        if p["nickname"] == nickname:
-                            p["ready"] = message.get("ready", True)
-                            
-                    await bm.update_room(room_id, room_data)
-                    await bm.publish(room_id, {"type": "room_state", "room": room_data})
-                    
-            elif msg_type == "start_game_request":
-                room_data = await bm.get_room(room_id)
-                if room_data and room_data["creator"] == nickname:
-                    other_players = [p for p in room_data["players"] if p["nickname"] != nickname and not p.get("disconnected")]
-                    # 다른 참가자가 최소 1명 이상 있고, 모두 ready 상태여야 시작 가능
-                    if len(other_players) >= 1 and all(p.get("ready", False) for p in other_players):
-                        room_data["status"] = "playing"
-                        await bm.update_room(room_id, room_data)
-                        await bm.publish(room_id, {"type": "start_game"})
-                        
-            elif msg_type == "chat":
-                message_text = message.get("message", "").strip()
-                if message_text:
-                    await bm.publish(room_id, {
-                        "type": "chat_message",
-                        "nickname": nickname,
-                        "message": message_text
-                    })
-                    
-            elif msg_type == "progress":
-                progress = message.get("progress", 0)
-                section_progress = message.get("section_progress", 0)
-                wpm = message.get("wpm", 0)
-                score = message.get("score", 0)
-                room_data = await bm.get_room(room_id)
-                if room_data:
-                    for p in room_data["players"]:
-                        if p["nickname"] == nickname:
-                            p["progress"] = progress
-                            p["section_progress"] = section_progress
-                            p["wpm"] = wpm
-                            p["score"] = score
-                            
-                    await bm.update_room(room_id, room_data)
-                    await bm.publish(room_id, {"type": "progress_update", "nickname": nickname, "progress": progress, "section_progress": section_progress, "wpm": wpm, "score": score})
-                    
-            elif msg_type == "finish":
-                room_data = await bm.get_room(room_id)
-                if room_data and room_data["status"] != "finished":
-                    await bm.publish(room_id, {"type": "game_over", "winner": nickname})
-                    room_data["status"] = "finished"
-                    await bm.update_room(room_id, room_data)
-                    
-            elif msg_type == "leave":
-                room_data = await bm.get_room(room_id)
-                if room_data:
-                    room_data["players"] = [p for p in room_data["players"] if p["nickname"] != nickname]
-                    if not room_data["players"]:
-                        await bm.delete_room(room_id)
-                    else:
-                        if room_data["creator"] == nickname:
-                            room_data["creator"] = room_data["players"][0]["nickname"]
-                        await bm.update_room(room_id, room_data)
-                        await bm.publish(room_id, {"type": "room_state", "room": room_data})
-                    
+            await websocket.receive_text()
     except WebSocketDisconnect:
-        bm.disconnect(websocket, room_id)
-        room_data = await bm.get_room(room_id)
-        if room_data:
-            room_data["players"] = [p for p in room_data["players"] if p["nickname"] != nickname]
-            if not room_data["players"]:
-                await bm.delete_room(room_id)
+        lobby_manager.disconnect("lobby", websocket)
+
+
+# ── 대전 기록 저장 (내부 함수) ─────────────────────────────
+async def save_battle_results(room_data: dict, db: Session):
+    """게임 종료 시 MySQL에 대전 기록 저장"""
+    players = room_data.get("players", {})
+    song_id = room_data.get("song_id")
+    room_code = room_data.get("code", "")
+
+    # 점수 기준 순위 정렬
+    sorted_players = sorted(
+        players.items(),
+        key=lambda x: x[1].get("score", 0),
+        reverse=True
+    )
+
+    for rank, (nickname, pdata) in enumerate(sorted_players, start=1):
+        user_id = pdata.get("user_id")
+        if not user_id:
+            continue
+        history = models.BattleHistory(
+            room_code=room_code,
+            user_id=user_id,
+            content_id=song_id,
+            rank=rank,
+            score=pdata.get("score", 0),
+            wpm=pdata.get("wpm", 0),
+            accuracy=pdata.get("accuracy", 100.0)
+        )
+        db.add(history)
+    db.commit()
+
+
+# ── WebSocket 대전 엔드포인트 ──────────────────────────────
+@app.websocket("/ws/battle/{room_code}")
+async def battle_websocket(
+    websocket: WebSocket,
+    room_code: str,
+    token: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    # 1. JWT 토큰 검증
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            await websocket.close(code=4001)
+            return
+    except JWTError:
+        await websocket.close(code=4001)
+        return
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        await websocket.close(code=4001)
+        return
+
+    nickname = user.nickname
+    redis = await get_redis()
+
+    # 2. 방 상태 로드
+    room_data = await get_room_data(redis, room_code)
+    if not room_data:
+        await websocket.close(code=4004)
+        return
+
+    # 3. 인원 초과 체크
+    if len(room_data["players"]) >= room_data["max_players"] and nickname not in room_data["players"]:
+        await websocket.close(code=4003)
+        return
+
+    # 4. WebSocket 수락 및 방 입장
+    await battle_manager.connect(room_code, websocket, nickname)
+
+    # 플레이어 등록 (재접속 시 기존 데이터 유지)
+    if nickname not in room_data["players"]:
+        room_data["players"][nickname] = {
+            "user_id": user.id,
+            "ready": False,
+            "score": 0,
+            "progress": 0.0,
+            "wpm": 0,
+            "accuracy": 100.0,
+            "finished": False,
+            "is_host": nickname == room_data["host"]
+        }
+        await save_room_data(redis, room_code, room_data)
+
+    # 입장한 플레이어에게 현재 방 상태 전송
+    await websocket.send_json({"type": "room_state", "room": room_data})
+
+    # 나머지 플레이어에게 입장 알림
+    await battle_manager.broadcast(room_code, {
+        "type": "player_joined",
+        "nickname": nickname,
+        "players": room_data["players"]
+    }, exclude=websocket)
+    
+    # 로비에도 인원 변동 알림
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+
+            # ── 준비 상태 변경 ──────────────────────────────
+            if msg_type == "ready":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["ready"] = data.get("ready", True)
+                    await save_room_data(redis, room_code, room_data)
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_update",
+                        "nickname": nickname,
+                        "data": room_data["players"][nickname],
+                        "players": room_data["players"]
+                    })
+
+            # ── 방장이 시작 ─────────────────────────────────
+            elif msg_type == "start":
+                room_data = await get_room_data(redis, room_code)
+                if not room_data:
+                    continue
+                if nickname != room_data["host"]:
+                    await websocket.send_json({"type": "error", "message": "방장만 시작할 수 있습니다."})
+                    continue
+
+                # 모두 레디 체크 (퇴장한 유저 제외)
+                non_host_players = {n: p for n, p in room_data["players"].items() if n != room_data["host"] and not p.get("disconnected")}
+                if non_host_players and not all(p["ready"] for p in non_host_players.values()):
+                    await websocket.send_json({"type": "error", "message": "아직 준비가 안 된 플레이어가 있습니다."})
+                    continue
+
+                async def sync_and_start(r_code):
+                    sync_timeout = 10.0
+                    checked_time = 0.0
+                    while checked_time < sync_timeout:
+                        r_data = await get_room_data(redis, r_code)
+                        if not r_data or r_data.get("status") != "syncing":
+                            return
+                        active_players = {n: p for n, p in r_data["players"].items() if not p.get("disconnected")}
+                        if active_players and all(p.get("sync_ready") for p in active_players.values()):
+                            break
+                        await asyncio.sleep(0.5)
+                        checked_time += 0.5
+                    
+                    r_data = await get_room_data(redis, r_code)
+                    if r_data and r_data.get("status") == "syncing":
+                        r_data["status"] = "countdown"
+                        await save_room_data(redis, r_code, r_data)
+
+                        for count in range(5, 0, -1):
+                            await battle_manager.broadcast_all(r_code, {"type": "countdown", "count": count})
+                            await asyncio.sleep(1)
+
+                        f_data = await get_room_data(redis, r_code)
+                        if f_data:
+                            f_data["status"] = "playing"
+                            f_data["start_time"] = time.time()
+                            for p in f_data["players"].values():
+                                p["score"] = 0
+                                p["progress"] = 0.0
+                                p["wpm"] = 0
+                                p["accuracy"] = 100.0
+                                p["finished"] = False
+                            await save_room_data(redis, r_code, f_data)
+                            await battle_manager.broadcast_all(r_code, {
+                                "type": "game_start",
+                                "song_id": f_data["song_id"],
+                                "players": f_data["players"]
+                            })
+
+                room_data["status"] = "syncing"
+                for p in room_data["players"].values():
+                    if not p.get("disconnected"):
+                        p["sync_ready"] = False
+                await save_room_data(redis, room_code, room_data)
+
+                await battle_manager.broadcast_all(room_code, {"type": "sync_check"})
+                asyncio.create_task(sync_and_start(room_code))
+
+            # ── 동기화 완료 신호 ─────────────────────────────
+            elif msg_type == "sync_ready":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and room_data.get("status") == "syncing" and nickname in room_data["players"]:
+                    room_data["players"][nickname]["sync_ready"] = True
+                    await save_room_data(redis, room_code, room_data)
+
+            # ── 채팅 메시지 ─────────────────────────────────
+            elif msg_type == "chat":
+                await battle_manager.broadcast(room_code, {
+                    "type": "chat",
+                    "nickname": nickname,
+                    "message": data.get("message", "")
+                }, exclude=websocket)
+
+            # ── 타이핑 진행도 업데이트 ──────────────────────
+            elif msg_type == "progress":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["score"] = data.get("score", 0)
+                    room_data["players"][nickname]["progress"] = data.get("progress", 0.0)
+                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                    await save_room_data(redis, room_code, room_data)
+                    # 나머지 플레이어에게 브로드캐스트 (본인 제외)
+                    await battle_manager.broadcast(room_code, {
+                        "type": "player_update",
+                        "nickname": nickname,
+                        "score": room_data["players"][nickname]["score"],
+                        "progress": room_data["players"][nickname]["progress"],
+                        "wpm": room_data["players"][nickname]["wpm"],
+                    }, exclude=websocket)
+
+            # ── 게임 완료 ───────────────────────────────────
+            elif msg_type == "finish":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["finished"] = True
+                    room_data["players"][nickname]["score"] = data.get("score", 0)
+                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                    room_data["players"][nickname]["progress"] = 1.0
+                    await save_room_data(redis, room_code, room_data)
+
+                    # 완료 알림 브로드캐스트
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_finished",
+                        "nickname": nickname,
+                        "players": room_data["players"]
+                    })
+
+                    # 모든 플레이어가 완료했으면 게임 종료 (이미 finished 상태인 경우 중복 처리 방지)
+                    all_finished = all(p["finished"] for p in room_data["players"].values())
+                    if all_finished and room_data.get("status") != "finished":
+                        room_data["status"] = "finished"
+                        await save_room_data(redis, room_code, room_data)
+
+                        # 순위 계산
+                        sorted_players = sorted(
+                            room_data["players"].items(),
+                            key=lambda x: x[1].get("score", 0),
+                            reverse=True
+                        )
+                        results = [
+                            {"rank": i+1, "nickname": n, **p}
+                            for i, (n, p) in enumerate(sorted_players)
+                        ]
+
+                        await battle_manager.broadcast_all(room_code, {
+                            "type": "game_end",
+                            "results": results
+                        })
+
+                        # MySQL에 기록 저장
+                        try:
+                            await save_battle_results(room_data, db)
+                        except Exception as e:
+                            print(f"Battle history save error: {e}")
+
+                        # 방 정리 (10분 후)
+                        await asyncio.sleep(600)
+                        await delete_room(redis, room_code)
+
+    except WebSocketDisconnect:
+        battle_manager.disconnect(room_code, websocket)
+        room_data = await get_room_data(redis, room_code)
+        if room_data and nickname in room_data["players"]:
+            if room_data.get("status") in ["playing", "countdown", "finished"]:
+                room_data["players"][nickname]["disconnected"] = True
+                room_data["players"][nickname]["finished"] = True
+                
+                # 방장이 나갔으면 다음 사람에게 양도
+                if nickname == room_data["host"]:
+                    active_players = [n for n, p in room_data["players"].items() if not p.get("disconnected")]
+                    if active_players:
+                        room_data["host"] = active_players[0]
+                        
+                await save_room_data(redis, room_code, room_data)
+                
+                await battle_manager.broadcast_all(room_code, {
+                    "type": "player_disconnected",
+                    "nickname": nickname,
+                    "players": room_data["players"],
+                    "new_host": room_data["host"]
+                })
+                
+                # 남은 사람들이 모두 완료했는지 체크
+                active_players_dict = {n: p for n, p in room_data["players"].items() if not p.get("disconnected")}
+                if active_players_dict:
+                    all_finished = all(p.get("finished") for p in active_players_dict.values())
+                    if all_finished and room_data["status"] != "finished":
+                        room_data["status"] = "finished"
+                        await save_room_data(redis, room_code, room_data)
+                        
+                        sorted_players = sorted(
+                            room_data["players"].items(),
+                            key=lambda x: x[1].get("score", 0),
+                            reverse=True
+                        )
+                        results = [
+                            {"rank": i+1, "nickname": n, **p}
+                            for i, (n, p) in enumerate(sorted_players)
+                        ]
+                        await battle_manager.broadcast_all(room_code, {
+                            "type": "game_end",
+                            "results": results
+                        })
+                        try:
+                            await save_battle_results(room_data, db)
+                        except Exception as e:
+                            print(f"Battle history save error: {e}")
+                        await asyncio.sleep(600)
+                        await delete_room(redis, room_code)
+                else:
+                    await delete_room(redis, room_code)
             else:
-                if room_data["creator"] == nickname:
-                    room_data["creator"] = room_data["players"][0]["nickname"]
-                await bm.update_room(room_id, room_data)
-                await bm.publish(room_id, {"type": "room_state", "room": room_data})
+                del room_data["players"][nickname]
+                if not room_data["players"]:
+                    await delete_room(redis, room_code)
+                else:
+                    if nickname == room_data["host"] and room_data["players"]:
+                        room_data["host"] = next(iter(room_data["players"]))
+                    await save_room_data(redis, room_code, room_data)
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_left",
+                        "nickname": nickname,
+                        "players": room_data["players"],
+                        "new_host": room_data["host"]
+                    })
+                await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        battle_manager.disconnect(room_code, websocket)
+
+
+# ──────────────────────────────────────────
+# 오타 통계 API
+# ──────────────────────────────────────────
+
+class TypoStatItem(BaseModel):
+    character: str
+    error_count: int
+
+class SaveTypoRequest(BaseModel):
+    typos: list[TypoStatItem]
+
+@app.post("/api/typo-stats")
+async def save_typo_stats(
+    request: SaveTypoRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    for item in request.typos:
+        if not item.character or item.error_count <= 0:
+            continue
+        existing = db.query(models.TypoStat).filter(
+            models.TypoStat.user_id == current_user.id,
+            models.TypoStat.character_typed == item.character
+        ).first()
+        if existing:
+            # 버그 수정: 오타 수(error_count)만 누적하고 전체 시도 횟수(total_count)는 더하지 않음.
+            existing.error_count += item.error_count
+        else:
+            db.add(models.TypoStat(
+                user_id=current_user.id,
+                character_typed=item.character,
+                error_count=item.error_count,
+                total_count=item.error_count
+            ))
+    db.commit()
+    return {"success": True}
+
+@app.get("/api/typo-stats")
+async def get_typo_stats(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    # 1. 모든 오타 통계 가져오기
+    stats = (
+        db.query(models.TypoStat)
+        .filter(models.TypoStat.user_id == current_user.id)
+        .all()
+    )
+    
+    # 2. 요약 정보 계산
+    total_typos = sum(s.error_count for s in stats)
+    total_inputs = sum(s.total_count for s in stats)
+    
+    avg_error_rate = 0.0
+    if total_inputs > 0:
+        avg_error_rate = (total_typos / total_inputs) * 100
+        
+    # 개선도 계산 (이전 50% vs 최근 50% 정확도 차이)
+    histories = (
+        db.query(models.TypingHistory)
+        .filter(models.TypingHistory.user_id == current_user.id)
+        .order_by(models.TypingHistory.played_at.asc())
+        .all()
+    )
+    
+    improvement = 0.0
+    if len(histories) >= 2:
+        mid = len(histories) // 2
+        first_half = histories[:mid]
+        second_half = histories[mid:]
+        
+        acc_first = sum(h.accuracy for h in first_half) / len(first_half)
+        acc_second = sum(h.accuracy for h in second_half) / len(second_half)
+        
+        improvement = acc_second - acc_first
+
+    # 3. 오타 데이터를 오타율(error_rate) 기준으로 내림차순 정렬한 TOP list 준비
+    stats_list = []
+    for s in stats:
+        rate = 0.0
+        if s.total_count > 0:
+            rate = (s.error_count / s.total_count) * 100
+        stats_list.append({
+            "kana": s.character_typed,
+            "error_count": s.error_count,
+            "total_count": s.total_count,
+            "error_rate": round(rate, 1)
+        })
+    
+    # 오타율이 높은 순으로 정렬 (시도 횟수가 최소 2회 이상인 것 우선 필터링해서 신뢰성 확보)
+    sorted_by_rate = sorted(
+        [s for s in stats_list if s["total_count"] >= 2],
+        key=lambda x: x["error_rate"],
+        reverse=True
+    )
+    
+    # 만약 시도 횟수 2회 이상이 부족하면 전체에서 정렬
+    if len(sorted_by_rate) < 5:
+        sorted_by_rate = sorted(stats_list, key=lambda x: x["error_rate"], reverse=True)
+
+    # 4. 동적 혼동 쌍 및 로마자 실수 패턴 추출
+    # 유저의 실제 에러 리스트 중 특정 키들이 포함되어 있는지 검사
+    top_error_kanas = {s["kana"] for s in sorted_by_rate[:5] if s["error_count"] > 0}
+    
+    pair_data = []
+    romaji_data = []
+    
+    # 미리 정의된 전형적인 오타 패턴 템플릿
+    typical_confusions = {
+        "ぢ": {
+            "pair": {"a": "ぢ", "b": "じ", "aRoma": "di", "bRoma": "ji", "rate": "지연발생", "desc": "ぢ(di)와 じ(ji)는 발음이 같아 헷갈리기 쉽습니다."},
+            "romaji": {"char": "ぢ", "correct": "di", "wrong": "ji", "pct": 40, "desc": "발음 혼동으로 인한 입력 시도 오류"}
+        },
+        "じ": {
+            "pair": {"a": "じ", "b": "zi", "aRoma": "ji", "bRoma": "zi", "rate": "혼동", "desc": "じ를 ji 대신 zi로 잘못 치는 경향이 있습니다."},
+            "romaji": {"char": "じ", "correct": "ji", "wrong": "zi", "pct": 30, "desc": "zi 대신 표준 ji 입력을 추천합니다."}
+        },
+        "つ": {
+            "pair": {"a": "つ", "b": "치", "aRoma": "tsu", "bRoma": "chi", "rate": "입력속도 지연", "desc": "tsu 대신 tu를 쳐서 생기는 속도 저하입니다."},
+            "romaji": {"char": "つ", "correct": "tsu", "wrong": "tu", "pct": 50, "desc": "tu도 허용되지만 tsu가 표준 타법입니다."}
+        },
+        "っ": {
+            "pair": {"a": "っ", "b": "자음연타", "aRoma": "자음 연타", "bRoma": "xtsu", "rate": "속도 지연", "desc": "촉음 입력 시 다음 자음을 두 번 치는 것이 빠릅니다."},
+            "romaji": {"char": "っ", "correct": "자음연타", "wrong": "xtsu", "pct": 60, "desc": "xtsu 입력보다 자음 연속 입력이 효율적입니다."}
+        },
+        "ん": {
+            "pair": {"a": "ん", "b": "n", "aRoma": "nn", "bRoma": "n", "rate": "오타율 높음", "desc": "ん 뒤에 모음이나 야행이 올 때 nn을 쳐야 오타가 안 납니다."},
+            "romaji": {"char": "ん", "correct": "nn", "wrong": "n", "pct": 45, "desc": "단독 n 입력으로 다음 글자와 결합하는 오류"}
+        },
+        "づ": {
+            "pair": {"a": "づ", "b": "ず", "aRoma": "du", "bRoma": "zu", "rate": "혼동", "desc": "づ(du)와 ず(zu)는 발음이 같아 헷갈리기 쉽습니다."},
+            "romaji": {"char": "づ", "correct": "du", "wrong": "zu", "pct": 35, "desc": "두음(づ) 입력 시 du 타법 인지 필요"}
+        }
+    }
+    
+    for kana in top_error_kanas:
+        if kana in typical_confusions:
+            item = typical_confusions[kana]
+            pair_data.append(item["pair"])
+            romaji_data.append(item["romaji"])
+            
+    # 만약 유저의 오타 데이터에 전형적인 혼동 패턴이 없다면, 탑 에러 글자 중 상위 항목들로 일반 리포트 생성
+    if not pair_data:
+        for s in sorted_by_rate[:2]:
+            if s["error_count"] > 0:
+                pair_data.append({
+                    "a": s["kana"],
+                    "b": "타 건반",
+                    "aRoma": s["kana"],
+                    "bRoma": "오타",
+                    "rate": f"{round(s['error_rate'])}%",
+                    "desc": f"'{s['kana']}' 입력 시 정확도가 낮아 오타가 빈번하게 발생하고 있습니다."
+                })
+                romaji_data.append({
+                    "char": s["kana"],
+                    "correct": "정타",
+                    "wrong": "오타",
+                    "pct": round(s["error_rate"]),
+                    "desc": "정확한 키 스토크 연습이 필요합니다."
+                })
+                
+    return {
+        "success": True,
+        "summary": {
+            "total_typos": total_typos,
+            "avg_error_rate": round(avg_error_rate, 1),
+            "improvement": round(improvement, 1)
+        },
+        "data": stats_list,
+        "pairs": pair_data,
+        "romaji_patterns": romaji_data
+    }
+
+

@@ -18,6 +18,7 @@ class User(Base):
     typing_histories = relationship("TypingHistory", back_populates="user", cascade="all, delete-orphan")
     quiz_histories = relationship("QuizHistory", back_populates="user", cascade="all, delete-orphan")
     typo_stats = relationship("TypoStat", back_populates="user", cascade="all, delete-orphan")
+    battle_histories = relationship("BattleHistory", back_populates="user", cascade="all, delete-orphan")
 
 # 2. 출석체크 테이블
 class Attendance(Base):
@@ -36,10 +37,12 @@ class TypingHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=True)
     content_title = Column(String(255), nullable=False)
     genre = Column(String(50), nullable=False)
     wpm = Column(Integer, nullable=False)
     accuracy = Column(Float, nullable=False)
+    score = Column(Integer, default=0, nullable=False)
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="typing_histories")
@@ -50,6 +53,7 @@ class QuizHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    quiz_id = Column(Integer, ForeignKey("quiz_contents.id"), nullable=True)
     quiz_category = Column(String(50), nullable=False)
     score = Column(Integer, nullable=False)
     total_questions = Column(Integer, nullable=False)
@@ -87,6 +91,7 @@ class TypingContent(Base):
     difficulty = Column(Integer, default=3, nullable=False)
     play_count = Column(Integer, default=0, nullable=False)
     best_time = Column(Integer, default=0, nullable=False)
+    best_score = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     creator = relationship("User")
@@ -110,19 +115,18 @@ class QuizContent(Base):
 
     creator = relationship("User")
 
-# 8. 대전 히스토리 테이블
+# 8. 실시간 대전 기록 테이블
 class BattleHistory(Base):
     __tablename__ = "battle_histories"
 
     id = Column(Integer, primary_key=True, index=True)
-    room_id = Column(String(50), nullable=False)
+    room_code = Column(String(10), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    opponent_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    content_title = Column(String(255), nullable=False)
-    wpm = Column(Integer, nullable=False)
-    accuracy = Column(Float, nullable=False)
-    is_winner = Column(Integer, nullable=False) # 1: 승리, 0: 패배, -1: 무승부
+    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=True)
+    rank = Column(Integer, nullable=False)       # 최종 순위 (1~4)
+    score = Column(Integer, nullable=False)      # 최종 점수
+    wpm = Column(Integer, nullable=False)        # 분당 타수
+    accuracy = Column(Float, nullable=False)     # 정확도
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", foreign_keys=[user_id], backref="battle_histories")
-    opponent = relationship("User", foreign_keys=[opponent_id])
+    user = relationship("User", back_populates="battle_histories")

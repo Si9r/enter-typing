@@ -1,11 +1,15 @@
-const linesContainer = document.getElementById('lines-container');
-const typingInput = document.getElementById('typing-input');
-const wpmDisplay = document.getElementById('wpm');
-const accuracyDisplay = document.getElementById('accuracy');
-const timeDisplay = document.getElementById('time');
-const typosDisplay = document.getElementById('typos'); // Added for the new UI
-const btnStart = document.getElementById('btn-start');
-const btnRestart = document.getElementById('btn-restart');
+const typingInput = document.getElementById("typing-input");
+const wpmDisplay = document.getElementById("wpm");
+const accuracyDisplay = document.getElementById("accuracy");
+const timeDisplay = document.getElementById("time");
+const typosDisplay = document.getElementById("typos"); // Added for the new UI
+const scoreDisplay = document.getElementById("score"); // Added for score display
+const stageIndicator = document.getElementById("stageIndicator");
+const kanjiDisplay = document.getElementById("kanjiDisplay");
+const lyricDisplay = document.getElementById("lyricDisplay");
+const nextPreviewDisplay = document.getElementById("nextPreviewDisplay");
+const statusPanel = document.getElementById("statusPanel");
+const progressBar = document.getElementById("timerBarFill");
 
 let timeLeft = 60;
 let timer = null;
@@ -17,16 +21,34 @@ let syncTimer = null;
 let currentLineElapsed = 0;
 let gameTimeElapsed = 0;
 let isYoutubeMode = false;
+let isWaitingPhase = false;
+let typoDetails = [];
+let allTargetUnits = [];
+
+// Variables for new score logic
+let totalTypedChars = 0;
+let totalCorrectChars = 0;
+let totalTargetCorrectChars = 0;
+let totalRemainingTime = 0;
+let totalTimeSum = 0;
+let contentDifficulty = 3;
+let currentSectionDuration = 0;
+let sectionTypos = 0;
+let savedSectionRemaining = 0;
 
 let youtubePlayer = null;
 let currentYoutubeId = null;
 let isYoutubeReady = false;
 let isPlayerReady = false;
-let isLineCompleted = false;
+let lineCompleted = false;
+
+// Variables for countdown overlay
+let isCountingDown = false;
+let countdownInterval = null;
 
 window.onYouTubeIframeAPIReady = function () {
-    isYoutubeReady = true;
-    initYoutubePlayer();
+  isYoutubeReady = true;
+  initYoutubePlayer();
 };
 
 /**
@@ -34,151 +56,152 @@ window.onYouTubeIframeAPIReady = function () {
  * 지정된 currentYoutubeId를 사용하여 YouTube IFrame API 플레이어 객체를 생성합니다.
  */
 function initYoutubePlayer() {
-    if (isYoutubeReady && currentYoutubeId && !youtubePlayer) {
-        const placeholder = document.getElementById('video-placeholder');
-        const container = document.getElementById('youtube-player-container');
-        if (placeholder) placeholder.style.display = 'none';
-        if (container) container.style.display = 'block';
+  if (isYoutubeReady && currentYoutubeId && !youtubePlayer) {
+    const placeholder = document.getElementById("video-placeholder");
+    const container = document.getElementById("youtube-player-container");
+    if (placeholder) placeholder.style.display = "none";
+    if (container) container.style.display = "block";
 
-        youtubePlayer = new YT.Player('youtube-player', {
-            videoId: currentYoutubeId,
-            playerVars: {
-                'playsinline': 1,
-                'controls': 1,
-                'disablekb': 0,
-                'fs': 0,
-                'rel': 0,
-            },
-            events: {
-                'onReady': function (event) { isPlayerReady = true; },
-                'onStateChange': function (event) {
-                    if (event.data == YT.PlayerState.PLAYING) {
-                        if (!isPlaying) {
-                            startGame(true);
-                        } else {
-                            resumeTimer();
-                        }
-                    } else if (event.data == YT.PlayerState.PAUSED || event.data == YT.PlayerState.BUFFERING) {
-                        pauseTimer();
-                    } else if (event.data == YT.PlayerState.ENDED && isPlaying) {
-                        endGame(false);
-                    }
-                }
+    youtubePlayer = new YT.Player("youtube-player", {
+      videoId: currentYoutubeId,
+      playerVars: {
+        playsinline: 1,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        rel: 0,
+      },
+      events: {
+        onReady: function (event) {
+          isPlayerReady = true;
+          const volSlider = document.getElementById("volume-slider");
+          if (volSlider && typeof youtubePlayer.setVolume === "function") {
+            youtubePlayer.setVolume(volSlider.value);
+          }
+        },
+        onStateChange: function (event) {
+          if (event.data == YT.PlayerState.PLAYING) {
+            if (!isPlaying) {
+              startGame(true);
+            } else {
+              resumeTimer();
             }
-        });
-    } else if (youtubePlayer && currentYoutubeId) {
-        youtubePlayer.loadVideoById(currentYoutubeId);
-        youtubePlayer.pauseVideo();
-    }
+          } else if (
+            event.data == YT.PlayerState.PAUSED ||
+            event.data == YT.PlayerState.BUFFERING
+          ) {
+            pauseTimer();
+          } else if (event.data == YT.PlayerState.ENDED && isPlaying) {
+            endGame(false);
+          }
+        },
+      },
+    });
+  } else if (youtubePlayer && currentYoutubeId) {
+    youtubePlayer.loadVideoById(currentYoutubeId);
+    youtubePlayer.pauseVideo();
+  }
 }
 
-const romajiTable = {
-    あ: ["a"], い: ["i", "yi"], う: ["u", "wu"], え: ["e", "ye"], お: ["o"],
-    か: ["ka"], き: ["ki"], く: ["ku"], け: ["ke"], こ: ["ko"],
-    さ: ["sa"], し: ["shi", "si"], す: ["su"], せ: ["se"], そ: ["so"],
-    た: ["ta"], ち: ["chi", "ti"], つ: ["tsu", "tu"], て: ["te"], と: ["to"],
-    な: ["na"], に: ["ni"], ぬ: ["nu"], ね: ["ne"], の: ["no"],
-    は: ["ha"], ひ: ["hi"], ふ: ["fu", "hu"], へ: ["he"], ほ: ["ho"],
-    ま: ["ma"], み: ["mi"], む: ["mu"], め: ["me"], も: ["mo"],
-    や: ["ya"], ゆ: ["yu"], よ: ["yo"],
-    ら: ["ra"], り: ["ri"], る: ["ru"], れ: ["re"], ろ: ["ro"],
-    わ: ["wa"], を: ["wo"], ん: ["nn", "n", "n'"],
-    が: ["ga"], ぎ: ["gi"], ぐ: ["gu"], げ: ["ge"], ご: ["go"],
-    ざ: ["za"], じ: ["zi", "ji"], ず: ["zu"], ぜ: ["ze"], ぞ: ["zo"],
-    だ: ["da"], ぢ: ["di"], づ: ["du"], で: ["de"], ど: ["do"],
-    ば: ["ba"], び: ["bi"], ぶ: ["bu"], べ: ["be"], ぼ: ["bo"],
-    ぱ: ["pa"], ぴ: ["pi"], ぷ: ["pu"], ぺ: ["pe"], ぽ: ["po"],
-    ぁ: ["xa", "la"], ぃ: ["xi", "li"], ぅ: ["xu", "lu"], ぇ: ["xe", "le"], ぉ: ["xo", "lo"],
-    っ: ["xtsu", "ltsu", "xtu", "ltu"],
-    ゃ: ["xya", "lya"], ゅ: ["xyu", "lyu"], ょ: ["xyo", "lyo"], ゎ: ["xwa", "lwa"],
-    " ": [" "], "、": [","], "。": ["."], "?": ["?"], "!": ["!"],
-    "？": ["?"], "！": ["!"], "〜": ["~"], "~": ["~"]
-};
 
-const combinationRules = {
-    き: { ゃ: ["kya"], ゅ: ["kyu"], ょ: ["kyo"] },
-    し: { ゃ: ["sha", "sya"], ゅ: ["shu", "syu"], ょ: ["sho", "syo"], ぇ: ["she", "sye"] },
-    ち: { ゃ: ["cha", "tya"], ゅ: ["chu", "tyu"], ょ: ["cho", "tyo"], ぇ: ["che", "tye"] },
-    に: { ゃ: ["nya"], ゅ: ["nyu"], ょ: ["nyo"] },
-    ひ: { ゃ: ["hya"], ゅ: ["hyu"], ょ: ["hyo"] },
-    み: { ゃ: ["mya"], ゅ: ["myu"], ょ: ["myo"] },
-    り: { ゃ: ["rya"], ゅ: ["ryu"], ょ: ["ryo"] },
-    ぎ: { ゃ: ["gya"], ゅ: ["gyu"], ょ: ["gyo"] },
-    じ: { ゃ: ["ja", "zya"], ゅ: ["ju", "zyu"], ょ: ["jo", "zyo"], ぇ: ["je", "zye"] },
-    ぢ: { ゃ: ["dya"], ゅ: ["dyu"], ょ: ["dyo"] },
-    び: { ゃ: ["bya"], ゅ: ["byu"], ょ: ["byo"] },
-    ぴ: { ゃ: ["pya"], ゅ: ["pyu"], ょ: ["pyo"] }
-};
+let hiraColorThresholds = [];
+let targetUnits = [];
+let currentUnitIndex = 0;
+let currentBuffer = "";
+let currentLineText = "";
 
-function parseKanaToTargetUnits(kanaString, mustCombine) {
-    const rawChars = Array.from(kanaString);
-    const targetUnits = [];
+/**
+ * 입력 중인 로마자와 실제 가사(히라가나) 간의 인덱스 매핑을 생성하는 함수입니다.
+ * 사용자가 로마자를 타이핑할 때마다 원본 히라가나에서 어디까지 색칠해야 할지 계산합니다.
+ */
+function buildMapping() {
+  // 현재 줄의 히라가나와 로마자
+  let hiragana = contentHiraganaLines[currentLineIndex];
+  let romaji = currentText;
+  if (!hiragana || !romaji) return;
 
-    for (let i = 0; i < rawChars.length; i++) {
-        let char = rawChars[i];
-        let nextChar = rawChars[i + 1];
+  // 로마자 입력 위치 -> 색칠할 히라가나 위치 매핑 테이블
+  hiraColorThresholds = new Array(romaji.length + 1).fill(0);
 
-        if (char === "っ" && nextChar && mustCombine && romajiTable[nextChar]) {
-            let nextValidRomajis = romajiTable[nextChar];
-            let combinedRomajis = [];
-            nextValidRomajis.forEach((r) => {
-                combinedRomajis.push(r[0] + r);
-                romajiTable["っ"].forEach((s) => {
-                    combinedRomajis.push(s + r);
-                });
-            });
-            targetUnits.push({
-                text: char + nextChar,
-                validInputs: [...new Set(combinedRomajis)],
-            });
-            i++;
-            continue;
+  let hIdx = 0; // 히라가나 인덱스
+  let rIdx = 0; // 로마자 인덱스
+
+  // 작은 가나(きゃ, しゅ 등) 판별용
+  const smallKana = ["ゃ", "ゅ", "ょ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゎ"];
+
+  // 로마자 음절의 끝을 찾기 위한 모음
+  const vowels = ["a", "i", "u", "e", "o"];
+
+  while (hIdx < hiragana.length && rIdx < romaji.length) {
+    let hChar = hiragana[hIdx];
+
+    // 현재 히라가나 음절이 차지하는 길이
+    let rLen = 1; // 대응되는 로마자 길이
+    let hLen = 1; // 대응되는 히라가나 길이
+
+    if (hChar === "っ") {
+      // 촉음(っ)은 자음 하나 추가(tt) 이거나 명시적 분리입력(xtsu)
+      let sokuons = ["xtsu", "ltsu", "xtu", "ltu"];
+      rLen = 1;
+      for (let sq of sokuons) {
+        if (romaji.startsWith(sq, rIdx)) {
+          rLen = sq.length;
+          break;
         }
+      }
+    } else if (hChar === "ん") {
+      // "ん"은 n 또는 nn, xn, ln으로 입력 가능
+      if (
+        romaji.startsWith("xn", rIdx) ||
+        romaji.startsWith("ln", rIdx) ||
+        romaji.startsWith("nn", rIdx)
+      ) {
+        rLen = 2;
+      } else {
+        rLen = 1;
+      }
+    } else {
+      // 다음 문자가 작은 가나면 하나의 음절로 처리
+      if (
+        hIdx + 1 < hiragana.length &&
+        smallKana.includes(hiragana[hIdx + 1])
+      ) {
+        hLen = 2;
+      }
 
-        if (mustCombine && combinationRules[char] && nextChar && combinationRules[char][nextChar]) {
-            let combinedRomajis = [...combinationRules[char][nextChar]];
-            romajiTable[char].forEach((c) => {
-                romajiTable[nextChar].forEach((n) => {
-                    combinedRomajis.push(c + n);
-                });
-            });
-            targetUnits.push({
-                text: char + nextChar,
-                validInputs: [...new Set(combinedRomajis)],
-            });
-            i++;
-            continue;
-        }
+      // 모음이 나올 때까지 읽어서 음절 길이 계산
+      rLen = 0;
+      while (rIdx + rLen < romaji.length) {
+        let c = romaji[rIdx + rLen];
+        rLen++;
 
-        targetUnits.push({ text: char, validInputs: romajiTable[char] || [char] });
-    }
-    return targetUnits;
-}
-
-let currentUnits = [];
-
-function findValidPath(units, typedStr, unitIndex = 0, path = []) {
-    if (typedStr.length === 0) return { isValid: true, matchedCount: unitIndex, currentMatch: "", path: path };
-    if (unitIndex >= units.length) return { isValid: false };
-
-    let unit = units[unitIndex];
-
-    for (let val of unit.validInputs) {
-        if (typedStr.startsWith(val)) {
-            let res = findValidPath(units, typedStr.substring(val.length), unitIndex + 1, [...path, val]);
-            if (res.isValid) {
-                return res;
-            }
-        }
+        if (vowels.includes(c)) break;
+      }
     }
 
-    for (let val of unit.validInputs) {
-        if (val.startsWith(typedStr)) {
-            return { isValid: true, matchedCount: unitIndex, currentMatch: typedStr, path: [...path, val] };
-        }
+    if (rLen === 0) rLen = 1;
+
+    // 음절 입력 중인 구간은 현재 히라가나 위치를 가리킴
+    for (let i = 0; i < rLen; i++) {
+      if (rIdx + i <= romaji.length) {
+        hiraColorThresholds[rIdx + i] = hIdx;
+      }
     }
 
-    return { isValid: false };
+    // 음절이 완성된 시점에는 다음 히라가나까지 색칠
+    if (rIdx + rLen <= romaji.length) {
+      hiraColorThresholds[rIdx + rLen] = hIdx + hLen;
+    }
+
+    // 다음 음절로 이동
+    hIdx += hLen;
+    rIdx += rLen;
+  }
+
+  // 남은 구간은 마지막 히라가나 위치로 채움
+  for (let i = rIdx; i <= romaji.length; i++) {
+    hiraColorThresholds[i] = hIdx;
+  }
 }
 
 let sessionCorrectChars = 0;
@@ -197,65 +220,166 @@ let currentLineIndex = 0;
  * @param {number|string} contentId - 불러올 콘텐츠의 고유 ID
  */
 async function fetchTypingContent(contentId) {
-    try {
-        const response = await fetch(`/api/typing-content/${contentId}`);
-        const data = await response.json();
-        if (data.success) {
-            contentLines = data.lines;
-            contentHiraganaLines = data.hiragana_lines || data.lines;
-            contentRomajiLines = data.romaji_lines;
+  try {
+    const response = await fetch(`/api/typing-content/${contentId}`);
+    const data = await response.json();
+    if (data.success) {
+      contentLines = data.lines;
+      contentHiraganaLines = data.hiragana_lines || data.lines;
+      contentRomajiLines = data.romaji_lines;
 
-            // 기존 DB에 저장된 스테가나 로마자 변환 오류 교정 (jie -> je 등)
-            for (let i = 0; i < contentHiraganaLines.length; i++) {
-                if (contentHiraganaLines[i] && contentRomajiLines[i]) {
-                    if (contentHiraganaLines[i].includes('じぇ') && contentRomajiLines[i].includes('jie')) {
-                        contentRomajiLines[i] = contentRomajiLines[i].replace(/jie/g, 'je');
-                    }
-                    if (contentHiraganaLines[i].includes('しぇ') && contentRomajiLines[i].includes('shie')) {
-                        contentRomajiLines[i] = contentRomajiLines[i].replace(/shie/g, 'she');
-                    }
-                    if (contentHiraganaLines[i].includes('ちぇ') && contentRomajiLines[i].includes('chie')) {
-                        contentRomajiLines[i] = contentRomajiLines[i].replace(/chie/g, 'che');
-                    }
-                }
-            }
-            if (data.timestamps) {
-                contentTimestamps = data.timestamps.split('\n').map(t => parseFloat(t.trim())).filter(t => !isNaN(t));
-
-                // 첫 가사가 나오기 전까지(0.5초 초과) 대기 시간이 있다면 시작 전 간주 더미 추가
-                if (contentTimestamps.length > 0 && contentTimestamps[0] > 0.5) {
-                    contentLines.unshift("🎵");
-                    contentHiraganaLines.unshift("");
-                    contentRomajiLines.unshift("");
-                    contentTimestamps.unshift(0);
-                }
-            } else {
-                contentTimestamps = [];
-            }
-            currentYoutubeId = data.youtube_id;
-            currentLineIndex = 0;
-            renderLines();
-
-            if (currentYoutubeId) {
-                initYoutubePlayer();
-                const controls = document.getElementById('video-controls');
-                if (controls) controls.style.display = 'none';
-            } else {
-                const placeholder = document.getElementById('video-placeholder');
-                const container = document.getElementById('youtube-player-container');
-                const controls = document.getElementById('video-controls');
-                if (placeholder) placeholder.style.display = 'block';
-                if (container) container.style.display = 'none';
-                if (controls) controls.style.display = 'block';
-            }
-        } else {
-            console.error("Failed to load content.");
-            if (linesContainer) linesContainer.innerText = "콘텐츠를 불러오는 데 실패했습니다.";
+      // 기존 DB에 저장된 스테가나 로마자 변환 오류 교정 (jie -> je 등)
+      for (let i = 0; i < contentHiraganaLines.length; i++) {
+        if (contentHiraganaLines[i] && contentRomajiLines[i]) {
+          if (
+            contentHiraganaLines[i].includes("じぇ") &&
+            contentRomajiLines[i].includes("jie")
+          ) {
+            contentRomajiLines[i] = contentRomajiLines[i].replace(/jie/g, "je");
+          }
+          if (
+            contentHiraganaLines[i].includes("しぇ") &&
+            contentRomajiLines[i].includes("shie")
+          ) {
+            contentRomajiLines[i] = contentRomajiLines[i].replace(
+              /shie/g,
+              "she",
+            );
+          }
+          if (
+            contentHiraganaLines[i].includes("ちぇ") &&
+            contentRomajiLines[i].includes("chie")
+          ) {
+            contentRomajiLines[i] = contentRomajiLines[i].replace(
+              /chie/g,
+              "che",
+            );
+          }
         }
-    } catch (error) {
-        console.error(error);
-        if (linesContainer) linesContainer.innerText = "서버 에러가 발생했습니다.";
+      }
+      if (data.timestamps) {
+        contentTimestamps = data.timestamps
+          .split("\n")
+          .map((t) => parseFloat(t.trim()))
+          .filter((t) => !isNaN(t));
+      } else {
+        contentTimestamps = [];
+      }
+      contentDifficulty = data.difficulty !== undefined ? data.difficulty : 3;
+      currentYoutubeId = data.youtube_id;
+      currentLineIndex = 0;
+      if (currentYoutubeId && contentTimestamps.length > 0 && contentTimestamps[0] > 0) {
+        isWaitingPhase = true;
+        renderWaitingPhase();
+      } else {
+        isWaitingPhase = false;
+        renderLines();
+      }
+
+      // Update Video Info Panel
+      const infoTitle = document.getElementById("info-title");
+      const infoArtist = document.getElementById("info-artist");
+      const infoCreator = document.getElementById("info-creator");
+      const infoThumbnail = document.getElementById("info-thumbnail");
+      const infoAvatarPlaceholder = document.getElementById("info-avatar-placeholder");
+      const infoViews = document.getElementById("info-views");
+      const infoTags = document.getElementById("info-tags");
+
+      if (infoTitle) infoTitle.innerText = data.title || "제목 없음";
+      if (infoArtist) infoArtist.innerText = data.artist || "아티스트 미상";
+      if (infoViews) infoViews.innerText = data.play_count || "0";
+      
+      if (infoTags) {
+          infoTags.innerHTML = "";
+          if (data.genre) {
+              const genres = data.genre.split(',').map(g => g.trim());
+              genres.forEach(g => {
+                  const tagSpan = document.createElement("span");
+                  tagSpan.style.cssText = "background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;";
+                  tagSpan.innerText = g;
+                  infoTags.appendChild(tagSpan);
+              });
+          } else {
+              infoTags.innerHTML = '<span style="background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;">태그 없음</span>';
+          }
+      }
+
+      if (currentYoutubeId) {
+          if (infoThumbnail) {
+              infoThumbnail.src = `https://img.youtube.com/vi/${currentYoutubeId}/mqdefault.jpg`;
+              infoThumbnail.style.display = "block";
+          }
+          if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "none";
+          
+          if (infoCreator) infoCreator.innerText = "로딩 중...";
+          fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${currentYoutubeId}&format=json`)
+            .then(res => res.json())
+            .then(oEmbedData => {
+                if (infoCreator && oEmbedData.author_name) {
+                    infoCreator.innerText = oEmbedData.author_name;
+                } else if (infoCreator) {
+                    infoCreator.innerText = data.creator_nickname || "엔터핑";
+                }
+            })
+            .catch(err => {
+                if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+            });
+      } else {
+          if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+          if (infoThumbnail) infoThumbnail.style.display = "none";
+          if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "flex";
+      }
+
+      if (currentYoutubeId) {
+        initYoutubePlayer();
+        const controls = document.getElementById("video-controls");
+        if (controls) controls.style.display = "none";
+      } else {
+        const placeholder = document.getElementById("video-placeholder");
+        const container = document.getElementById("youtube-player-container");
+        const controls = document.getElementById("video-controls");
+        if (placeholder) placeholder.style.display = "block";
+        if (container) container.style.display = "none";
+        if (controls) controls.style.display = "block";
+        if (statusPanel) {
+          statusPanel.innerHTML = '<span style="color: #c92a2a; font-weight: bold;">타이핑 영역을 클릭하면 게임이 시작됩니다!</span>';
+        }
+      }
+    } else {
+      console.error("Failed to load content.");
+      if (statusPanel)
+        statusPanel.innerText = "콘텐츠를 불러오는 데 실패했습니다.";
     }
+  } catch (error) {
+    console.error(error);
+    if (statusPanel) statusPanel.innerText = "서버 에러가 발생했습니다.";
+  }
+}
+
+function renderWaitingPhase() {
+  if (stageIndicator) {
+    stageIndicator.innerText = `STAGE ${currentLineIndex + 1} / ${contentLines.length}`;
+  }
+  if (kanjiDisplay) {
+    kanjiDisplay.innerText = "준비 중...";
+  }
+  if (nextPreviewDisplay) {
+    nextPreviewDisplay.innerHTML = `<span class='prefix'>Next</span> -`;
+  }
+  if (lyricDisplay) {
+    lyricDisplay.innerHTML = "<span class='lyric-unit pending'><span class='hira-text'>-</span><span class='roma-text'><span>-</span></span></span>";
+  }
+  if (typingInput) {
+    typingInput.value = "";
+    typingInput.disabled = true;
+  }
+  if (statusPanel) {
+    statusPanel.innerHTML = '<span style="color: #666;">전주 재생 중... 곧 가사가 시작됩니다.</span>';
+  }
+  targetUnits = [];
+  currentBuffer = "";
+  currentText = "";
+  currentChars = [];
 }
 
 /**
@@ -263,101 +387,104 @@ async function fetchTypingContent(contentId) {
  * 가사(한자), 히라가나(읽기), 로마자(입력용)를 DOM 요소로 만들어 화면에 표시합니다.
  */
 function renderLines() {
-    if (contentLines.length === 0) return;
+  if (contentLines.length === 0) return;
 
-    if (currentLineIndex >= contentLines.length || currentLineIndex >= contentRomajiLines.length) {
-        endGame(true);
-        return;
-    }
+  if (
+    currentLineIndex >= contentLines.length ||
+    currentLineIndex >= contentHiraganaLines.length
+  ) {
+    endGame(true);
+    return;
+  }
 
-    linesContainer.innerHTML = '';
+  const currentKanji = contentLines[currentLineIndex] || "";
+  if (currentKanji === "[END]") {
+      endGame(true);
+      return;
+  }
+  const currentHiragana = contentHiraganaLines[currentLineIndex] || "";
+  const nextKanji = contentLines[currentLineIndex + 1] || "-";
 
-    // Show up to 3 lines
-    for (let i = currentLineIndex; i < currentLineIndex + 3 && i < contentLines.length; i++) {
-        const isCurrent = (i === currentLineIndex);
+  if (stageIndicator) {
+    stageIndicator.innerText = `STAGE ${currentLineIndex + 1} / ${contentLines.length}`;
+  }
+  if (kanjiDisplay) {
+    kanjiDisplay.innerText = currentKanji;
+  }
+  if (nextPreviewDisplay) {
+    nextPreviewDisplay.innerHTML = `<span class='prefix'>Next</span> ${nextKanji}`;
+  }
 
-        const block = document.createElement('div');
-        block.className = 'lyric-block' + (isCurrent ? ' active' : '');
+  targetUnits = parseKanaToTargetUnits(currentHiragana, true);
+  allTargetUnits[currentLineIndex] = targetUnits;
+  currentUnitIndex = 0;
+  currentBuffer = "";
+  currentLineText = targetUnits
+    .map((unit) => unit.validInputs[0] || unit.text)
+    .join("");
+  currentText = currentLineText;
+  currentChars = currentText.split("");
+  buildMapping();
 
-        const offset = i - currentLineIndex;
-        if (offset === 1) {
-            block.style.opacity = '0.5';
-        } else if (offset === 2) {
-            block.style.opacity = '0.2';
-        } else if (offset >= 3) {
-            block.style.opacity = '0.05';
-        }
+  lineCompleted = false;
+  if (isPlaying && typingInput) typingInput.disabled = false;
 
-        const kanjiDiv = document.createElement('div');
-        kanjiDiv.className = 'lyric-kanji';
-        kanjiDiv.innerText = contentLines[i];
+  if (lyricDisplay) {
+    lyricDisplay.innerHTML = "";
+    targetUnits.forEach((unit, idx) => {
+      const span = document.createElement("span");
+      span.className = "lyric-unit " + (idx === 0 ? "current" : "pending");
+      
+      const hira = document.createElement("span");
+      hira.className = "hira-text";
+      hira.textContent = unit.text;
+      
+      const roma = document.createElement("span");
+      roma.className = "roma-text";
+      const initialRoma = unit.validInputs[0];
+      for (let i = 0; i < initialRoma.length; i++) {
+        const charSpan = document.createElement("span");
+        charSpan.textContent = initialRoma[i];
+        roma.appendChild(charSpan);
+      }
+      
+      span.appendChild(hira);
+      span.appendChild(roma);
+      lyricDisplay.appendChild(span);
+    });
+  }
 
-        const hiraDiv = document.createElement('div');
-        hiraDiv.className = 'lyric-hiragana';
+  typingInput.value = "";
+  currentIndex = 0;
+  correctChars = 0;
+  sectionTypos = 0;
+  if (progressBar) progressBar.style.width = "0%";
 
-        if (isCurrent) {
-            const hChars = contentHiraganaLines[i].split('');
-            hChars.forEach((char) => {
-                const span = document.createElement('span');
-                span.innerText = char;
-                hiraDiv.appendChild(span);
-            });
-        } else {
-            hiraDiv.innerText = contentHiraganaLines[i];
-        }
-        block.appendChild(hiraDiv);
+  updateStatus();
+  highlightCurrentChar();
+  if (typingInput) typingInput.focus({ preventScroll: true });
+}
 
-        const romaDiv = document.createElement('div');
-        romaDiv.className = 'lyric-romaji';
+/**
+ * 한 줄의 가사를 모두 올바르게 입력했을 때 호출되는 처리 함수입니다.
+ * 입력한 글자 수를 통계에 누적하고, 입력창을 비활성화하며 대기 상태를 표시합니다.
+ */
+function handleLineCompletion() {
+  if (lineCompleted) return;
+  lineCompleted = true;
 
-        if (isCurrent) {
-            currentUnits = parseKanaToTargetUnits(contentHiraganaLines[i], true);
-            currentText = currentUnits.map(u => u.validInputs[0]).join('');
-            currentChars = currentText.split('');
+  let elapsed = currentLineElapsed;
+  if (elapsed < 0) elapsed = 0;
+  savedSectionRemaining = Math.max(0, currentSectionDuration - elapsed);
 
-            currentChars.forEach((char) => {
-                const span = document.createElement('span');
-                span.innerText = char;
-                romaDiv.appendChild(span);
-            });
-            block.appendChild(romaDiv);
-        } else {
-            romaDiv.innerText = contentRomajiLines[i];
-            block.appendChild(romaDiv);
-        }
-
-        block.appendChild(kanjiDiv);
-
-        if (isCurrent) {
-            // Add progress bar here, underneath kanji
-            const progressContainer = document.createElement('div');
-            progressContainer.id = 'progress-bar-container';
-            progressContainer.style.marginTop = '15px';
-            progressContainer.style.width = '100%';
-            progressContainer.style.height = '6px';
-            progressContainer.style.background = '#ddd';
-            progressContainer.style.borderRadius = '3px';
-            progressContainer.style.overflow = 'hidden';
-
-            const progressBar = document.createElement('div');
-            progressBar.id = 'line-progress-bar';
-            progressBar.style.width = '0%'; // Start at 0%
-            progressBar.style.height = '100%';
-            progressBar.style.background = 'linear-gradient(90deg, #ff9a9e, #fecfef)';
-            progressBar.style.transition = 'width 0.1s linear, background 0.3s ease';
-
-            progressContainer.appendChild(progressBar);
-            block.appendChild(progressContainer);
-        }
-
-        linesContainer.appendChild(block);
-    }
-    isLineCompleted = false;
-    typingInput.value = '';
-    currentIndex = 0;
-    correctChars = 0;
-
-    highlightCurrentChar();
+  sessionCorrectChars += correctChars;
+  sessionTotalChars += currentChars.length;
+  updateStats();
+  if (typingInput) typingInput.disabled = true;
+  if (statusPanel) {
+    statusPanel.innerHTML =
+      '<span class="success-text">✨ 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
+  }
 }
 
 /**
@@ -366,40 +493,59 @@ function renderLines() {
  * @param {boolean} startedByYoutube - 유튜브 영상에 의해 자동으로 시작되었는지 여부
  */
 function startGame(startedByYoutube = false) {
-    if (isPlaying) return;
-    if (contentLines.length === 0) return;
+  if (isPlaying) return;
+  if (contentLines.length === 0) return;
 
-    if (!startedByYoutube && youtubePlayer && isPlayerReady) {
-        youtubePlayer.playVideo();
-    }
+  if (countdownInterval) clearInterval(countdownInterval);
+  isCountingDown = false;
+  const overlay = document.getElementById("countdown-overlay");
+  if (overlay) overlay.style.display = "none";
 
-    sessionCorrectChars = 0;
-    sessionTotalChars = 0;
-    totalTypos = 0;
-    gameTimeElapsed = 0;
-    isYoutubeMode = !!(youtubePlayer && isPlayerReady && currentYoutubeId);
+  if (!startedByYoutube && youtubePlayer && isPlayerReady) {
+    youtubePlayer.playVideo();
+  }
 
-    if (isYoutubeMode && youtubePlayer.getDuration) {
-        let dur = Math.round(youtubePlayer.getDuration());
-        timeLeft = dur > 0 ? dur : 60;
-    } else {
-        timeLeft = 0; // 유튜브 모드가 아니면 0부터 시작해서 시간 증가 (무제한)
-    }
+  sessionCorrectChars = 0;
+  sessionTotalChars = 0;
+  totalTypos = 0;
+  gameTimeElapsed = 0;
+  totalTypedChars = 0;
+  totalCorrectChars = 0;
+  totalTargetCorrectChars = 0;
+  totalRemainingTime = 0;
+  totalTimeSum = 0;
+  typoDetails = [];
+  allTargetUnits = [];
+  if (scoreDisplay) scoreDisplay.innerText = 0;
+  isYoutubeMode = !!(youtubePlayer && isPlayerReady && currentYoutubeId);
 
-    timeDisplay.innerText = timeLeft;
-    wpmDisplay.innerText = 0;
-    accuracyDisplay.innerText = '100%';
-    if (typosDisplay) typosDisplay.innerText = 0;
+  if (isYoutubeMode && youtubePlayer.getDuration) {
+    let dur = Math.round(youtubePlayer.getDuration());
+    timeLeft = dur > 0 ? dur : 60;
+  } else {
+    timeLeft = 0; // 유튜브 모드가 아니면 0부터 시작해서 시간 증가 (무제한)
+  }
 
-    isPlaying = true;
-    typingInput.disabled = false;
-    typingInput.focus();
+  timeDisplay.innerText = timeLeft;
+  wpmDisplay.innerText = 0;
+  accuracyDisplay.innerText = "100%";
+  if (typosDisplay) typosDisplay.innerText = 0;
 
-    currentLineIndex = 0;
+  isPlaying = true;
+  typingInput.disabled = false;
+  typingInput.focus({ preventScroll: true });
+
+  currentLineIndex = 0;
+  if (isYoutubeMode && contentTimestamps.length > 0 && contentTimestamps[0] > 0) {
+    isWaitingPhase = true;
+    renderWaitingPhase();
+  } else {
+    isWaitingPhase = false;
     renderLines();
+  }
 
-    startTimer();
-    startSyncLoop();
+  startTimer();
+  startSyncLoop();
 }
 
 /**
@@ -407,39 +553,46 @@ function startGame(startedByYoutube = false) {
  * 매 초마다 남은 시간을 감소시키고 0이 되면 게임을 종료합니다.
  */
 function startTimer() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-        gameTimeElapsed++;
-        if (isYoutubeMode) {
-            if (timeLeft > 0) {
-                timeLeft--;
-                timeDisplay.innerText = timeLeft;
-                updateStats();
-            } else {
-                endGame(false);
-            }
-        } else {
-            timeLeft++; // 무제한 모드일 때는 남은 시간 대신 경과 시간을 보여줍니다
-            timeDisplay.innerText = timeLeft;
-            updateStats();
-        }
-    }, 1000);
+  clearInterval(timer);
+  timer = setInterval(() => {
+    gameTimeElapsed++;
+    if (isYoutubeMode) {
+      if (timeLeft > 0) {
+        timeLeft--;
+        timeDisplay.innerText = timeLeft;
+        updateStats();
+      } else {
+        endGame(false);
+      }
+    } else {
+      timeLeft++; // 무제한 모드일 때는 남은 시간 대신 경과 시간을 보여줍니다
+      timeDisplay.innerText = timeLeft;
+      updateStats();
+    }
+  }, 1000);
 }
 
 /**
  * 게임 타이머와 진행 바 싱크 루프를 일시 정지하는 함수입니다.
  */
 function pauseTimer() {
-    clearInterval(timer);
+  clearInterval(timer);
+  if (typingInput) {
+    typingInput.disabled = true;
+  }
 }
 
 /**
  * 일시 정지된 게임 타이머와 진행 바 싱크 루프를 다시 재개하는 함수입니다.
  */
 function resumeTimer() {
-    if (isPlaying && timeLeft > 0) {
-        startTimer();
+  if (isPlaying && timeLeft > 0) {
+    startTimer();
+    if (typingInput && !lineCompleted) {
+      typingInput.disabled = false;
+      typingInput.focus({ preventScroll: true });
     }
+  }
 }
 
 /**
@@ -448,161 +601,524 @@ function resumeTimer() {
  * @param {boolean} completed - 끝까지 입력하여 성공적으로 게임을 마쳤는지 여부
  */
 function endGame(completed = false) {
-    clearInterval(timer);
-    clearInterval(syncTimer);
-    isPlaying = false;
-    typingInput.disabled = true;
+  clearInterval(timer);
+  clearInterval(syncTimer);
+  if (countdownInterval) clearInterval(countdownInterval);
+  isCountingDown = false;
+  const overlay = document.getElementById("countdown-overlay");
+  if (overlay) overlay.style.display = "none";
+  isPlaying = false;
+  if (typingInput) typingInput.disabled = true;
 
-    if (youtubePlayer && isPlayerReady) {
-        youtubePlayer.pauseVideo();
+  if (youtubePlayer && isPlayerReady) {
+    youtubePlayer.pauseVideo();
+  }
+
+  if (statusPanel) {
+    statusPanel.innerHTML = '<span class="success-text">✨ 모든 타이핑이 종료되었습니다!</span>';
+  }
+
+  const resultModal = document.getElementById("resultModal");
+  if (resultModal) {
+    document.getElementById("final-score").innerText = scoreDisplay ? scoreDisplay.innerText : "0";
+    document.getElementById("final-wpm").innerText = wpmDisplay ? wpmDisplay.innerText : "0";
+    document.getElementById("final-accuracy").innerText = accuracyDisplay ? accuracyDisplay.innerText : "100%";
+    document.getElementById("final-typos").innerText = typosDisplay ? typosDisplay.innerText : "0";
+    
+    const typoContainer = document.getElementById("typo-details-container");
+    const typoList = document.getElementById("typo-list");
+    if (typoContainer && typoList) {
+      if (contentLines && contentLines.length > 0) {
+        typoList.innerHTML = "";
+        
+        const groupedTypos = {};
+        typoDetails.forEach(t => {
+          if (!groupedTypos[t.lineIndex]) {
+             groupedTypos[t.lineIndex] = [];
+          }
+          groupedTypos[t.lineIndex].push(t);
+        });
+
+        // 1. Calculate Top 5 Typos
+        const typoCounts = {};
+        typoDetails.forEach(t => {
+            if (t.type === 'typing') {
+                typoCounts[t.word] = (typoCounts[t.word] || 0) + 1;
+            }
+        });
+        const topTypos = Object.entries(typoCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+
+        const topTypoList = document.getElementById("top-typo-list");
+        if (topTypoList) {
+            topTypoList.innerHTML = "";
+            if (topTypos.length === 0) {
+                topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 👏</div>";
+            } else {
+                topTypos.forEach((item, idx) => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex";
+                    row.style.flexDirection = "row";
+                    row.style.alignItems = "center";
+                    row.style.padding = "6px 12px";
+                    row.style.background = idx === 0 ? "#fff0f2" : "#fff";
+                    row.style.border = "1px solid #eee";
+                    row.style.borderRadius = "20px";
+                    row.style.gap = "8px";
+
+                    const rankSpan = document.createElement("span");
+                    rankSpan.style.fontWeight = "bold";
+                    rankSpan.style.color = idx < 3 ? "var(--color-pink)" : "#777";
+                    rankSpan.style.fontSize = "0.85rem";
+                    rankSpan.innerText = `${idx + 1}위`;
+
+                    const wordSpan = document.createElement("span");
+                    wordSpan.style.fontWeight = "bold";
+                    wordSpan.style.fontSize = "1rem";
+                    wordSpan.style.color = "#333";
+                    wordSpan.innerText = `'${item[0]}'`;
+
+                    const countSpan = document.createElement("span");
+                    countSpan.style.fontWeight = "bold";
+                    countSpan.style.color = "#e67700";
+                    countSpan.style.fontSize = "0.9rem";
+                    countSpan.innerText = `${item[1]}회`;
+
+                    row.appendChild(rankSpan);
+                    row.appendChild(wordSpan);
+                    row.appendChild(countSpan);
+                    topTypoList.appendChild(row);
+                });
+            }
+        }
+
+        let maxLinePlayed = currentLineIndex;
+        if (maxLinePlayed >= contentLines.length) {
+            maxLinePlayed = contentLines.length - 1;
+        }
+
+        for (let i = 0; i <= maxLinePlayed; i++) {
+           const errors = groupedTypos[i] || [];
+           const units = allTargetUnits[i] || [];
+           const lineText = contentLines[i] || "알 수 없는 구간";
+           
+           const sectionDiv = document.createElement("div");
+           sectionDiv.style.marginBottom = "10px";
+           sectionDiv.style.border = "1px solid #ddd";
+           sectionDiv.style.borderRadius = "6px";
+           sectionDiv.style.overflow = "hidden";
+           
+           const sectionHeader = document.createElement("div");
+           sectionHeader.style.padding = "10px 15px";
+           sectionHeader.style.background = "#f1f1f1";
+           sectionHeader.style.cursor = "pointer";
+           sectionHeader.style.display = "flex";
+           sectionHeader.style.justifyContent = "space-between";
+           sectionHeader.style.alignItems = "center";
+           sectionHeader.style.fontWeight = "bold";
+           sectionHeader.style.color = "#444";
+           
+           let coloredLineHtml = "";
+           if (units.length > 0) {
+               units.forEach((u, idx) => {
+                   let hadTypo = errors.some(t => t.type === 'typing' && t.unitIndex === idx);
+                   let wasTimeout = errors.some(t => t.type === 'timeout' && idx >= t.startUnitIndex);
+                   
+                   if (wasTimeout) {
+                       coloredLineHtml += `<span style="color: #c92a2a; background: #fff5f5; padding: 2px; border-radius: 4px;">${u.text}</span>`;
+                   } else if (hadTypo) {
+                       coloredLineHtml += `<span style="color: #e67700; background: #fff4e6; padding: 2px; border-radius: 4px;">${u.text}</span>`;
+                   } else {
+                       coloredLineHtml += `<span style="color: #555;">${u.text}</span>`;
+                   }
+               });
+           } else {
+               coloredLineHtml = `<span>${lineText}</span>`;
+           }
+
+           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: #666; margin-left: 10px;">${coloredLineHtml}</span></span>`;
+           if (errors.length === 0) {
+              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! ✨)</span>`;
+           } else {
+              let typingErrors = errors.filter(e => e.type === 'typing').length;
+              let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
+              titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">오타 ${typingErrors} / 시간초과 ${timeoutErrors}</span>`;
+           }
+           sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: #888; margin-left: 10px; flex-shrink: 0;">▼</span>`;
+
+           const detailsDiv = document.createElement("div");
+           detailsDiv.style.padding = "15px";
+           detailsDiv.style.background = "#fff";
+           detailsDiv.style.display = "none";
+
+           sectionHeader.addEventListener("click", () => {
+               const arrow = sectionHeader.querySelector(".toggle-arrow");
+               if (detailsDiv.style.display === "none") {
+                   detailsDiv.style.display = "block";
+                   if (arrow) arrow.innerText = "▲";
+               } else {
+                   detailsDiv.style.display = "none";
+                   if (arrow) arrow.innerText = "▼";
+               }
+           });
+
+           sectionDiv.appendChild(sectionHeader);
+
+           if (units.length > 0) {
+               const visualTextContainer = document.createElement("div");
+               visualTextContainer.style.fontSize = "1.2rem";
+               visualTextContainer.style.fontWeight = "bold";
+               visualTextContainer.style.marginBottom = "8px";
+               visualTextContainer.style.lineHeight = "1.4";
+               visualTextContainer.style.wordBreak = "keep-all";
+               visualTextContainer.innerHTML = coloredLineHtml;
+               detailsDiv.appendChild(visualTextContainer);
+           } else {
+               const visualTextContainer = document.createElement("div");
+               visualTextContainer.style.fontSize = "1.1rem";
+               visualTextContainer.style.fontWeight = "bold";
+               visualTextContainer.style.marginBottom = "8px";
+               visualTextContainer.innerText = lineText;
+               detailsDiv.appendChild(visualTextContainer);
+           }
+
+           if (errors.length > 0) {
+               const analysisLabel = document.createElement("div");
+               analysisLabel.style.fontSize = "0.85rem";
+               analysisLabel.style.fontWeight = "bold";
+               analysisLabel.style.color = "#888";
+               analysisLabel.style.marginBottom = "4px";
+               analysisLabel.innerText = "오타 상세 분석:";
+               detailsDiv.appendChild(analysisLabel);
+
+               const ul = document.createElement("ul");
+               ul.style.margin = "0";
+               ul.style.paddingLeft = "20px";
+               ul.style.lineHeight = "1.6";
+               ul.style.fontSize = "0.9rem";
+
+               errors.forEach(t => {
+                  const li = document.createElement("li");
+                  li.style.marginBottom = "2px";
+                  if (t.type === 'typing') {
+                    li.innerHTML = `「${t.word}」 오타: <span style="color: #e67700; font-weight: bold;">'${t.typed}'</span> (정답: <strong>${t.expected}</strong>)`;
+                  } else if (t.type === 'timeout') {
+                    li.innerHTML = `<span style="color: #c92a2a; font-weight: bold;">[시간 초과]</span> 미입력: <strong>${t.missedText}</strong>`;
+                  }
+                  ul.appendChild(li);
+               });
+               detailsDiv.appendChild(ul);
+           } else {
+               const perfectMsg = document.createElement("div");
+               perfectMsg.style.fontSize = "0.9rem";
+               perfectMsg.style.color = "#2b8a3e";
+               perfectMsg.innerText = "이 구간은 완벽하게 입력했습니다!";
+               detailsDiv.appendChild(perfectMsg);
+           }
+           
+           sectionDiv.appendChild(detailsDiv);
+           typoList.appendChild(sectionDiv);
+        }
+        
+        if (maxLinePlayed >= 0) {
+            typoContainer.style.display = "block";
+        } else {
+            typoContainer.style.display = "none";
+        }
+      } else {
+        typoContainer.style.display = "none";
+      }
     }
+
+    resultModal.style.display = "flex";
+
+    // --- 히스토리 저장 로직 추가 ---
+    const token = sessionStorage.getItem("ep_token");
+    if (token) {
+      const finalWpm = parseInt(document.getElementById("final-wpm").innerText) || 0;
+      const finalAcc = parseFloat(document.getElementById("final-accuracy").innerText) || 0;
+      const title = document.getElementById("info-title").innerText || "알 수 없는 곡";
+      const tagsContainer = document.getElementById("info-tags");
+      let genre = "타이핑";
+      if (tagsContainer && tagsContainer.children.length > 0) {
+          genre = tagsContainer.children[0].innerText;
+      }
+      
+      fetch("/api/typing-history", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+              content_title: title,
+              genre: genre,
+              wpm: finalWpm,
+              accuracy: finalAcc,
+              text: "history_record"
+          })
+      })
+      .then(res => res.json())
+      .then(data => console.log("히스토리 저장:", data))
+      .catch(err => console.error("히스토리 저장 오류:", err));
+
+      // 오타 통계 서버 저장
+      const typoCountsForSave = {};
+      typoDetails.forEach(t => {
+        if (t.type === 'typing' && t.word) {
+          typoCountsForSave[t.word] = (typoCountsForSave[t.word] || 0) + 1;
+        }
+      });
+      const typoPayload = Object.entries(typoCountsForSave).map(([char, cnt]) => ({
+        character: char,
+        error_count: cnt
+      }));
+      if (typoPayload.length > 0) {
+        fetch("/api/typo-stats", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ typos: typoPayload })
+        })
+        .then(res => res.json())
+        .then(d => console.log("오타 통계 저장:", d))
+        .catch(err => console.error("오타 통계 저장 오류:", err));
+      }
+    }
+  }
 }
 
 /**
- * 현재까지 입력한 문자 수와 걸린 시간 등을 바탕으로 
+ * 현재까지 입력한 문자 수와 걸린 시간 등을 바탕으로
  * WPM(분당 타자수), 정확도, 오타수 등의 통계 데이터를 갱신하여 화면에 표시하는 함수입니다.
  */
 function updateStats() {
-    const timeElapsed = gameTimeElapsed;
-    let wpm = 0;
+  const timeElapsed = gameTimeElapsed;
+  let wpm = 0;
 
-    const totalCorrect = sessionCorrectChars + correctChars;
-    const totalTyped = sessionTotalChars + typingInput.value.length + totalTypos;
+  const totalCorrect = sessionCorrectChars + correctChars;
+  const totalTypedLegacy = sessionTotalChars + typingInput.value.length + totalTypos;
 
-    if (timeElapsed > 0) {
-        wpm = Math.round(((totalCorrect / 5) / timeElapsed) * 60);
-    }
-    wpmDisplay.innerText = wpm;
+  let currentElapsed = currentLineElapsed;
+  if (currentElapsed < 0) currentElapsed = 0;
+  let currentRemaining = 0;
+  if (!lineCompleted) {
+    currentRemaining = Math.max(0, currentSectionDuration - currentElapsed);
+  } else {
+    currentRemaining = savedSectionRemaining;
+  }
 
-    let accuracy = 100;
-    if (totalTyped > 0) {
-        accuracy = Math.round((totalCorrect / totalTyped) * 100);
-    }
-    accuracyDisplay.innerText = accuracy + '%';
-    if (typosDisplay) typosDisplay.innerText = totalTypos;
+  let tempTotalTyped = totalTypedChars + correctChars + sectionTypos;
+  let tempTotalCorrect = totalCorrectChars + correctChars;
+  let tempTotalTarget = totalTargetCorrectChars + (currentChars ? currentChars.length : 0);
+  let tempTotalRemaining = totalRemainingTime + currentRemaining;
+  let tempTotalTimeSum = totalTimeSum + currentSectionDuration;
+
+  if (timeElapsed > 0) {
+    wpm = Math.round((tempTotalCorrect / 5 / timeElapsed) * 60);
+  }
+  wpmDisplay.innerText = wpm;
+
+  let accuracyVal = 1;
+  if (tempTotalTyped > 0) {
+    accuracyVal = tempTotalCorrect / tempTotalTyped;
+  }
+  let accuracy = Math.round(accuracyVal * 100);
+  accuracyDisplay.innerText = accuracy + "%";
+  if (typosDisplay) typosDisplay.innerText = totalTypos;
+
+  let typingRatio = tempTotalTarget > 0 ? tempTotalCorrect / tempTotalTarget : 0;
+  let timeRatio = tempTotalTimeSum > 0 ? tempTotalRemaining / tempTotalTimeSum : 0;
+
+  let totalScore = calculateTypingScore(accuracyVal, typingRatio, timeRatio, contentDifficulty);
+
+  const diffWeight = {1: 0.8, 2: 0.9, 3: 1.0, 4: 1.1, 5: 1.2}[contentDifficulty] || 1.0;
+  const baseScore = typingRatio * 100 * Math.pow(accuracyVal, 2) * diffWeight;
+  console.log(`[Score Log] diffWeight: ${diffWeight}, typingRatio: ${typingRatio.toFixed(3)}, timeRatio: ${timeRatio.toFixed(3)}, accuracy: ${accuracyVal.toFixed(3)}, baseScore: ${baseScore.toFixed(1)}, totalScore: ${totalScore}`);
+
+  if (scoreDisplay) scoreDisplay.innerText = totalScore;
 }
 
 /**
  * 사용자가 현재 입력해야 할 문자를 화면에서 시각적으로 하이라이트(밑줄 등) 처리하는 함수입니다.
  */
 function highlightCurrentChar() {
-    const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-    if (!activeBlock) return;
-    const spans = activeBlock.querySelectorAll('span');
-    spans.forEach(span => span.classList.remove('active'));
-    if (currentIndex < spans.length) {
-        spans[currentIndex].classList.add('active');
+  if (!lyricDisplay) return;
+  const spans = lyricDisplay.querySelectorAll(".lyric-unit");
+  spans.forEach((span, idx) => {
+    span.classList.remove("current", "typed", "pending");
+    
+    const romaContainer = span.querySelector(".roma-text");
+    
+    if (idx < currentUnitIndex) {
+      span.classList.add("typed");
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach(c => {
+          c.classList.remove("current", "pending");
+          c.classList.add("typed");
+        });
+      }
+    } else if (idx === currentUnitIndex) {
+      span.classList.add("current");
+      
+      const unit = targetUnits[idx];
+      let bestMatch = unit.validInputs[0];
+      if (currentBuffer.length > 0) {
+        for (let v of unit.validInputs) {
+          if (v.startsWith(currentBuffer)) {
+            bestMatch = v;
+            break;
+          }
+        }
+      }
+      
+      if (romaContainer && romaContainer.textContent !== bestMatch) {
+        romaContainer.innerHTML = "";
+        for (let i = 0; i < bestMatch.length; i++) {
+          const charSpan = document.createElement("span");
+          charSpan.textContent = bestMatch[i];
+          romaContainer.appendChild(charSpan);
+        }
+      }
+      
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach((c, i) => {
+          c.classList.remove("current", "typed", "pending");
+          if (i < currentBuffer.length) {
+            c.classList.add("typed");
+          } else if (i === currentBuffer.length) {
+            c.classList.add("current");
+          } else {
+            c.classList.add("pending");
+          }
+        });
+      }
+    } else {
+      span.classList.add("pending");
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach(c => {
+          c.classList.remove("current", "typed");
+          c.classList.add("pending");
+        });
+      }
     }
+  });
 }
 
-typingInput.addEventListener('input', (e) => {
-    if (!isPlaying) return;
-    if (isLineCompleted) {
-        typingInput.value = currentChars.join('');
-        return;
-    }
-    if (currentUnits.length === 0) {
-        typingInput.value = '';
-        return;
-    }
+/**
+ * 현재 입력해야 할 가사와 현재까지 입력된 로마자 버퍼의 상태를
+ * 상태 패널(Status Panel)에 업데이트하여 화면에 표시하는 함수입니다.
+ */
+function updateStatus() {
+  if (!statusPanel) return;
+  if (currentUnitIndex >= targetUnits.length) {
+    statusPanel.innerHTML =
+      '<span class="success-text">✨ 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>';
+    return;
+  }
 
-    let typedValue = typingInput.value;
-    let res = findValidPath(currentUnits, typedValue);
+  const currentUnit = targetUnits[currentUnitIndex];
+  if (!currentUnit) {
+    statusPanel.innerText = "입력할 항목을 준비 중입니다.";
+    return;
+  }
 
-    if (!res.isValid) {
-        // Typo
-        totalTypos++;
-        typingInput.value = typedValue.slice(0, -1);
-        typedValue = typingInput.value;
-        updateStats();
+  if (currentBuffer === "") {
+    statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span>`;
+  } else {
+    statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span> 입력 중... (입력된 조합: <span class="typing-now">${currentBuffer}</span>)`;
+  }
+}
 
-        // Re-evaluate valid path for the reverted string
-        res = findValidPath(currentUnits, typedValue);
-        if (!res.isValid) return; // Should not happen
-    }
 
-    // Update dynamic romaji text to match the chosen path
-    let newText = "";
-    for (let i = 0; i < currentUnits.length; i++) {
-        if (i < res.path.length) {
-            newText += res.path[i];
-        } else {
-            newText += currentUnits[i].validInputs[0]; // fallback to default
-        }
-    }
+typingInput.addEventListener("input", (e) => {
+  if (!isPlaying) return;
+  if (lineCompleted) return;
 
-    if (newText !== currentText) {
-        currentText = newText;
-        currentChars = currentText.split('');
+  let rawValue = e.target.value;
+  let convertedValue = ko2en(rawValue);
+  if (rawValue !== convertedValue) {
+    e.target.value = convertedValue;
+  }
+  
+  let typedValue = convertedValue.toLowerCase();
+  if (!targetUnits || currentUnitIndex >= targetUnits.length) return;
 
-        const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-        if (activeBlock) {
-            activeBlock.innerHTML = '';
-            currentChars.forEach((char) => {
-                const span = document.createElement('span');
-                span.innerText = char;
-                activeBlock.appendChild(span);
-            });
-        }
-    }
-
-    const activeBlock = linesContainer.querySelector('.lyric-block.active .lyric-romaji');
-    const hiraBlock = linesContainer.querySelector('.lyric-block.active .lyric-hiragana');
-
-    if (!activeBlock) return;
-    const spans = activeBlock.querySelectorAll('span');
-    const hiraSpans = hiraBlock ? hiraBlock.querySelectorAll('span') : [];
-
-    correctChars = 0;
-
-    spans.forEach((span, index) => {
-        span.className = '';
-        if (index < typedValue.length) {
-            span.classList.add('correct');
-            correctChars++;
-        }
-    });
-
-    let hiraCorrectCount = 0;
-    for (let i = 0; i < res.matchedCount; i++) {
-        hiraCorrectCount += currentUnits[i].text.length;
-    }
-
-    hiraSpans.forEach((span, index) => {
-        span.className = '';
-        if (index < hiraCorrectCount) {
-            span.classList.add('correct');
-        }
-    });
-
-    currentIndex = typedValue.length;
+  if (typedValue.length < currentBuffer.length) {
+    currentBuffer = typedValue;
+    currentIndex = getCompletedRomajiLength(targetUnits, currentUnitIndex) + currentBuffer.length;
+    updateStatus();
+    updateStats();
     highlightCurrentChar();
+    return;
+  }
 
-    if (res.matchedCount === currentUnits.length && res.currentMatch === "") {
-        isLineCompleted = true;
+  const newChar = typedValue.charAt(typedValue.length - 1);
+  const testBuffer = currentBuffer + newChar;
+  const currentUnit = targetUnits[currentUnitIndex];
 
-        const activeHiraBlock = linesContainer.querySelector('.lyric-block.active .lyric-hiragana');
-        if (activeHiraBlock) {
-            const hiraSpans = activeHiraBlock.querySelectorAll('span');
-            hiraSpans.forEach(span => {
-                span.style.color = '#27ae60';
-                span.style.textShadow = '0 0 8px rgba(39, 174, 96, 0.4)';
-            });
-        }
+  let isPossiblePrefix = false;
+  let isCompleteMatch = false;
 
-        const progressBar = document.getElementById('line-progress-bar');
-        if (progressBar) {
-            progressBar.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
-        }
-
-        if (!isYoutubeMode) {
-            setTimeout(() => {
-                if (isPlaying) {
-                    transitionNextLine(false);
-                }
-            }, 300);
-        }
+  for (let validInput of currentUnit.validInputs) {
+    if (validInput === testBuffer) {
+      isCompleteMatch = true;
+      break;
     }
+    if (validInput.startsWith(testBuffer)) {
+      isPossiblePrefix = true;
+    }
+  }
+
+  if (!isCompleteMatch && !isPossiblePrefix) {
+    totalTypos++;
+    sectionTypos++;
+    typingInput.value = currentBuffer;
+    
+    const expectedCharStr = currentUnit.validInputs.join(" / ");
+    typoDetails.push({
+      lineIndex: currentLineIndex,
+      lineText: contentLines[currentLineIndex] || "알 수 없는 구간",
+      type: 'typing',
+      unitIndex: currentUnitIndex,
+      word: currentUnit.text,
+      expected: expectedCharStr,
+      typed: newChar
+    });
+
+    updateStats();
+    return;
+  }
+
+  currentBuffer = testBuffer;
+  if (isCompleteMatch) {
+    currentUnitIndex++;
+    currentBuffer = "";
+    typingInput.value = "";
+  }
+
+  if (currentUnitIndex >= targetUnits.length) {
+    currentIndex = currentChars.length;
+    correctChars = currentIndex;
+    updateStatus();
+    updateStats();
+    highlightCurrentChar();
+    handleLineCompletion();
+    return;
+  }
+
+  currentIndex = getCompletedRomajiLength(targetUnits, currentUnitIndex) + currentBuffer.length;
+  correctChars = currentIndex;
+
+  highlightCurrentChar();
+  updateStatus();
+  updateStats();
 });
 
 /**
@@ -610,114 +1126,262 @@ typingInput.addEventListener('input', (e) => {
  * 설정된 시간이 초과되면 강제로 다음 줄로 넘어가도록 체크하는 루프 함수입니다.
  */
 function startSyncLoop() {
-    clearInterval(syncTimer);
-    const progressContainer = document.getElementById('progress-bar-container');
-    const progressBar = document.getElementById('line-progress-bar');
-    if (progressContainer) progressContainer.style.opacity = '1';
+  clearInterval(syncTimer);
+  if (!isPlaying) return;
+  if (progressBar) progressBar.style.width = "0%";
 
-    let duration = 50.0; // default 5 seconds
-    if (contentTimestamps.length > currentLineIndex + 1 && contentTimestamps[currentLineIndex] !== undefined) {
-        duration = contentTimestamps[currentLineIndex + 1] - contentTimestamps[currentLineIndex];
-        if (duration <= 0) duration = 50.0;
-    } else if (contentTimestamps[currentLineIndex] !== undefined) {
-        // Last line
-        duration = 50.0;
-    }
+  let duration = 50.0; // default 5 seconds
+  if (
+    contentTimestamps.length > currentLineIndex + 1 &&
+    contentTimestamps[currentLineIndex] !== undefined
+  ) {
+    duration =
+      contentTimestamps[currentLineIndex + 1] -
+      contentTimestamps[currentLineIndex];
+    if (duration <= 0) duration = 0.1;
+  } else if (contentTimestamps[currentLineIndex] !== undefined) {
+    // Last line
+    duration = 50.0;
+  }
 
-    currentLineElapsed = 0;
+  currentSectionDuration = duration;
+  currentLineElapsed = 0;
 
-    syncTimer = setInterval(() => {
-        if (!isPlaying) return;
+  syncTimer = setInterval(() => {
+    if (!isPlaying) return;
 
-        if (isYoutubeMode) {
-            if (contentTimestamps.length > 0 && contentTimestamps[currentLineIndex] !== undefined) {
-                let currentTime = youtubePlayer.getCurrentTime();
-                let lineStartTime = contentTimestamps[currentLineIndex];
-                currentLineElapsed = currentTime - lineStartTime;
+    if (isYoutubeMode) {
+      if (
+        contentTimestamps.length > 0 &&
+        contentTimestamps[currentLineIndex] !== undefined
+      ) {
+        let currentTime = youtubePlayer.getCurrentTime();
+        let lineStartTime = contentTimestamps[currentLineIndex];
+        currentLineElapsed = currentTime - lineStartTime;
 
-                if (currentLineElapsed < 0) {
-                    if (progressBar) progressBar.style.width = '100%';
-                    return;
-                }
-            } else {
-                currentLineElapsed += 0.05;
-            }
+        if (currentLineElapsed < 0) {
+          if (!isWaitingPhase) {
+            isWaitingPhase = true;
+            renderWaitingPhase();
+          }
 
-            let remaining = duration - currentLineElapsed;
+          let prevLineStartTime = 0;
+          if (currentLineIndex > 0 && contentTimestamps[currentLineIndex - 1] !== undefined) {
+            prevLineStartTime = contentTimestamps[currentLineIndex - 1];
+          }
+          let waitDuration = lineStartTime - prevLineStartTime;
+          let waitElapsed = currentTime - prevLineStartTime;
 
-            if (remaining <= 0) {
-                transitionNextLine(!isLineCompleted);
-            } else {
-                let percent = (currentLineElapsed / duration) * 100;
-                if (percent < 0) percent = 0;
-                if (percent > 100) percent = 100;
-                if (progressBar) progressBar.style.width = percent + '%';
-            }
+          if (waitDuration > 0) {
+            let percent = (waitElapsed / waitDuration) * 100;
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+            if (progressBar) progressBar.style.width = percent + "%";
+          } else {
+            if (progressBar) progressBar.style.width = "100%";
+          }
+          return;
         } else {
-            // 유튜브 영상이 없는 경우, 강제 스킵 없이 진행바를 꽉 채워둠
-            if (progressBar) progressBar.style.width = '100%';
+          if (isWaitingPhase) {
+            isWaitingPhase = false;
+            renderLines();
+          }
         }
-    }, 50);
+      } else {
+        currentLineElapsed += 0.05;
+      }
+
+      let remaining = duration - currentLineElapsed;
+
+      if (remaining <= 0) {
+        forceSkipToNextLine();
+      } else {
+        let percent = (currentLineElapsed / duration) * 100;
+        if (percent < 0) percent = 0;
+        if (percent > 100) percent = 100;
+        if (progressBar) progressBar.style.width = percent + "%";
+      }
+    } else {
+      // 유튜브 영상이 없는 경우, 강제 스킵 없이 진행바를 꽉 채워둠
+      if (progressBar) progressBar.style.width = "100%";
+    }
+  }, 50);
 }
 
 /**
  * 다음 가사로 넘어가는 트랜지션 함수입니다.
  * @param {boolean} isForceSkip - 시간 초과로 인해 강제로 넘어가는지 여부
  */
-function transitionNextLine(isForceSkip) {
-    if (isForceSkip) {
-        if (currentChars && currentIndex < currentChars.length) {
-            totalTypos += (currentChars.length - currentIndex);
-        }
-    }
+function forceSkipToNextLine() {
+  if (!lineCompleted) {
+    let elapsed = currentLineElapsed;
+    if (elapsed < 0) elapsed = 0;
+    savedSectionRemaining = Math.max(0, currentSectionDuration - elapsed);
+  }
+
+  if (!lineCompleted && currentChars && currentIndex < currentChars.length) {
+    let missedCharsCount = currentChars.length - currentIndex;
+    totalTypos += missedCharsCount;
+    sectionTypos += missedCharsCount;
+    
+    let missedText = currentText.substring(currentIndex);
+    typoDetails.push({
+      lineIndex: currentLineIndex,
+      lineText: contentLines[currentLineIndex] || "알 수 없는 구간",
+      type: 'timeout',
+      startUnitIndex: currentUnitIndex,
+      missedText: missedText,
+      count: missedCharsCount
+    });
 
     sessionCorrectChars += correctChars;
     sessionTotalChars += currentChars.length;
-    updateStats();
+  }
 
-    currentLineIndex++;
+  let sectionCorrect = correctChars;
+  let sectionTyped = sectionCorrect + sectionTypos;
+  let sectionTarget = currentChars ? currentChars.length : 0;
 
-    if (currentLineIndex >= contentLines.length || currentLineIndex >= contentRomajiLines.length) {
-        endGame(true);
-    } else {
-        renderLines();
-        startSyncLoop();
-    }
+  totalTypedChars += sectionTyped;
+  totalCorrectChars += sectionCorrect;
+  totalTargetCorrectChars += sectionTarget;
+  totalRemainingTime += savedSectionRemaining;
+  totalTimeSum += currentSectionDuration;
+
+  lineCompleted = false;
+  if (typingInput) typingInput.disabled = false;
+  updateStats();
+
+  currentLineIndex++;
+
+  if (
+    currentLineIndex >= contentLines.length ||
+    currentLineIndex >= contentRomajiLines.length
+  ) {
+    endGame(true);
+  } else {
+    renderLines();
+    startSyncLoop();
+  }
 }
 
 // Click anywhere in typing area to focus input
-const typingPanel = document.querySelector('.typing-panel');
+const typingPanel = document.querySelector(".typing-panel");
 if (typingPanel) {
-    typingPanel.addEventListener('click', () => {
-        if (isPlaying) typingInput.focus();
-    });
+  typingPanel.addEventListener("click", () => {
+    if (!isPlaying && (!currentYoutubeId || !isYoutubeReady)) {
+      startGame(false);
+    }
+    if (isPlaying && typingInput) {
+      typingInput.focus({ preventScroll: true });
+    }
+  });
 }
 
-btnStart.addEventListener('click', startGame);
-
-btnRestart.addEventListener('click', () => {
-    clearInterval(timer);
-    isPlaying = false;
-    typingInput.value = '';
-    typingInput.disabled = true;
-    timeDisplay.innerText = 0;
-    wpmDisplay.innerText = 0;
-    accuracyDisplay.innerText = '100%';
-    if (typosDisplay) typosDisplay.innerText = 0;
-
-    if (youtubePlayer && isPlayerReady) {
-        youtubePlayer.pauseVideo();
-        youtubePlayer.seekTo(0);
+// Tab skip and Spacebar pause logic
+document.addEventListener("keydown", function(e) {
+  if (isPlaying) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      skipTo80Percent();
+    } else if (e.code === "Space" || e.key === " ") {
+      e.preventDefault();
+      if (isYoutubeMode && youtubePlayer && isPlayerReady) {
+        if (isCountingDown) return; // Ignore spacebar during countdown
+        
+        const state = youtubePlayer.getPlayerState();
+        if (state === YT.PlayerState.PLAYING) {
+          youtubePlayer.pauseVideo();
+        } else if (state === YT.PlayerState.PAUSED) {
+          startCountdownAndPlay();
+        }
+      }
     }
-
-    currentLineIndex = 0;
-    renderLines();
-    const progressContainer = document.getElementById('progress-bar-container');
-    if (progressContainer) progressContainer.style.opacity = '0';
-    clearInterval(syncTimer);
+  }
 });
+
+function startCountdownAndPlay() {
+  const overlay = document.getElementById("countdown-overlay");
+  const text = document.getElementById("countdown-text");
+  
+  if (!overlay || !text) {
+    youtubePlayer.playVideo();
+    return;
+  }
+
+  isCountingDown = true;
+  overlay.style.display = "flex";
+  let count = 3;
+  text.innerText = count;
+
+  countdownInterval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      text.innerText = count;
+    } else {
+      clearInterval(countdownInterval);
+      overlay.style.display = "none";
+      isCountingDown = false;
+      youtubePlayer.playVideo();
+    }
+  }, 1000);
+}
+
+function skipTo80Percent() {
+  if (!isPlaying || !isYoutubeMode || !youtubePlayer || !isPlayerReady) return;
+
+  let currentTime = youtubePlayer.getCurrentTime();
+  
+  if (contentTimestamps.length > 0 && contentTimestamps[currentLineIndex] !== undefined) {
+    let lineStartTime = contentTimestamps[currentLineIndex];
+    let elapsed = currentTime - lineStartTime;
+    
+    if (elapsed < 0) {
+      // Waiting phase skip
+      let prevLineStartTime = 0;
+      if (currentLineIndex > 0 && contentTimestamps[currentLineIndex - 1] !== undefined) {
+        prevLineStartTime = contentTimestamps[currentLineIndex - 1];
+      }
+      let waitDuration = lineStartTime - prevLineStartTime;
+      let targetTime = prevLineStartTime + waitDuration * 0.8;
+      
+      if (targetTime > currentTime) {
+        youtubePlayer.seekTo(targetTime, true);
+      }
+    } else {
+      // Active line skip
+      let duration = 5; // default 5s if last line
+      if (
+        currentLineIndex + 1 < contentTimestamps.length &&
+        contentTimestamps[currentLineIndex + 1] !== undefined
+      ) {
+        duration = contentTimestamps[currentLineIndex + 1] - lineStartTime;
+      }
+      
+      let targetTime = lineStartTime + duration * 0.8;
+      
+      if (targetTime > currentTime) {
+        youtubePlayer.seekTo(targetTime, true);
+      }
+    }
+  }
+}
 
 // Load test content
 const urlParams = new URLSearchParams(window.location.search);
-const contentId = urlParams.get('id') || 1;
+const contentId = urlParams.get("id") || 1;
 fetchTypingContent(contentId);
+
+// Volume control logic
+const volumeSlider = document.getElementById("volume-slider");
+const volumeDisplay = document.getElementById("volume-display");
+
+if (volumeSlider && volumeDisplay) {
+  volumeSlider.addEventListener("input", (e) => {
+    const val = e.target.value;
+    volumeDisplay.innerText = val + "%";
+    if (youtubePlayer && typeof youtubePlayer.setVolume === "function") {
+      youtubePlayer.setVolume(val);
+    }
+  });
+}

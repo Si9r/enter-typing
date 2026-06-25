@@ -1,4 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, WebSocket, WebSocketDisconnect, Query
+from fastapi.responses import JSONResponse
+import asyncio
+import redis.asyncio as aioredis
+from typing import Dict, List, Optional
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -7,18 +11,17 @@ import random
 import string
 import os
 import re
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import time
-import re
 from sqlalchemy.orm import Session
-from database import engine, get_db, SessionLocal
+from database import engine, get_db
 import models
 import bcrypt
 from jose import jwt, JWTError
 import pykakasi
-import yt_dlp
 
 kks = pykakasi.kakasi()
 
@@ -71,14 +74,9 @@ def get_password_hash(password: str) -> str:
 
 app = FastAPI()
 
-@app.get("/favicon.ico", include_in_schema=False)
-async def favicon():
-    return FileResponse("assets/logo_icon.png")
-
-
 @app.on_event("startup")
 def startup_event():
-    db = SessionLocal()
+    db = next(get_db())
     if db.query(models.TypingContent).count() < 4:
         # 기존 데이터 삭제 (중복 방지용 초기화)
         db.query(models.TypingContent).delete()
@@ -130,95 +128,6 @@ def startup_event():
             content = models.TypingContent(**song)
             db.add(content)
         db.commit()
-
-    # 시드 퀴즈 데이터 정의
-    seed_quizzes = [
-        {
-            "title": "클릭으로 노래 맞히기 — YOASOBI",
-            "description": "YOASOBI의 어디서 들어본 이 노래일까요? 유튜브 소리를 듣고 노래 제목을 맞춰보세요!",
-            "category": "제목맞추기",
-            "questions_data": [
-                { "question_number": 1, "question_text": "이 노래의 제목은?", "youtube_url": "https://www.youtube.com/watch?v=dy90tA3TT1c", "start_time": 50, "end_time": 55, "answer": "怪物", "alternative_answers": "かいぶつ,カイブツ,monster,kaibutsu", "hint": "2021년 애니메이션 《비스타즈》 시즌 2 OP" },
-                { "question_number": 2, "question_text": "이 노래의 제목은?", "youtube_url": "https://www.youtube.com/watch?v=ZRtdQ81jPUQ", "start_time": 60, "end_time": 65, "answer": "アイドル", "alternative_answers": "あいる,idol,aidoru", "hint": "2023년 애니메이션 《최애의 아이》 OP" },
-                { "question_number": 3, "question_text": "이 노래의 제목은?", "youtube_url": "https://www.youtube.com/watch?v=Y4nEEZwckuU", "start_time": 45, "end_time": 50, "answer": "群青", "alternative_answers": "ぐんじょう,グンジョウ,gunjou,gunjyo", "hint": "'好き'를 전하지 못한 이야기" },
-                { "question_number": 4, "question_text": "이 노래의 제목은?", "youtube_url": "https://www.youtube.com/watch?v=kzdJkT4kp-A", "start_time": 48, "end_time": 53, "answer": "ハルジオン", "alternative_answers": "はるじおん,harujion,haruzione", "hint": "봄에 피는 흰 들꽃 이름" },
-                { "question_number": 5, "question_text": "이 노래의 제목은?", "youtube_url": "https://www.youtube.com/watch?v=x8VYWazR5mE", "start_time": 34, "end_time": 39, "answer": "夜に駆ける", "alternative_answers": "よるにかける,ヨルニカケル,yorunikakeru", "hint": "YOASOBI 데뷔곡이자 최고 히트곡" }
-            ]
-        },
-        {
-            "title": "애니메이션 OST 제목 맞추기",
-            "description": "귀멸의 칼날, 주술회전 등 인기 애니 OST 제목을 맞혀보세요!",
-            "category": "제목맞추기",
-            "questions_data": [
-                { "question_number": 1, "question_text": "준비 중인 문제입니다.", "youtube_url": "https://www.youtube.com/watch?v=dy90tA3TT1c", "start_time": 0, "end_time": 5, "answer": "준비중", "alternative_answers": "", "hint": "아직 문제가 없습니다." }
-            ]
-        },
-        {
-            "title": "요네즈 켄시 한자 제목 읽기 (후리가나 퀴즈)",
-            "description": "요네즈 켄시의 명곡 중 '한자'로 된 제목의 노래를 듣고, 어떻게 읽는지(히라가나/로마자) 정답을 맞혀보세요! (예: 漢字 -> かんじ)",
-            "category": "가사퀴즈",
-            "questions_data": [
-                { "question_number": 1, "question_text": "이 노래(地球儀)의 후리가나는?", "youtube_url": "https://www.youtube.com/watch?v=VUsURj_OYdA", "start_time": 65, "end_time": 70, "answer": "ちきゅうぎ", "alternative_answers": "地球儀,chikyugi", "hint": "지구본 (애니 '그대들은 어떻게 살 것인가' 주제곡)" },
-                { "question_number": 2, "question_text": "이 노래(春雷)의 후리가나는?", "youtube_url": "https://www.youtube.com/watch?v=zkNzxsaCunU", "start_time": 64, "end_time": 69, "answer": "しゅんらい", "alternative_answers": "春雷,shunrai", "hint": "봄철의 우레 (춘뢰)" },
-                { "question_number": 3, "question_text": "이 노래(感電)의 후리가나는?", "youtube_url": "https://www.youtube.com/watch?v=UFQEttrn6CQ", "start_time": 86, "end_time": 91, "answer": "かんでん", "alternative_answers": "感電,kanden", "hint": "감전 (드라마 'MIU404' 주제곡)" },
-                { "question_number": 4, "question_text": "이 노래(海の幽霊)의 후리가나는?", "youtube_url": "https://www.youtube.com/watch?v=1s84rIhPuhk", "start_time": 73, "end_time": 78, "answer": "うみのゆうれい", "alternative_answers": "海の幽霊,uminoyurei,uminoyourei", "hint": "바다의 유령 (애니 '해수의 아이' 주제곡)" },
-                { "question_number": 5, "question_text": "이 노래(打上花火)의 후리가나는?", "youtube_url": "https://www.youtube.com/watch?v=-tKVN2mAKRI", "start_time": 65, "end_time": 70, "answer": "うちあげはなび", "alternative_answers": "打上花火,uchiagehanabi", "hint": "쏘아올린 불꽃" }
-            ]
-        },
-        {
-            "title": "초인기 J-POP 가사 빈칸 채우기",
-            "description": "일본에서 가장 유명한 메가 히트곡 10곡! 노래를 듣고 다음 빈칸에 들어갈 가사(히라가나/로마자)를 맞춰보세요.",
-            "category": "가사퀴즈",
-            "questions_data": [
-                { "question_number": 1, "question_text": "誰もが目を奪われていく君は完璧で究極の [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=ZRtdQ81jPUQ", "start_time": 79, "end_time": 84, "answer": "アイドル", "alternative_answers": "あいる,aidoru", "hint": "YOASOBI - 아**** (공식 MV)" },
-                { "question_number": 2, "question_text": "夢ならばどれほどよかったでしょう 未だにあなたのことを [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=SX_ViT4Ra7k", "start_time": 64, "end_time": 71, "answer": "ゆめにみる", "alternative_answers": "夢にみる,yumenimiru", "hint": "Kenshi Yonezu - 꿈에 본다 (공식 MV)" },
-                { "question_number": 3, "question_text": "麦わらの帽子の君が 揺れたマリーゴールドに [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=0xSiBpUdW4E", "start_time": 65, "end_time": 73, "answer": "にてる", "alternative_answers": "似てる,niteru", "hint": "Aimyon - 닮았어 (공식 MV)" },
-                { "question_number": 4, "question_text": "声も顔も不器用なとこも 全部全部 [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=aRQdl694VOA", "start_time": 80, "end_time": 86, "answer": "きらいじゃないの", "alternative_answers": "嫌いじゃないの,kiraijanaino", "hint": "Yuuri - 싫지 않은걸 (공식 MV)" },
-                { "question_number": 5, "question_text": "はぁ？うっせぇうっせぇうっせぇわ あなたが思うより [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=Qp3b-RXtz4w", "start_time": 66, "end_time": 71, "answer": "けんこうです", "alternative_answers": "健康です,kenkoudesu", "hint": "Ado - 건강합니다 (공식 MV)" },
-                { "question_number": 6, "question_text": "胸の中に 刻む [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=jhOVibLEDhA", "start_time": 75, "end_time": 80, "answer": "いきのおと", "alternative_answers": "息の音,ikinooto", "hint": "Hoshino Gen - 숨소리 (공식 MV)" },
-                { "question_number": 7, "question_text": "垂れ流しのテレビの音 溜めてしまった洗濯物は [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=mp2-w15SXms", "start_time": 60, "end_time": 66, "answer": "あしたにしよう", "alternative_answers": "明日にしよう,ashitanishiyou", "hint": "Tani Yuuki - 내일로 하자 (공식 가사 영상)" },
-                { "question_number": 8, "question_text": "君の運命のヒトは [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=DQSAq-Uu_F8", "start_time": 65, "end_time": 68, "answer": "ぼくじゃない", "alternative_answers": "僕じゃない,bokujanai", "hint": "Official Hige Dandism - 내가 아니야" },
-                { "question_number": 9, "question_text": "思い出すのは 君の歌 [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=GDtH6A7w0mQ", "start_time": 61, "end_time": 65, "answer": "うたって", "alternative_answers": "歌って,utatte", "hint": "Vaundy - 노래해" },
-                { "question_number": 10, "question_text": "君の前前前世から僕は 君を [ ____ ]", "youtube_url": "https://www.youtube.com/watch?v=PDSkFeMVNFs", "start_time": 65, "end_time": 70, "answer": "さがしていたよ", "alternative_answers": "探していたよ,sagashiteitayo", "hint": "RADWIMPS - 찾고 있었어 (공식 MV)" }
-            ]
-        }
-    ]
-
-    # 시드 데이터 일괄 추가 및 업데이트
-    for seed in seed_quizzes:
-        existing = db.query(models.Quiz).filter(models.Quiz.title == seed["title"]).first()
-        if not existing:
-            new_quiz = models.Quiz(
-                title=seed["title"],
-                description=seed["description"],
-                category=seed["category"],
-                creator_id=None
-            )
-            db.add(new_quiz)
-            db.flush()
-            
-            for q in seed["questions_data"]:
-                new_q = models.QuizQuestion(
-                    quiz_id=new_quiz.id,
-                    **q
-                )
-                db.add(new_q)
-        else:
-            # 이미 존재하면 메타 정보(설명, 카테고리)만 최신화
-            # ※ 질문(questions)은 덮어쓰지 않음 → 사용자가 편집한 내용 유지
-            existing.description = seed["description"]
-            existing.category = seed["category"]
-            # 질문이 하나도 없는 경우(비어있을 때)만 시드 데이터로 채움
-            if not db.query(models.QuizQuestion).filter(models.QuizQuestion.quiz_id == existing.id).first():
-                for q in seed["questions_data"]:
-                    new_q = models.QuizQuestion(
-                        quiz_id=existing.id,
-                        **q
-                    )
-                    db.add(new_q)
-    
-    db.commit()
-    db.close()
 
 # ── 정적 파일 서빙 ─────────────────────────────────────────
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
@@ -317,28 +226,29 @@ class TypingContentCreate(BaseModel):
     timestamps: str | None = None
     difficulty: int = 3
     youtube_id: str | None = None
+    best_time: int = 0
+
+class QuizContentCreate(BaseModel):
+    title: str
+    artist: str
+    genre: str
+    description: str
+    quiz_data: str
+    difficulty: int = 3
+    youtube_id: str | None = None
 
 class ConvertRequest(BaseModel):
     text: str
 
-class QuizQuestionCreate(BaseModel):
-    question_number: int
-    question_text: str
-    youtube_url: str | None = None
-    start_time: int | None = None
-    end_time: int | None = None
-    answer: str
-    alternative_answers: str | None = None
-    hint: str | None = None
-
-class QuizCreate(BaseModel):
-    title: str
-    description: str | None = None
-    category: str = "제목맞추기"
-    difficulty: int = 3
-    questions: list[QuizQuestionCreate]
+class TypingHistoryCreate(BaseModel):
+    content_title: str
+    genre: str
+    wpm: int
+    accuracy: float
+    text: str
 
 class QuizHistoryCreate(BaseModel):
+    quiz_id: Optional[int] = None
     quiz_category: str
     score: int
     total_questions: int
@@ -720,7 +630,12 @@ def get_all_typing_contents(db: Session = Depends(get_db)):
             "description": c.description,
             "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
             "difficulty": c.difficulty,
-            "best_time": c.best_time
+            "best_time": c.best_time,
+            "lyrics": c.lyrics,
+            "hiragana": c.hiragana,
+            "romaji": c.romaji,
+            "youtube_id": c.youtube_id,
+            "timestamps": c.timestamps
         })
     return {"success": True, "data": result}
 
@@ -746,26 +661,6 @@ def get_my_typing_contents(current_user: models.User = Depends(get_current_user)
     return {"success": True, "data": result}
 
 # ════════════════════════════════════════════════════════════
-# API: 내 퀴즈 콘텐츠 목록 가져오기
-# GET /api/my-quizzes
-# ════════════════════════════════════════════════════════════
-@app.get("/api/my-quizzes")
-def get_my_quizzes(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    quizzes = db.query(models.Quiz).filter(models.Quiz.creator_id == current_user.id).all()
-    result = []
-    for quiz in quizzes:
-        result.append({
-            "id": quiz.id,
-            "title": quiz.title,
-            "description": quiz.description,
-            "category": quiz.category,
-            "difficulty": quiz.difficulty,
-            "question_count": len(quiz.questions) if quiz.questions else 0,
-            "created_at": str(quiz.created_at)
-        })
-    return {"success": True, "data": result}
-
-# ════════════════════════════════════════════════════════════
 # API: 타이핑 콘텐츠 추가
 # POST /api/typing-contents
 # ════════════════════════════════════════════════════════════
@@ -784,7 +679,7 @@ def create_typing_content(req: TypingContentCreate, current_user: models.User = 
         timestamps=req.timestamps,
         difficulty=req.difficulty,
         play_count=0,
-        best_time=0
+        best_time=req.best_time
     )
     db.add(new_content)
     db.commit()
@@ -805,9 +700,6 @@ def delete_typing_content(content_id: int, db: Session = Depends(get_db)):
     # if content.creator_id != current_user.id:
     #     raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
         
-    # 연관된 히스토리 기록 먼저 삭제 (외래 키 제약 조건 방지)
-    db.query(models.TypingHistory).filter(models.TypingHistory.content_id == content_id).delete()
-    
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}
@@ -835,6 +727,7 @@ def update_typing_content(content_id: int, req: TypingContentCreate, current_use
     content.romaji = req.romaji
     content.timestamps = req.timestamps
     content.difficulty = req.difficulty
+    content.best_time = req.best_time
     
     db.commit()
     return {"success": True, "message": "수정되었습니다."}
@@ -873,185 +766,122 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
     }
 
 # ════════════════════════════════════════════════════════════
-# API: 퀴즈 추가 (Quiz Create)
-# POST /api/quizzes
+# API: 퀴즈 콘텐츠 API
 # ════════════════════════════════════════════════════════════
-@app.post("/api/quizzes")
-def create_quiz(req: QuizCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if len(req.questions) not in [1, 5, 10, 15]:
-        raise HTTPException(status_code=400, detail="문제 수는 1개, 5개, 10개, 또는 15개여야 합니다.")
-
-    new_quiz = models.Quiz(
-        title=req.title,
-        description=req.description,
-        category=req.category,
-        difficulty=req.difficulty,
-        creator_id=current_user.id
-    )
-    db.add(new_quiz)
-    db.flush()
-    
-    for q in req.questions:
-        if re.search(r'[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]', q.answer):
-            raise HTTPException(status_code=400, detail="정답에 한국어를 사용할 수 없습니다. 일본어 또는 영어로 입력해주세요.")
-        if q.alternative_answers and re.search(r'[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]', q.alternative_answers):
-            raise HTTPException(status_code=400, detail="복수 정답에 한국어를 사용할 수 없습니다. 일본어 또는 영어로 입력해주세요.")
-            
-        new_q = models.QuizQuestion(
-            quiz_id=new_quiz.id,
-            question_number=q.question_number,
-            question_text=q.question_text,
-            youtube_url=q.youtube_url,
-            start_time=q.start_time,
-            end_time=q.end_time,
-            answer=q.answer,
-            alternative_answers=q.alternative_answers,
-            hint=q.hint
-        )
-        db.add(new_q)
-
-    db.commit()
-    db.refresh(new_quiz)
-    return {"success": True, "message": "퀴즈가 성공적으로 생성되었습니다.", "quiz_id": new_quiz.id}
-
-# ════════════════════════════════════════════════════════════
-# API: 퀴즈 목록 가져오기
-# GET /api/quizzes
-# ════════════════════════════════════════════════════════════
-@app.get("/api/quizzes")
-def get_all_quizzes(db: Session = Depends(get_db)):
-    quizzes = db.query(models.Quiz).all()
+@app.get("/api/quiz-contents")
+def get_all_quiz_contents(db: Session = Depends(get_db)):
+    contents = db.query(models.QuizContent).all()
     result = []
-    for quiz in quizzes:
+    for c in contents:
+        quiz_count = 0
+        try:
+            quiz_count = len(json.loads(c.quiz_data)) if c.quiz_data else 0
+        except Exception:
+            pass
         result.append({
-            "id": quiz.id,
-            "title": quiz.title,
-            "description": quiz.description,
-            "category": quiz.category,
-            "difficulty": quiz.difficulty,
-            "creator_nickname": quiz.creator.nickname if quiz.creator else "엔터핑",
-            "question_count": len(quiz.questions) if quiz.questions else 0,
-            "created_at": str(quiz.created_at)
+            "id": c.id,
+            "title": c.title,
+            "artist": c.artist,
+            "genre": c.genre,
+            "description": c.description,
+            "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
+            "difficulty": c.difficulty,
+            "best_score": c.best_score,
+            "quiz_count": quiz_count
         })
     return {"success": True, "data": result}
 
-# ════════════════════════════════════════════════════════════
-# API: 퀴즈 수정 (Quiz Update)
-# PUT /api/quizzes/{quiz_id}
-# ════════════════════════════════════════════════════════════
-@app.put("/api/quizzes/{quiz_id}")
-def update_quiz(quiz_id: int, req: QuizCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    quiz = db.query(models.Quiz).filter(models.Quiz.id == quiz_id).first()
-    if not quiz:
-        raise HTTPException(status_code=404, detail="퀴즈를 찾을 수 없습니다.")
-    
-    if quiz.creator_id != current_user.id:
-        raise HTTPException(status_code=403, detail="수정 권한이 없습니다.")
-
-    quiz.title = req.title
-    quiz.description = req.description
-    quiz.category = req.category
-    quiz.difficulty = req.difficulty
-    
-    # 기존 문제들 삭제
-    db.query(models.QuizQuestion).filter(models.QuizQuestion.quiz_id == quiz_id).delete()
-    db.flush()
-
-    # 새 문제 추가
-    for q in req.questions:
-        if re.search(r'[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]', q.answer):
-            raise HTTPException(status_code=400, detail="정답에 한국어를 사용할 수 없습니다. 일본어 또는 영어로 입력해주세요.")
-        if q.alternative_answers and re.search(r'[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]', q.alternative_answers):
-            raise HTTPException(status_code=400, detail="복수 정답에 한국어를 사용할 수 없습니다. 일본어 또는 영어로 입력해주세요.")
-            
-        new_q = models.QuizQuestion(
-            quiz_id=quiz.id,
-            question_number=q.question_number,
-            question_text=q.question_text,
-            youtube_url=q.youtube_url,
-            start_time=q.start_time,
-            end_time=q.end_time,
-            answer=q.answer,
-            alternative_answers=q.alternative_answers,
-            hint=q.hint
-        )
-        db.add(new_q)
-
-    db.commit()
-    return {"success": True, "message": "퀴즈가 수정되었습니다."}
-
-# ════════════════════════════════════════════════════════════
-# API: 퀴즈 상세 조회 (포함 전체 문제)
-# GET /api/quizzes/{quiz_id}
-# ════════════════════════════════════════════════════════════
-@app.get("/api/quizzes/{quiz_id}")
-def get_quiz(quiz_id: int, db: Session = Depends(get_db)):
-    quiz = db.query(models.Quiz).filter(models.Quiz.id == quiz_id).first()
-    if not quiz:
-        raise HTTPException(status_code=404, detail="퀴즈를 찾을 수 없습니다.")
-
-    questions_data = []
-    for q in sorted(quiz.questions, key=lambda x: x.question_number):
-        questions_data.append({
-            "id": q.id,
-            "question_number": q.question_number,
-            "question_text": q.question_text,
-            "youtube_url": q.youtube_url,
-            "start_time": q.start_time,
-            "end_time": q.end_time,
-            "answer": q.answer,
-            "alternative_answers": q.alternative_answers,
-            "hint": q.hint
+@app.get("/api/my-quiz-contents")
+def get_my_quiz_contents(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    contents = db.query(models.QuizContent).filter(models.QuizContent.creator_id == current_user.id).all()
+    result = []
+    for c in contents:
+        quiz_count = 0
+        try:
+            quiz_count = len(json.loads(c.quiz_data)) if c.quiz_data else 0
+        except Exception:
+            pass
+        result.append({
+            "id": c.id,
+            "title": c.title,
+            "artist": c.artist,
+            "genre": c.genre,
+            "description": c.description,
+            "difficulty": c.difficulty,
+            "best_score": c.best_score,
+            "play_count": c.play_count,
+            "quiz_count": quiz_count
         })
+    return {"success": True, "data": result}
 
+@app.post("/api/quiz-contents")
+def create_quiz_content(req: QuizContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    new_content = models.QuizContent(
+        title=req.title,
+        artist=req.artist,
+        genre=req.genre,
+        description=req.description,
+        creator_id=current_user.id,
+        youtube_id=req.youtube_id,
+        quiz_data=req.quiz_data,
+        difficulty=req.difficulty,
+        play_count=0,
+        best_score=0
+    )
+    db.add(new_content)
+    db.commit()
+    db.refresh(new_content)
+    return {"success": True, "message": "성공적으로 추가되었습니다.", "id": new_content.id}
+
+@app.get("/api/quiz-content/{content_id}")
+def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    
     return {
         "success": True,
-        "id": quiz.id,
-        "title": quiz.title,
-        "description": quiz.description,
-        "category": quiz.category,
-        "difficulty": quiz.difficulty,
-        "creator_nickname": quiz.creator.nickname if quiz.creator else "엔터핑",
-        "question_count": len(questions_data),
-        "questions": questions_data
+        "title": content.title,
+        "artist": content.artist,
+        "genre": content.genre,
+        "description": content.description,
+        "youtube_id": content.youtube_id,
+        "creator_nickname": content.creator.nickname if content.creator else "엔터핑",
+        "difficulty": content.difficulty,
+        "play_count": content.play_count,
+        "best_score": content.best_score,
+        "quiz_data": content.quiz_data
     }
 
-# ════════════════════════════════════════════════════════════
-# API: 퀴즈 삭제
-# DELETE /api/quizzes/{quiz_id}
-# ════════════════════════════════════════════════════════════
-@app.delete("/api/quizzes/{quiz_id}")
-def delete_quiz(quiz_id: int, db: Session = Depends(get_db)):
-    quiz = db.query(models.Quiz).filter(models.Quiz.id == quiz_id).first()
-    if not quiz:
-        raise HTTPException(status_code=404, detail="퀴즈를 찾을 수 없습니다.")
-    
-    # 임시 관리자 모드: 작성자 권한 체크를 무시하고 모두 삭제 허용
-    # if quiz.creator_id != current_user.id:
-    #     raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
+@app.delete("/api/quiz-contents/{content_id}")
+def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
         
-    # 연관된 히스토리 기록 먼저 삭제 (외래 키 제약 조건 방지)
-    db.query(models.QuizHistory).filter(models.QuizHistory.quiz_id == quiz_id).delete()
-    
-    db.delete(quiz)
+    db.delete(content)
     db.commit()
-    return {"success": True, "message": "퀴즈가 삭제되었습니다."}
+    return {"success": True, "message": "삭제되었습니다."}
 
-# ════════════════════════════════════════════════════════════
-# API: 퀴즈 점수 저장 (Quiz History)
-# POST /api/quiz-history
-# ════════════════════════════════════════════════════════════
-@app.post("/api/quiz-history")
-def save_quiz_history(req: QuizHistoryCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    history = models.QuizHistory(
-        user_id=current_user.id,
-        quiz_category=req.quiz_category,
-        score=req.score,
-        total_questions=req.total_questions
-    )
-    db.add(history)
+@app.put("/api/quiz-contents/{content_id}")
+def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    
+    if content.creator_id != current_user.id:
+        raise HTTPException(status_code=403, detail="수정 권한이 없습니다.")
+        
+    content.title = req.title
+    content.artist = req.artist
+    content.genre = req.genre
+    content.description = req.description
+    content.youtube_id = req.youtube_id
+    content.quiz_data = req.quiz_data
+    content.difficulty = req.difficulty
+    
     db.commit()
-    return {"success": True, "message": "점수가 기록되었습니다."}
+    return {"success": True, "message": "수정되었습니다."}
 
 # ════════════════════════════════════════════════════════════
 # API: 가사 자동 변환 (히라가나, 로마자)
@@ -1130,32 +960,30 @@ def convert_lyrics(req: ConvertRequest):
     converted = kks.convert(text)
     
     hiragana = ""
+    romaji = ""
     for item in converted:
-        hiragana += item['hira']
+        h = item['hira']
+        r = item['hepburn']
         
+        # pykakasi 스테가나 변환 예외 처리 (jie -> je 등)
+        if 'じぇ' in h: r = r.replace('jie', 'je')
+        if 'しぇ' in h: r = r.replace('shie', 'she')
+        if 'ちぇ' in h: r = r.replace('chie', 'che')
+        if 'せぁ' in h: r = r.replace('sea', 'sexa')
+        if 'せぃ' in h: r = r.replace('sei', 'sexi')
+        if 'せぅ' in h: r = r.replace('seu', 'sexu')
+        if 'せぇ' in h: r = r.replace('see', 'sexe')
+        if 'せぉ' in h: r = r.replace('seo', 'sexo')
+        
+        hiragana += h
+        romaji += r
+    
+    # romaji may need some cleanup for typing game
+    romaji = romaji.replace(" ", "")
     hiragana = hiragana.replace(" ", "")
     romaji = hiragana_to_romaji(hiragana)
     
     return {"success": True, "hiragana": hiragana, "romaji": romaji}
-
-# ════════════════════════════════════════════════════════════
-# API: 유튜브 오디오 스트림 URL 직접 추출 (임베드 차단 우회)
-# GET /api/youtube-audio/{video_id}
-# ════════════════════════════════════════════════════════════
-@app.get("/api/youtube-audio/{video_id}")
-def get_youtube_audio_url(video_id: str):
-    try:
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'quiet': True,
-            'no_warnings': True,
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
-            return {"success": True, "url": info['url']}
-    except Exception as e:
-        print(f"yt-dlp error: {e}")
-        raise HTTPException(status_code=400, detail=f"오디오 추출 실패: {str(e)}")
 
 # ════════════════════════════════════════════════════════════
 # 페이지 라우팅
@@ -1176,8 +1004,866 @@ def serve_html(page: str):
         return FileResponse(path)
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
-for f in ["style.css", "typing.css", "script.js", "navbar.js", "quiz_engine.js"]:
+for f in ["style.css", "typing.css", "script.js", "navbar.js", "battle.js", "shared_typing_engine.js"]:
     @app.get(f"/{f}")
     def serve_static(filename: str = f):
         return FileResponse(filename)
+
+# ── 가나 파서 구현 ───────────────────────────────────
+def parse_kana_to_units(kana_str: str) -> list[str]:
+    units = []
+    chars = list(kana_str)
+    i = 0
+    small_kana = {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"}
+    combination_rules = {
+        "き": {"ゃ", "ゅ", "ょ"},
+        "し": {"ゃ", "ゅ", "ょ"},
+        "せ": {"ぃ"},
+        "ち": {"ゃ", "ゅ", "ょ"},
+        "に": {"ゃ", "ゅ", "ょ"},
+        "ひ": {"ゃ", "ゅ", "ょ"},
+        "み": {"ゃ", "ゅ", "ょ"},
+        "り": {"ゃ", "ゅ", "ょ"},
+        "ぎ": {"ゃ", "ゅ", "ょ"},
+        "じ": {"ゃ", "ゅ", "ょ"},
+        "ぢ": {"ゃ", "ゅ", "ょ"},
+        "び": {"ゃ", "ゅ", "ょ"},
+        "ぴ": {"ゃ", "ゅ", "ょ"},
+    }
+    
+    while i < len(chars):
+        char = chars[i]
+        next_char = chars[i + 1] if i + 1 < len(chars) else None
+        
+        if char in ["\n", "\r", " "]:
+            i += 1
+            continue
+            
+        # 1. 촉음(っ) 결합
+        if char == "っ" and next_char and next_char not in ["\n", "\r", " "]:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 2. 요음 combination rules
+        if char in combination_rules and next_char in combination_rules[char]:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 3. 기타 작은 가나 결합
+        if next_char in small_kana:
+            units.append(char + next_char)
+            i += 2
+            continue
+            
+        # 4. 단일 문자
+        units.append(char)
+        i += 1
+        
+    return units
+
+# API: 타이핑 히스토리 저장 (오직 "타이핑" 장르에서만 오타 통계 반영)
+# POST /api/typing-history
+# ════════════════════════════════════════════════════════════
+@app.post("/api/typing-history")
+def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # 1. 곡(Content) 조회하여 ID 매핑
+    content = db.query(models.TypingContent).filter(models.TypingContent.title == req.content_title).first()
+    content_id = content.id if content else None
+
+    history = models.TypingHistory(
+        user_id=current_user.id,
+        content_id=content_id,
+        content_title=req.content_title,
+        genre=req.genre,
+        wpm=req.wpm,
+        accuracy=req.accuracy
+    )
+    db.add(history)
+    
+    # 2. 오타 분석을 위해 "타이핑" 모드 완료 시에만 total_count 업데이트
+    # req.genre가 "타이핑" 혹은 "J-POP" 등 일반 타이핑 연습 모드일 때만 적용
+    if content and req.genre in ["타이핑", "J-POP", "ANI", "GAME", "ETC"]:
+        try:
+            units = parse_kana_to_units(content.hiragana)
+            for unit in units:
+                existing = db.query(models.TypoStat).filter(
+                    models.TypoStat.user_id == current_user.id,
+                    models.TypoStat.character_typed == unit
+                ).first()
+                if existing:
+                    existing.total_count += 1
+                else:
+                    db.add(models.TypoStat(
+                        user_id=current_user.id,
+                        character_typed=unit,
+                        error_count=0,
+                        total_count=1
+                    ))
+        except Exception as e:
+            print(f"Error updating total_count from hiragana: {e}")
+
+    db.commit()
+    return {"message": "기록이 저장되었습니다."}
+# API: 퀴즈 히스토리 저장
+# POST /api/quiz-history
+# ════════════════════════════════════════════════════════════
+@app.post("/api/quiz-history")
+def save_quiz_history(req: QuizHistoryCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    history = models.QuizHistory(
+        user_id=current_user.id,
+        quiz_id=req.quiz_id,
+        quiz_category=req.quiz_category,
+        score=req.score,
+        total_questions=req.total_questions
+    )
+    db.add(history)
+    
+    if req.quiz_id:
+        quiz_content = db.query(models.QuizContent).filter(models.QuizContent.id == req.quiz_id).first()
+        if quiz_content:
+            if quiz_content.play_count is None:
+                quiz_content.play_count = 0
+            quiz_content.play_count += 1
+            if req.score > (quiz_content.best_score or 0):
+                quiz_content.best_score = req.score
+
+    db.commit()
+    return {"message": "퀴즈 기록이 저장되었습니다."}
+
+# ════════════════════════════════════════════════════════════
+# API: 내 플레이 히스토리 조회
+# GET /api/my-history
+# ════════════════════════════════════════════════════════════
+@app.get("/api/my-history")
+def get_my_history(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    typing_histories = db.query(models.TypingHistory).filter(
+        models.TypingHistory.user_id == current_user.id
+    ).order_by(models.TypingHistory.played_at.desc()).limit(20).all()
+    
+    quiz_histories = db.query(models.QuizHistory).filter(
+        models.QuizHistory.user_id == current_user.id
+    ).order_by(models.QuizHistory.played_at.desc()).limit(20).all()
+
+    battle_histories = db.query(models.BattleHistory).filter(
+        models.BattleHistory.user_id == current_user.id
+    ).order_by(models.BattleHistory.played_at.desc()).limit(20).all()
+    
+    combined = []
+    for th in typing_histories:
+        combined.append({
+            "type": "typing",
+            "content_id": th.content_id,
+            "title": th.content_title,
+            "genre": th.genre,
+            "wpm": th.wpm,
+            "accuracy": th.accuracy,
+            "score_str": f"{th.score}점 · {th.wpm} WPM · {int(th.accuracy)}%",
+            "played_at": th.played_at.isoformat(),
+            "_raw_date": th.played_at
+        })
+        
+    for qh in quiz_histories:
+        combined.append({
+            "type": "quiz",
+            "content_id": qh.quiz_id,
+            "title": qh.quiz_category,
+            "genre": "퀴즈",
+            "score": qh.score,
+            "total_questions": qh.total_questions,
+            "score_str": f"{qh.score} / {qh.total_questions} 정답",
+            "played_at": qh.played_at.isoformat(),
+            "_raw_date": qh.played_at
+        })
+
+    for bh in battle_histories:
+        song_title = "알 수 없음"
+        if bh.content_id:
+            content = db.query(models.TypingContent).filter(models.TypingContent.id == bh.content_id).first()
+            if content:
+                song_title = content.title
+        rank_labels = {1: "🥇 1위", 2: "🥈 2위", 3: "🥉 3위"}
+        rank_str = rank_labels.get(bh.rank, f"{bh.rank}위")
+        combined.append({
+            "type": "battle",
+            "content_id": bh.content_id,
+            "title": song_title,
+            "genre": "실시간 대전",
+            "rank": bh.rank,
+            "wpm": bh.wpm,
+            "accuracy": bh.accuracy,
+            "score": bh.score,
+            "room_code": bh.room_code,
+            "score_str": f"{rank_str} · {bh.score}점 · {bh.wpm} WPM · {int(bh.accuracy)}%",
+            "played_at": bh.played_at.isoformat(),
+            "_raw_date": bh.played_at
+        })
+        
+    # Sort descending by raw datetime
+    combined.sort(key=lambda x: x["_raw_date"], reverse=True)
+    
+    # Remove raw_date
+    for item in combined:
+        del item["_raw_date"]
+        
+    return {"success": True, "data": combined}
+
+
+# ════════════════════════════════════════════════════════════
+# 실시간 대전 시스템 - Redis + WebSocket
+# ════════════════════════════════════════════════════════════
+
+# Redis 연결
+redis_client: Optional[aioredis.Redis] = None
+
+async def get_redis() -> aioredis.Redis:
+    global redis_client
+    if redis_client is None:
+        redis_client = aioredis.from_url("redis://localhost:6379", decode_responses=True, protocol=2)
+    return redis_client
+
+
+# WebSocket 연결 관리자
+class BattleConnectionManager:
+    def __init__(self):
+        # room_code → list of (websocket, nickname)
+        self.rooms: Dict[str, List[tuple]] = {}
+
+    async def connect(self, room_code: str, ws: WebSocket, nickname: str):
+        await ws.accept()
+        if room_code not in self.rooms:
+            self.rooms[room_code] = []
+        self.rooms[room_code].append((ws, nickname))
+
+    def disconnect(self, room_code: str, ws: WebSocket):
+        if room_code in self.rooms:
+            self.rooms[room_code] = [(w, n) for w, n in self.rooms[room_code] if w != ws]
+            if not self.rooms[room_code]:
+                del self.rooms[room_code]
+
+    async def broadcast(self, room_code: str, message: dict, exclude: WebSocket = None):
+        if room_code not in self.rooms:
+            return
+        dead = []
+        for ws, nick in self.rooms[room_code]:
+            if ws == exclude:
+                continue
+            try:
+                await ws.send_json(message)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self.disconnect(room_code, ws)
+
+    async def broadcast_all(self, room_code: str, message: dict):
+        await self.broadcast(room_code, message, exclude=None)
+
+    def get_connections(self, room_code: str) -> int:
+        return len(self.rooms.get(room_code, []))
+
+
+battle_manager = BattleConnectionManager()
+lobby_manager = BattleConnectionManager()
+
+REDIS_ROOM_TTL = 7200  # 2시간
+
+
+async def get_room_data(redis: aioredis.Redis, room_code: str) -> Optional[dict]:
+    raw = await redis.get(f"battle:room:{room_code}")
+    if raw:
+        return json.loads(raw)
+    return None
+
+
+async def save_room_data(redis: aioredis.Redis, room_code: str, data: dict):
+    await redis.set(f"battle:room:{room_code}", json.dumps(data, ensure_ascii=False), ex=REDIS_ROOM_TTL)
+
+
+async def delete_room(redis: aioredis.Redis, room_code: str):
+    await redis.delete(f"battle:room:{room_code}")
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+
+# ── 방 생성 API ────────────────────────────────────────────
+class BattleRoomCreate(BaseModel):
+    title: str
+    song_id: int
+    max_players: int = 4
+
+
+@app.post("/api/battle/rooms")
+async def create_battle_room(req: BattleRoomCreate, authorization: str = Header(None), db: Session = Depends(get_db)):
+    current_user = get_current_user(authorization, db)
+    redis = await get_redis()
+
+    # 4자리 방 코드 생성 (중복 방지)
+    for _ in range(10):
+        code = str(random.randint(1000, 9999))
+        existing = await redis.get(f"battle:room:{code}")
+        if not existing:
+            break
+
+    # 곡 정보 조회
+    content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="곡을 찾을 수 없습니다.")
+
+    room_data = {
+        "code": code,
+        "title": req.title,
+        "host": current_user.nickname,
+        "song_id": content.id,
+        "song_title": content.title,
+        "song_artist": content.artist,
+        "max_players": min(req.max_players, 4),
+        "status": "waiting",  # waiting | countdown | playing | finished
+        "players": {}
+    }
+
+    await save_room_data(redis, code, room_data)
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+    return {"success": True, "room_code": code, "room": room_data}
+
+
+@app.get("/api/battle/rooms")
+async def list_battle_rooms():
+    redis = await get_redis()
+    keys = await redis.keys("battle:room:*")
+    rooms = []
+    for key in keys:
+        raw = await redis.get(key)
+        if raw:
+            room = json.loads(raw)
+            if room.get("status") in ("waiting", "playing"):
+                rooms.append({
+                    "code": room["code"],
+                    "title": room["title"],
+                    "host": room["host"],
+                    "song_title": room["song_title"],
+                    "song_artist": room["song_artist"],
+                    "player_count": len(room.get("players", {})),
+                    "max_players": room["max_players"],
+                    "status": room["status"]
+                })
+    return {"success": True, "rooms": rooms}
+
+@app.websocket("/ws/lobby")
+async def lobby_websocket(websocket: WebSocket):
+    await lobby_manager.connect("lobby", websocket, "guest")
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        lobby_manager.disconnect("lobby", websocket)
+
+
+# ── 대전 기록 저장 (내부 함수) ─────────────────────────────
+async def save_battle_results(room_data: dict, db: Session):
+    """게임 종료 시 MySQL에 대전 기록 저장"""
+    players = room_data.get("players", {})
+    song_id = room_data.get("song_id")
+    room_code = room_data.get("code", "")
+
+    # 점수 기준 순위 정렬
+    sorted_players = sorted(
+        players.items(),
+        key=lambda x: x[1].get("score", 0),
+        reverse=True
+    )
+
+    for rank, (nickname, pdata) in enumerate(sorted_players, start=1):
+        user_id = pdata.get("user_id")
+        if not user_id:
+            continue
+        history = models.BattleHistory(
+            room_code=room_code,
+            user_id=user_id,
+            content_id=song_id,
+            rank=rank,
+            score=pdata.get("score", 0),
+            wpm=pdata.get("wpm", 0),
+            accuracy=pdata.get("accuracy", 100.0)
+        )
+        db.add(history)
+    db.commit()
+
+
+# ── WebSocket 대전 엔드포인트 ──────────────────────────────
+@app.websocket("/ws/battle/{room_code}")
+async def battle_websocket(
+    websocket: WebSocket,
+    room_code: str,
+    token: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    # 1. JWT 토큰 검증
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            await websocket.close(code=4001)
+            return
+    except JWTError:
+        await websocket.close(code=4001)
+        return
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        await websocket.close(code=4001)
+        return
+
+    nickname = user.nickname
+    redis = await get_redis()
+
+    # 2. 방 상태 로드
+    room_data = await get_room_data(redis, room_code)
+    if not room_data:
+        await websocket.close(code=4004)
+        return
+
+    # 3. 인원 초과 체크
+    if len(room_data["players"]) >= room_data["max_players"] and nickname not in room_data["players"]:
+        await websocket.close(code=4003)
+        return
+
+    # 4. WebSocket 수락 및 방 입장
+    await battle_manager.connect(room_code, websocket, nickname)
+
+    # 플레이어 등록 (재접속 시 기존 데이터 유지)
+    if nickname not in room_data["players"]:
+        room_data["players"][nickname] = {
+            "user_id": user.id,
+            "ready": False,
+            "score": 0,
+            "progress": 0.0,
+            "wpm": 0,
+            "accuracy": 100.0,
+            "finished": False,
+            "is_host": nickname == room_data["host"]
+        }
+        await save_room_data(redis, room_code, room_data)
+
+    # 입장한 플레이어에게 현재 방 상태 전송
+    await websocket.send_json({"type": "room_state", "room": room_data})
+
+    # 나머지 플레이어에게 입장 알림
+    await battle_manager.broadcast(room_code, {
+        "type": "player_joined",
+        "nickname": nickname,
+        "players": room_data["players"]
+    }, exclude=websocket)
+    
+    # 로비에도 인원 변동 알림
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+
+            # ── 준비 상태 변경 ──────────────────────────────
+            if msg_type == "ready":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["ready"] = data.get("ready", True)
+                    await save_room_data(redis, room_code, room_data)
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_update",
+                        "nickname": nickname,
+                        "data": room_data["players"][nickname],
+                        "players": room_data["players"]
+                    })
+
+            # ── 방장이 시작 ─────────────────────────────────
+            elif msg_type == "start":
+                room_data = await get_room_data(redis, room_code)
+                if not room_data:
+                    continue
+                if nickname != room_data["host"]:
+                    await websocket.send_json({"type": "error", "message": "방장만 시작할 수 있습니다."})
+                    continue
+
+                # 모두 레디 체크 (퇴장한 유저 제외)
+                non_host_players = {n: p for n, p in room_data["players"].items() if n != room_data["host"] and not p.get("disconnected")}
+                if non_host_players and not all(p["ready"] for p in non_host_players.values()):
+                    await websocket.send_json({"type": "error", "message": "아직 준비가 안 된 플레이어가 있습니다."})
+                    continue
+
+                async def sync_and_start(r_code):
+                    sync_timeout = 10.0
+                    checked_time = 0.0
+                    while checked_time < sync_timeout:
+                        r_data = await get_room_data(redis, r_code)
+                        if not r_data or r_data.get("status") != "syncing":
+                            return
+                        active_players = {n: p for n, p in r_data["players"].items() if not p.get("disconnected")}
+                        if active_players and all(p.get("sync_ready") for p in active_players.values()):
+                            break
+                        await asyncio.sleep(0.5)
+                        checked_time += 0.5
+                    
+                    r_data = await get_room_data(redis, r_code)
+                    if r_data and r_data.get("status") == "syncing":
+                        r_data["status"] = "countdown"
+                        await save_room_data(redis, r_code, r_data)
+
+                        for count in range(5, 0, -1):
+                            await battle_manager.broadcast_all(r_code, {"type": "countdown", "count": count})
+                            await asyncio.sleep(1)
+
+                        f_data = await get_room_data(redis, r_code)
+                        if f_data:
+                            f_data["status"] = "playing"
+                            f_data["start_time"] = time.time()
+                            for p in f_data["players"].values():
+                                p["score"] = 0
+                                p["progress"] = 0.0
+                                p["wpm"] = 0
+                                p["accuracy"] = 100.0
+                                p["finished"] = False
+                            await save_room_data(redis, r_code, f_data)
+                            await battle_manager.broadcast_all(r_code, {
+                                "type": "game_start",
+                                "song_id": f_data["song_id"],
+                                "players": f_data["players"]
+                            })
+
+                room_data["status"] = "syncing"
+                for p in room_data["players"].values():
+                    if not p.get("disconnected"):
+                        p["sync_ready"] = False
+                await save_room_data(redis, room_code, room_data)
+
+                await battle_manager.broadcast_all(room_code, {"type": "sync_check"})
+                asyncio.create_task(sync_and_start(room_code))
+
+            # ── 동기화 완료 신호 ─────────────────────────────
+            elif msg_type == "sync_ready":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and room_data.get("status") == "syncing" and nickname in room_data["players"]:
+                    room_data["players"][nickname]["sync_ready"] = True
+                    await save_room_data(redis, room_code, room_data)
+
+            # ── 채팅 메시지 ─────────────────────────────────
+            elif msg_type == "chat":
+                await battle_manager.broadcast(room_code, {
+                    "type": "chat",
+                    "nickname": nickname,
+                    "message": data.get("message", "")
+                }, exclude=websocket)
+
+            # ── 타이핑 진행도 업데이트 ──────────────────────
+            elif msg_type == "progress":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["score"] = data.get("score", 0)
+                    room_data["players"][nickname]["progress"] = data.get("progress", 0.0)
+                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                    await save_room_data(redis, room_code, room_data)
+                    # 나머지 플레이어에게 브로드캐스트 (본인 제외)
+                    await battle_manager.broadcast(room_code, {
+                        "type": "player_update",
+                        "nickname": nickname,
+                        "score": room_data["players"][nickname]["score"],
+                        "progress": room_data["players"][nickname]["progress"],
+                        "wpm": room_data["players"][nickname]["wpm"],
+                    }, exclude=websocket)
+
+            # ── 게임 완료 ───────────────────────────────────
+            elif msg_type == "finish":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["finished"] = True
+                    room_data["players"][nickname]["score"] = data.get("score", 0)
+                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                    room_data["players"][nickname]["progress"] = 1.0
+                    await save_room_data(redis, room_code, room_data)
+
+                    # 완료 알림 브로드캐스트
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_finished",
+                        "nickname": nickname,
+                        "players": room_data["players"]
+                    })
+
+                    # 모든 플레이어가 완료했으면 게임 종료 (이미 finished 상태인 경우 중복 처리 방지)
+                    all_finished = all(p["finished"] for p in room_data["players"].values())
+                    if all_finished and room_data.get("status") != "finished":
+                        room_data["status"] = "finished"
+                        await save_room_data(redis, room_code, room_data)
+
+                        # 순위 계산
+                        sorted_players = sorted(
+                            room_data["players"].items(),
+                            key=lambda x: x[1].get("score", 0),
+                            reverse=True
+                        )
+                        results = [
+                            {"rank": i+1, "nickname": n, **p}
+                            for i, (n, p) in enumerate(sorted_players)
+                        ]
+
+                        await battle_manager.broadcast_all(room_code, {
+                            "type": "game_end",
+                            "results": results
+                        })
+
+                        # MySQL에 기록 저장
+                        try:
+                            await save_battle_results(room_data, db)
+                        except Exception as e:
+                            print(f"Battle history save error: {e}")
+
+                        # 방 정리 (10분 후)
+                        await asyncio.sleep(600)
+                        await delete_room(redis, room_code)
+
+    except WebSocketDisconnect:
+        battle_manager.disconnect(room_code, websocket)
+        room_data = await get_room_data(redis, room_code)
+        if room_data and nickname in room_data["players"]:
+            if room_data.get("status") in ["playing", "countdown", "finished"]:
+                room_data["players"][nickname]["disconnected"] = True
+                room_data["players"][nickname]["finished"] = True
+                
+                # 방장이 나갔으면 다음 사람에게 양도
+                if nickname == room_data["host"]:
+                    active_players = [n for n, p in room_data["players"].items() if not p.get("disconnected")]
+                    if active_players:
+                        room_data["host"] = active_players[0]
+                        
+                await save_room_data(redis, room_code, room_data)
+                
+                await battle_manager.broadcast_all(room_code, {
+                    "type": "player_disconnected",
+                    "nickname": nickname,
+                    "players": room_data["players"],
+                    "new_host": room_data["host"]
+                })
+                
+                # 남은 사람들이 모두 완료했는지 체크
+                active_players_dict = {n: p for n, p in room_data["players"].items() if not p.get("disconnected")}
+                if active_players_dict:
+                    all_finished = all(p.get("finished") for p in active_players_dict.values())
+                    if all_finished and room_data["status"] != "finished":
+                        room_data["status"] = "finished"
+                        await save_room_data(redis, room_code, room_data)
+                        
+                        sorted_players = sorted(
+                            room_data["players"].items(),
+                            key=lambda x: x[1].get("score", 0),
+                            reverse=True
+                        )
+                        results = [
+                            {"rank": i+1, "nickname": n, **p}
+                            for i, (n, p) in enumerate(sorted_players)
+                        ]
+                        await battle_manager.broadcast_all(room_code, {
+                            "type": "game_end",
+                            "results": results
+                        })
+                        try:
+                            await save_battle_results(room_data, db)
+                        except Exception as e:
+                            print(f"Battle history save error: {e}")
+                        await asyncio.sleep(600)
+                        await delete_room(redis, room_code)
+                else:
+                    await delete_room(redis, room_code)
+            else:
+                del room_data["players"][nickname]
+                if not room_data["players"]:
+                    await delete_room(redis, room_code)
+                else:
+                    if nickname == room_data["host"] and room_data["players"]:
+                        room_data["host"] = next(iter(room_data["players"]))
+                    await save_room_data(redis, room_code, room_data)
+                    await battle_manager.broadcast_all(room_code, {
+                        "type": "player_left",
+                        "nickname": nickname,
+                        "players": room_data["players"],
+                        "new_host": room_data["host"]
+                    })
+                await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+        battle_manager.disconnect(room_code, websocket)
+
+
+# ──────────────────────────────────────────
+# 오타 통계 API
+# ──────────────────────────────────────────
+
+class TypoStatItem(BaseModel):
+    character: str
+    error_count: int
+
+class SaveTypoRequest(BaseModel):
+    typos: list[TypoStatItem]
+
+@app.post("/api/typo-stats")
+async def save_typo_stats(
+    request: SaveTypoRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    for item in request.typos:
+        if not item.character or item.error_count <= 0:
+            continue
+        existing = db.query(models.TypoStat).filter(
+            models.TypoStat.user_id == current_user.id,
+            models.TypoStat.character_typed == item.character
+        ).first()
+        if existing:
+            # 버그 수정: 오타 수(error_count)만 누적하고 전체 시도 횟수(total_count)는 더하지 않음.
+            existing.error_count += item.error_count
+        else:
+            db.add(models.TypoStat(
+                user_id=current_user.id,
+                character_typed=item.character,
+                error_count=item.error_count,
+                total_count=item.error_count
+            ))
+    db.commit()
+    return {"success": True}
+
+@app.get("/api/typo-stats")
+async def get_typo_stats(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    # 1. 모든 오타 통계 가져오기
+    stats = (
+        db.query(models.TypoStat)
+        .filter(models.TypoStat.user_id == current_user.id)
+        .all()
+    )
+    
+    # 2. 요약 정보 계산
+    total_typos = sum(s.error_count for s in stats)
+    total_inputs = sum(s.total_count for s in stats)
+    
+    avg_error_rate = 0.0
+    if total_inputs > 0:
+        avg_error_rate = (total_typos / total_inputs) * 100
+        
+    # 개선도 계산 (이전 50% vs 최근 50% 정확도 차이)
+    histories = (
+        db.query(models.TypingHistory)
+        .filter(models.TypingHistory.user_id == current_user.id)
+        .order_by(models.TypingHistory.played_at.asc())
+        .all()
+    )
+    
+    improvement = 0.0
+    if len(histories) >= 2:
+        mid = len(histories) // 2
+        first_half = histories[:mid]
+        second_half = histories[mid:]
+        
+        acc_first = sum(h.accuracy for h in first_half) / len(first_half)
+        acc_second = sum(h.accuracy for h in second_half) / len(second_half)
+        
+        improvement = acc_second - acc_first
+
+    # 3. 오타 데이터를 오타율(error_rate) 기준으로 내림차순 정렬한 TOP list 준비
+    stats_list = []
+    for s in stats:
+        rate = 0.0
+        if s.total_count > 0:
+            rate = (s.error_count / s.total_count) * 100
+        stats_list.append({
+            "kana": s.character_typed,
+            "error_count": s.error_count,
+            "total_count": s.total_count,
+            "error_rate": round(rate, 1)
+        })
+    
+    # 오타율이 높은 순으로 정렬 (시도 횟수가 최소 2회 이상인 것 우선 필터링해서 신뢰성 확보)
+    sorted_by_rate = sorted(
+        [s for s in stats_list if s["total_count"] >= 2],
+        key=lambda x: x["error_rate"],
+        reverse=True
+    )
+    
+    # 만약 시도 횟수 2회 이상이 부족하면 전체에서 정렬
+    if len(sorted_by_rate) < 5:
+        sorted_by_rate = sorted(stats_list, key=lambda x: x["error_rate"], reverse=True)
+
+    # 4. 동적 혼동 쌍 및 로마자 실수 패턴 추출
+    # 유저의 실제 에러 리스트 중 특정 키들이 포함되어 있는지 검사
+    top_error_kanas = {s["kana"] for s in sorted_by_rate[:5] if s["error_count"] > 0}
+    
+    pair_data = []
+    romaji_data = []
+    
+    # 미리 정의된 전형적인 오타 패턴 템플릿
+    typical_confusions = {
+        "ぢ": {
+            "pair": {"a": "ぢ", "b": "じ", "aRoma": "di", "bRoma": "ji", "rate": "지연발생", "desc": "ぢ(di)와 じ(ji)는 발음이 같아 헷갈리기 쉽습니다."},
+            "romaji": {"char": "ぢ", "correct": "di", "wrong": "ji", "pct": 40, "desc": "발음 혼동으로 인한 입력 시도 오류"}
+        },
+        "じ": {
+            "pair": {"a": "じ", "b": "zi", "aRoma": "ji", "bRoma": "zi", "rate": "혼동", "desc": "じ를 ji 대신 zi로 잘못 치는 경향이 있습니다."},
+            "romaji": {"char": "じ", "correct": "ji", "wrong": "zi", "pct": 30, "desc": "zi 대신 표준 ji 입력을 추천합니다."}
+        },
+        "つ": {
+            "pair": {"a": "つ", "b": "치", "aRoma": "tsu", "bRoma": "chi", "rate": "입력속도 지연", "desc": "tsu 대신 tu를 쳐서 생기는 속도 저하입니다."},
+            "romaji": {"char": "つ", "correct": "tsu", "wrong": "tu", "pct": 50, "desc": "tu도 허용되지만 tsu가 표준 타법입니다."}
+        },
+        "っ": {
+            "pair": {"a": "っ", "b": "자음연타", "aRoma": "자음 연타", "bRoma": "xtsu", "rate": "속도 지연", "desc": "촉음 입력 시 다음 자음을 두 번 치는 것이 빠릅니다."},
+            "romaji": {"char": "っ", "correct": "자음연타", "wrong": "xtsu", "pct": 60, "desc": "xtsu 입력보다 자음 연속 입력이 효율적입니다."}
+        },
+        "ん": {
+            "pair": {"a": "ん", "b": "n", "aRoma": "nn", "bRoma": "n", "rate": "오타율 높음", "desc": "ん 뒤에 모음이나 야행이 올 때 nn을 쳐야 오타가 안 납니다."},
+            "romaji": {"char": "ん", "correct": "nn", "wrong": "n", "pct": 45, "desc": "단독 n 입력으로 다음 글자와 결합하는 오류"}
+        },
+        "づ": {
+            "pair": {"a": "づ", "b": "ず", "aRoma": "du", "bRoma": "zu", "rate": "혼동", "desc": "づ(du)와 ず(zu)는 발음이 같아 헷갈리기 쉽습니다."},
+            "romaji": {"char": "づ", "correct": "du", "wrong": "zu", "pct": 35, "desc": "두음(づ) 입력 시 du 타법 인지 필요"}
+        }
+    }
+    
+    for kana in top_error_kanas:
+        if kana in typical_confusions:
+            item = typical_confusions[kana]
+            pair_data.append(item["pair"])
+            romaji_data.append(item["romaji"])
+            
+    # 만약 유저의 오타 데이터에 전형적인 혼동 패턴이 없다면, 탑 에러 글자 중 상위 항목들로 일반 리포트 생성
+    if not pair_data:
+        for s in sorted_by_rate[:2]:
+            if s["error_count"] > 0:
+                pair_data.append({
+                    "a": s["kana"],
+                    "b": "타 건반",
+                    "aRoma": s["kana"],
+                    "bRoma": "오타",
+                    "rate": f"{round(s['error_rate'])}%",
+                    "desc": f"'{s['kana']}' 입력 시 정확도가 낮아 오타가 빈번하게 발생하고 있습니다."
+                })
+                romaji_data.append({
+                    "char": s["kana"],
+                    "correct": "정타",
+                    "wrong": "오타",
+                    "pct": round(s["error_rate"]),
+                    "desc": "정확한 키 스토크 연습이 필요합니다."
+                })
+                
+    return {
+        "success": True,
+        "summary": {
+            "total_typos": total_typos,
+            "avg_error_rate": round(avg_error_rate, 1),
+            "improvement": round(improvement, 1)
+        },
+        "data": stats_list,
+        "pairs": pair_data,
+        "romaji_patterns": romaji_data
+    }
+
 

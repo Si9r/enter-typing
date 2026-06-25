@@ -1,359 +1,287 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>곡 상세 정보 - 엔터핑</title>
-    <!-- 구글 폰트 적용 (Outfit & Noto Sans KR) -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>타이핑 상세 - 엔터핑</title>
+    <link rel="stylesheet" href="style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
     <style>
-        body {
-            background-color: var(--color-ivory); /* 연분홍빛 아이보리 배경 유지 */
-            color: var(--color-text-main);
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            padding-top: 100px; /* 네비게이션 바 공간 확보 */
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .detail-wrapper {
-            width: 90%;
-            max-width: 900px;
-            background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 182, 193, 0.15);
-            overflow: hidden;
-            display: flex;
-            flex-direction: row;
-            margin-bottom: 60px;
-            animation: slideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 모바일 대응 */
-        @media (max-width: 768px) {
-            .detail-wrapper {
-                flex-direction: column;
-            }
-            .left-visual-panel {
-                width: 100% !important;
-                padding: 30px !important;
-            }
-            .right-info-panel {
-                width: 100% !important;
-                padding: 30px !important;
-            }
-        }
-
-        /* ── 좌측 비주얼 패널 (앨범 커버 & 제목) ── */
-        .left-visual-panel {
-            width: 45%;
-            background: #fafafa;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid rgba(0, 0, 0, 0.03);
-            text-align: center;
-        }
-
-        .album-cover {
+        .detail-container {
             width: 100%;
-            aspect-ratio: 1; /* 1:1 정사각 앨범 아트 */
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--color-white);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            display: flex;
+            gap: 50px;
+            margin-bottom: 60px;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .detail-cover {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(135deg, var(--color-pink), var(--color-blue));
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(255, 182, 193, 0.3);
-            margin-bottom: 24px;
+            color: white;
+            font-size: 5rem;
+            font-weight: 900;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.3);
+            flex-shrink: 0;
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s;
         }
 
-        .album-cover:hover {
-            transform: scale(1.02) rotate(1deg);
+        .detail-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
         }
 
-        .album-cover-visual-text {
-            color: #ffffff;
-            font-family: 'Outfit', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 900;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            letter-spacing: 2px;
-        }
-
-        .detail-song-title {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--color-text-main);
-            margin: 0 0 8px 0;
-            line-height: 1.3;
-        }
-
-        .detail-artist-name {
-            font-size: 1rem;
-            color: var(--color-text-muted);
-            font-weight: 600;
-            margin: 0 0 20px 0;
-        }
-
-        /* 난이도 & 메타태그 라벨 */
-        .detail-meta-tags {
+        .detail-info {
+            flex: 1;
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            flex-direction: column;
             justify-content: center;
         }
 
-        .tag-badge {
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-size: 0.82rem;
-            font-weight: 800;
+        .detail-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--color-text-main);
+            margin-bottom: 8px;
+            line-height: 1.2;
         }
 
-        .tag-badge.easy {
-            background-color: rgba(144, 238, 144, 0.25);
-            color: #2b7a2b;
-        }
-
-        .tag-badge.medium {
-            background-color: rgba(173, 216, 230, 0.3);
-            color: #27627a;
-        }
-
-        .tag-badge.hard {
-            background-color: rgba(255, 182, 193, 0.3);
-            color: #b33951;
-        }
-
-        .tag-badge.genre {
-            background-color: #f0f0f0;
-            color: #555555;
-        }
-
-        /* ── 우측 정보 패널 (가사 미리보기 & 액션) ── */
-        .right-info-panel {
-            width: 55%;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-title {
+        .detail-artist {
             font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 16px;
+            color: var(--color-text-muted);
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .detail-stats {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--color-text-main);
-            border-bottom: 2px solid rgba(0, 0, 0, 0.03);
-            padding-bottom: 10px;
-        }
-
-        /* 가사 미리보기창 */
-        .lyrics-preview-container {
-            flex-grow: 1;
-            background-color: rgba(0, 0, 0, 0.01);
-            border: 1px solid rgba(0, 0, 0, 0.03);
-            border-radius: 16px;
-            padding: 20px;
-            max-height: 280px;
-            overflow-y: auto;
+            gap: 30px;
             margin-bottom: 30px;
+            padding: 20px 0;
+            border-top: 1px solid var(--color-border);
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .lyrics-preview-line {
-            margin-bottom: 16px;
-            border-left: 3px solid var(--color-pink);
-            padding-left: 10px;
-        }
-
-        .lyrics-preview-line:last-child {
-            margin-bottom: 0;
-        }
-
-        .lyrics-preview-kanji {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #111;
-            margin-bottom: 2px;
-        }
-
-        .lyrics-preview-furigana {
-            font-size: 0.85rem;
-            color: var(--color-pink-hover);
-            font-weight: 700;
-        }
-
-        /* 액션 버튼 그룹 */
-        .action-button-group {
+        .stat-item {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .action-btn-primary {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            background-color: var(--color-pink);
-            color: #ffffff;
-            font-size: 1.1rem;
-            font-weight: 800;
-            padding: 16px 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            text-align: center;
-            border: none;
-            cursor: pointer;
-        }
-
-        .action-btn-primary:hover {
-            background-color: var(--color-pink-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 182, 193, 0.6);
-        }
-
-        .action-btn-secondary {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 6px;
-            text-decoration: none;
-            color: var(--color-text-muted);
-            background-color: #f3f3f3;
-            font-size: 0.95rem;
-            font-weight: 700;
-            padding: 12px 24px;
-            border-radius: 14px;
-            transition: all 0.25s;
-            text-align: center;
         }
 
-        .action-btn-secondary:hover {
-            background-color: #e5e5e5;
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-item .value {
+            font-size: 1.2rem;
+            font-weight: 900;
             color: var(--color-text-main);
         }
 
+        .detail-desc {
+            font-size: 1.05rem;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 35px;
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 15px;
+        }
     </style>
 </head>
-<body>
 
-    <!-- 공통 네비게이션 바 -->
-    <nav class="navbar">
+<body>
+    <header class="navbar">
         <div class="nav-left">
             <div class="logo" onclick="location.href='index.html'">
-                <span style="font-size: 1.8rem;">🎵</span>
-                <span>엔터핑</span>
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
             </div>
-            <div class="nav-links">
-                <a href="index.html">홈</a>
+            <nav class="nav-links">
                 <a href="typing_list.html" class="active">타이핑</a>
+                <a href="quiz_list.html">퀴즈</a>
                 <a href="ranking.html">랭킹</a>
-                <a href="notice.html">공지사항</a>
+                <a href="battle.html">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='search.html'">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- 상세 페이지 메인 레이아웃 -->
-    <div class="detail-wrapper" id="detail-card">
-        <!-- 자바스크립트로 데이터를 렌더링 -->
-    </div>
+    <script src="navbar.js?v=1.0.2"></script>
 
-    <!-- 공통 네비게이션 바 및 공용 가사 데이터베이스 로드 -->
-    <script src="navbar.js"></script>
+    <main
+        style="margin-top: 120px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
+        <div class="detail-container">
+            <div class="detail-cover">
+                🎵
+            </div>
+            <div class="detail-info">
+                <div class="card-badge pink" style="margin-bottom: 15px;">-</div>
+                <h1 class="detail-title">로딩 중...</h1>
+                <div class="detail-artist">...</div>
 
+                <div class="detail-stats">
+                    <div class="stat-item">
+                        <span class="label">난이도</span>
+                        <span id="detail-difficulty" class="value">⭐⭐⭐</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">플레이 수</span>
+                        <span id="detail-play-count" class="value">0회</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="label">시간</span>
+                        <span id="detail-best-time" class="value">0초</span>
+                    </div>
+                </div>
 
-    <!-- 상세 정보 렌더링 스크립트 (DB API fetch 방식으로 전환) -->
+                <p class="detail-desc">
+                    콘텐츠 정보를 불러오는 중입니다...
+                </p>
+
+                <div class="detail-actions">
+                    <button id="btn-start-typing" class="btn btn-pink btn-large" style="flex: 1;"
+                        onclick="location.href='typing.html'">
+                        ▶ 타이핑 시작하기
+                    </button>
+                    <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
+                        🏆 랭킹 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
     <script>
-        // URL 파라미터에서 songId 추출
-        const urlParams = new URLSearchParams(window.location.search);
-        const songId = parseInt(urlParams.get('songId')) || 1;
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('id') || 1;
 
-        // 난이도에 따른 뱃지 클래스
-        function getDiffClass(difficulty) {
-            if (difficulty === '초급') return 'easy';
-            if (difficulty === '중급') return 'medium';
-            return 'hard';
-        }
-
-        // ★ /api/songs/{songId} API에서 곡 상세 정보 fetch
-        async function loadDetail() {
-            const detailCard = document.getElementById('detail-card');
-            detailCard.innerHTML = '<p style="text-align:center; padding: 80px; color: #aaa;">🎵 곡 정보 불러오는 중...</p>';
             try {
-                const res = await fetch(`/api/songs/${songId}`);
-                if (!res.ok) throw new Error('곡을 찾을 수 없습니다.');
-                const song = await res.json();
+                const response = await fetch(`/api/typing-content/${contentId}?t=${Date.now()}`);
+                const data = await response.json();
+                if (data.success) {
+                    document.querySelector('.detail-title').innerText = data.title;
+                    document.querySelector('.detail-artist').innerText = data.artist;
+                    document.querySelector('.card-badge').innerText = data.genre || 'JPOP';
 
-                detailCard.innerHTML = `
-                    <!-- 좌측 비주얼 패널 -->
-                    <div class="left-visual-panel">
-                        <div class="album-cover" style="background: ${song.gradient};">
-                            <span class="album-cover-visual-text">${song.short_code}</span>
-                        </div>
-                        <h2 class="detail-song-title">${song.title}</h2>
-                        <p class="detail-artist-name">${song.artist}</p>
-                        <div class="detail-meta-tags">
-                            <span class="tag-badge ${getDiffClass(song.difficulty)}">🔥 ${song.difficulty}</span>
-                            <span class="tag-badge genre">🏷 ${song.genre}</span>
-                            <span class="tag-badge genre">⏱ ${song.duration}</span>
-                        </div>
-                    </div>
+                    const diffValue = data.difficulty || 3;
+                    document.getElementById('detail-difficulty').innerText = '⭐'.repeat(diffValue);
+                    document.getElementById('detail-play-count').innerText = (data.play_count || 0) + '회';
+                    document.getElementById('detail-best-time').innerText = (data.best_time || 0) + '초';
 
-                    <!-- 우측 정보 패널 -->
-                    <div class="right-info-panel">
-                        <h3 class="panel-title">📃 가사 및 후리가나 독음 미리보기</h3>
-                        <div class="lyrics-preview-container">
-                            ${song.lines.map(line => `
-                                <div class="lyrics-preview-line">
-                                    <div class="lyrics-preview-kanji">${line.kanji}</div>
-                                    <div class="lyrics-preview-furigana">${line.furigana}</div>
-                                </div>
-                            `).join('')}
-                        </div>
+                    if (data.description) {
+                        document.querySelector('.detail-desc').innerText = data.description;
+                    } else {
+                        document.querySelector('.detail-desc').innerText = `${data.artist}의 '${data.title}' 가사로 일본어 타자 연습을 시작해보세요!`;
+                    }
 
-                        <div class="action-button-group">
-                            <a href="typing.html?songId=${songId}" class="action-btn-primary">
-                                <span>🚀 타이핑 시작하기</span>
-                            </a>
-                            <a href="typing_list.html" class="action-btn-secondary">
-                                <span>⬅ 곡 리스트로 돌아가기</span>
-                            </a>
-                        </div>
-                    </div>
-                `;
-            } catch (e) {
-                detailCard.innerHTML = `<p style="text-align:center; padding: 80px; color: #e74c3c;">곡 정보를 불러올 수 없습니다.</p>`;
-                console.error(e);
+                    if (data.youtube_id) {
+                        const cover = document.querySelector('.detail-cover');
+                        cover.style.backgroundImage = `url('https://img.youtube.com/vi/${data.youtube_id}/maxresdefault.jpg')`;
+                        cover.style.backgroundSize = 'cover';
+                        cover.style.backgroundPosition = 'center';
+                        cover.innerHTML = ''; // 🎵 이모지 제거
+                    }
+
+                    document.getElementById('btn-start-typing').setAttribute('onclick', `location.href='typing.html?id=${contentId}'`);
+                }
+            } catch (error) {
+                console.error("Failed to fetch typing content details", error);
             }
-        }
-
-        loadDetail();
+        });
     </script>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>타이핑</h4>
+                <ul>
+                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
+                    <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
+                    <li><a href="typing_create.html">타이핑 작성하기</a></li>
+                    <li><a href="battle.html">실시간 대전</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>퀴즈 & 랭킹</h4>
+                <ul>
+                    <li><a href="quiz_list.html">퀴즈 리스트</a></li>
+                    <li><a href="quiz_create.html">퀴즈 작성하기</a></li>
+                    <li><a href="ranking.html">전체 랭킹</a></li>
+                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="notice.html">공지사항</a></li>
+                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
 </body>
+
 </html>

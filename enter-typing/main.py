@@ -619,7 +619,7 @@ def do_attendance(req: AttendanceRequest, current_user: models.User = Depends(ge
 # ════════════════════════════════════════════════════════════
 @app.get("/api/typing-contents")
 def get_all_typing_contents(db: Session = Depends(get_db)):
-    contents = db.query(models.TypingContent).all()
+    contents = db.query(models.TypingContent).order_by(models.TypingContent.id.desc()).all()
     result = []
     for c in contents:
         result.append({
@@ -645,7 +645,7 @@ def get_all_typing_contents(db: Session = Depends(get_db)):
 # ════════════════════════════════════════════════════════════
 @app.get("/api/my-typing-contents")
 def get_my_typing_contents(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    contents = db.query(models.TypingContent).filter(models.TypingContent.creator_id == current_user.id).all()
+    contents = db.query(models.TypingContent).filter(models.TypingContent.creator_id == current_user.id).order_by(models.TypingContent.id.desc()).all()
     result = []
     for c in contents:
         result.append({
@@ -770,7 +770,7 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
 # ════════════════════════════════════════════════════════════
 @app.get("/api/quiz-contents")
 def get_all_quiz_contents(db: Session = Depends(get_db)):
-    contents = db.query(models.QuizContent).all()
+    contents = db.query(models.QuizContent).order_by(models.QuizContent.id.desc()).all()
     result = []
     for c in contents:
         quiz_count = 0
@@ -793,7 +793,7 @@ def get_all_quiz_contents(db: Session = Depends(get_db)):
 
 @app.get("/api/my-quiz-contents")
 def get_my_quiz_contents(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    contents = db.query(models.QuizContent).filter(models.QuizContent.creator_id == current_user.id).all()
+    contents = db.query(models.QuizContent).filter(models.QuizContent.creator_id == current_user.id).order_by(models.QuizContent.id.desc()).all()
     result = []
     for c in contents:
         quiz_count = 0
@@ -959,28 +959,14 @@ def convert_lyrics(req: ConvertRequest):
         
     converted = kks.convert(text)
     
+    # pykakasi로 한자 → 히라가나 변환만 수행
     hiragana = ""
-    romaji = ""
     for item in converted:
-        h = item['hira']
-        r = item['hepburn']
-        
-        # pykakasi 스테가나 변환 예외 처리 (jie -> je 등)
-        if 'じぇ' in h: r = r.replace('jie', 'je')
-        if 'しぇ' in h: r = r.replace('shie', 'she')
-        if 'ちぇ' in h: r = r.replace('chie', 'che')
-        if 'せぁ' in h: r = r.replace('sea', 'sexa')
-        if 'せぃ' in h: r = r.replace('sei', 'sexi')
-        if 'せぅ' in h: r = r.replace('seu', 'sexu')
-        if 'せぇ' in h: r = r.replace('see', 'sexe')
-        if 'せぉ' in h: r = r.replace('seo', 'sexo')
-        
-        hiragana += h
-        romaji += r
+        hiragana += item['hira']
     
-    # romaji may need some cleanup for typing game
-    romaji = romaji.replace(" ", "")
     hiragana = hiragana.replace(" ", "")
+    
+    # romaji는 히라가나 → 로마자 변환 함수로 일관성 있게 처리
     romaji = hiragana_to_romaji(hiragana)
     
     return {"success": True, "hiragana": hiragana, "romaji": romaji}
@@ -1290,6 +1276,7 @@ class BattleRoomCreate(BaseModel):
     title: str
     song_id: int
     max_players: int = 4
+    type: str = "typing" # "typing" or "quiz"
 
 
 @app.post("/api/battle/rooms")
@@ -1304,13 +1291,18 @@ async def create_battle_room(req: BattleRoomCreate, authorization: str = Header(
         if not existing:
             break
 
-    # 곡 정보 조회
-    content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+    # 콘텐츠 정보 조회
+    if req.type == "quiz":
+        content = db.query(models.QuizContent).filter(models.QuizContent.id == req.song_id).first()
+    else:
+        content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+        
     if not content:
-        raise HTTPException(status_code=404, detail="곡을 찾을 수 없습니다.")
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
 
     room_data = {
         "code": code,
+        "type": req.type,
         "title": req.title,
         "host": current_user.nickname,
         "song_id": content.id,
@@ -1338,6 +1330,7 @@ async def list_battle_rooms():
             if room.get("status") in ("waiting", "playing"):
                 rooms.append({
                     "code": room["code"],
+                    "type": room.get("type", "typing"),
                     "title": room["title"],
                     "host": room["host"],
                     "song_title": room["song_title"],
@@ -1866,4 +1859,226 @@ async def get_typo_stats(
         "romaji_patterns": romaji_data
     }
 
+
+
+# ════════════════════════════════════════════════════════════
+# 실시간 퀴즈 대전 전용 WebSocket 및 Manager
+# ════════════════════════════════════════════════════════════
+quiz_battle_manager = BattleConnectionManager()
+
+async def save_quiz_battle_results(room_data: dict, db: Session):
+    players = room_data.get("players", {})
+    sorted_players = sorted(players.values(), key=lambda p: p.get("score", 0), reverse=True)
+    
+    # 순위 계산
+    current_rank = 1
+    for i, p in enumerate(sorted_players):
+        if i > 0 and p.get("score", 0) < sorted_players[i-1].get("score", 0):
+            current_rank = i + 1
+        p["rank"] = current_rank
+
+    for nick, p_data in players.items():
+        history = models.QuizBattleHistory(
+            room_code=room_data["code"],
+            user_id=p_data["user_id"],
+            quiz_id=room_data["song_id"], # song_id 필드를 quiz_id로 사용
+            rank=p_data.get("rank", 4),
+            score=p_data.get("score", 0),
+            correct_count=p_data.get("correct_count", 0)
+        )
+        db.add(history)
+    db.commit()
+
+@app.websocket("/ws/quiz-battle/{room_code}")
+async def quiz_battle_websocket(
+    websocket: WebSocket,
+    room_code: str,
+    token: str = Query(...),
+    db: Session = Depends(get_db)
+):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            await websocket.close(code=4001)
+            return
+    except JWTError:
+        await websocket.close(code=4001)
+        return
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        await websocket.close(code=4001)
+        return
+
+    nickname = user.nickname
+    redis = await get_redis()
+    room_data = await get_room_data(redis, room_code)
+    
+    if not room_data:
+        await websocket.close(code=4004)
+        return
+
+    if len(room_data["players"]) >= room_data["max_players"] and nickname not in room_data["players"]:
+        await websocket.close(code=4003)
+        return
+
+    await quiz_battle_manager.connect(room_code, websocket, nickname)
+
+    if nickname not in room_data["players"]:
+        room_data["players"][nickname] = {
+            "user_id": user.id,
+            "ready": False,
+            "score": 0,
+            "correct_count": 0,
+            "finished": False,
+            "is_host": nickname == room_data["host"]
+        }
+        await save_room_data(redis, room_code, room_data)
+
+    await websocket.send_json({"type": "room_state", "room": room_data})
+    
+    await quiz_battle_manager.broadcast(room_code, {
+        "type": "player_joined",
+        "nickname": nickname,
+        "players": room_data["players"]
+    }, exclude=websocket)
+    
+    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type")
+
+            if msg_type == "ready":
+                is_ready = data.get("is_ready", False)
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["ready"] = is_ready
+                    await save_room_data(redis, room_code, room_data)
+                    await quiz_battle_manager.broadcast_all(room_code, {
+                        "type": "player_ready",
+                        "nickname": nickname,
+                        "is_ready": is_ready
+                    })
+
+            elif msg_type == "start_game":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and room_data["host"] == nickname:
+                    all_ready = all(p["ready"] for p in room_data["players"].values() if not p["is_host"])
+                    if all_ready or len(room_data["players"]) == 1:
+                        room_data["status"] = "countdown"
+                        room_data["current_question_index"] = 0
+                        room_data["question_answered_by"] = [] # 선착순 처리를 위한 배열
+                        await save_room_data(redis, room_code, room_data)
+                        
+                        import asyncio
+                        async def sync_and_start(r_code):
+                            # 카운트다운
+                            for count in [3, 2, 1]:
+                                await quiz_battle_manager.broadcast_all(r_code, {"type": "countdown", "count": count})
+                                await asyncio.sleep(1)
+                            
+                            rd = await get_room_data(redis, r_code)
+                            if rd:
+                                rd["status"] = "playing"
+                                await save_room_data(redis, r_code, rd)
+                                await quiz_battle_manager.broadcast_all(r_code, {
+                                    "type": "game_started"
+                                })
+                        
+                        asyncio.create_task(sync_and_start(room_code))
+
+            elif msg_type == "submit_answer":
+                # 선착순 로직
+                is_correct = data.get("is_correct", False)
+                question_index = data.get("question_index", 0)
+                
+                room_data = await get_room_data(redis, room_code)
+                if room_data and room_data["status"] == "playing" and nickname in room_data["players"]:
+                    # 현재 방의 질문 인덱스와 맞는지 확인
+                    if room_data.get("current_question_index", 0) == question_index:
+                        answered_list = room_data.get("question_answered_by", [])
+                        
+                        if is_correct and nickname not in answered_list:
+                            # 1등 3점, 2등 2점, 나머지 1점
+                            points = max(1, 3 - len(answered_list))
+                            room_data["players"][nickname]["score"] += points
+                            room_data["players"][nickname]["correct_count"] += 1
+                            room_data["question_answered_by"].append(nickname)
+                            
+                            await save_room_data(redis, room_code, room_data)
+                            
+                            await quiz_battle_manager.broadcast_all(room_code, {
+                                "type": "score_update",
+                                "players": room_data["players"],
+                                "event": f"{nickname}님이 정답을 맞혔습니다! (+{points}점)"
+                            })
+                            
+            elif msg_type == "next_question":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and room_data["host"] == nickname:
+                    room_data["current_question_index"] = data.get("question_index", 0)
+                    room_data["question_answered_by"] = [] # 다음 문제용 초기화
+                    await save_room_data(redis, room_code, room_data)
+                    await quiz_battle_manager.broadcast_all(room_code, {
+                        "type": "next_question_sync",
+                        "question_index": room_data["current_question_index"]
+                    })
+
+            elif msg_type == "game_over":
+                room_data = await get_room_data(redis, room_code)
+                if room_data and nickname in room_data["players"]:
+                    room_data["players"][nickname]["finished"] = True
+                    await save_room_data(redis, room_code, room_data)
+                    
+                    all_finished = all(p["finished"] for p in room_data["players"].values())
+                    if all_finished and room_data["status"] != "finished":
+                        room_data["status"] = "finished"
+                        await save_room_data(redis, room_code, room_data)
+                        
+                        try:
+                            await save_quiz_battle_results(room_data, db)
+                        except Exception as e:
+                            print(f"Quiz Battle history save error: {e}")
+
+                        await quiz_battle_manager.broadcast_all(room_code, {
+                            "type": "battle_ended",
+                            "players": room_data["players"]
+                        })
+
+    except WebSocketDisconnect:
+        quiz_battle_manager.disconnect(room_code, websocket)
+        room_data = await get_room_data(redis, room_code)
+        if room_data and nickname in room_data["players"]:
+            del room_data["players"][nickname]
+            
+            if not room_data["players"]:
+                await delete_room(redis, room_code)
+            else:
+                if room_data["host"] == nickname:
+                    room_data["host"] = list(room_data["players"].keys())[0]
+                    room_data["players"][room_data["host"]]["is_host"] = True
+                await save_room_data(redis, room_code, room_data)
+                await quiz_battle_manager.broadcast_all(room_code, {
+                    "type": "player_left",
+                    "nickname": nickname,
+                    "players": room_data["players"],
+                    "new_host": room_data["host"]
+                })
+        
+        await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+
+
+
+@app.get("/api/battle/rooms/{room_code}")
+async def get_battle_room_info(room_code: str):
+    redis = await get_redis()
+    raw = await redis.get(f"battle:room:{room_code}")
+    if raw:
+        import json
+        room = json.loads(raw)
+        return {"success": True, "type": room.get("type", "typing")}
+    return {"success": False, "detail": "방을 찾을 수 없습니다."}
 

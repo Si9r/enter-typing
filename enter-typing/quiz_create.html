@@ -425,7 +425,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
 
         .modal-content code {
@@ -477,7 +477,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href = 'login.html'">
                     로그인
@@ -687,7 +691,8 @@
                     gap: 10px;
                   "></div>
 
-                            <div style="display: flex; flex-direction: column; gap: 10px; width: 280px; justify-content: flex-end;">
+                            <div
+                                style="display: flex; flex-direction: column; gap: 10px; width: 280px; justify-content: flex-end;">
                                 <div class="answer-input-container"
                                     style="display: flex; gap: 10px; align-items: center">
                                     <label style="width: 40px; font-weight: 700; color: #555">힌트</label>
@@ -698,7 +703,8 @@
                         outline: none;
                         flex: 1;
                         transition: all 0.2s;
-                      " onfocus="this.style.borderColor='var(--color-pink)'; this.style.boxShadow='0 0 0 3px rgba(255,154,158,0.2)'" onblur="this.style.borderColor='#ffe3e4'; this.style.boxShadow='none'" />
+                      " onfocus="this.style.borderColor='var(--color-pink)'; this.style.boxShadow='0 0 0 3px rgba(255,154,158,0.2)'"
+                                        onblur="this.style.borderColor='#ffe3e4'; this.style.boxShadow='none'" />
                                 </div>
                                 <button class="btn-submit" id="btn-add-quiz" style="
                       width: 100%;
@@ -744,27 +750,31 @@
                 <span>✨ 퀴즈 제작 가이드</span>
                 <span class="close-modal" id="close-guide">✕</span>
             </div>
-            
+
             <div style="font-size: 0.95rem; color: #444; line-height: 1.6;">
                 <p><strong>1. 영상 불러오기</strong><br>
-                YouTube 영상의 URL을 입력하면 자동으로 영상이 불러와집니다.</p>
+                    YouTube 영상의 URL을 입력하면 자동으로 영상이 불러와집니다.</p>
 
                 <p><strong>2. 구간 및 정답 설정</strong><br>
-                퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.</p>
+                    퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.</p>
 
                 <p><strong>3. 개별 퀴즈 추가 및 수정</strong><br>
-                우측 하단의 <code>등록</code> 버튼이나 하단 <code>확인</code> 버튼을 눌러 개별 퀴즈를 목록에 등록하세요.</p>
+                    우측 하단의 <code>등록</code> 버튼이나 하단 <code>확인</code> 버튼을 눌러 개별 퀴즈를 목록에 등록하세요.</p>
 
                 <p style="margin-top: 15px; color: var(--color-pink); font-weight: bold;">
-                원하는 만큼 퀴즈 등록을 마친 후 우측 상단의 <code>✨ 전체 저장</code> 버튼을 누르면 퀴즈 세트 등록이 완료됩니다!
+                    원하는 만큼 퀴즈 등록을 마친 후 우측 상단의 <code>✨ 전체 저장</code> 버튼을 누르면 퀴즈 세트 등록이 완료됩니다!
                 </p>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid #eee;">
-                <label style="font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
-                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루 동안 보지 않기
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid #eee;">
+                <label
+                    style="font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
+                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루
+                    동안 보지 않기
                 </label>
-                <button class="toolbar-btn btn-primary" id="btn-close-guide" style="padding: 8px 20px; font-weight: bold;">닫기</button>
+                <button class="toolbar-btn btn-primary" id="btn-close-guide"
+                    style="padding: 8px 20px; font-weight: bold;">닫기</button>
             </div>
         </div>
     </div>
@@ -1473,7 +1483,7 @@
                     document.getElementById("genre").value = data.genre || "JPOP";
                     document.getElementById("description").value = data.description || "";
                     document.getElementById("difficulty").value = data.difficulty || "3";
-                    
+
                     if (data.quiz_data) {
                         linesData = JSON.parse(data.quiz_data);
                     }
@@ -1496,11 +1506,11 @@
         // Guide Modal Logic
         const guideModal = document.getElementById('guide-modal');
         const hideGuideCheckbox = document.getElementById('hide-guide-today');
-        
+
         function showGuideModal() {
             const hideUntil = localStorage.getItem('hideQuizGuideUntil');
             const now = new Date().getTime();
-            
+
             if (editContentId) return;
 
             if (!hideUntil || now > parseInt(hideUntil)) {

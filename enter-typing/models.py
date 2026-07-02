@@ -19,6 +19,7 @@ class User(Base):
     quiz_histories = relationship("QuizHistory", back_populates="user", cascade="all, delete-orphan")
     typo_stats = relationship("TypoStat", back_populates="user", cascade="all, delete-orphan")
     battle_histories = relationship("BattleHistory", back_populates="user", cascade="all, delete-orphan")
+    quiz_battle_histories = relationship("QuizBattleHistory", back_populates="user", cascade="all, delete-orphan")
 
 # 2. 출석체크 테이블
 class Attendance(Base):
@@ -130,3 +131,18 @@ class BattleHistory(Base):
     played_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User", back_populates="battle_histories")
+
+# 9. 실시간 퀴즈 대전 기록 테이블
+class QuizBattleHistory(Base):
+    __tablename__ = "quiz_battle_histories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    room_code = Column(String(10), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    quiz_id = Column(Integer, ForeignKey("quiz_contents.id"), nullable=True)
+    rank = Column(Integer, nullable=False)       # 최종 순위 (1~4)
+    score = Column(Integer, nullable=False)      # 최종 점수
+    correct_count = Column(Integer, nullable=False) # 맞춘 문제 수
+    played_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="quiz_battle_histories")

@@ -206,7 +206,8 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  opacity: 0.5; /* Faded by default */
+  opacity: 0.5;
+  /* Faded by default */
   transition:
     opacity 0.3s,
     border-color 0.3s;
@@ -214,7 +215,8 @@ h1 {
 
 .lyric-block.active {
   opacity: 1;
-  border-color: #ffd700; /* Yellow/Orange highlight */
+  border-color: #ffd700;
+  /* Yellow/Orange highlight */
 }
 
 .lyric-kanji {
@@ -272,12 +274,15 @@ h1 {
 
 .sentence-display .lyric-unit.current {
   background: rgba(255, 182, 193, 0.2);
-  color: #D84B6B; /* Deep pink for current word */
+  color: #D84B6B;
+  /* Deep pink for current word */
 }
 
 .sentence-display .lyric-unit.typed {
-  color: var(--color-correct); /* Green for completed words */
+  color: var(--color-correct);
+  /* Green for completed words */
 }
+
 .sentence-display .lyric-unit.typed .roma-text {
   opacity: 0.5;
 }
@@ -341,12 +346,14 @@ h1 {
 .lyric-block.active .lyric-romaji span,
 .lyric-block.active .lyric-hiragana span {
   transition: color 0.1s;
-  color: #ccc; /* Untyped text is faded */
+  color: #ccc;
+  /* Untyped text is faded */
 }
 
 .lyric-block.active .lyric-romaji span.correct,
 .lyric-block.active .lyric-hiragana span.correct {
-  color: #f39c12; /* Orange/Yellow highlight when typed */
+  color: #f39c12;
+  /* Orange/Yellow highlight when typed */
 }
 
 .lyric-block.active .lyric-romaji span.incorrect,
@@ -375,8 +382,8 @@ h1 {
   font-weight: 700;
   color: #3a8e3a;
   padding: 14px;
-  background: rgba(144,238,144,0.15);
-  border: 1.5px solid rgba(144,238,144,0.5);
+  background: rgba(144, 238, 144, 0.15);
+  border: 1.5px solid rgba(144, 238, 144, 0.5);
   border-radius: 12px;
 }
 

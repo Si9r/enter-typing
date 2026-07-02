@@ -312,16 +312,68 @@
     }
 
     /* 오타 분석 바 (profile_analysis 스타일 공유) */
-    .typo-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-    .typo-char { width:70px; flex-shrink:0; font-size:1rem; font-weight:800; color:#2C3E50; font-family:monospace; }
-    .typo-char small { font-size:.72rem; color:#7F8C8D; font-weight:500; display:block; }
-    .typo-bar-bg { flex:1; height:12px; background:#f0f0f0; border-radius:12px; overflow:hidden; }
-    .typo-bar-fill { height:100%; border-radius:12px; background:linear-gradient(90deg,#FFB6C1,#FF9EAB); transition:width .9s ease; }
-    .typo-bar-fill.med { background:linear-gradient(90deg,#FFDAA0,#FFB74D); }
-    .typo-bar-fill.low { background:linear-gradient(90deg,#A8D8A8,#5CB85C); }
-    .typo-pct { width:42px; text-align:right; font-size:.88rem; font-weight:800; color:#FF9EAB; flex-shrink:0; }
-    .typo-pct.med { color:#FFB74D; }
-    .typo-pct.low { color:#5CB85C; }
+    .typo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .typo-char {
+      width: 70px;
+      flex-shrink: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2C3E50;
+      font-family: monospace;
+    }
+
+    .typo-char small {
+      font-size: .72rem;
+      color: #7F8C8D;
+      font-weight: 500;
+      display: block;
+    }
+
+    .typo-bar-bg {
+      flex: 1;
+      height: 12px;
+      background: #f0f0f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .typo-bar-fill {
+      height: 100%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #FFB6C1, #FF9EAB);
+      transition: width .9s ease;
+    }
+
+    .typo-bar-fill.med {
+      background: linear-gradient(90deg, #FFDAA0, #FFB74D);
+    }
+
+    .typo-bar-fill.low {
+      background: linear-gradient(90deg, #A8D8A8, #5CB85C);
+    }
+
+    .typo-pct {
+      width: 42px;
+      text-align: right;
+      font-size: .88rem;
+      font-weight: 800;
+      color: #FF9EAB;
+      flex-shrink: 0;
+    }
+
+    .typo-pct.med {
+      color: #FFB74D;
+    }
+
+    .typo-pct.low {
+      color: #5CB85C;
+    }
 
     /* History Tab */
     .history-list {
@@ -816,7 +868,10 @@
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link"
+        style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+        onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+        onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -923,7 +978,7 @@
         <!-- ⌨️ WPM + 정확도 카드 (단일 칸) -->
         <div class="analysis-card">
           <h4>⌨️ 속도 &amp; 정확도</h4>
-          
+
           <!-- Hidden elements to prevent JS errors -->
           <div style="display: none;">
             <span id="analysis-wpm-week-stat"></span>
@@ -942,21 +997,24 @@
           <div class="bar-row">
             <div class="bar-label">이번 주</div>
             <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-week-bar" style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
+              <div class="bar-fill" id="analysis-wpm-week-bar"
+                style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
             </div>
             <div class="bar-val" id="analysis-wpm-week-val">0</div>
           </div>
           <div class="bar-row">
             <div class="bar-label">지난 주</div>
             <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-lastweek-bar" style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
+              <div class="bar-fill" id="analysis-wpm-lastweek-bar"
+                style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
             </div>
             <div class="bar-val" id="analysis-wpm-lastweek-val">0</div>
           </div>
           <div class="bar-row">
             <div class="bar-label">이번 달</div>
             <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-month-bar" style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
+              <div class="bar-fill" id="analysis-wpm-month-bar"
+                style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
             </div>
             <div class="bar-val" id="analysis-wpm-month-val">0</div>
           </div>
@@ -968,27 +1026,34 @@
             <div class="bar-row" style="margin-bottom:0;">
               <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-typing-bar" style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
+                <div class="bar-fill" id="analysis-play-typing-bar"
+                  style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
               </div>
-              <div class="bar-val" id="analysis-play-typing-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              <div class="bar-val" id="analysis-play-typing-val"
+                style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
               <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">🧩 퀴즈</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-quiz-bar" style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
+                <div class="bar-fill" id="analysis-play-quiz-bar"
+                  style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
               </div>
-              <div class="bar-val" id="analysis-play-quiz-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              <div class="bar-val" id="analysis-play-quiz-val"
+                style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
               <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⚔️ 대전</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-battle-bar" style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
+                <div class="bar-fill" id="analysis-play-battle-bar"
+                  style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
               </div>
-              <div class="bar-val" id="analysis-play-battle-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              <div class="bar-val" id="analysis-play-battle-val"
+                style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
           </div>
           <!-- 비율 표시 -->
-          <div style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
+          <div
+            style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
             <div style="text-align:center;">
               <div style="font-size:1.8rem; font-weight:900; color:#FF9EAB;" id="analysis-pct-typing">0%</div>
               <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">⌨️ 타이핑</div>
@@ -1011,25 +1076,31 @@
           <div class="bar-row" style="margin-bottom:14px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-gold-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
+              <div class="bar-fill" id="analysis-quiz-gold-bar"
+                style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;" id="analysis-quiz-gold-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;"
+              id="analysis-quiz-gold-val">0회</div>
           </div>
           <!-- Good -->
           <div class="bar-row" style="margin-bottom:14px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-silver-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
+              <div class="bar-fill" id="analysis-quiz-silver-bar"
+                style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;" id="analysis-quiz-silver-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;"
+              id="analysis-quiz-silver-val">0회</div>
           </div>
           <!-- Normal -->
           <div class="bar-row" style="margin-bottom:20px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-bronze-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
+              <div class="bar-fill" id="analysis-quiz-bronze-bar"
+                style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#8B4513; font-size:.9rem;" id="analysis-quiz-bronze-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#8B4513; font-size:.9rem;"
+              id="analysis-quiz-bronze-val">0회</div>
           </div>
           <!-- 요약 -->
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
@@ -1053,30 +1124,38 @@
           <div class="bar-row" style="margin-bottom:14px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-battle-1st-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
+              <div class="bar-fill" id="analysis-battle-1st-bar"
+                style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;" id="analysis-battle-1st-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;"
+              id="analysis-battle-1st-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-battle-2nd-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
+              <div class="bar-fill" id="analysis-battle-2nd-bar"
+                style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;" id="analysis-battle-2nd-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;"
+              id="analysis-battle-2nd-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
             <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-battle-3rd-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
+              <div class="bar-fill" id="analysis-battle-3rd-bar"
+                style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#8B4513; font-size:.9rem;" id="analysis-battle-3rd-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#8B4513; font-size:.9rem;"
+              id="analysis-battle-3rd-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:20px;">
             <div style="width:36px; text-align:center; font-size:1.1rem; flex-shrink:0; color:#aaa;">4위</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-battle-4th-bar" style="width:0%; background: linear-gradient(90deg, #ddd, #bbb);"></div>
+              <div class="bar-fill" id="analysis-battle-4th-bar"
+                style="width:0%; background: linear-gradient(90deg, #ddd, #bbb);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#aaa; font-size:.9rem;" id="analysis-battle-4th-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#aaa; font-size:.9rem;"
+              id="analysis-battle-4th-val">0회</div>
           </div>
           <!-- 요약 -->
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
@@ -1096,7 +1175,8 @@
         </div>
         <div class="analysis-card" style="grid-column: span 2;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h4 style="margin-bottom:0;">📉 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
+            <h4 style="margin-bottom:0;">📉 오타 패턴 분석 <span
+                style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
             <a href="profile_analysis.html"
               style="font-size:.78rem; font-weight:700; color:#FF9EAB; text-decoration:none; padding:4px 12px; border:1.5px solid #FF9EAB; border-radius:20px; transition:all .2s;"
               onmouseover="this.style.background='#FF9EAB';this.style.color='#fff';"
@@ -1168,8 +1248,11 @@
     <!-- 탭 5: 내 컨텐츠 -->
     <div class="tab-panel" id="tab-mytyping">
       <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
-        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈 컨텐츠</button>
+        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')"
+          style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')"
+          style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈
+          컨텐츠</button>
       </div>
       <div class="history-list" id="mytyping-list">
         <!-- JS가 데이터를 채워줍니다 -->
@@ -1447,10 +1530,10 @@
     function switchSubTab(type) {
       document.getElementById('mytyping-list').style.display = type === 'typing' ? 'block' : 'none';
       document.getElementById('myquiz-list').style.display = type === 'quiz' ? 'block' : 'none';
-      
+
       const btnTyping = document.getElementById('subtab-typing-btn');
       const btnQuiz = document.getElementById('subtab-quiz-btn');
-      
+
       if (type === 'typing') {
         btnTyping.className = 'btn btn-pink';
         btnTyping.style.background = '';
@@ -1577,38 +1660,38 @@
           const topTypos = resData.data.slice(0, 5);
           const maxErrors = topTypos[0].error_count || 1;
           const kanaRoma = {
-            'あ':'a','い':'i','う':'u','え':'e','お':'o',
-            'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
-            'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
-            'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
-            'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
-            'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
-            'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
-            'や':'ya','ゆ':'yu','よ':'yo',
-            'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
-            'わ':'wa','を':'wo','ん':'n','っ':'xtsu',
-            'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
-            'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo',
-            'だ':'da','ぢ':'di','づ':'du','で':'de','ど':'do',
-            'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
-            'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po',
-            'きゃ':'kya','きゅ':'kyu','きょ':'kyo',
-            'しゃ':'sha','しゅ':'shu','しょ':'sho',
-            'ちゃ':'cha','ちゅ':'chu','ちょ':'cho',
-            'にゃ':'nya','にゅ':'nyu','にょ':'nyo',
-            'ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo',
-            'みゃ':'mya','みゅ':'myu','みょ':'myo',
-            'りゃ':'rya','りゅ':'ryu','りょ':'ryo',
-            'ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo',
-            'じゃ':'ja','じゅ':'ju','じょ':'jo',
-            'びゃ':'bya','びゅ':'byu','びょ':'byo',
-            'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo',
+            'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+            'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+            'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+            'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+            'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+            'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+            'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+            'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+            'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+            'わ': 'wa', 'を': 'wo', 'ん': 'n', 'っ': 'xtsu',
+            'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+            'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+            'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+            'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+            'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+            'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+            'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+            'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+            'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+            'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+            'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+            'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+            'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+            'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+            'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+            'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
           };
           container.innerHTML = topTypos.map((item, idx) => {
-              const pct = Math.round((item.error_count / maxErrors) * 100);
-              const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
-              const roma = kanaRoma[item.kana] || item.kana;
-              return `
+            const pct = Math.round((item.error_count / maxErrors) * 100);
+            const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
+            const roma = kanaRoma[item.kana] || item.kana;
+            return `
                 <div class="typo-row">
                   <div class="typo-char">
                     ${item.kana}
@@ -1620,7 +1703,7 @@
                   <div class="typo-pct${level}">${item.error_count}회</div>
                 </div>
               `;
-            }).join('');
+          }).join('');
         } else {
           container.innerHTML = '<div style="text-align:center; padding: 20px; color: #7F8C8D; font-weight: bold;">오타 기록이 아직 없습니다.</div>';
         }
@@ -1679,9 +1762,9 @@
           monthWpms.push(item.wpm);
         }
       });
-      const weekAvg = weekWpms.length > 0 ? Math.round(weekWpms.reduce((a,b)=>a+b, 0)/weekWpms.length) : 0;
-      const lastWeekAvg = lastWeekWpms.length > 0 ? Math.round(lastWeekWpms.reduce((a,b)=>a+b, 0)/lastWeekWpms.length) : 0;
-      const monthAvg = monthWpms.length > 0 ? Math.round(monthWpms.reduce((a,b)=>a+b, 0)/monthWpms.length) : 0;
+      const weekAvg = weekWpms.length > 0 ? Math.round(weekWpms.reduce((a, b) => a + b, 0) / weekWpms.length) : 0;
+      const lastWeekAvg = lastWeekWpms.length > 0 ? Math.round(lastWeekWpms.reduce((a, b) => a + b, 0) / lastWeekWpms.length) : 0;
+      const monthAvg = monthWpms.length > 0 ? Math.round(monthWpms.reduce((a, b) => a + b, 0) / monthWpms.length) : 0;
 
       const maxTargetWpm = 500;
       document.getElementById('analysis-wpm-week-val').textContent = weekAvg;
@@ -1753,15 +1836,15 @@
         else if (acc >= 60) bronze++;
       });
       const maxMedal = Math.max(gold, silver, bronze, 1);
-      
+
       document.getElementById('analysis-quiz-gold-val').textContent = gold + '회';
       document.getElementById('analysis-quiz-gold-bar').style.width = Math.round((gold / maxMedal) * 100) + '%';
       document.getElementById('analysis-quiz-gold-summary').textContent = gold;
-      
+
       document.getElementById('analysis-quiz-silver-val').textContent = silver + '회';
       document.getElementById('analysis-quiz-silver-bar').style.width = Math.round((silver / maxMedal) * 100) + '%';
       document.getElementById('analysis-quiz-silver-summary').textContent = silver;
-      
+
       document.getElementById('analysis-quiz-bronze-val').textContent = bronze + '회';
       document.getElementById('analysis-quiz-bronze-bar').style.width = Math.round((bronze / maxMedal) * 100) + '%';
       document.getElementById('analysis-quiz-bronze-summary').textContent = bronze;

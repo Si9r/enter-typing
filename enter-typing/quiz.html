@@ -109,7 +109,7 @@
             border: 2px solid #ffe3e4;
             border-radius: 16px;
             background: #fff;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             display: flex;
             flex-direction: column;
             height: 400px;
@@ -205,7 +205,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href = 'login.html'">
                     로그인
@@ -681,7 +685,8 @@
             gap: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         ">
-            <div style="font-size: 1.5rem; font-weight: 900; color: #333; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+            <div
+                style="font-size: 1.5rem; font-weight: 900; color: #333; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px;">
                 🎉 퀴즈 결과 🎉
             </div>
             <div style="font-size: 1.2rem; font-weight: bold; text-align: center; color: var(--color-pink);">
@@ -977,7 +982,7 @@
                     guessedArray[matchedIndex] = matchedAnswer;
                     updateBoardItem(key, matchedIndex, matchedAnswer);
                     addSystemChat(`정답입니다! (${question.question || "질문"})`);
-                    
+
                     quizLogs.push({
                         quizIndex: currentIndex + 1,
                         questionLabel: question.question || "질문",
@@ -986,7 +991,7 @@
 
                     currentScore += 1;
                     document.getElementById('score').innerText = currentScore;
-                    
+
                     foundNew = true;
                     break;
                 }
@@ -1178,40 +1183,40 @@
         function showQuizResult() {
             const modal = document.getElementById('quiz-result-modal');
             document.getElementById('modal-total-score').innerText = currentScore;
-            
+
             const logContainer = document.getElementById('modal-log-container');
             logContainer.innerHTML = '';
-            
+
             if (quizLogs.length === 0) {
                 logContainer.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">맞춘 정답이 없습니다 😢</div>';
             } else {
                 // Group by quizIndex
                 const grouped = {};
                 quizLogs.forEach(log => {
-                    if(!grouped[log.quizIndex]) grouped[log.quizIndex] = [];
+                    if (!grouped[log.quizIndex]) grouped[log.quizIndex] = [];
                     grouped[log.quizIndex].push(log);
                 });
-                
+
                 Object.keys(grouped).forEach(qIdx => {
                     const groupDiv = document.createElement('div');
                     groupDiv.style.cssText = "background: #fff; border: 1px solid #eaeaea; border-radius: 6px; padding: 10px;";
-                    
+
                     const header = document.createElement('div');
                     header.style.cssText = "font-weight: bold; color: #555; margin-bottom: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 4px;";
                     header.innerText = `문제 ${qIdx}`;
                     groupDiv.appendChild(header);
-                    
+
                     grouped[qIdx].forEach(log => {
                         const itemDiv = document.createElement('div');
                         itemDiv.style.cssText = "font-size: 0.95rem; margin-bottom: 4px;";
                         itemDiv.innerHTML = `<span style="color: #888; display: inline-block; width: 80px;">${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink);">${log.matchedAnswer}</span>`;
                         groupDiv.appendChild(itemDiv);
                     });
-                    
+
                     logContainer.appendChild(groupDiv);
                 });
             }
-            
+
             modal.style.display = 'flex';
         }
 
@@ -1231,9 +1236,9 @@
                     total_questions: quizData.length
                 })
             })
-            .then(res => res.json())
-            .then(data => console.log("퀴즈 기록 저장:", data))
-            .catch(err => console.error("퀴즈 기록 저장 오류:", err));
+                .then(res => res.json())
+                .then(data => console.log("퀴즈 기록 저장:", data))
+                .catch(err => console.error("퀴즈 기록 저장 오류:", err));
         }
 
         initQuiz();

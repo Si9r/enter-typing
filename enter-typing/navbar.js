@@ -35,7 +35,7 @@
   /* 닉네임 첫 글자(아바타) */
   function avatarChar(user) {
     if (user.nickname) return user.nickname.charAt(0).toUpperCase();
-    if (user.email)    return user.email.charAt(0).toUpperCase();
+    if (user.email) return user.email.charAt(0).toUpperCase();
     return '?';
   }
 
@@ -74,7 +74,7 @@
     `;
 
     /* 드롭다운 토글 */
-    const btn      = document.getElementById('nav-profile-btn');
+    const btn = document.getElementById('nav-profile-btn');
     const dropdown = document.getElementById('nav-profile-dropdown');
 
     btn.addEventListener('click', function (e) {
@@ -186,7 +186,7 @@
   function initFooterModals() {
     const btnTerms = document.getElementById('footer-open-terms');
     const btnPrivacy = document.getElementById('footer-open-privacy');
-    
+
     // 만약 푸터가 없는 페이지라면 종료
     if (!btnTerms && !btnPrivacy) return;
 
@@ -221,7 +221,7 @@
     function openFooterModal(type) {
       const titleEl = document.getElementById('footer-modal-title');
       const contentEl = document.getElementById('footer-modal-content');
-      
+
       if (type === 'terms') {
         titleEl.textContent = '이용약관';
         contentEl.innerHTML = footerTermsHTML;

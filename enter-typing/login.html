@@ -72,8 +72,15 @@
         }
 
         @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 상단 로고 */
@@ -321,9 +328,14 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'" style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
+                <button class="auth-login" onclick="location.href='login.html'"
+                    style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
             </div>
         </div>
@@ -347,28 +359,16 @@
                 <!-- 이메일 -->
                 <div class="form-group">
                     <label class="form-label" for="login-email">이메일</label>
-                    <input
-                        id="login-email"
-                        class="form-input"
-                        type="email"
-                        placeholder="example@email.com"
-                        autocomplete="email"
-                        required
-                    >
+                    <input id="login-email" class="form-input" type="email" placeholder="example@email.com"
+                        autocomplete="email" required>
                     <span class="form-error" id="email-error">올바른 이메일 형식을 입력해주세요.</span>
                 </div>
 
                 <!-- 비밀번호 -->
                 <div class="form-group">
                     <label class="form-label" for="login-password">비밀번호</label>
-                    <input
-                        id="login-password"
-                        class="form-input"
-                        type="password"
-                        placeholder="비밀번호를 입력하세요"
-                        autocomplete="current-password"
-                        required
-                    >
+                    <input id="login-password" class="form-input" type="password" placeholder="비밀번호를 입력하세요"
+                        autocomplete="current-password" required>
                     <span class="form-error" id="password-error">비밀번호를 입력해주세요.</span>
                 </div>
 
@@ -394,11 +394,11 @@
             e.preventDefault();
             let valid = true;
 
-            const emailInput    = document.getElementById('login-email');
+            const emailInput = document.getElementById('login-email');
             const passwordInput = document.getElementById('login-password');
-            const emailError    = document.getElementById('email-error');
+            const emailError = document.getElementById('email-error');
             const passwordError = document.getElementById('password-error');
-            const loginBtn      = document.getElementById('login-btn');
+            const loginBtn = document.getElementById('login-btn');
 
             // 이메일 유효성 검사
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,10 +37,24 @@
       text-decoration: none;
       transition: all .2s;
     }
-    .back-btn:hover { border-color: #FFB6C1; color: #FF9EAB; background: #fff9f9; }
 
-    .page-title { font-size: 1.5rem; font-weight: 900; color: #2C3E50; }
-    .page-subtitle { font-size: .9rem; color: #7F8C8D; margin-top: 2px; }
+    .back-btn:hover {
+      border-color: #FFB6C1;
+      color: #FF9EAB;
+      background: #fff9f9;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #2C3E50;
+    }
+
+    .page-subtitle {
+      font-size: .9rem;
+      color: #7F8C8D;
+      margin-top: 2px;
+    }
 
     /* 상단 요약 카드 */
     .summary-row {
@@ -54,28 +69,39 @@
       border-radius: 18px;
       padding: 22px 20px;
       text-align: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
     }
+
     .summary-box .s-val {
       font-size: 2.2rem;
       font-weight: 900;
       color: #2C3E50;
     }
+
     .summary-box .s-lbl {
       font-size: .82rem;
       color: #7F8C8D;
       margin-top: 4px;
     }
-    .summary-box.red .s-val { color: #FF9EAB; }
-    .summary-box.blue .s-val { color: #5BBCD6; }
-    .summary-box.green .s-val { color: #5CB85C; }
+
+    .summary-box.red .s-val {
+      color: #FF9EAB;
+    }
+
+    .summary-box.blue .s-val {
+      color: #5BBCD6;
+    }
+
+    .summary-box.green .s-val {
+      color: #5CB85C;
+    }
 
     /* 공통 카드 */
     .card-block {
       background: #fff;
       border-radius: 20px;
       padding: 28px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
       margin-bottom: 20px;
     }
 
@@ -96,6 +122,7 @@
       gap: 12px;
       margin-bottom: 14px;
     }
+
     .typo-char {
       width: 80px;
       flex-shrink: 0;
@@ -103,12 +130,14 @@
       font-weight: 700;
       color: #2C3E50;
     }
+
     .typo-char small {
       font-size: .75rem;
       color: #7F8C8D;
       font-weight: 400;
       display: block;
     }
+
     .typo-bar-bg {
       flex: 1;
       height: 12px;
@@ -116,14 +145,22 @@
       border-radius: 12px;
       overflow: hidden;
     }
+
     .typo-bar-fill {
       height: 100%;
       border-radius: 12px;
       background: linear-gradient(90deg, #FFB6C1, #FF9EAB);
       transition: width .9s ease;
     }
-    .typo-bar-fill.med { background: linear-gradient(90deg, #FFDAA0, #FFB74D); }
-    .typo-bar-fill.low { background: linear-gradient(90deg, #A8D8A8, #5CB85C); }
+
+    .typo-bar-fill.med {
+      background: linear-gradient(90deg, #FFDAA0, #FFB74D);
+    }
+
+    .typo-bar-fill.low {
+      background: linear-gradient(90deg, #A8D8A8, #5CB85C);
+    }
+
     .typo-pct {
       width: 38px;
       text-align: right;
@@ -131,8 +168,14 @@
       font-weight: 800;
       color: #FF9EAB;
     }
-    .typo-pct.med { color: #FFB74D; }
-    .typo-pct.low { color: #5CB85C; }
+
+    .typo-pct.med {
+      color: #FFB74D;
+    }
+
+    .typo-pct.low {
+      color: #5CB85C;
+    }
 
     /* 혼동 쌍 카드 */
     .pair-grid {
@@ -140,6 +183,7 @@
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 14px;
     }
+
     .pair-item {
       background: #fafafa;
       border: 1.5px solid #EAEAEA;
@@ -147,11 +191,13 @@
       padding: 16px;
       transition: all .2s;
     }
+
     .pair-item:hover {
       border-color: #FFB6C1;
-      box-shadow: 0 4px 14px rgba(255,182,193,.2);
+      box-shadow: 0 4px 14px rgba(255, 182, 193, .2);
       transform: translateY(-2px);
     }
+
     .pair-chars {
       font-size: 1.6rem;
       font-weight: 900;
@@ -161,18 +207,24 @@
       align-items: center;
       gap: 8px;
     }
-    .pair-arrow { color: #FFB6C1; font-size: 1rem; }
+
+    .pair-arrow {
+      color: #FFB6C1;
+      font-size: 1rem;
+    }
+
     .pair-desc {
       font-size: .8rem;
       color: #7F8C8D;
       line-height: 1.5;
     }
+
     .pair-rate {
       margin-top: 10px;
       font-size: .82rem;
       font-weight: 700;
       color: #FF9EAB;
-      background: rgba(255,182,193,.12);
+      background: rgba(255, 182, 193, .12);
       display: inline-block;
       padding: 2px 10px;
       border-radius: 20px;
@@ -183,6 +235,7 @@
       width: 100%;
       border-collapse: collapse;
     }
+
     .romaji-table th {
       background: #fafafa;
       font-size: .82rem;
@@ -192,16 +245,24 @@
       text-align: left;
       border-bottom: 2px solid #EAEAEA;
     }
+
     .romaji-table td {
       padding: 12px 14px;
       font-size: .9rem;
       color: #2C3E50;
       border-bottom: 1px solid #F5F5F5;
     }
-    .romaji-table tr:last-child td { border-bottom: none; }
-    .romaji-table tr:hover td { background: #fff9f9; }
+
+    .romaji-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .romaji-table tr:hover td {
+      background: #fff9f9;
+    }
+
     .tag-wrong {
-      background: rgba(255,159,171,.15);
+      background: rgba(255, 159, 171, .15);
       color: #D84B6B;
       font-weight: 700;
       padding: 2px 8px;
@@ -209,8 +270,9 @@
       font-size: .85rem;
       font-family: monospace;
     }
+
     .tag-correct {
-      background: rgba(90,187,214,.12);
+      background: rgba(90, 187, 214, .12);
       color: #3C7A92;
       font-weight: 700;
       padding: 2px 8px;
@@ -220,7 +282,11 @@
     }
 
     /* 개선 팁 */
-    .tip-list { list-style: none; padding: 0; }
+    .tip-list {
+      list-style: none;
+      padding: 0;
+    }
+
     .tip-list li {
       display: flex;
       align-items: flex-start;
@@ -228,12 +294,17 @@
       padding: 14px 0;
       border-bottom: 1px solid #F5F5F5;
     }
-    .tip-list li:last-child { border-bottom: none; }
+
+    .tip-list li:last-child {
+      border-bottom: none;
+    }
+
     .tip-icon {
       font-size: 1.4rem;
       flex-shrink: 0;
       margin-top: 1px;
     }
+
     .tip-text strong {
       display: block;
       font-size: .92rem;
@@ -241,6 +312,7 @@
       color: #2C3E50;
       margin-bottom: 4px;
     }
+
     .tip-text span {
       font-size: .84rem;
       color: #7F8C8D;
@@ -253,6 +325,7 @@
       grid-template-columns: repeat(10, 1fr);
       gap: 6px;
     }
+
     .hm-cell {
       aspect-ratio: 1;
       border-radius: 8px;
@@ -266,18 +339,50 @@
       transition: transform .15s;
       position: relative;
     }
-    .hm-cell:hover { transform: scale(1.15); z-index: 2; }
-    .hm-char { font-size: .95rem; line-height: 1; }
-    .hm-rate { font-size: .6rem; margin-top: 2px; }
 
-    .hm-high   { background: rgba(255,159,171,.45); color: #B03050; }
-    .hm-med    { background: rgba(255,197,130,.35); color: #A0600A; }
-    .hm-low    { background: rgba(168,216,168,.35); color: #2F6A2F; }
-    .hm-none   { background: #f0f0f0; color: #aaa; }
+    .hm-cell:hover {
+      transform: scale(1.15);
+      z-index: 2;
+    }
+
+    .hm-char {
+      font-size: .95rem;
+      line-height: 1;
+    }
+
+    .hm-rate {
+      font-size: .6rem;
+      margin-top: 2px;
+    }
+
+    .hm-high {
+      background: rgba(255, 159, 171, .45);
+      color: #B03050;
+    }
+
+    .hm-med {
+      background: rgba(255, 197, 130, .35);
+      color: #A0600A;
+    }
+
+    .hm-low {
+      background: rgba(168, 216, 168, .35);
+      color: #2F6A2F;
+    }
+
+    .hm-none {
+      background: #f0f0f0;
+      color: #aaa;
+    }
 
     @media (max-width: 600px) {
-      .summary-row { grid-template-columns: 1fr 1fr; }
-      .heatmap-grid { grid-template-columns: repeat(5, 1fr); }
+      .summary-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .heatmap-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
     }
   </style>
 </head>
@@ -304,7 +409,10 @@
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link"
+        style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+        onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+        onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -400,7 +508,8 @@
           <div class="tip-icon">🆑</div>
           <div class="tip-text">
             <strong>「っ」 — 촉음(小文字) 입력 패턴</strong>
-            <span>「っ」는 다음 자음을 두 번 입력(<b>kk, ss, tt…</b>)하거나, <b>xtsu / ltsu</b>로 단독 입력할 수 있습니다. 뒤 글자와 함께 치는 습관을 들이세요.</span>
+            <span>「っ」는 다음 자음을 두 번 입력(<b>kk, ss, tt…</b>)하거나, <b>xtsu / ltsu</b>로 단독 입력할 수 있습니다. 뒤 글자와 함께 치는 습관을
+              들이세요.</span>
           </div>
         </li>
         <li>
@@ -500,16 +609,16 @@
     };
 
     const baseChars = [
-      'あ','い','う','え','お',
-      'か','き','く','け','こ',
-      'さ','し','す','せ','そ',
-      'た','ち','つ','て','と',
-      'な','に','ぬ','ね','の',
-      'は','ひ','ふ','へ','ほ',
-      'ま','み','む','め','も',
-      'や','유','よ','ん','っ',
-      'ら','り','る','れ','ろ',
-      'わ','을','ぢ','づ','ぜ'
+      'あ', 'い', 'う', 'え', 'お',
+      'か', 'き', 'く', 'け', 'こ',
+      'さ', 'し', 'す', 'せ', 'そ',
+      'た', 'ち', 'つ', 'て', 'と',
+      'な', 'に', 'ぬ', 'ね', 'の',
+      'は', 'ひ', 'ふ', 'へ', 'ほ',
+      'ま', 'み', 'む', 'め', 'も',
+      'や', '유', 'よ', 'ん', 'っ',
+      'ら', 'り', 'る', 'れ', 'ろ',
+      'わ', '을', 'ぢ', 'づ', 'ぜ'
     ];
 
     // Convert any Korean/placeholders to standard Japanese in baseChars
@@ -523,26 +632,26 @@
         "Authorization": "Bearer " + token
       }
     })
-    .then(res => {
-      if (!res.ok) throw new Error("인증 실패");
-      return res.json();
-    })
-    .then(result => {
-      if (result.success) {
-        renderAnalysis(result);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("데이터를 가져오는 중 오류가 발생했습니다.");
-      location.href = "login.html";
-    });
+      .then(res => {
+        if (!res.ok) throw new Error("인증 실패");
+        return res.json();
+      })
+      .then(result => {
+        if (result.success) {
+          renderAnalysis(result);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("데이터를 가져오는 중 오류가 발생했습니다.");
+        location.href = "login.html";
+      });
 
     function renderAnalysis(result) {
       // 1. 요약 통계 렌더
       document.getElementById('avg-error-rate-val').innerText = result.summary.avg_error_rate.toFixed(1) + "%";
       document.getElementById('total-typos-val').innerText = result.summary.total_typos + "회";
-      
+
       const imp = result.summary.improvement;
       const impValEl = document.getElementById('improvement-val');
       if (imp > 0) {
@@ -564,11 +673,11 @@
 
       const hm = document.getElementById('heatmap');
       hm.innerHTML = '';
-      
+
       baseChars.forEach(ch => {
         const item = dataMap[ch];
         const pct = item && item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
-        
+
         const cell = document.createElement('div');
         cell.className = 'hm-cell ' + (pct >= 10 ? 'hm-high' : pct >= 5 ? 'hm-med' : pct > 0 ? 'hm-low' : 'hm-none');
         cell.title = `${ch} — 오타율 ${pct}% (오타 ${item ? item.error_count : 0}/${item ? item.total_count : 0})`;
@@ -579,7 +688,7 @@
       // 3. 오타 TOP 10 렌더
       const barsEl = document.getElementById('typo-bars');
       barsEl.innerHTML = '';
-      
+
       const sortedStats = result.data
         .map(item => {
           const rate = item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
@@ -593,9 +702,9 @@
         sortedStats.forEach(d => {
           const level = d.pct >= 10 ? 'high' : d.pct >= 5 ? 'med' : 'low';
           const fillCls = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
-          const pctCls  = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
+          const pctCls = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
           const roma = romajiLookup[d.kana] || '';
-          
+
           barsEl.innerHTML += `
             <div class="typo-row">
               <div class="typo-char">${d.kana}<small>${roma}</small></div>
@@ -654,4 +763,5 @@
     }
   </script>
 </body>
+
 </html>

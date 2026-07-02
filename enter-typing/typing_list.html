@@ -181,7 +181,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -224,7 +228,8 @@
             </div>
 
             <div style="text-align: center; margin-top: 60px;">
-                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;" onclick="loadMore()">더 많은 콘텐츠 보기</button>
+                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;"
+                    onclick="loadMore()">더 많은 콘텐츠 보기</button>
             </div>
         </section>
     </main>
@@ -335,7 +340,7 @@
         let allTypingContents = [];
         let isAdminMode = false;
         let currentCategory = '전체';
-        let displayLimit = 4;
+        let displayLimit = 30;
 
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
@@ -349,7 +354,7 @@
 
         function setCategory(cat) {
             currentCategory = cat;
-            displayLimit = 4; // 카테고리 변경 시 표시 개수 초기화
+            displayLimit = 30; // 카테고리 변경 시 표시 개수 초기화
             renderCards();
             updateCategoryButtons();
         }
@@ -369,7 +374,7 @@
         }
 
         function loadMore() {
-            displayLimit += 4;
+            displayLimit += 30;
             renderCards();
         }
 
@@ -510,7 +515,7 @@
                     const diffValue = data.difficulty || 3;
                     document.getElementById('modal-difficulty').innerText = '⭐'.repeat(diffValue);
                     document.getElementById('modal-play-count').innerText = (data.play_count || 0) + '회';
-                    
+
                     let mTotalSeconds = data.best_time || 0;
                     if (mTotalSeconds === 0 && data.timestamps) {
                         try {

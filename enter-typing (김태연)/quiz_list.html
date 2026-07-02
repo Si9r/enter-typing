@@ -216,7 +216,6 @@
                 <button class="btn btn-outline" style="padding: 8px 20px;">JPOP</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;">KPOP</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;">애니메이션</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">문학</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;">팝송</button>
             </div>
 
@@ -409,7 +408,7 @@
                                 <span class="difficulty">${diffStars}</span>
                                 <span class="time" style="margin-left: 10px;">🏆 ${bestScore}점</span>
                             </div>
-                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
+                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
                         </div>
                     </div>
                 `;

@@ -122,7 +122,8 @@ class BattleHistory(Base):
     id = Column(Integer, primary_key=True, index=True)
     room_code = Column(String(10), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=True)
+    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=True) # 타이핑 콘텐츠
+    quiz_id = Column(Integer, ForeignKey("quiz_contents.id"), nullable=True)      # 퀴즈 콘텐츠
     rank = Column(Integer, nullable=False)       # 최종 순위 (1~4)
     score = Column(Integer, nullable=False)      # 최종 점수
     wpm = Column(Integer, nullable=False)        # 분당 타수

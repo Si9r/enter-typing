@@ -241,11 +241,212 @@ function calculateTypingScore(accuracy, typingRatio, timeRatio, difficulty) {
   return Math.round(finalScore);
 }
 
+/**
+ * 사용자가 입력한 새로운 글자가 현재 입력해야 할 가나 유닛에 유효한지 검사하는 함수입니다.
+ * @param {Object} currentUnit - 검사할 대상 유닛 (validInputs 배열 포함)
+ * @param {string} testBuffer - 현재까지 입력된 버퍼와 새로 입력된 글자의 조합
+ * @returns {Object} { isCompleteMatch: boolean, isPossiblePrefix: boolean }
+ */
+function checkRomajiMatch(currentUnit, testBuffer) {
+  let isPossiblePrefix = false;
+  let isCompleteMatch = false;
+
+  if (currentUnit && currentUnit.validInputs) {
+    for (let validInput of currentUnit.validInputs) {
+      if (validInput === testBuffer) {
+        isCompleteMatch = true;
+        break;
+      }
+      if (validInput.startsWith(testBuffer)) {
+        isPossiblePrefix = true;
+      }
+    }
+  }
+
+  return { isCompleteMatch, isPossiblePrefix };
+}
+
+/**
+ * 타이핑 대상이 되는 일본어 가사 유닛(TargetUnits)들을 HTML DOM 요소로 생성하여 컨테이너에 삽입하는 함수입니다.
+ * @param {HTMLElement} container - 가사가 렌더링될 부모 컨테이너 요소
+ * @param {Array} units - parseKanaToTargetUnits 로 파싱된 유닛 배열
+ */
+function renderActiveLyrics(container, units) {
+  if (!container || !units) return;
+  container.innerHTML = "";
+  units.forEach((unit, idx) => {
+    const span = document.createElement("span");
+    span.className = "lyric-unit " + (idx === 0 ? "current" : "pending");
+
+    const hira = document.createElement("span");
+    hira.className = "hira-text";
+    hira.textContent = unit.text;
+
+    const roma = document.createElement("span");
+    roma.className = "roma-text";
+    const initialRoma = unit.validInputs[0] || "";
+    for (let i = 0; i < initialRoma.length; i++) {
+      const charSpan = document.createElement("span");
+      charSpan.textContent = initialRoma[i];
+      roma.appendChild(charSpan);
+    }
+
+    span.appendChild(hira);
+    span.appendChild(roma);
+    container.appendChild(span);
+  });
+}
+
+/**
+ * 현재 입력 위치 및 입력 중인 버퍼 상태에 맞춰 가사 렌더링 요소들의 하이라이트 클래스를 업데이트하는 함수입니다.
+ * @param {HTMLElement} container - 가사가 렌더링되어 있는 부모 컨테이너 요소
+ * @param {Array} units - 파싱된 유닛 배열
+ * @param {number} currentUnitIndex - 현재 입력 중인 유닛의 인덱스
+ * @param {string} currentBuffer - 현재 입력 중인 로마자 버퍼
+ */
+function highlightCurrentChar(container, units, currentUnitIndex, currentBuffer) {
+  if (!container || !units) return;
+  const spans = container.querySelectorAll(".lyric-unit");
+  spans.forEach((span, idx) => {
+    span.classList.remove("current", "typed", "pending");
+
+    const romaContainer = span.querySelector(".roma-text");
+
+    if (idx < currentUnitIndex) {
+      span.classList.add("typed");
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach((c) => {
+          c.classList.remove("current", "pending");
+          c.classList.add("typed");
+        });
+      }
+    } else if (idx === currentUnitIndex) {
+      span.classList.add("current");
+
+      const unit = units[idx];
+      if (!unit) return;
+      let bestMatch = unit.validInputs[0];
+      if (currentBuffer.length > 0) {
+        for (let v of unit.validInputs) {
+          if (v.startsWith(currentBuffer)) {
+            bestMatch = v;
+            break;
+          }
+        }
+      }
+
+      if (romaContainer && romaContainer.textContent !== bestMatch) {
+        romaContainer.innerHTML = "";
+        for (let i = 0; i < bestMatch.length; i++) {
+          const charSpan = document.createElement("span");
+          charSpan.textContent = bestMatch[i];
+          romaContainer.appendChild(charSpan);
+        }
+      }
+
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach((c, i) => {
+          c.classList.remove("current", "typed", "pending");
+          if (i < currentBuffer.length) {
+            c.classList.add("typed");
+          } else if (i === currentBuffer.length) {
+            c.classList.add("current");
+          } else {
+            c.classList.add("pending");
+          }
+        });
+      }
+    } else {
+      span.classList.add("pending");
+      if (romaContainer) {
+        const chars = romaContainer.querySelectorAll("span");
+        chars.forEach((c) => {
+          c.classList.remove("current", "typed");
+          c.classList.add("pending");
+        });
+      }
+    }
+  });
+}
+
+/**
+ * 현재 입력해야 할 가사와 현재까지 입력된 로마자 버퍼 상태를 한글 텍스트(Status Panel)로 업데이트하는 함수입니다.
+ * @param {HTMLElement} statusPanel - 상태 정보를 표시할 엘리먼트
+ * @param {Array} units - 파싱된 유닛 배열
+ * @param {number} currentUnitIndex - 현재 입력 중인 유닛의 인덱스
+ * @param {string} currentBuffer - 현재 입력 중인 로마자 버퍼
+ * @param {string} completeMessage - 입력 완료 시 표시할 메시지
+ * @returns {string} 상태 패널에 설정될 HTML/Text 문자열
+ */
+function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, completeMessage = "입력 완료!") {
+  if (!statusPanel) return "";
+  if (!units || currentUnitIndex >= units.length) {
+    statusPanel.innerHTML = completeMessage;
+    return completeMessage;
+  }
+
+  const currentUnit = units[currentUnitIndex];
+  if (!currentUnit) {
+    const defaultMsg = "입력할 항목을 준비 중입니다.";
+    statusPanel.innerText = defaultMsg;
+    return defaultMsg;
+  }
+
+  let htmlStr = "";
+  if (currentBuffer === "") {
+    htmlStr = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span>`;
+  } else {
+    htmlStr = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span> 입력 중... (입력된 조합: <span class="typing-now">${currentBuffer}</span>)`;
+  }
+  statusPanel.innerHTML = htmlStr;
+  return htmlStr;
+}
+
 // 브라우저 전역 범위에 노출
-window.getCompletedRomajiLength = getCompletedRomajiLength;
-window.KO_CHO = KO_CHO;
-window.KO_JUNG = KO_JUNG;
-window.KO_JONG = KO_JONG;
-window.KO_JA_MO = KO_JA_MO;
-window.ko2en = ko2en;
-window.calculateTypingScore = calculateTypingScore;
+if (typeof window !== "undefined") {
+  window.TypingEngine = {
+    romajiTable,
+    combinationRules,
+    parseKanaToTargetUnits,
+    getCompletedRomajiLength,
+    KO_CHO,
+    KO_JUNG,
+    KO_JONG,
+    KO_JA_MO,
+    ko2en,
+    calculateTypingScore,
+    checkRomajiMatch,
+    renderActiveLyrics,
+    highlightCurrentChar,
+    getStatusHTML
+  };
+
+  // 기존 전역 변수 하위 호환성 유지
+  window.parseKanaToTargetUnits = parseKanaToTargetUnits;
+  window.getCompletedRomajiLength = getCompletedRomajiLength;
+  window.KO_CHO = KO_CHO;
+  window.KO_JUNG = KO_JUNG;
+  window.KO_JONG = KO_JONG;
+  window.KO_JA_MO = KO_JA_MO;
+  window.ko2en = ko2en;
+  window.calculateTypingScore = calculateTypingScore;
+}
+
+// Node.js 모듈 노출
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    romajiTable,
+    combinationRules,
+    parseKanaToTargetUnits,
+    getCompletedRomajiLength,
+    KO_CHO,
+    KO_JUNG,
+    KO_JONG,
+    KO_JA_MO,
+    ko2en,
+    calculateTypingScore,
+    checkRomajiMatch,
+  };
+}

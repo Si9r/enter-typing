@@ -262,39 +262,8 @@
             <h2>🔥 인기 타이핑 콘텐츠</h2>
             <a href="typing_popular.html" class="view-all">전체보기 ></a>
         </div>
-        <div class="card-grid">
-            <div class="card" onclick="location.href='typing_detail.html'">
-                <div class="card-badge pink">JPOP</div>
-                <h3 class="card-title">夜に駆ける (밤을 달리다)</h3>
-                <p class="card-desc">YOASOBI의 히트곡 가사로 타이핑 연습하기</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 120k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='typing_detail.html'">
-                <div class="card-badge blue">애니메이션</div>
-                <h3 class="card-title">너의 이름은. 명대사</h3>
-                <p class="card-desc">감동적인 명대사를 직접 타이핑하며 되새겨보세요.</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 85k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='typing_detail.html'">
-                <div class="card-badge green">문학</div>
-                <h3 class="card-title">윤동주 - 별 헤는 밤</h3>
-                <p class="card-desc">한국인이 가장 사랑하는 시를 차분히 연습해보세요.</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 54k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='typing_detail.html'">
-                <div class="card-badge pink">KPOP</div>
-                <h3 class="card-title">Ditto - NewJeans</h3>
-                <p class="card-desc">인기 KPOP 가사로 타자 속도를 높여보세요.</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 210k+</span>
-                </div>
-            </div>
+        <div class="card-grid" id="popular-typing-grid">
+            <!-- 동적으로 렌더링됩니다 -->
         </div>
     </section>
 
@@ -303,39 +272,8 @@
             <h2>💡 추천 퀴즈</h2>
             <a href="quiz_list.html" class="view-all">전체보기 ></a>
         </div>
-        <div class="card-grid">
-            <div class="card" onclick="location.href='quiz.html'">
-                <div class="card-badge blue">일본어</div>
-                <h3 class="card-title">히라가나/가타카나 마스터</h3>
-                <p class="card-desc">기초부터 탄탄하게! 일본어 문자를 퀴즈로 학습하세요.</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 32k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='quiz.html'">
-                <div class="card-badge green">상식</div>
-                <h3 class="card-title">IT 기본 용어 퀴즈</h3>
-                <p class="card-desc">프론트엔드, 백엔드 기초 용어 알아맞히기</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 15k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='quiz.html'">
-                <div class="card-badge pink">넌센스</div>
-                <h3 class="card-title">두뇌 회전 넌센스 퀴즈</h3>
-                <p class="card-desc">재미있는 넌센스 퀴즈로 쉬어가는 타임!</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 48k+</span>
-                </div>
-            </div>
-            <div class="card" onclick="location.href='quiz.html'">
-                <div class="card-badge blue">영어</div>
-                <h3 class="card-title">필수 영단어 100선</h3>
-                <p class="card-desc">가장 많이 쓰이는 필수 영단어를 퀴즈로 암기!</p>
-                <div class="card-footer">
-                    <span class="plays">▶ 92k+</span>
-                </div>
-            </div>
+        <div class="card-grid" id="popular-quiz-grid">
+            <!-- 동적으로 렌더링됩니다 -->
         </div>
     </section>
 
@@ -392,6 +330,64 @@
         </div>
     </footer>
 
+    <!-- Dynamic Loading Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetch popular typing contents
+                const typingRes = await fetch('/api/typing-contents?t=' + Date.now());
+                const typingData = await typingRes.json();
+                if (typingData.success) {
+                    const sortedTyping = typingData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 3);
+                    const typingGrid = document.getElementById('popular-typing-grid');
+                    typingGrid.innerHTML = '';
+                    sortedTyping.forEach(item => {
+                        let badgeColor = 'pink';
+                        if (item.genre === 'ANIME' || item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
+                        else if (item.genre === '문학' || item.genre === '기타') badgeColor = 'green';
+                        const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '가사 타이핑 연습하기');
+                        typingGrid.insertAdjacentHTML('beforeend', `
+                            <div class="card" onclick="location.href='typing.html?id=${item.id}'">
+                                <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
+                                <h3 class="card-title">${item.title}</h3>
+                                <p class="card-desc">${descPreview}</p>
+                                <div class="card-footer">
+                                    <span class="plays">▶ ${item.play_count || 0}</span>
+                                </div>
+                            </div>
+                        `);
+                    });
+                }
+
+                // Fetch popular quiz contents
+                const quizRes = await fetch('/api/quiz-contents?t=' + Date.now());
+                const quizData = await quizRes.json();
+                if (quizData.success) {
+                    const sortedQuiz = quizData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 3);
+                    const quizGrid = document.getElementById('popular-quiz-grid');
+                    quizGrid.innerHTML = '';
+                    sortedQuiz.forEach(item => {
+                        let badgeColor = 'pink';
+                        if (item.genre === '영어' || item.genre === '일본어' || item.genre === 'ANIME') badgeColor = 'blue';
+                        else if (item.genre === '상식' || item.genre === '역사' || item.genre === '문학') badgeColor = 'green';
+                        const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '퀴즈 풀기');
+                        quizGrid.insertAdjacentHTML('beforeend', `
+                            <div class="card" onclick="location.href='quiz.html?id=${item.id}'">
+                                <div class="card-badge ${badgeColor}">${item.genre || '퀴즈'}</div>
+                                <h3 class="card-title">${item.title}</h3>
+                                <p class="card-desc">${descPreview}</p>
+                                <div class="card-footer">
+                                    <span class="plays">▶ ${item.play_count || 0}</span>
+                                </div>
+                            </div>
+                        `);
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load popular contents', err);
+            }
+        });
+    </script>
 </body>
 
 </html>

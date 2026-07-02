@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>퀴즈 목록 - 엔터핑</title>
+    <title>타이핑 목록 - 엔터핑</title>
     <link rel="stylesheet" href="style.css?v=1.0.3">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
         rel="stylesheet">
@@ -167,8 +167,8 @@
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="typing_list.html">타이핑</a>
-                <a href="quiz_list.html" class="active">퀴즈</a>
+                <a href="typing_list.html" class="active">타이핑</a>
+                <a href="quiz_list.html">퀴즈</a>
                 <a href="ranking.html">랭킹</a>
                 <a href="battle.html">실시간 대전</a>
             </nav>
@@ -181,11 +181,7 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link"
-                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
-                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
-                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
-                공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -200,28 +196,26 @@
         style="margin-top: 80px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
         <section class="content-section" style="padding-top: 40px; width: 100%; max-width: 1200px;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>📚 모든 퀴즈 콘텐츠</h2>
+                <h2>📚 모든 타이핑 콘텐츠</h2>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-outline" id="admin-mode-btn" onclick="toggleAdminMode()"
                         style="display: flex; align-items: center; border-radius: 30px; padding: 10px 22px;">
                         관리자 모드: OFF
                     </button>
                     <button class="btn btn-pink"
-                        onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='quiz_create.html'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='login.html'; }"
+                        onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='typing_create.html'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='login.html'; }"
                         style="display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 10px 22px;">
-                        <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> 퀴즈 추가하기
+                        <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> 타이핑 추가하기
                     </button>
                 </div>
             </div>
 
-            <!-- 필터/카테고리 영역 -->
-            <div style="margin-bottom: 40px; display: flex; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-pink" style="padding: 8px 20px;">전체</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">JPOP</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">KPOP</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">애니메이션</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">문학</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;">팝송</button>
+            <div id="category-buttons" style="margin-bottom: 40px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
+                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
+                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('KPOP')">KPOP</button>
+                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
+                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('팝송')">팝송</button>
             </div>
 
             <div class="card-grid" id="card-grid">
@@ -229,7 +223,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 60px;">
-                <button class="btn btn-blue-outline btn-large" style="display: inline-flex;">더 많은 콘텐츠 보기</button>
+                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;" onclick="loadMore()">더 많은 콘텐츠 보기</button>
             </div>
         </section>
     </main>
@@ -312,8 +306,8 @@
                         <span id="modal-play-count" class="value">0회</span>
                     </div>
                     <div class="stat-item">
-                        <span class="label">최고 점수</span>
-                        <span id="modal-best-score" class="value">0점</span>
+                        <span class="label">시간</span>
+                        <span id="modal-best-time" class="value">0초</span>
                     </div>
                 </div>
 
@@ -323,9 +317,9 @@
 
                 <div class="detail-actions">
                     <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
-                        ▶ 퀴즈 시작하기
+                        ▶ 타이핑 시작하기
                     </button>
-                    <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
+                    <button id="modal-rank-btn" class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
                         🏆 랭킹 보기
                     </button>
                 </div>
@@ -337,8 +331,10 @@
         const modal = document.getElementById('detail-modal');
 
         // 페이지 로드 시 콘텐츠 불러오기
-        let allQuizContents = [];
+        let allTypingContents = [];
         let isAdminMode = false;
+        let currentCategory = '전체';
+        let displayLimit = 4;
 
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
@@ -350,15 +346,41 @@
             renderCards();
         }
 
-        async function deleteQuizContent(id) {
-            if (!confirm('정말로 이 퀴즈 콘텐츠를 삭제하시겠습니까?')) return;
+        function setCategory(cat) {
+            currentCategory = cat;
+            displayLimit = 4; // 카테고리 변경 시 표시 개수 초기화
+            renderCards();
+            updateCategoryButtons();
+        }
+
+        function updateCategoryButtons() {
+            const container = document.getElementById('category-buttons');
+            if (!container) return;
+            const buttons = container.querySelectorAll('button');
+            buttons.forEach(btn => {
+                // 버튼의 텍스트와 현재 카테고리를 매칭. ANIME는 '애니메이션' 텍스트와 매칭될 수 있으므로 onclick 값 활용
+                if (btn.getAttribute('onclick').includes(currentCategory)) {
+                    btn.className = 'btn btn-pink';
+                } else {
+                    btn.className = 'btn btn-outline';
+                }
+            });
+        }
+
+        function loadMore() {
+            displayLimit += 4;
+            renderCards();
+        }
+
+        async function deleteTypingContent(id) {
+            if (!confirm('정말로 이 타이핑 콘텐츠를 삭제하시겠습니까?')) return;
 
             try {
                 const token = sessionStorage.getItem('ep_token');
                 const headers = {};
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
-                const response = await fetch(`/api/quiz-contents/${id}`, {
+                const response = await fetch(`/api/typing-contents/${id}`, {
                     method: 'DELETE',
                     headers: headers
                 });
@@ -371,7 +393,7 @@
                 const data = await response.json();
                 if (data.success) {
                     alert('성공적으로 삭제되었습니다.');
-                    allQuizContents = allQuizContents.filter(item => item.id !== id);
+                    allTypingContents = allTypingContents.filter(item => item.id !== id);
                     renderCards();
                 } else {
                     alert('삭제에 실패했습니다: ' + (data.message || '알 수 없는 오류'));
@@ -386,54 +408,80 @@
             const grid = document.getElementById('card-grid');
             grid.innerHTML = '';
 
-            allQuizContents.forEach(item => {
+            let filtered = allTypingContents;
+            if (currentCategory !== '전체') {
+                filtered = allTypingContents.filter(item => item.genre === currentCategory);
+            }
+
+            const itemsToShow = filtered.slice(0, displayLimit);
+
+            itemsToShow.forEach(item => {
                 let badgeColor = 'pink';
-                if (item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
+                if (item.genre === 'ANIME' || item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
                 else if (item.genre === '문학' || item.genre === '기타') badgeColor = 'green';
 
                 const descPreview = (item.description && item.description.length > 30)
                     ? item.description.substring(0, 30) + '...'
-                    : (item.description || '새로운 퀴즈에 도전해보세요!');
+                    : (item.description || '가사 타이핑 연습하기');
 
                 const diffStars = '⭐'.repeat(item.difficulty || 3);
-                const bestScore = item.best_score || 0;
+                let totalSeconds = item.best_time || 0;
+                if (totalSeconds === 0 && item.timestamps) {
+                    try {
+                        let tArr = [];
+                        if (item.timestamps.trim().startsWith('[')) {
+                            tArr = JSON.parse(item.timestamps);
+                        } else {
+                            tArr = item.timestamps.split('\n').map(s => s.trim()).filter(s => s !== '');
+                        }
+                        if (tArr && tArr.length > 0) {
+                            totalSeconds = Math.round(parseFloat(tArr[tArr.length - 1]));
+                        }
+                    } catch (e) { }
+                }
+                const m = Math.floor(totalSeconds / 60);
+                const s = totalSeconds % 60;
+                const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
 
                 const cardHTML = `
                     <div class="card" onclick="openModal(${item.id})">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                            <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${item.genre || 'JPOP'}</div>
-                            <div style="font-size: 0.8rem; font-weight: 700; color: #666; background: #f5f5f5; padding: 4px 10px; border-radius: 12px; border: 1px solid #e0e0e0; display: flex; align-items: center; gap: 4px;">
-                                📝 ${item.quiz_count || 0}문제
-                            </div>
-                        </div>
+                        <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
                         <h3 class="card-title">${item.title}</h3>
                         <p class="card-desc">${descPreview}</p>
                         <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                             <div>
                                 <span class="difficulty">${diffStars}</span>
-                                <span class="time" style="margin-left: 10px;">🏆 ${bestScore}점</span>
+                                <span class="time" style="margin-left: 10px;">⏱️ ${timeStr}</span>
                             </div>
-                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
+                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
                         </div>
                     </div>
                 `;
                 grid.insertAdjacentHTML('beforeend', cardHTML);
             });
+
+            // 더보기 버튼 표시 여부
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                if (displayLimit >= filtered.length) {
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    loadMoreBtn.style.display = 'inline-flex';
+                }
+            }
         }
 
-        // 페이지 로드 시 콘텐츠 불러오기
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                const response = await fetch('/api/quiz-contents');
+                const response = await fetch('/api/typing-contents?t=' + Date.now());
                 const data = await response.json();
 
                 if (data.success) {
-                    allQuizContents = data.data;
+                    allTypingContents = data.data;
+                    renderCards();
                 }
-
-                renderCards();
             } catch (err) {
-                console.error('Failed to load quiz contents', err);
+                console.error('Failed to load typing contents', err);
             }
         });
 
@@ -442,8 +490,7 @@
             setTimeout(() => modal.classList.add('show'), 10);
 
             try {
-                // 퀴즈 디테일 API가 있다면 사용
-                const response = await fetch(`/api/quiz-content/${id}`);
+                const response = await fetch(`/api/typing-content/${id}?t=${Date.now()}`);
                 const data = await response.json();
                 if (data.success) {
                     document.getElementById('modal-title').innerText = data.title;
@@ -462,16 +509,33 @@
                     const diffValue = data.difficulty || 3;
                     document.getElementById('modal-difficulty').innerText = '⭐'.repeat(diffValue);
                     document.getElementById('modal-play-count').innerText = (data.play_count || 0) + '회';
-                    document.getElementById('modal-best-score').innerText = (data.best_score || 0) + '점';
+                    
+                    let mTotalSeconds = data.best_time || 0;
+                    if (mTotalSeconds === 0 && data.timestamps) {
+                        try {
+                            let mtArr = [];
+                            if (data.timestamps.trim().startsWith('[')) {
+                                mtArr = JSON.parse(data.timestamps);
+                            } else {
+                                mtArr = data.timestamps.split('\n').map(s => s.trim()).filter(s => s !== '');
+                            }
+                            if (mtArr && mtArr.length > 0) {
+                                mTotalSeconds = Math.round(parseFloat(mtArr[mtArr.length - 1]));
+                            }
+                        } catch (e) { }
+                    }
+                    const mm = Math.floor(mTotalSeconds / 60);
+                    const ms = mTotalSeconds % 60;
+                    document.getElementById('modal-best-time').innerText = mm > 0 ? `${mm}분 ${ms}초` : `${ms}초`;
 
-                    document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 퀴즈를 시작해보세요!`;
+                    document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 가사로 타자 연습을 시작해보세요!`;
 
-                    document.getElementById('modal-start-btn').onclick = () => location.href = `quiz.html?id=${id}`;
+                    document.getElementById('modal-start-btn').onclick = () => location.href = `typing.html?id=${id}`;
+                    document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking_song.html?id=${id}`;
                 }
             } catch (error) {
-                console.error("Failed to fetch quiz content details", error);
-                document.getElementById('modal-desc').innerText = "콘텐츠를 불러오지 못했습니다. API가 연결되어 있지 않을 수 있습니다.";
-                document.getElementById('modal-start-btn').onclick = () => location.href = `quiz.html?id=${id}`;
+                console.error("Failed to fetch typing content details", error);
+                document.getElementById('modal-desc').innerText = "콘텐츠를 불러오지 못했습니다.";
             }
         }
 

@@ -12,6 +12,16 @@ const statusPanel = document.getElementById("statusPanel");
 const progressBar = document.getElementById("timerBarFill");
 
 let timeLeft = 60;
+
+function escapeHTML(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 let timer = null;
 let isPlaying = false;
 let currentText = "";
@@ -45,6 +55,7 @@ let lineCompleted = false;
 // Variables for countdown overlay
 let isCountingDown = false;
 let countdownInterval = null;
+let playCountIncremented = false; // 세션 내 중복 카운트 방지
 
 window.onYouTubeIframeAPIReady = function () {
   isYoutubeReady = true;
@@ -288,46 +299,46 @@ async function fetchTypingContent(contentId) {
       if (infoTitle) infoTitle.innerText = data.title || "제목 없음";
       if (infoArtist) infoArtist.innerText = data.artist || "아티스트 미상";
       if (infoViews) infoViews.innerText = data.play_count || "0";
-
+      
       if (infoTags) {
-        infoTags.innerHTML = "";
-        if (data.genre) {
-          const genres = data.genre.split(',').map(g => g.trim());
-          genres.forEach(g => {
-            const tagSpan = document.createElement("span");
-            tagSpan.style.cssText = "background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;";
-            tagSpan.innerText = g;
-            infoTags.appendChild(tagSpan);
-          });
-        } else {
-          infoTags.innerHTML = '<span style="background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;">태그 없음</span>';
-        }
+          infoTags.innerHTML = "";
+          if (data.genre) {
+              const genres = data.genre.split(',').map(g => g.trim());
+              genres.forEach(g => {
+                  const tagSpan = document.createElement("span");
+                  tagSpan.style.cssText = "background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;";
+                  tagSpan.innerText = g;
+                  infoTags.appendChild(tagSpan);
+              });
+          } else {
+              infoTags.innerHTML = '<span style="background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;">태그 없음</span>';
+          }
       }
 
       if (currentYoutubeId) {
-        if (infoThumbnail) {
-          infoThumbnail.src = `https://img.youtube.com/vi/${currentYoutubeId}/mqdefault.jpg`;
-          infoThumbnail.style.display = "block";
-        }
-        if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "none";
-
-        if (infoCreator) infoCreator.innerText = "로딩 중...";
-        fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${currentYoutubeId}&format=json`)
-          .then(res => res.json())
-          .then(oEmbedData => {
-            if (infoCreator && oEmbedData.author_name) {
-              infoCreator.innerText = oEmbedData.author_name;
-            } else if (infoCreator) {
-              infoCreator.innerText = data.creator_nickname || "엔터핑";
-            }
-          })
-          .catch(err => {
-            if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
-          });
+          if (infoThumbnail) {
+              infoThumbnail.src = `https://img.youtube.com/vi/${currentYoutubeId}/mqdefault.jpg`;
+              infoThumbnail.style.display = "block";
+          }
+          if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "none";
+          
+          if (infoCreator) infoCreator.innerText = "로딩 중...";
+          fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${currentYoutubeId}&format=json`)
+            .then(res => res.json())
+            .then(oEmbedData => {
+                if (infoCreator && oEmbedData.author_name) {
+                    infoCreator.innerText = oEmbedData.author_name;
+                } else if (infoCreator) {
+                    infoCreator.innerText = data.creator_nickname || "엔터핑";
+                }
+            })
+            .catch(err => {
+                if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+            });
       } else {
-        if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
-        if (infoThumbnail) infoThumbnail.style.display = "none";
-        if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "flex";
+          if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+          if (infoThumbnail) infoThumbnail.style.display = "none";
+          if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "flex";
       }
 
       if (currentYoutubeId) {
@@ -399,8 +410,8 @@ function renderLines() {
 
   const currentKanji = contentLines[currentLineIndex] || "";
   if (currentKanji === "[END]") {
-    endGame(true);
-    return;
+      endGame(true);
+      return;
   }
   const currentHiragana = contentHiraganaLines[currentLineIndex] || "";
   const nextKanji = contentLines[currentLineIndex + 1] || "-";
@@ -429,30 +440,7 @@ function renderLines() {
   lineCompleted = false;
   if (isPlaying && typingInput) typingInput.disabled = false;
 
-  if (lyricDisplay) {
-    lyricDisplay.innerHTML = "";
-    targetUnits.forEach((unit, idx) => {
-      const span = document.createElement("span");
-      span.className = "lyric-unit " + (idx === 0 ? "current" : "pending");
-
-      const hira = document.createElement("span");
-      hira.className = "hira-text";
-      hira.textContent = unit.text;
-
-      const roma = document.createElement("span");
-      roma.className = "roma-text";
-      const initialRoma = unit.validInputs[0];
-      for (let i = 0; i < initialRoma.length; i++) {
-        const charSpan = document.createElement("span");
-        charSpan.textContent = initialRoma[i];
-        roma.appendChild(charSpan);
-      }
-
-      span.appendChild(hira);
-      span.appendChild(roma);
-      lyricDisplay.appendChild(span);
-    });
-  }
+  TypingEngine.renderActiveLyrics(lyricDisplay, targetUnits);
 
   typingInput.value = "";
   currentIndex = 0;
@@ -496,6 +484,16 @@ function startGame(startedByYoutube = false) {
   if (isPlaying) return;
   if (contentLines.length === 0) return;
 
+  // 플레이 수 카운트 (최초 1회만, 새로고침 시 초기화)
+  if (!playCountIncremented) {
+    playCountIncremented = true;
+    const urlParams = new URLSearchParams(window.location.search);
+    const cid = urlParams.get("id");
+    if (cid) {
+      fetch(`/api/typing-content/${cid}/play`, { method: "POST" })
+        .catch(err => console.warn("play_count 업데이트 실패:", err));
+    }
+  }
   if (countdownInterval) clearInterval(countdownInterval);
   isCountingDown = false;
   const overlay = document.getElementById("countdown-overlay");
@@ -624,17 +622,17 @@ function endGame(completed = false) {
     document.getElementById("final-wpm").innerText = wpmDisplay ? wpmDisplay.innerText : "0";
     document.getElementById("final-accuracy").innerText = accuracyDisplay ? accuracyDisplay.innerText : "100%";
     document.getElementById("final-typos").innerText = typosDisplay ? typosDisplay.innerText : "0";
-
+    
     const typoContainer = document.getElementById("typo-details-container");
     const typoList = document.getElementById("typo-list");
     if (typoContainer && typoList) {
       if (contentLines && contentLines.length > 0) {
         typoList.innerHTML = "";
-
+        
         const groupedTypos = {};
         typoDetails.forEach(t => {
           if (!groupedTypos[t.lineIndex]) {
-            groupedTypos[t.lineIndex] = [];
+             groupedTypos[t.lineIndex] = [];
           }
           groupedTypos[t.lineIndex].push(t);
         });
@@ -642,189 +640,189 @@ function endGame(completed = false) {
         // 1. Calculate Top 5 Typos
         const typoCounts = {};
         typoDetails.forEach(t => {
-          if (t.type === 'typing') {
-            typoCounts[t.word] = (typoCounts[t.word] || 0) + 1;
-          }
+            if (t.type === 'typing') {
+                typoCounts[t.word] = (typoCounts[t.word] || 0) + 1;
+            }
         });
         const topTypos = Object.entries(typoCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5);
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
 
         const topTypoList = document.getElementById("top-typo-list");
         if (topTypoList) {
-          topTypoList.innerHTML = "";
-          if (topTypos.length === 0) {
-            topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 👏</div>";
-          } else {
-            topTypos.forEach((item, idx) => {
-              const row = document.createElement("div");
-              row.style.display = "flex";
-              row.style.flexDirection = "row";
-              row.style.alignItems = "center";
-              row.style.padding = "6px 12px";
-              row.style.background = idx === 0 ? "#fff0f2" : "#fff";
-              row.style.border = "1px solid #eee";
-              row.style.borderRadius = "20px";
-              row.style.gap = "8px";
+            topTypoList.innerHTML = "";
+            if (topTypos.length === 0) {
+                topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 👏</div>";
+            } else {
+                topTypos.forEach((item, idx) => {
+                    const row = document.createElement("div");
+                    row.style.display = "flex";
+                    row.style.flexDirection = "row";
+                    row.style.alignItems = "center";
+                    row.style.padding = "6px 12px";
+                    row.style.background = idx === 0 ? "#fff0f2" : "#fff";
+                    row.style.border = "1px solid #eee";
+                    row.style.borderRadius = "20px";
+                    row.style.gap = "8px";
 
-              const rankSpan = document.createElement("span");
-              rankSpan.style.fontWeight = "bold";
-              rankSpan.style.color = idx < 3 ? "var(--color-pink)" : "#777";
-              rankSpan.style.fontSize = "0.85rem";
-              rankSpan.innerText = `${idx + 1}위`;
+                    const rankSpan = document.createElement("span");
+                    rankSpan.style.fontWeight = "bold";
+                    rankSpan.style.color = idx < 3 ? "var(--color-pink)" : "#777";
+                    rankSpan.style.fontSize = "0.85rem";
+                    rankSpan.innerText = `${idx + 1}위`;
 
-              const wordSpan = document.createElement("span");
-              wordSpan.style.fontWeight = "bold";
-              wordSpan.style.fontSize = "1rem";
-              wordSpan.style.color = "#333";
-              wordSpan.innerText = `'${item[0]}'`;
+                    const wordSpan = document.createElement("span");
+                    wordSpan.style.fontWeight = "bold";
+                    wordSpan.style.fontSize = "1rem";
+                    wordSpan.style.color = "#333";
+                    wordSpan.innerText = `'${item[0]}'`;
 
-              const countSpan = document.createElement("span");
-              countSpan.style.fontWeight = "bold";
-              countSpan.style.color = "#e67700";
-              countSpan.style.fontSize = "0.9rem";
-              countSpan.innerText = `${item[1]}회`;
+                    const countSpan = document.createElement("span");
+                    countSpan.style.fontWeight = "bold";
+                    countSpan.style.color = "#e67700";
+                    countSpan.style.fontSize = "0.9rem";
+                    countSpan.innerText = `${item[1]}회`;
 
-              row.appendChild(rankSpan);
-              row.appendChild(wordSpan);
-              row.appendChild(countSpan);
-              topTypoList.appendChild(row);
-            });
-          }
+                    row.appendChild(rankSpan);
+                    row.appendChild(wordSpan);
+                    row.appendChild(countSpan);
+                    topTypoList.appendChild(row);
+                });
+            }
         }
 
         let maxLinePlayed = currentLineIndex;
         if (maxLinePlayed >= contentLines.length) {
-          maxLinePlayed = contentLines.length - 1;
+            maxLinePlayed = contentLines.length - 1;
         }
 
         for (let i = 0; i <= maxLinePlayed; i++) {
-          const errors = groupedTypos[i] || [];
-          const units = allTargetUnits[i] || [];
-          const lineText = contentLines[i] || "알 수 없는 구간";
+           const errors = groupedTypos[i] || [];
+           const units = allTargetUnits[i] || [];
+           const lineText = contentLines[i] || "알 수 없는 구간";
+           
+           const sectionDiv = document.createElement("div");
+           sectionDiv.style.marginBottom = "10px";
+           sectionDiv.style.border = "1px solid #ddd";
+           sectionDiv.style.borderRadius = "6px";
+           sectionDiv.style.overflow = "hidden";
+           
+           const sectionHeader = document.createElement("div");
+           sectionHeader.style.padding = "10px 15px";
+           sectionHeader.style.background = "#f1f1f1";
+           sectionHeader.style.cursor = "pointer";
+           sectionHeader.style.display = "flex";
+           sectionHeader.style.justifyContent = "space-between";
+           sectionHeader.style.alignItems = "center";
+           sectionHeader.style.fontWeight = "bold";
+           sectionHeader.style.color = "#444";
+           
+           let coloredLineHtml = "";
+           if (units.length > 0) {
+               units.forEach((u, idx) => {
+                   let hadTypo = errors.some(t => t.type === 'typing' && t.unitIndex === idx);
+                   let wasTimeout = errors.some(t => t.type === 'timeout' && idx >= t.startUnitIndex);
+                   
+                   if (wasTimeout) {
+                       coloredLineHtml += `<span style="color: #c92a2a; background: #fff5f5; padding: 2px; border-radius: 4px;">${escapeHTML(u.text)}</span>`;
+                   } else if (hadTypo) {
+                       coloredLineHtml += `<span style="color: #e67700; background: #fff4e6; padding: 2px; border-radius: 4px;">${escapeHTML(u.text)}</span>`;
+                   } else {
+                       coloredLineHtml += `<span style="color: #555;">${escapeHTML(u.text)}</span>`;
+                   }
+               });
+           } else {
+               coloredLineHtml = `<span>${escapeHTML(lineText)}</span>`;
+           }
 
-          const sectionDiv = document.createElement("div");
-          sectionDiv.style.marginBottom = "10px";
-          sectionDiv.style.border = "1px solid #ddd";
-          sectionDiv.style.borderRadius = "6px";
-          sectionDiv.style.overflow = "hidden";
+           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: #666; margin-left: 10px;">${coloredLineHtml}</span></span>`;
+           if (errors.length === 0) {
+              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! ✨)</span>`;
+           } else {
+              let typingErrors = errors.filter(e => e.type === 'typing').length;
+              let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
+              titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">오타 ${typingErrors} / 시간초과 ${timeoutErrors}</span>`;
+           }
+           sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: #888; margin-left: 10px; flex-shrink: 0;">▼</span>`;
 
-          const sectionHeader = document.createElement("div");
-          sectionHeader.style.padding = "10px 15px";
-          sectionHeader.style.background = "#f1f1f1";
-          sectionHeader.style.cursor = "pointer";
-          sectionHeader.style.display = "flex";
-          sectionHeader.style.justifyContent = "space-between";
-          sectionHeader.style.alignItems = "center";
-          sectionHeader.style.fontWeight = "bold";
-          sectionHeader.style.color = "#444";
+           const detailsDiv = document.createElement("div");
+           detailsDiv.style.padding = "15px";
+           detailsDiv.style.background = "#fff";
+           detailsDiv.style.display = "none";
 
-          let coloredLineHtml = "";
-          if (units.length > 0) {
-            units.forEach((u, idx) => {
-              let hadTypo = errors.some(t => t.type === 'typing' && t.unitIndex === idx);
-              let wasTimeout = errors.some(t => t.type === 'timeout' && idx >= t.startUnitIndex);
+           sectionHeader.addEventListener("click", () => {
+               const arrow = sectionHeader.querySelector(".toggle-arrow");
+               if (detailsDiv.style.display === "none") {
+                   detailsDiv.style.display = "block";
+                   if (arrow) arrow.innerText = "▲";
+               } else {
+                   detailsDiv.style.display = "none";
+                   if (arrow) arrow.innerText = "▼";
+               }
+           });
 
-              if (wasTimeout) {
-                coloredLineHtml += `<span style="color: #c92a2a; background: #fff5f5; padding: 2px; border-radius: 4px;">${u.text}</span>`;
-              } else if (hadTypo) {
-                coloredLineHtml += `<span style="color: #e67700; background: #fff4e6; padding: 2px; border-radius: 4px;">${u.text}</span>`;
-              } else {
-                coloredLineHtml += `<span style="color: #555;">${u.text}</span>`;
-              }
-            });
-          } else {
-            coloredLineHtml = `<span>${lineText}</span>`;
-          }
+           sectionDiv.appendChild(sectionHeader);
 
-          let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: #666; margin-left: 10px;">${coloredLineHtml}</span></span>`;
-          if (errors.length === 0) {
-            titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! ✨)</span>`;
-          } else {
-            let typingErrors = errors.filter(e => e.type === 'typing').length;
-            let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
-            titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">오타 ${typingErrors} / 시간초과 ${timeoutErrors}</span>`;
-          }
-          sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: #888; margin-left: 10px; flex-shrink: 0;">▼</span>`;
+           if (units.length > 0) {
+               const visualTextContainer = document.createElement("div");
+               visualTextContainer.style.fontSize = "1.2rem";
+               visualTextContainer.style.fontWeight = "bold";
+               visualTextContainer.style.marginBottom = "8px";
+               visualTextContainer.style.lineHeight = "1.4";
+               visualTextContainer.style.wordBreak = "keep-all";
+               visualTextContainer.innerHTML = coloredLineHtml;
+               detailsDiv.appendChild(visualTextContainer);
+           } else {
+               const visualTextContainer = document.createElement("div");
+               visualTextContainer.style.fontSize = "1.1rem";
+               visualTextContainer.style.fontWeight = "bold";
+               visualTextContainer.style.marginBottom = "8px";
+               visualTextContainer.innerText = lineText;
+               detailsDiv.appendChild(visualTextContainer);
+           }
 
-          const detailsDiv = document.createElement("div");
-          detailsDiv.style.padding = "15px";
-          detailsDiv.style.background = "#fff";
-          detailsDiv.style.display = "none";
+           if (errors.length > 0) {
+               const analysisLabel = document.createElement("div");
+               analysisLabel.style.fontSize = "0.85rem";
+               analysisLabel.style.fontWeight = "bold";
+               analysisLabel.style.color = "#888";
+               analysisLabel.style.marginBottom = "4px";
+               analysisLabel.innerText = "오타 상세 분석:";
+               detailsDiv.appendChild(analysisLabel);
 
-          sectionHeader.addEventListener("click", () => {
-            const arrow = sectionHeader.querySelector(".toggle-arrow");
-            if (detailsDiv.style.display === "none") {
-              detailsDiv.style.display = "block";
-              if (arrow) arrow.innerText = "▲";
-            } else {
-              detailsDiv.style.display = "none";
-              if (arrow) arrow.innerText = "▼";
-            }
-          });
+               const ul = document.createElement("ul");
+               ul.style.margin = "0";
+               ul.style.paddingLeft = "20px";
+               ul.style.lineHeight = "1.6";
+               ul.style.fontSize = "0.9rem";
 
-          sectionDiv.appendChild(sectionHeader);
-
-          if (units.length > 0) {
-            const visualTextContainer = document.createElement("div");
-            visualTextContainer.style.fontSize = "1.2rem";
-            visualTextContainer.style.fontWeight = "bold";
-            visualTextContainer.style.marginBottom = "8px";
-            visualTextContainer.style.lineHeight = "1.4";
-            visualTextContainer.style.wordBreak = "keep-all";
-            visualTextContainer.innerHTML = coloredLineHtml;
-            detailsDiv.appendChild(visualTextContainer);
-          } else {
-            const visualTextContainer = document.createElement("div");
-            visualTextContainer.style.fontSize = "1.1rem";
-            visualTextContainer.style.fontWeight = "bold";
-            visualTextContainer.style.marginBottom = "8px";
-            visualTextContainer.innerText = lineText;
-            detailsDiv.appendChild(visualTextContainer);
-          }
-
-          if (errors.length > 0) {
-            const analysisLabel = document.createElement("div");
-            analysisLabel.style.fontSize = "0.85rem";
-            analysisLabel.style.fontWeight = "bold";
-            analysisLabel.style.color = "#888";
-            analysisLabel.style.marginBottom = "4px";
-            analysisLabel.innerText = "오타 상세 분석:";
-            detailsDiv.appendChild(analysisLabel);
-
-            const ul = document.createElement("ul");
-            ul.style.margin = "0";
-            ul.style.paddingLeft = "20px";
-            ul.style.lineHeight = "1.6";
-            ul.style.fontSize = "0.9rem";
-
-            errors.forEach(t => {
-              const li = document.createElement("li");
-              li.style.marginBottom = "2px";
-              if (t.type === 'typing') {
-                li.innerHTML = `「${t.word}」 오타: <span style="color: #e67700; font-weight: bold;">'${t.typed}'</span> (정답: <strong>${t.expected}</strong>)`;
-              } else if (t.type === 'timeout') {
-                li.innerHTML = `<span style="color: #c92a2a; font-weight: bold;">[시간 초과]</span> 미입력: <strong>${t.missedText}</strong>`;
-              }
-              ul.appendChild(li);
-            });
-            detailsDiv.appendChild(ul);
-          } else {
-            const perfectMsg = document.createElement("div");
-            perfectMsg.style.fontSize = "0.9rem";
-            perfectMsg.style.color = "#2b8a3e";
-            perfectMsg.innerText = "이 구간은 완벽하게 입력했습니다!";
-            detailsDiv.appendChild(perfectMsg);
-          }
-
-          sectionDiv.appendChild(detailsDiv);
-          typoList.appendChild(sectionDiv);
+               errors.forEach(t => {
+                  const li = document.createElement("li");
+                  li.style.marginBottom = "2px";
+                  if (t.type === 'typing') {
+                    li.innerHTML = `「${escapeHTML(t.word)}」 오타: <span style="color: #e67700; font-weight: bold;">'${escapeHTML(t.typed)}'</span> (정답: <strong>${escapeHTML(t.expected)}</strong>)`;
+                  } else if (t.type === 'timeout') {
+                    li.innerHTML = `<span style="color: #c92a2a; font-weight: bold;">[시간 초과]</span> 미입력: <strong>${escapeHTML(t.missedText)}</strong>`;
+                  }
+                  ul.appendChild(li);
+               });
+               detailsDiv.appendChild(ul);
+           } else {
+               const perfectMsg = document.createElement("div");
+               perfectMsg.style.fontSize = "0.9rem";
+               perfectMsg.style.color = "#2b8a3e";
+               perfectMsg.innerText = "이 구간은 완벽하게 입력했습니다!";
+               detailsDiv.appendChild(perfectMsg);
+           }
+           
+           sectionDiv.appendChild(detailsDiv);
+           typoList.appendChild(sectionDiv);
         }
-
+        
         if (maxLinePlayed >= 0) {
-          typoContainer.style.display = "block";
+            typoContainer.style.display = "block";
         } else {
-          typoContainer.style.display = "none";
+            typoContainer.style.display = "none";
         }
       } else {
         typoContainer.style.display = "none";
@@ -842,26 +840,26 @@ function endGame(completed = false) {
       const tagsContainer = document.getElementById("info-tags");
       let genre = "타이핑";
       if (tagsContainer && tagsContainer.children.length > 0) {
-        genre = tagsContainer.children[0].innerText;
+          genre = tagsContainer.children[0].innerText;
       }
-
+      
       fetch("/api/typing-history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-          content_title: title,
-          genre: genre,
-          wpm: finalWpm,
-          accuracy: finalAcc,
-          text: "history_record"
-        })
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+              content_title: title,
+              genre: genre,
+              wpm: finalWpm,
+              accuracy: finalAcc,
+              text: "history_record"
+          })
       })
-        .then(res => res.json())
-        .then(data => console.log("히스토리 저장:", data))
-        .catch(err => console.error("히스토리 저장 오류:", err));
+      .then(res => res.json())
+      .then(data => console.log("히스토리 저장:", data))
+      .catch(err => console.error("히스토리 저장 오류:", err));
 
       // 오타 통계 서버 저장
       const typoCountsForSave = {};
@@ -883,9 +881,9 @@ function endGame(completed = false) {
           },
           body: JSON.stringify({ typos: typoPayload })
         })
-          .then(res => res.json())
-          .then(d => console.log("오타 통계 저장:", d))
-          .catch(err => console.error("오타 통계 저장 오류:", err));
+        .then(res => res.json())
+        .then(d => console.log("오타 통계 저장:", d))
+        .catch(err => console.error("오타 통계 저장 오류:", err));
       }
     }
   }
@@ -935,80 +933,15 @@ function updateStats() {
 
   let totalScore = calculateTypingScore(accuracyVal, typingRatio, timeRatio, contentDifficulty);
 
-  const diffWeight = { 1: 0.8, 2: 0.9, 3: 1.0, 4: 1.1, 5: 1.2 }[contentDifficulty] || 1.0;
+  const diffWeight = {1: 0.8, 2: 0.9, 3: 1.0, 4: 1.1, 5: 1.2}[contentDifficulty] || 1.0;
   const baseScore = typingRatio * 100 * Math.pow(accuracyVal, 2) * diffWeight;
   console.log(`[Score Log] diffWeight: ${diffWeight}, typingRatio: ${typingRatio.toFixed(3)}, timeRatio: ${timeRatio.toFixed(3)}, accuracy: ${accuracyVal.toFixed(3)}, baseScore: ${baseScore.toFixed(1)}, totalScore: ${totalScore}`);
 
   if (scoreDisplay) scoreDisplay.innerText = totalScore;
 }
 
-/**
- * 사용자가 현재 입력해야 할 문자를 화면에서 시각적으로 하이라이트(밑줄 등) 처리하는 함수입니다.
- */
 function highlightCurrentChar() {
-  if (!lyricDisplay) return;
-  const spans = lyricDisplay.querySelectorAll(".lyric-unit");
-  spans.forEach((span, idx) => {
-    span.classList.remove("current", "typed", "pending");
-
-    const romaContainer = span.querySelector(".roma-text");
-
-    if (idx < currentUnitIndex) {
-      span.classList.add("typed");
-      if (romaContainer) {
-        const chars = romaContainer.querySelectorAll("span");
-        chars.forEach(c => {
-          c.classList.remove("current", "pending");
-          c.classList.add("typed");
-        });
-      }
-    } else if (idx === currentUnitIndex) {
-      span.classList.add("current");
-
-      const unit = targetUnits[idx];
-      let bestMatch = unit.validInputs[0];
-      if (currentBuffer.length > 0) {
-        for (let v of unit.validInputs) {
-          if (v.startsWith(currentBuffer)) {
-            bestMatch = v;
-            break;
-          }
-        }
-      }
-
-      if (romaContainer && romaContainer.textContent !== bestMatch) {
-        romaContainer.innerHTML = "";
-        for (let i = 0; i < bestMatch.length; i++) {
-          const charSpan = document.createElement("span");
-          charSpan.textContent = bestMatch[i];
-          romaContainer.appendChild(charSpan);
-        }
-      }
-
-      if (romaContainer) {
-        const chars = romaContainer.querySelectorAll("span");
-        chars.forEach((c, i) => {
-          c.classList.remove("current", "typed", "pending");
-          if (i < currentBuffer.length) {
-            c.classList.add("typed");
-          } else if (i === currentBuffer.length) {
-            c.classList.add("current");
-          } else {
-            c.classList.add("pending");
-          }
-        });
-      }
-    } else {
-      span.classList.add("pending");
-      if (romaContainer) {
-        const chars = romaContainer.querySelectorAll("span");
-        chars.forEach(c => {
-          c.classList.remove("current", "typed");
-          c.classList.add("pending");
-        });
-      }
-    }
-  });
+  TypingEngine.highlightCurrentChar(lyricDisplay, targetUnits, currentUnitIndex, currentBuffer);
 }
 
 /**
@@ -1016,24 +949,7 @@ function highlightCurrentChar() {
  * 상태 패널(Status Panel)에 업데이트하여 화면에 표시하는 함수입니다.
  */
 function updateStatus() {
-  if (!statusPanel) return;
-  if (currentUnitIndex >= targetUnits.length) {
-    statusPanel.innerHTML =
-      '<span class="success-text">✨ 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>';
-    return;
-  }
-
-  const currentUnit = targetUnits[currentUnitIndex];
-  if (!currentUnit) {
-    statusPanel.innerText = "입력할 항목을 준비 중입니다.";
-    return;
-  }
-
-  if (currentBuffer === "") {
-    statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span>`;
-  } else {
-    statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span> 입력 중... (입력된 조합: <span class="typing-now">${currentBuffer}</span>)`;
-  }
+  TypingEngine.getStatusHTML(statusPanel, targetUnits, currentUnitIndex, currentBuffer, '<span class="success-text">✨ 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>');
 }
 
 
@@ -1046,7 +962,7 @@ typingInput.addEventListener("input", (e) => {
   if (rawValue !== convertedValue) {
     e.target.value = convertedValue;
   }
-
+  
   let typedValue = convertedValue.toLowerCase();
   if (!targetUnits || currentUnitIndex >= targetUnits.length) return;
 
@@ -1063,24 +979,13 @@ typingInput.addEventListener("input", (e) => {
   const testBuffer = currentBuffer + newChar;
   const currentUnit = targetUnits[currentUnitIndex];
 
-  let isPossiblePrefix = false;
-  let isCompleteMatch = false;
-
-  for (let validInput of currentUnit.validInputs) {
-    if (validInput === testBuffer) {
-      isCompleteMatch = true;
-      break;
-    }
-    if (validInput.startsWith(testBuffer)) {
-      isPossiblePrefix = true;
-    }
-  }
+  const { isCompleteMatch, isPossiblePrefix } = TypingEngine.checkRomajiMatch(currentUnit, testBuffer);
 
   if (!isCompleteMatch && !isPossiblePrefix) {
     totalTypos++;
     sectionTypos++;
     typingInput.value = currentBuffer;
-
+    
     const expectedCharStr = currentUnit.validInputs.join(" / ");
     typoDetails.push({
       lineIndex: currentLineIndex,
@@ -1223,7 +1128,7 @@ function forceSkipToNextLine() {
     let missedCharsCount = currentChars.length - currentIndex;
     totalTypos += missedCharsCount;
     sectionTypos += missedCharsCount;
-
+    
     let missedText = currentText.substring(currentIndex);
     typoDetails.push({
       lineIndex: currentLineIndex,
@@ -1279,7 +1184,7 @@ if (typingPanel) {
 }
 
 // Tab skip and Spacebar pause logic
-document.addEventListener("keydown", function (e) {
+document.addEventListener("keydown", function(e) {
   if (isPlaying) {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -1288,7 +1193,7 @@ document.addEventListener("keydown", function (e) {
       e.preventDefault();
       if (isYoutubeMode && youtubePlayer && isPlayerReady) {
         if (isCountingDown) return; // Ignore spacebar during countdown
-
+        
         const state = youtubePlayer.getPlayerState();
         if (state === YT.PlayerState.PLAYING) {
           youtubePlayer.pauseVideo();
@@ -1303,7 +1208,7 @@ document.addEventListener("keydown", function (e) {
 function startCountdownAndPlay() {
   const overlay = document.getElementById("countdown-overlay");
   const text = document.getElementById("countdown-text");
-
+  
   if (!overlay || !text) {
     youtubePlayer.playVideo();
     return;
@@ -1331,11 +1236,11 @@ function skipTo80Percent() {
   if (!isPlaying || !isYoutubeMode || !youtubePlayer || !isPlayerReady) return;
 
   let currentTime = youtubePlayer.getCurrentTime();
-
+  
   if (contentTimestamps.length > 0 && contentTimestamps[currentLineIndex] !== undefined) {
     let lineStartTime = contentTimestamps[currentLineIndex];
     let elapsed = currentTime - lineStartTime;
-
+    
     if (elapsed < 0) {
       // Waiting phase skip
       let prevLineStartTime = 0;
@@ -1344,7 +1249,7 @@ function skipTo80Percent() {
       }
       let waitDuration = lineStartTime - prevLineStartTime;
       let targetTime = prevLineStartTime + waitDuration * 0.8;
-
+      
       if (targetTime > currentTime) {
         youtubePlayer.seekTo(targetTime, true);
       }
@@ -1357,9 +1262,9 @@ function skipTo80Percent() {
       ) {
         duration = contentTimestamps[currentLineIndex + 1] - lineStartTime;
       }
-
+      
       let targetTime = lineStartTime + duration * 0.8;
-
+      
       if (targetTime > currentTime) {
         youtubePlayer.seekTo(targetTime, true);
       }

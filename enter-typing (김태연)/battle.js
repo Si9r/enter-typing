@@ -1,4 +1,5 @@
 let databaseSongs = [];
+let databaseQuizzes = [];
 let currentRoom = null;
 let isHost = false;
 
@@ -108,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     fetchBackendSongs();
+    fetchBackendQuizzes();
     loadYouTubeAPI();
 });
 
@@ -144,17 +146,56 @@ async function fetchBackendSongs() {
         console.log("Failed to fetch songs");
     }
 
-    const selectIds = ["create-song-select", "page-create-song-select"];
-    selectIds.forEach(id => {
-        const selectEl = document.getElementById(id);
-        if (!selectEl) return;
-        selectEl.innerHTML = "";
-        databaseSongs.forEach(song => {
-            const opt = document.createElement("option");
-            opt.value = song.id;
-            opt.textContent = `${song.title} - ${song.artist}`;
-            selectEl.appendChild(opt);
-        });
+    const selectEl = document.getElementById("page-create-song-select");
+    const modeEl = document.getElementById("page-create-mode-select");
+    if (selectEl && modeEl && modeEl.value === "typing") {
+        populateSelectBox(selectEl, databaseSongs);
+    }
+}
+
+async function fetchBackendQuizzes() {
+    try {
+        const res = await fetch('/api/quiz-contents');
+        const data = await res.json();
+        if (data.success && data.data && data.data.length > 0) {
+            databaseQuizzes = data.data.map(item => ({
+                id: item.id,
+                title: item.title,
+                artist: item.artist || "알 수 없음",
+                genre: item.genre || "",
+            }));
+        }
+    } catch (e) {
+        console.log("Failed to fetch quizzes");
+    }
+}
+
+function onModeChange() {
+    const mode = document.getElementById("page-create-mode-select").value;
+    const selectEl = document.getElementById("page-create-song-select");
+    if (!selectEl) return;
+    
+    if (mode === "typing") {
+        populateSelectBox(selectEl, databaseSongs);
+    } else if (mode === "quiz") {
+        populateSelectBox(selectEl, databaseQuizzes);
+    }
+}
+
+function populateSelectBox(selectEl, list) {
+    selectEl.innerHTML = "";
+    if (list.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "콘텐츠가 없습니다.";
+        selectEl.appendChild(opt);
+        return;
+    }
+    list.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.id;
+        opt.textContent = `${item.title} - ${item.artist}`;
+        selectEl.appendChild(opt);
     });
 }
 
@@ -184,18 +225,20 @@ function joinRoomByEntranceCode() {
 
 async function createRoomFromPageSubmit() {
     const title = document.getElementById("page-create-title-input").value.trim() || "즐거운 대전방";
+    const mode = document.getElementById("page-create-mode-select").value;
     const songSelect = document.getElementById("page-create-song-select");
+    
     if (!songSelect || !songSelect.value) {
-        alert("선택 가능한 타이핑 콘텐츠가 없습니다.");
+        alert("선택 가능한 콘텐츠가 없습니다.");
         return;
     }
     const songId = parseInt(songSelect.value);
     const maxSlots = parseInt(document.getElementById("page-create-slots-select").value);
 
-    await createBattleRoom(title, songId, maxSlots);
+    await createBattleRoom(title, songId, mode, maxSlots);
 }
 
-async function createBattleRoom(title, songId, maxSlots) {
+async function createBattleRoom(title, songId, mode, maxSlots) {
     const token = sessionStorage.getItem('ep_token');
     try {
         const res = await fetch('/api/battle/rooms', {
@@ -207,6 +250,7 @@ async function createBattleRoom(title, songId, maxSlots) {
             body: JSON.stringify({
                 title: title,
                 song_id: songId,
+                mode: mode,
                 max_players: maxSlots
             })
         });
@@ -257,42 +301,59 @@ function connectToBattleRoom(roomCode) {
                 opponents = currentRoom.players;
 
                 // Set selected song
-                const songObj = databaseSongs.find(s => s.id === currentRoom.song_id);
-                if (songObj) {
-                    selectedSong = songObj;
-                    console.log(`[Battle] 선택된 곡: ${songObj.title}, timestamps: [${(songObj.timestamps || []).join(', ')}]`);
-                } else {
-                    // databaseSongs가 아직 안 로드됐을 경우 직접 API 조회
-                    console.warn(`[Battle] song_id=${currentRoom.song_id} 를 databaseSongs에서 못 찾음. API 직접 조회 시도.`);
-                    fetch(`/api/typing-content/${currentRoom.song_id}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                selectedSong = {
-                                    id: data.id,
-                                    title: data.title,
-                                    artist: data.artist || "알 수 없음",
-                                    lines: data.lines || [],
-                                    hiragana_lines: data.hiragana_lines || data.lines || [],
-                                    romaji_lines: data.romaji_lines || [],
-                                    youtube_id: data.youtube_id,
-                                    timestamps: data.timestamps
-                                        ? data.timestamps.split('\n').map(t => parseFloat(t.trim())).filter(t => !isNaN(t))
-                                        : [],
-                                    difficulty: data.difficulty || 3,
-                                    play_count: data.play_count || 0,
-                                    genre: data.genre || "",
-                                    creator_nickname: data.creator_nickname || "엔터핑"
-                                };
-                                console.log(`[Battle] fallback 조회 성공: ${data.title}, timestamps: [${selectedSong.timestamps.join(', ')}]`);
-                                updateVideoInfoPanel();
-                                // 유튜브 사전 버퍼링 재시도
-                                if (ytPlayer && typeof ytPlayer.cueVideoById === 'function' && selectedSong.youtube_id) {
-                                    ytPlayer.cueVideoById(selectedSong.youtube_id);
+                if (currentRoom.mode === 'quiz') {
+                    const quizObj = databaseQuizzes.find(s => s.id === currentRoom.song_id);
+                    if (quizObj && quizObj.quiz_data) {
+                        selectedSong = quizObj;
+                        console.log(`[Battle] 선택된 퀴즈: ${quizObj.title}`);
+                    } else {
+                        console.log(`[Battle] quiz_id=${currentRoom.song_id} 의 상세 데이터를 API에서 조회합니다.`);
+                        fetch(`/api/quiz-content/${currentRoom.song_id}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success) {
+                                    selectedSong = data;
+                                    console.log(`[Battle] 퀴즈 상세 데이터 조회 성공: ${selectedSong.title}`);
                                 }
-                            }
-                        })
-                        .catch(err => console.error('[Battle] fallback 곡 조회 실패:', err));
+                            })
+                            .catch(err => console.error('[Battle] 퀴즈 상세 데이터 조회 실패:', err));
+                    }
+                } else {
+                    const songObj = databaseSongs.find(s => s.id === currentRoom.song_id);
+                    if (songObj) {
+                        selectedSong = songObj;
+                        console.log(`[Battle] 선택된 곡: ${songObj.title}`);
+                    } else {
+                        console.warn(`[Battle] song_id=${currentRoom.song_id} 를 databaseSongs에서 못 찾음. API 직접 조회 시도.`);
+                        fetch(`/api/typing-content/${currentRoom.song_id}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success) {
+                                    selectedSong = {
+                                        id: data.id,
+                                        title: data.title,
+                                        artist: data.artist || "알 수 없음",
+                                        lines: data.lines || [],
+                                        hiragana_lines: data.hiragana_lines || data.lines || [],
+                                        romaji_lines: data.romaji_lines || [],
+                                        youtube_id: data.youtube_id,
+                                        timestamps: data.timestamps
+                                            ? data.timestamps.split('\n').map(t => parseFloat(t.trim())).filter(t => !isNaN(t))
+                                            : [],
+                                        difficulty: data.difficulty || 3,
+                                        play_count: data.play_count || 0,
+                                        genre: data.genre || "",
+                                        creator_nickname: data.creator_nickname || "엔터핑"
+                                    };
+                                    console.log(`[Battle] fallback 조회 성공: ${data.title}`);
+                                    updateVideoInfoPanel();
+                                    if (ytPlayer && typeof ytPlayer.cueVideoById === 'function' && selectedSong.youtube_id) {
+                                        ytPlayer.cueVideoById(selectedSong.youtube_id);
+                                    }
+                                }
+                            })
+                            .catch(err => console.error('[Battle] fallback 곡 조회 실패:', err));
+                    }
                 }
 
                 enterWaitingRoom();
@@ -358,7 +419,18 @@ function connectToBattleRoom(roomCode) {
                 showResultsScreen(data.results);
                 break;
             case "chat":
-                appendOpponentChat(data.nickname, data.message);
+                // 퀴즈 뷰에 있을 때는 퀴즈 채팅창으로 라우팅
+                if (currentRoom && currentRoom.mode === 'quiz' && document.getElementById('view-quiz-gameplay')?.classList.contains('active')) {
+                    addQuizOpponentChat(data.nickname, data.message, false);
+                } else {
+                    appendOpponentChat(data.nickname, data.message);
+                }
+                break;
+            case "quiz_answer":
+                handleOpponentQuizAnswer(data);
+                break;
+            case "quiz_chat":
+                addQuizOpponentChat(data.nickname, data.message, false);
                 break;
         }
     };
@@ -438,9 +510,14 @@ function updateVideoInfoPanel() {
 
 function enterWaitingRoom() {
     switchView("view-waiting");
-    updateVideoInfoPanel();
+    if (currentRoom.mode === 'quiz') {
+        // Quiz mode doesn't need video info panel update in the same way, but let's clear it
+        document.getElementById("wait-room-title").textContent = currentRoom.title + " (퀴즈)";
+    } else {
+        updateVideoInfoPanel();
+        document.getElementById("wait-room-title").textContent = currentRoom.title;
+    }
 
-    document.getElementById("wait-room-title").textContent = currentRoom.title;
     document.getElementById("wait-room-code").innerHTML = `코드: ${currentRoom.code} <span style="font-size: 0.85rem;">📋</span>`;
     document.getElementById("wait-song-title").textContent = currentRoom.song_title;
     document.getElementById("wait-song-artist").textContent = currentRoom.song_artist;
@@ -907,6 +984,11 @@ function startGamePlay() {
     const overlay = document.getElementById("countdown-overlay");
     overlay.style.display = "none";
 
+    if (currentRoom && currentRoom.mode === "quiz") {
+        startQuizGameplay();
+        return;
+    }
+
     switchView("view-gameplay");
     updateVideoInfoPanel();
 
@@ -1006,112 +1088,15 @@ function loadGameplayLine() {
 
 function renderActiveLyrics() {
     const container = document.getElementById("game-lyric-display");
-    container.innerHTML = "";
-
-    battleTargetUnits.forEach((unit, idx) => {
-        const span = document.createElement("span");
-        span.className = "lyric-unit " + (idx === 0 ? "current" : "pending");
-
-        const hira = document.createElement("span");
-        hira.className = "hira-text";
-        hira.textContent = unit.text;
-
-        const roma = document.createElement("span");
-        roma.className = "roma-text";
-        const initialRoma = unit.validInputs[0];
-        for (let i = 0; i < initialRoma.length; i++) {
-            const charSpan = document.createElement("span");
-            charSpan.textContent = initialRoma[i];
-            roma.appendChild(charSpan);
-        }
-
-        span.appendChild(hira);
-        span.appendChild(roma);
-        container.appendChild(span);
-    });
+    TypingEngine.renderActiveLyrics(container, battleTargetUnits);
 }
-
-
 
 function highlightCurrentChar() {
     const lyricDisplay = document.getElementById("game-lyric-display");
-    if (!lyricDisplay) return;
-    const spans = lyricDisplay.querySelectorAll(".lyric-unit");
-    spans.forEach((span, idx) => {
-        span.classList.remove("current", "typed", "pending");
-
-        const romaContainer = span.querySelector(".roma-text");
-
-        if (idx < currentUnitIndex) {
-            span.classList.add("typed");
-            if (romaContainer) {
-                const chars = romaContainer.querySelectorAll("span");
-                chars.forEach(c => {
-                    c.classList.remove("current", "pending");
-                    c.classList.add("typed");
-                });
-            }
-        } else if (idx === currentUnitIndex) {
-            span.classList.add("current");
-
-            const unit = battleTargetUnits[idx];
-            let bestMatch = unit.validInputs[0];
-            if (currentBuffer.length > 0) {
-                for (let v of unit.validInputs) {
-                    if (v.startsWith(currentBuffer)) {
-                        bestMatch = v;
-                        break;
-                    }
-                }
-            }
-
-            if (romaContainer && romaContainer.textContent !== bestMatch) {
-                romaContainer.innerHTML = "";
-                for (let i = 0; i < bestMatch.length; i++) {
-                    const charSpan = document.createElement("span");
-                    charSpan.textContent = bestMatch[i];
-                    romaContainer.appendChild(charSpan);
-                }
-            }
-
-            if (romaContainer) {
-                const chars = romaContainer.querySelectorAll("span");
-                chars.forEach((c, i) => {
-                    c.classList.remove("current", "typed", "pending");
-                    if (i < currentBuffer.length) {
-                        c.classList.add("typed");
-                    } else if (i === currentBuffer.length) {
-                        c.classList.add("current");
-                    } else {
-                        c.classList.add("pending");
-                    }
-                });
-            }
-        } else {
-            span.classList.add("pending");
-            if (romaContainer) {
-                const chars = romaContainer.querySelectorAll("span");
-                chars.forEach(c => {
-                    c.classList.remove("current", "typed");
-                    c.classList.add("pending");
-                });
-            }
-        }
-    });
+    TypingEngine.highlightCurrentChar(lyricDisplay, battleTargetUnits, currentUnitIndex, currentBuffer);
 
     const statusPanel = document.getElementById("game-status-panel");
-    if (statusPanel) {
-        const currentUnit = battleTargetUnits[currentUnitIndex];
-        if (currentUnit) {
-            if (currentBuffer.length > 0) {
-                statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span> 입력 중... (입력된 조합: <span class="typing-now">${currentBuffer}</span>)`;
-            } else {
-                statusPanel.innerHTML = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span>`;
-            }
-        } else {
-            statusPanel.textContent = "입력 완료!";
-        }
-    }
+    TypingEngine.getStatusHTML(statusPanel, battleTargetUnits, currentUnitIndex, currentBuffer, "입력 완료!");
 }
 
 function handleTypingInput(e) {
@@ -1134,18 +1119,7 @@ function handleTypingInput(e) {
     const testBuffer = currentBuffer + newChar;
     const currentUnit = battleTargetUnits[currentUnitIndex];
 
-    let isPossiblePrefix = false;
-    let isCompleteMatch = false;
-
-    for (let validInput of currentUnit.validInputs) {
-        if (validInput === testBuffer) {
-            isCompleteMatch = true;
-            break;
-        }
-        if (validInput.startsWith(testBuffer)) {
-            isPossiblePrefix = true;
-        }
-    }
+    const { isCompleteMatch, isPossiblePrefix } = TypingEngine.checkRomajiMatch(currentUnit, testBuffer);
 
     totalKeysTyped++;
 
@@ -1307,6 +1281,12 @@ function finishMyTypingGame() {
 }
 
 function renderLiveRanking() {
+    if (currentRoom && currentRoom.mode === 'quiz') {
+        if (typeof renderLiveRankingQuiz === 'function') {
+            renderLiveRankingQuiz();
+        }
+        return;
+    }
     const container = document.getElementById("live-ranking-container");
     if (!container) return;
     // ensure container supports ordering
@@ -1375,11 +1355,18 @@ function renderLiveRanking() {
 function showResultsScreen(results) {
     switchView("view-results");
 
+    // 퀴즈 모드이면 테이블 헤더 변경
+    const isQuizMode = currentRoom && currentRoom.mode === 'quiz';
+    const thWpm = document.getElementById("result-th-wpm");
+    const thAccuracy = document.getElementById("result-th-accuracy");
+    if (thWpm) thWpm.textContent = isQuizMode ? "정답 수" : "분당 타수(WPM)";
+    if (thAccuracy) thAccuracy.textContent = isQuizMode ? "정확도" : "정확도";
+
     if (results.length > 0) {
         document.getElementById("podium-1st-name").textContent = results[0].nickname;
         document.getElementById("podium-1st-wpm").innerHTML = `
             <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[0].score}점</div>
-            <div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[0].wpm} WPM</div>
+            ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[0].wpm} WPM</div>`}
         `;
         document.getElementById("podium-1st-avatar").textContent = results[0].nickname.charAt(0).toUpperCase();
         if (results[0].nickname === myUser.nickname) document.getElementById("podium-1st-avatar").style.background = "linear-gradient(135deg, #ff7b8e, #ffd17b)";
@@ -1391,7 +1378,7 @@ function showResultsScreen(results) {
         document.getElementById("podium-2nd-name").textContent = results[1].nickname;
         document.getElementById("podium-2nd-wpm").innerHTML = `
             <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[1].score}점</div>
-            <div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[1].wpm} WPM</div>
+            ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[1].wpm} WPM</div>`}
         `;
         document.getElementById("podium-2nd-avatar").textContent = results[1].nickname.charAt(0).toUpperCase();
         if (results[1].nickname === myUser.nickname) document.getElementById("podium-2nd-avatar").style.background = "linear-gradient(135deg, #ff7b8e, #ffd17b)";
@@ -1405,7 +1392,7 @@ function showResultsScreen(results) {
         document.getElementById("podium-3rd-name").textContent = results[2].nickname;
         document.getElementById("podium-3rd-wpm").innerHTML = `
             <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[2].score}점</div>
-            <div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[2].wpm} WPM</div>
+            ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[2].wpm} WPM</div>`}
         `;
         document.getElementById("podium-3rd-avatar").textContent = results[2].nickname.charAt(0).toUpperCase();
         if (results[2].nickname === myUser.nickname) document.getElementById("podium-3rd-avatar").style.background = "linear-gradient(135deg, #ff7b8e, #ffd17b)";
@@ -1442,8 +1429,8 @@ function showResultsScreen(results) {
                         <span>${p.nickname} ${isMe ? '<strong>(나)</strong>' : ''}</span>
                     </div>
                 </td>
-                <td><strong>${p.wpm}</strong> WPM</td>
-                <td>${p.accuracy}%</td>
+                <td>${isQuizMode ? `<strong>${p.score}</strong>문제` : `<strong>${p.wpm}</strong> WPM`}</td>
+                <td>${isQuizMode ? `-` : `${p.accuracy}%`}</td>
                 <td>${p.score}점</td>
             `;
         }
@@ -1480,4 +1467,598 @@ function returnToLobby() {
 
 function returnToWaitingRoom() {
     enterWaitingRoom();
+}
+
+// ====== 실시간 퀴즈 대전 관련 로직 ======
+let quizData = [];
+let currentQuizIndex = 0;
+let currentQuizCombo = 0;
+let quizIsPlayingSegment = false;
+let quizIsPausedManually = false;
+let currentGuessedQuiz = {};
+let quizCheckInterval = null;
+
+function startQuizGameplay() {
+    switchView("view-quiz-gameplay");
+    
+    currentQuizIndex = 0;
+    currentQuizCombo = 0;
+    myUser.score = 0;
+    myUser.progress = 0;
+    
+    document.getElementById("quiz-my-score").innerText = "0";
+    document.getElementById("quiz-my-combo").innerText = "0";
+    document.getElementById("quiz-chat-messages").innerHTML = '<div class="chat-bubble system" style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.</div>';
+    
+    const inputField = document.getElementById("quiz-chat-input");
+    if(inputField) {
+        inputField.disabled = true;
+        inputField.value = "";
+    }
+    const sendBtn = document.getElementById("quiz-chat-send-btn");
+    if(sendBtn) sendBtn.disabled = true;
+    
+    if (selectedSong && selectedSong.quiz_data) {
+        try {
+            quizData = typeof selectedSong.quiz_data === 'string' ? JSON.parse(selectedSong.quiz_data) : selectedSong.quiz_data;
+        } catch(e) {
+            console.error("Quiz data parse error:", e);
+            quizData = [];
+        }
+    } else {
+        quizData = [];
+    }
+    
+    const countDisplay = document.getElementById("quiz-count-display-battle");
+    if(countDisplay) countDisplay.innerText = `남은 퀴즈: ${quizData.length}`;
+    
+    const infoTitle = document.getElementById("quiz-info-title");
+    if(infoTitle) infoTitle.innerText = selectedSong.title || "로딩 중...";
+    
+    // Set up volume slider
+    const volSlider = document.getElementById("quiz-volume-slider");
+    if (volSlider) {
+        volSlider.oninput = function() {
+            document.getElementById("quiz-volume-display").innerText = this.value + "%";
+            if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+                ytPlayer.setVolume(this.value);
+            }
+        };
+    }
+    
+    if (typeof renderLiveRankingQuiz === 'function') {
+        renderLiveRankingQuiz();
+    }
+    
+    if(quizData.length > 0) {
+        setupQuizBoard(0);
+    }
+    
+    // 자동 시작
+    setTimeout(() => {
+        startQuizBattle();
+    }, 1000);
+}
+
+function startQuizBattle() {
+    if (quizData.length === 0) return;
+    if (currentQuizIndex >= quizData.length) {
+        addQuizSystemChat("모든 문제가 끝났습니다.");
+        return;
+    }
+
+    const vinylRecord = document.getElementById("quiz-vinyl-record");
+    if (quizIsPlayingSegment) {
+        if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+        if (vinylRecord) vinylRecord.classList.add("paused");
+        quizIsPlayingSegment = false;
+        quizIsPausedManually = true;
+    } else {
+        if (quizIsPausedManually) {
+            if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
+            if (vinylRecord) vinylRecord.classList.remove("paused");
+            quizIsPlayingSegment = true;
+            quizIsPausedManually = false;
+        } else {
+            playQuizSegment();
+        }
+    }
+}
+
+function playQuizSegment() {
+    const item = quizData[currentQuizIndex];
+    if (!item) return;
+    setupQuizBoard(currentQuizIndex);
+    
+    const chatInput = document.getElementById("quiz-chat-input");
+    if (chatInput) {
+        chatInput.disabled = false;
+        chatInput.focus({ preventScroll: true });
+    }
+    const sendBtn = document.getElementById("quiz-chat-send-btn");
+    if(sendBtn) sendBtn.disabled = false;
+
+    const vinylRecord = document.getElementById("quiz-vinyl-record");
+    if(vinylRecord) vinylRecord.classList.remove("paused");
+    quizIsPlayingSegment = true;
+    quizIsPausedManually = false;
+
+    const targetVideoId = item.youtube_id || selectedSong.youtube_id;
+    const volSlider = document.getElementById("quiz-volume-slider");
+    const currentVol = volSlider ? volSlider.value : 50;
+    
+    if (ytPlayer && typeof ytPlayer.setVolume === 'function') {
+        ytPlayer.setVolume(currentVol);
+        ytPlayer.loadVideoById({
+            videoId: targetVideoId,
+            startSeconds: item.start,
+        });
+    }
+
+    if (quizCheckInterval) clearInterval(quizCheckInterval);
+    const progressCircle = document.getElementById("quiz-vinyl-progress");
+    if (progressCircle) {
+        progressCircle.style.strokeDashoffset = "264";
+    }
+
+    quizCheckInterval = setInterval(() => {
+        if(!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+        
+        const currentTime = ytPlayer.getCurrentTime();
+        const totalDuration = item.end - item.start;
+        const elapsed = currentTime - item.start;
+
+        if (progressCircle && totalDuration > 0) {
+            let p = elapsed / totalDuration;
+            if (p < 0) p = 0;
+            if (p > 1) p = 1;
+            const dashoffset = 264 - (264 * p);
+            progressCircle.style.strokeDashoffset = dashoffset;
+        }
+
+        if (currentTime >= item.end && item.end > item.start) {
+            ytPlayer.pauseVideo();
+            if(vinylRecord) vinylRecord.classList.add("paused");
+            quizIsPlayingSegment = false;
+            clearInterval(quizCheckInterval);
+        }
+    }, 100);
+}
+
+function setupQuizBoard(index) {
+    const item = quizData[index];
+    if (!item) return;
+    currentGuessedQuiz = {};
+    const questionKeys = Object.keys(item)
+        .filter((key) => key.startsWith("question_"))
+        .sort();
+        
+    questionKeys.forEach((key) => {
+        const question = item[key];
+        const answerCount = (question.answer && question.answer.length) || 0;
+        currentGuessedQuiz[`guessed_${key}`] = new Array(answerCount).fill(null);
+    });
+    
+    const countDisplay = document.getElementById("quiz-count-display-battle");
+    if (countDisplay) {
+        countDisplay.innerText = `남은 퀴즈: ${quizData.length - currentQuizIndex}`;
+    }
+    updateQuizAnswerBoard();
+}
+
+function updateQuizAnswerBoard() {
+    const boardItems = document.getElementById("quiz-board-items");
+    if (!boardItems) return;
+    boardItems.innerHTML = "";
+    
+    const item = quizData[currentQuizIndex];
+    if(!item) return;
+
+    // ── 문제 번호 + 힌트(제목) 표시 ──────────────────────
+    const headerDiv = document.createElement("div");
+    headerDiv.style.marginBottom = "12px";
+    headerDiv.style.paddingBottom = "10px";
+    headerDiv.style.borderBottom = "1.5px dashed rgba(0,0,0,0.1)";
+
+    // 문제 번호 배지
+    const numBadge = document.createElement("div");
+    numBadge.style.display = "inline-block";
+    numBadge.style.background = "linear-gradient(135deg, var(--color-battle-primary), var(--color-battle-secondary))";
+    numBadge.style.color = "white";
+    numBadge.style.padding = "3px 12px";
+    numBadge.style.borderRadius = "20px";
+    numBadge.style.fontSize = "0.8rem";
+    numBadge.style.fontWeight = "900";
+    numBadge.style.marginBottom = "8px";
+    numBadge.textContent = `문제 ${currentQuizIndex + 1} / ${quizData.length}`;
+    headerDiv.appendChild(numBadge);
+
+    // hint(제목) 토글 버튼 방식
+    if (item.hint) {
+        const hintRow = document.createElement("div");
+        hintRow.style.display = "flex";
+        hintRow.style.alignItems = "center";
+        hintRow.style.gap = "8px";
+        hintRow.style.marginTop = "6px";
+
+        const hintBtn = document.createElement("button");
+        hintBtn.textContent = "💡 힌트 보기";
+        hintBtn.style.cssText = "background: rgba(255,209,123,0.15); border: 1.5px solid rgba(255,209,123,0.4); color: #a07000; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: all 0.2s; flex-shrink: 0;";
+
+        const hintText = document.createElement("span");
+        hintText.textContent = item.hint;
+        hintText.style.cssText = "font-size: 0.95rem; font-weight: 800; color: #333; display: none; word-break: keep-all;";
+
+        hintBtn.onclick = () => {
+            const isHidden = hintText.style.display === "none";
+            hintText.style.display = isHidden ? "inline" : "none";
+            hintBtn.textContent = isHidden ? "💡 힌트 숨기기" : "💡 힌트 보기";
+        };
+
+        hintRow.appendChild(hintBtn);
+        hintRow.appendChild(hintText);
+        headerDiv.appendChild(hintRow);
+    }
+
+    boardItems.appendChild(headerDiv);
+
+    // ── 정답 슬롯 렌더링 ──────────────────────────────────
+    const questionKeys = Object.keys(item).filter((key) => key.startsWith("question_")).sort();
+    
+    questionKeys.forEach((key) => {
+        const question = item[key];
+        const answers = question.answer;
+        const guessedArray = currentGuessedQuiz[`guessed_${key}`] || [];
+
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.gap = "10px";
+
+        const typeBadge = document.createElement("div");
+        typeBadge.textContent = question.question || question.type || "질문";
+        typeBadge.style.background = "var(--color-battle-primary)";
+        typeBadge.style.color = "white";
+        typeBadge.style.padding = "4px 10px";
+        typeBadge.style.borderRadius = "20px";
+        typeBadge.style.fontSize = "0.85rem";
+        typeBadge.style.fontWeight = "bold";
+        typeBadge.style.flexShrink = "0";
+        row.appendChild(typeBadge);
+
+        const slotContainer = document.createElement("div");
+        slotContainer.style.display = "flex";
+        slotContainer.style.gap = "8px";
+        slotContainer.style.flexWrap = "wrap";
+
+        answers.forEach((ans, i) => {
+            const isGuessed = guessedArray[i] !== null;
+            const slot = document.createElement("div");
+            slot.style.padding = "6px 14px";
+            slot.style.borderRadius = "8px";
+            slot.style.fontWeight = "bold";
+            slot.style.fontSize = "0.95rem";
+            
+            if (isGuessed) {
+                slot.textContent = guessedArray[i];
+                slot.style.background = "#e6f4ea";
+                slot.style.border = "1.5px solid #34a853";
+                slot.style.color = "#137333";
+            } else {
+                slot.textContent = "?";
+                slot.style.background = "#f5f5f5";
+                slot.style.border = "1.5px dashed #ccc";
+                slot.style.color = "#999";
+                slot.style.minWidth = "40px";
+                slot.style.textAlign = "center";
+            }
+            slotContainer.appendChild(slot);
+        });
+
+        row.appendChild(slotContainer);
+        boardItems.appendChild(row);
+    });
+}
+
+
+function sendQuizChatMessage() {
+    const input = document.getElementById("quiz-chat-input");
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    // 오답 채팅은 quiz_chat 타입으로 서버 전송 (정답은 아래에서 별도 처리)
+    
+    let correctFound = false;
+    const item = quizData[currentQuizIndex];
+    if (item) {
+        const normalizedInput = text.toLowerCase().replace(/\s+/g, "");
+
+        const questionKeys = Object.keys(item).filter((key) => key.startsWith("question_"));
+        for (let key of questionKeys) {
+            const question = item[key];
+            const answers = question.answer;
+            const guessedArray = currentGuessedQuiz[`guessed_${key}`];
+
+            for (let i = 0; i < answers.length; i++) {
+                if (guessedArray[i] === null) {
+                    const synonyms = answers[i].split(",").map(s => s.trim().toLowerCase().replace(/\s+/g, ""));
+                    if (synonyms.includes(normalizedInput)) {
+                        guessedArray[i] = answers[i].split(",")[0].trim();
+                        correctFound = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (correctFound) {
+        currentQuizCombo++;
+        myUser.score += 1;
+        
+        document.getElementById("quiz-my-score").innerText = myUser.score;
+        document.getElementById("quiz-my-combo").innerText = currentQuizCombo;
+
+        // opponents 내 내 점수 즉시 반영 (랭킹 표시 정확성)
+        if (opponents && opponents[myUser.nickname]) {
+            opponents[myUser.nickname].score = myUser.score;
+        }
+        
+        addQuizUserChat(myUser.nickname, text, true);
+        updateQuizAnswerBoard();
+
+        // 정답을 quiz_answer 타입으로 서버에 전송해 상대방에게 브로드캐스트
+        if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+            battleSocket.send(JSON.stringify({
+                type: "quiz_answer",
+                question_key: Object.keys(quizData[currentQuizIndex] || {}).find(k => k.startsWith('question_')),
+                answer_text: text,
+                score: myUser.score,
+                message: text
+            }));
+        }
+
+        let allGuessed = true;
+        const questionKeys = Object.keys(item).filter((key) => key.startsWith("question_"));
+        for (let key of questionKeys) {
+            if (currentGuessedQuiz[`guessed_${key}`].includes(null)) {
+                allGuessed = false;
+                break;
+            }
+        }
+
+        if (allGuessed) {
+            addQuizSystemChat("모든 정답을 맞췄습니다! 잠시 후 다음 문제로 넘어갑니다.");
+            input.disabled = true;
+            document.getElementById("quiz-chat-send-btn").disabled = true;
+            myUser.progress = Math.min(100, Math.floor(((currentQuizIndex + 1) / quizData.length) * 100));
+            
+            setTimeout(() => {
+                currentQuizIndex++;
+                if (currentQuizIndex < quizData.length) {
+                    playQuizSegment();
+                } else {
+                    finishQuizBattle();
+                }
+            }, 3000);
+        }
+    } else {
+        currentQuizCombo = 0;
+        document.getElementById("quiz-my-combo").innerText = "0";
+        addQuizUserChat(myUser.nickname, text, false);
+        // 오답 채팅을 quiz_chat 타입으로 서버에 전송
+        if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+            battleSocket.send(JSON.stringify({ type: "quiz_chat", message: text }));
+        }
+    }
+    
+    if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+        battleSocket.send(JSON.stringify({
+            type: "progress",
+            score: myUser.score,
+            progress: myUser.progress || 0,
+            wpm: 0,
+            accuracy: 100
+        }));
+    }
+
+    input.value = "";
+}
+
+function addQuizSystemChat(msg) {
+    const container = document.getElementById("quiz-chat-messages");
+    if (!container) return;
+    const div = document.createElement("div");
+    div.className = "chat-bubble system";
+    div.style.alignSelf = "center";
+    div.style.backgroundColor = "rgba(255, 209, 123, 0.08)";
+    div.style.color = "var(--color-battle-accent)";
+    div.style.border = "1px solid rgba(255, 209, 123, 0.15)";
+    div.style.padding = "8px 12px";
+    div.style.borderRadius = "12px";
+    div.style.fontSize = "0.8rem";
+    div.style.fontWeight = "600";
+    div.textContent = msg;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function addQuizUserChat(sender, msg, isCorrect) {
+    const container = document.getElementById("quiz-chat-messages");
+    if (!container) return;
+    const bubble = document.createElement("div");
+    bubble.className = "chat-bubble me";
+    if (isCorrect) {
+        bubble.style.border = "2px solid #34a853";
+        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender} <span style="color:#34a853">✅</span></div>${escapeHTML(msg)}`;
+    } else {
+        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender}</div>${escapeHTML(msg)}`;
+    }
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
+}
+
+function renderLiveRankingQuiz() {
+    const container = document.getElementById("quiz-live-ranking-container");
+    if (!container) return;
+    container.innerHTML = "";
+
+    let playerList = Object.entries(opponents).map(([nick, p]) => ({ nickname: nick, ...p }));
+    playerList.sort((a, b) => b.score - a.score);
+
+    playerList.forEach((p, idx) => {
+        const isMe = p.nickname === myUser.nickname;
+        
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.alignItems = "center";
+        row.style.gap = "10px";
+
+        const rankBadge = document.createElement("div");
+        rankBadge.style.width = "24px";
+        rankBadge.style.height = "24px";
+        rankBadge.style.borderRadius = "50%";
+        rankBadge.style.display = "flex";
+        rankBadge.style.alignItems = "center";
+        rankBadge.style.justifyContent = "center";
+        rankBadge.style.fontWeight = "bold";
+        rankBadge.style.fontSize = "0.8rem";
+        rankBadge.style.color = "white";
+        
+        if (idx === 0) rankBadge.style.background = "#ffd700";
+        else if (idx === 1) rankBadge.style.background = "#c0c0c0";
+        else if (idx === 2) rankBadge.style.background = "#cd7f32";
+        else rankBadge.style.background = "#999";
+        rankBadge.innerText = idx + 1;
+
+        const nameLabel = document.createElement("div");
+        nameLabel.style.flex = "1";
+        nameLabel.style.minWidth = "0";
+        nameLabel.style.fontSize = "0.95rem";
+        nameLabel.style.fontWeight = isMe ? "bold" : "500";
+        nameLabel.style.color = isMe ? "var(--color-battle-primary)" : "var(--color-battle-text)";
+        nameLabel.style.whiteSpace = "nowrap";
+        nameLabel.style.overflow = "hidden";
+        nameLabel.style.textOverflow = "ellipsis";
+        nameLabel.innerText = p.nickname;
+
+        const scoreLabel = document.createElement("div");
+        scoreLabel.style.flexShrink = "0";
+        scoreLabel.style.textAlign = "right";
+        scoreLabel.style.fontSize = "0.95rem";
+        scoreLabel.style.fontWeight = "bold";
+        scoreLabel.style.color = isMe ? "var(--color-battle-primary)" : "var(--color-battle-text-muted)";
+        scoreLabel.innerText = `${p.score}점`;
+
+        row.appendChild(rankBadge);
+        row.appendChild(nameLabel);
+        row.appendChild(scoreLabel);
+
+        container.appendChild(row);
+    });
+}
+
+function finishQuizBattle() {
+    if (quizCheckInterval) clearInterval(quizCheckInterval);
+    if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
+    
+    addQuizSystemChat("모든 퀴즈가 종료되었습니다!");
+    const chatInput = document.getElementById("quiz-chat-input");
+    if(chatInput) chatInput.disabled = true;
+
+    myUser.finished = true;
+    if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+        battleSocket.send(JSON.stringify({
+            type: "finish",
+            score: myUser.score,
+            progress: 100,
+            wpm: 0,
+            accuracy: 100
+        }));
+    }
+}
+
+// ── 상대방 퀴즈 정답 처리 ──────────────────────────────────────────
+function handleOpponentQuizAnswer(data) {
+    const { nickname, answer_text, score, message } = data;
+
+    // 1. 퀴즈 채팅창에 상대방 정답 표시
+    addQuizOpponentChat(nickname, message || answer_text, true);
+
+    // 2. 상대방 점수 opponents에 반영 후 랭킹 재렌더링
+    if (opponents && opponents[nickname]) {
+        opponents[nickname].score = score || opponents[nickname].score;
+    }
+    if (typeof renderLiveRankingQuiz === 'function') {
+        renderLiveRankingQuiz();
+    }
+
+    // 3. 상대방이 맞춘 답도 문제판에 표시 (옵션 A: 정보 공유)
+    const item = quizData[currentQuizIndex];
+    if (item && answer_text) {
+        const normalizedInput = answer_text.toLowerCase().replace(/\s+/g, '');
+        const questionKeys = Object.keys(item).filter(k => k.startsWith('question_'));
+        let boardUpdated = false;
+        for (let key of questionKeys) {
+            const question = item[key];
+            const answers = question.answer;
+            const guessedArray = currentGuessedQuiz[`guessed_${key}`];
+            if (!guessedArray) continue;
+            for (let i = 0; i < answers.length; i++) {
+                if (guessedArray[i] === null) {
+                    const synonyms = answers[i].split(",").map(s => s.trim().toLowerCase().replace(/\s+/g, ""));
+                    if (synonyms.includes(normalizedInput)) {
+                        guessedArray[i] = answers[i].split(",")[0].trim();
+                        boardUpdated = true;
+                    }
+                }
+            }
+        }
+        if (boardUpdated) {
+            updateQuizAnswerBoard();
+
+            let allGuessed = true;
+            for (let key of questionKeys) {
+                if (currentGuessedQuiz[`guessed_${key}`].includes(null)) {
+                    allGuessed = false;
+                    break;
+                }
+            }
+
+            if (allGuessed) {
+                addQuizSystemChat("모든 정답을 맞췄습니다! 잠시 후 다음 문제로 넘어갑니다.");
+                const input = document.getElementById("quiz-chat-input");
+                if (input) input.disabled = true;
+                const sendBtn = document.getElementById("quiz-chat-send-btn");
+                if (sendBtn) sendBtn.disabled = true;
+                
+                myUser.progress = Math.min(100, Math.floor(((currentQuizIndex + 1) / quizData.length) * 100));
+                
+                setTimeout(() => {
+                    currentQuizIndex++;
+                    if (currentQuizIndex < quizData.length) {
+                        playQuizSegment();
+                    } else {
+                        finishQuizBattle();
+                    }
+                }, 3000);
+            }
+        }
+    }
+}
+
+// ── 상대방 퀴즈 채팅 추가 ──────────────────────────────────────────
+function addQuizOpponentChat(sender, msg, isCorrect) {
+    const container = document.getElementById('quiz-chat-messages');
+    if (!container) return;
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    if (isCorrect) {
+        bubble.style.border = '2px solid #1a73e8';
+        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender} <span style="color:#1a73e8">✅</span></div>${escapeHTML(msg)}`;
+    } else {
+        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender}</div>${escapeHTML(msg)}`;
+    }
+    container.appendChild(bubble);
+    container.scrollTop = container.scrollHeight;
 }

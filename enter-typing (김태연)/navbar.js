@@ -253,10 +253,44 @@
     }
   }
 
+  function initSearchBar() {
+    const searchBars = document.querySelectorAll('.search-bar');
+    searchBars.forEach(bar => {
+      bar.removeAttribute('onclick'); // 기존 하드코딩된 onclick 제거
+      const input = bar.querySelector('input');
+      const icon = bar.querySelector('.search-icon');
+      
+      if (input) {
+        input.removeAttribute('readonly');
+        
+        const executeSearch = () => {
+            const query = input.value.trim();
+            if (query) {
+                location.href = 'search.html?q=' + encodeURIComponent(query);
+            } else {
+                alert('검색어를 입력해주세요.');
+            }
+        };
+
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            executeSearch();
+          }
+        });
+
+        if (icon) {
+            icon.style.cursor = 'pointer';
+            icon.addEventListener('click', executeSearch);
+        }
+      }
+    });
+  }
+
   /* DOM 준비 후 실행 */
   function onDOMReady() {
     applyNavState();
     initFooterModals();
+    initSearchBar();
   }
 
   if (document.readyState === 'loading') {

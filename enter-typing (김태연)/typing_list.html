@@ -215,7 +215,6 @@
                 <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('KPOP')">KPOP</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('문학')">문학</button>
                 <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('팝송')">팝송</button>
             </div>
 
@@ -320,7 +319,7 @@
                     <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
                         ▶ 타이핑 시작하기
                     </button>
-                    <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
+                    <button id="modal-rank-btn" class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
                         🏆 랭킹 보기
                     </button>
                 </div>
@@ -454,7 +453,7 @@
                                 <span class="difficulty">${diffStars}</span>
                                 <span class="time" style="margin-left: 10px;">⏱️ ${timeStr}</span>
                             </div>
-                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
+                            ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
                         </div>
                     </div>
                 `;
@@ -532,6 +531,7 @@
                     document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 가사로 타자 연습을 시작해보세요!`;
 
                     document.getElementById('modal-start-btn').onclick = () => location.href = `typing.html?id=${id}`;
+                    document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking_song.html?id=${id}`;
                 }
             } catch (error) {
                 console.error("Failed to fetch typing content details", error);

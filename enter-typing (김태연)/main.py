@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends, Header, WebSocket, WebSocke
 from fastapi.responses import JSONResponse
 import asyncio
 import redis.asyncio as aioredis
+import redis as sync_redis
 from typing import Dict, List, Optional
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -77,9 +78,8 @@ app = FastAPI()
 @app.on_event("startup")
 def startup_event():
     db = next(get_db())
-    if db.query(models.TypingContent).count() < 4:
-        # 기존 데이터 삭제 (중복 방지용 초기화)
-        db.query(models.TypingContent).delete()
+    if db.query(models.TypingContent).count() == 0:
+        # 최초 실행 시에만 기본 데이터를 추가합니다. 기존 데이터는 절대 삭제하지 않습니다.
         
         songs = [
             {
@@ -132,9 +132,8 @@ def startup_event():
 # ── 정적 파일 서빙 ─────────────────────────────────────────
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
-# ── 인메모리 저장소 (실제 서비스에서는 DB/Redis 사용 권장) ─
-# { email: { "code": "123456", "expires_at": timestamp } }
-verification_store: dict = {}
+# ── Redis 기반 저장소 (다중 서버 호환) ─
+sync_redis_client = sync_redis.Redis.from_url("redis://localhost:6379", decode_responses=True, protocol=2)
 
 # ── 이메일 설정 ────────────────────────────────────────────
 SMTP_HOST     = os.getenv("SMTP_HOST", "smtp.gmail.com")
@@ -316,11 +315,11 @@ def send_verification_code(req: EmailRequest, db: Session = Depends(get_db)):
     code = generate_code()
     expires_at = time.time() + CODE_EXPIRE_SECONDS
 
-    verification_store[req.email] = {
+    verification_data = {
         "code": code,
-        "expires_at": expires_at,
         "verified": False,
     }
+    sync_redis_client.set(f"verification:{req.email}", json.dumps(verification_data), ex=CODE_EXPIRE_SECONDS)
 
     html_body = f"""
     <div style="font-family:'Noto Sans KR',sans-serif; max-width:480px; margin:0 auto;
@@ -363,22 +362,23 @@ def send_verification_code(req: EmailRequest, db: Session = Depends(get_db)):
 @app.post("/api/verify-code")
 def verify_code(req: VerifyRequest, db: Session = Depends(get_db)):
     validate_email(req.email)
-    entry = verification_store.get(req.email)
+    raw = sync_redis_client.get(f"verification:{req.email}")
 
-    if not entry:
-        raise HTTPException(status_code=400, detail="인증 요청 내역이 없습니다. 다시 시도해주세요.")
+    if not raw:
+        raise HTTPException(status_code=400, detail="인증 요청 내역이 없거나 만료되었습니다. 다시 시도해주세요.")
+        
+    entry = json.loads(raw)
 
-    if time.time() > entry["expires_at"]:
-        del verification_store[req.email]
-        raise HTTPException(status_code=400, detail="인증번호가 만료되었습니다. 다시 요청해주세요.")
-
-    if entry["code"] != req.code.strip():
+    if entry.get("code") != req.code.strip():
         raise HTTPException(status_code=400, detail="인증번호가 올바르지 않습니다.")
 
     # 검증 성공 → 임시 비밀번호 발급
     temp_pw = generate_temp_password()
     entry["verified"] = True
     entry["temp_password"] = temp_pw
+    
+    # 임시 비밀번호 로그인 및 비밀번호 변경을 위해 5분간 유지
+    sync_redis_client.set(f"verification:{req.email}", json.dumps(entry), ex=300)
 
     # DB에서 해당 유저의 비밀번호를 임시 비밀번호의 해시로 업데이트
     user = db.query(models.User).filter(models.User.email == req.email).first()
@@ -438,8 +438,11 @@ def change_password(req: ChangePasswordRequest, authorization: str = Header(None
         user = current_user
     else:
         # 2. 토큰이 없다면 임시 비밀번호 찾기(이메일 인증) 검증 세션이 유효한지 확인
-        entry = verification_store.get(req.email)
-        if not entry or not entry.get("verified"):
+        raw = sync_redis_client.get(f"verification:{req.email}")
+        if not raw:
+            raise HTTPException(status_code=401, detail="비밀번호 변경 권한이 없습니다. 먼저 이메일 인증을 진행해주세요.")
+        entry = json.loads(raw)
+        if not entry.get("verified"):
             raise HTTPException(status_code=401, detail="비밀번호 변경 권한이 없습니다. 먼저 이메일 인증을 진행해주세요.")
         user = db.query(models.User).filter(models.User.email == req.email).first()
         if not user:
@@ -452,9 +455,8 @@ def change_password(req: ChangePasswordRequest, authorization: str = Header(None
     user.password_hash = get_password_hash(req.new_password)
     db.commit()
 
-    # 인메모리 항목 정리
-    if req.email in verification_store:
-        del verification_store[req.email]
+    # Redis 항목 정리
+    sync_redis_client.delete(f"verification:{req.email}")
 
     return {"success": True, "message": "비밀번호가 변경되었습니다."}
 
@@ -501,9 +503,8 @@ def delete_account(req: DeleteAccountRequest, authorization: str = Header(None),
     db.delete(current_user)
     db.commit()
 
-    # 인메모리 항목 정리
-    if req.email in verification_store:
-        del verification_store[req.email]
+    # Redis 항목 정리
+    sync_redis_client.delete(f"verification:{req.email}")
 
     return {"success": True, "message": "회원 탈퇴가 완료되었습니다."}
 
@@ -520,12 +521,14 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="이메일 또는 비밀번호가 일치하지 않습니다.")
 
-    # verification_store에 해당 이메일의 임시 비밀번호가 있으면 비교
-    entry = verification_store.get(req.email)
+    # Redis에 해당 이메일의 임시 비밀번호가 있으면 비교
+    raw = sync_redis_client.get(f"verification:{req.email}")
     is_temp_login = False
-    if entry and entry.get("verified") and entry.get("temp_password"):
-        if req.password == entry["temp_password"]:
-            is_temp_login = True
+    if raw:
+        entry = json.loads(raw)
+        if entry.get("verified") and entry.get("temp_password"):
+            if req.password == entry["temp_password"]:
+                is_temp_login = True
 
     # 임시 비밀번호 로그인이 아닌 경우 해시 비밀번호 대조 검증
     if not is_temp_login:
@@ -631,6 +634,7 @@ def get_all_typing_contents(db: Session = Depends(get_db)):
             "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
             "difficulty": c.difficulty,
             "best_time": c.best_time,
+            "play_count": c.play_count,
             "lyrics": c.lyrics,
             "hiragana": c.hiragana,
             "romaji": c.romaji,
@@ -768,6 +772,31 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
 # ════════════════════════════════════════════════════════════
 # API: 퀴즈 콘텐츠 API
 # ════════════════════════════════════════════════════════════
+@app.post("/api/typing-content/{content_id}/play")
+def increment_typing_play_count(content_id: int, db: Session = Depends(get_db)):
+    """인증 없이 플레이 수를 1 증가시키는 경량 엔드포인트 (비로그인 사용자 포함)"""
+    content = db.query(models.TypingContent).filter(models.TypingContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    if content.play_count is None:
+        content.play_count = 0
+    content.play_count += 1
+    db.commit()
+    return {"success": True, "play_count": content.play_count}
+
+@app.post("/api/quiz-content/{content_id}/play")
+def increment_quiz_play_count(content_id: int, db: Session = Depends(get_db)):
+    """인증 없이 퀴즈 플레이 수를 1 증가시키는 경량 엔드포인트"""
+    content = db.query(models.QuizContent).filter(models.QuizContent.id == content_id).first()
+    if not content:
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
+    if content.play_count is None:
+        content.play_count = 0
+    content.play_count += 1
+    db.commit()
+    return {"success": True, "play_count": content.play_count}
+
+
 @app.get("/api/quiz-contents")
 def get_all_quiz_contents(db: Session = Depends(get_db)):
     contents = db.query(models.QuizContent).all()
@@ -787,6 +816,7 @@ def get_all_quiz_contents(db: Session = Depends(get_db)):
             "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
             "difficulty": c.difficulty,
             "best_score": c.best_score,
+            "play_count": c.play_count,
             "quiz_count": quiz_count
         })
     return {"success": True, "data": result}
@@ -882,6 +912,110 @@ def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: m
     
     db.commit()
     return {"success": True, "message": "수정되었습니다."}
+# ════════════════════════════════════════════════════════════
+# API: 랭킹 시스템
+# ════════════════════════════════════════════════════════════
+from sqlalchemy import func
+
+@app.get("/api/ranking/total")
+def get_total_ranking(db: Session = Depends(get_db)):
+    # 타이핑 랭킹 (누적 점수 기준)
+    typing_histories = db.query(
+        models.TypingHistory.user_id,
+        func.sum(models.TypingHistory.score).label("total_score"),
+        func.avg(models.TypingHistory.wpm).label("avg_wpm"),
+        func.avg(models.TypingHistory.accuracy).label("avg_accuracy")
+    ).group_by(models.TypingHistory.user_id).order_by(func.sum(models.TypingHistory.score).desc()).limit(100).all()
+    
+    typing_ranking = []
+    for rank, h in enumerate(typing_histories):
+        user = db.query(models.User).filter(models.User.id == h.user_id).first()
+        typing_ranking.append({
+            "rank": rank + 1,
+            "nickname": user.nickname if user else "알 수 없음",
+            "total_score": int(h.total_score) if h.total_score else 0,
+            "avg_wpm": int(h.avg_wpm) if h.avg_wpm else 0,
+            "avg_accuracy": round(h.avg_accuracy, 1) if h.avg_accuracy else 0.0
+        })
+
+    # 퀴즈 랭킹 (누적 점수 기준)
+    quiz_histories = db.query(
+        models.QuizHistory.user_id,
+        func.sum(models.QuizHistory.score).label("total_score"),
+        func.sum(models.QuizHistory.total_questions).label("total_questions")
+    ).group_by(models.QuizHistory.user_id).order_by(func.sum(models.QuizHistory.score).desc()).limit(100).all()
+
+    quiz_ranking = []
+    for rank, h in enumerate(quiz_histories):
+        user = db.query(models.User).filter(models.User.id == h.user_id).first()
+        quiz_ranking.append({
+            "rank": rank + 1,
+            "nickname": user.nickname if user else "알 수 없음",
+            "total_score": int(h.total_score) if h.total_score else 0,
+            "total_questions": int(h.total_questions) if h.total_questions else 0
+        })
+
+    # 대전 랭킹 (누적 점수 기준)
+    battle_histories = db.query(
+        models.BattleHistory.user_id,
+        func.sum(models.BattleHistory.score).label("total_score"),
+        func.count(models.BattleHistory.id).label("play_count")
+    ).group_by(models.BattleHistory.user_id).order_by(func.sum(models.BattleHistory.score).desc()).limit(100).all()
+
+    battle_ranking = []
+    for rank, h in enumerate(battle_histories):
+        user = db.query(models.User).filter(models.User.id == h.user_id).first()
+        battle_ranking.append({
+            "rank": rank + 1,
+            "nickname": user.nickname if user else "알 수 없음",
+            "total_score": int(h.total_score) if h.total_score else 0,
+            "play_count": int(h.play_count) if h.play_count else 0
+        })
+
+    return {
+        "success": True,
+        "typing": typing_ranking,
+        "quiz": quiz_ranking,
+        "battle": battle_ranking
+    }
+
+@app.get("/api/ranking/content/{content_id}")
+def get_content_ranking(content_id: int, db: Session = Depends(get_db)):
+    # 특정 타이핑 콘텐츠의 랭킹 (최고 점수 기준)
+    histories = db.query(models.TypingHistory).filter(models.TypingHistory.content_id == content_id).order_by(models.TypingHistory.score.desc()).all()
+    seen_users = set()
+    ranking = []
+    
+    for h in histories:
+        if h.user_id not in seen_users:
+            seen_users.add(h.user_id)
+            user = db.query(models.User).filter(models.User.id == h.user_id).first()
+            ranking.append({
+                "rank": len(ranking) + 1,
+                "nickname": user.nickname if user else "알 수 없음",
+                "score": h.score,
+                "wpm": h.wpm,
+                "accuracy": round(h.accuracy, 1),
+                "played_at": h.played_at.isoformat() if h.played_at else None
+            })
+            if len(ranking) >= 100:
+                break
+                
+    # 만약 곡 정보도 필요하다면
+    content = db.query(models.TypingContent).filter(models.TypingContent.id == content_id).first()
+    content_info = {}
+    if content:
+        content_info = {
+            "title": content.title,
+            "artist": content.artist,
+            "genre": content.genre
+        }
+
+    return {
+        "success": True,
+        "content_info": content_info,
+        "ranking": ranking
+    }
 
 # ════════════════════════════════════════════════════════════
 # API: 가사 자동 변환 (히라가나, 로마자)
@@ -959,28 +1093,14 @@ def convert_lyrics(req: ConvertRequest):
         
     converted = kks.convert(text)
     
+    # pykakasi로 한자 → 히라가나 변환만 수행
     hiragana = ""
-    romaji = ""
     for item in converted:
-        h = item['hira']
-        r = item['hepburn']
-        
-        # pykakasi 스테가나 변환 예외 처리 (jie -> je 등)
-        if 'じぇ' in h: r = r.replace('jie', 'je')
-        if 'しぇ' in h: r = r.replace('shie', 'she')
-        if 'ちぇ' in h: r = r.replace('chie', 'che')
-        if 'せぁ' in h: r = r.replace('sea', 'sexa')
-        if 'せぃ' in h: r = r.replace('sei', 'sexi')
-        if 'せぅ' in h: r = r.replace('seu', 'sexu')
-        if 'せぇ' in h: r = r.replace('see', 'sexe')
-        if 'せぉ' in h: r = r.replace('seo', 'sexo')
-        
-        hiragana += h
-        romaji += r
+        hiragana += item['hira']
     
-    # romaji may need some cleanup for typing game
-    romaji = romaji.replace(" ", "")
     hiragana = hiragana.replace(" ", "")
+    
+    # romaji는 히라가나 → 로마자 변환 함수로 일관성 있게 처리
     romaji = hiragana_to_romaji(hiragana)
     
     return {"success": True, "hiragana": hiragana, "romaji": romaji}
@@ -1081,7 +1201,7 @@ def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db),
         accuracy=req.accuracy
     )
     db.add(history)
-    
+
     # 2. 오타 분석을 위해 "타이핑" 모드 완료 시에만 total_count 업데이트
     # req.genre가 "타이핑" 혹은 "J-POP" 등 일반 타이핑 연습 모드일 때만 적용
     if content and req.genre in ["타이핑", "J-POP", "ANI", "GAME", "ETC"]:
@@ -1289,6 +1409,7 @@ async def delete_room(redis: aioredis.Redis, room_code: str):
 class BattleRoomCreate(BaseModel):
     title: str
     song_id: int
+    mode: str = "typing"  # "typing" or "quiz"
     max_players: int = 4
 
 
@@ -1304,18 +1425,24 @@ async def create_battle_room(req: BattleRoomCreate, authorization: str = Header(
         if not existing:
             break
 
-    # 곡 정보 조회
-    content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+    # 콘텐츠 정보 조회
+    content = None
+    if req.mode == "quiz":
+        content = db.query(models.QuizContent).filter(models.QuizContent.id == req.song_id).first()
+    else:
+        content = db.query(models.TypingContent).filter(models.TypingContent.id == req.song_id).first()
+        
     if not content:
-        raise HTTPException(status_code=404, detail="곡을 찾을 수 없습니다.")
+        raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
 
     room_data = {
         "code": code,
+        "mode": req.mode,
         "title": req.title,
         "host": current_user.nickname,
         "song_id": content.id,
         "song_title": content.title,
-        "song_artist": content.artist,
+        "song_artist": content.artist if hasattr(content, "artist") else "알 수 없음",
         "max_players": min(req.max_players, 4),
         "status": "waiting",  # waiting | countdown | playing | finished
         "players": {}
@@ -1376,10 +1503,16 @@ async def save_battle_results(room_data: dict, db: Session):
         user_id = pdata.get("user_id")
         if not user_id:
             continue
+        # mode 분기 (타이핑 vs 퀴즈)
+        mode = room_data.get("mode", "typing")
+        content_id_val = song_id if mode == "typing" else None
+        quiz_id_val = song_id if mode == "quiz" else None
+
         history = models.BattleHistory(
             room_code=room_code,
             user_id=user_id,
-            content_id=song_id,
+            content_id=content_id_val,
+            quiz_id=quiz_id_val,
             rank=rank,
             score=pdata.get("score", 0),
             wpm=pdata.get("wpm", 0),
@@ -1416,33 +1549,34 @@ async def battle_websocket(
     nickname = user.nickname
     redis = await get_redis()
 
-    # 2. 방 상태 로드
-    room_data = await get_room_data(redis, room_code)
-    if not room_data:
-        await websocket.close(code=4004)
-        return
+    # 2. 방 상태 로드 (Lock 적용)
+    async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+        room_data = await get_room_data(redis, room_code)
+        if not room_data:
+            await websocket.close(code=4004)
+            return
 
-    # 3. 인원 초과 체크
-    if len(room_data["players"]) >= room_data["max_players"] and nickname not in room_data["players"]:
-        await websocket.close(code=4003)
-        return
+        # 3. 인원 초과 체크
+        if len(room_data["players"]) >= room_data["max_players"] and nickname not in room_data["players"]:
+            await websocket.close(code=4003)
+            return
 
-    # 4. WebSocket 수락 및 방 입장
-    await battle_manager.connect(room_code, websocket, nickname)
+        # 4. WebSocket 수락 및 방 입장
+        await battle_manager.connect(room_code, websocket, nickname)
 
-    # 플레이어 등록 (재접속 시 기존 데이터 유지)
-    if nickname not in room_data["players"]:
-        room_data["players"][nickname] = {
-            "user_id": user.id,
-            "ready": False,
-            "score": 0,
-            "progress": 0.0,
-            "wpm": 0,
-            "accuracy": 100.0,
-            "finished": False,
-            "is_host": nickname == room_data["host"]
-        }
-        await save_room_data(redis, room_code, room_data)
+        # 플레이어 등록 (재접속 시 기존 데이터 유지)
+        if nickname not in room_data["players"]:
+            room_data["players"][nickname] = {
+                "user_id": user.id,
+                "ready": False,
+                "score": 0,
+                "progress": 0.0,
+                "wpm": 0,
+                "accuracy": 100.0,
+                "finished": False,
+                "is_host": nickname == room_data["host"]
+            }
+            await save_room_data(redis, room_code, room_data)
 
     # 입장한 플레이어에게 현재 방 상태 전송
     await websocket.send_json({"type": "room_state", "room": room_data})
@@ -1464,10 +1598,13 @@ async def battle_websocket(
 
             # ── 준비 상태 변경 ──────────────────────────────
             if msg_type == "ready":
-                room_data = await get_room_data(redis, room_code)
+                async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+                    room_data = await get_room_data(redis, room_code)
+                    if room_data and nickname in room_data["players"]:
+                        room_data["players"][nickname]["ready"] = data.get("ready", True)
+                        await save_room_data(redis, room_code, room_data)
+                
                 if room_data and nickname in room_data["players"]:
-                    room_data["players"][nickname]["ready"] = data.get("ready", True)
-                    await save_room_data(redis, room_code, room_data)
                     await battle_manager.broadcast_all(room_code, {
                         "type": "player_update",
                         "nickname": nickname,
@@ -1540,10 +1677,11 @@ async def battle_websocket(
 
             # ── 동기화 완료 신호 ─────────────────────────────
             elif msg_type == "sync_ready":
-                room_data = await get_room_data(redis, room_code)
-                if room_data and room_data.get("status") == "syncing" and nickname in room_data["players"]:
-                    room_data["players"][nickname]["sync_ready"] = True
-                    await save_room_data(redis, room_code, room_data)
+                async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+                    room_data = await get_room_data(redis, room_code)
+                    if room_data and room_data.get("status") == "syncing" and nickname in room_data["players"]:
+                        room_data["players"][nickname]["sync_ready"] = True
+                        await save_room_data(redis, room_code, room_data)
 
             # ── 채팅 메시지 ─────────────────────────────────
             elif msg_type == "chat":
@@ -1553,15 +1691,47 @@ async def battle_websocket(
                     "message": data.get("message", "")
                 }, exclude=websocket)
 
+            # ── 퀴즈 정답 브로드캐스트 ──────────────────────
+            elif msg_type == "quiz_answer":
+                # 점수를 Redis에 즉시 반영
+                async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+                    room_data = await get_room_data(redis, room_code)
+                    if room_data and nickname in room_data["players"]:
+                        new_score = data.get("score", 0)
+                        room_data["players"][nickname]["score"] = new_score
+                        await save_room_data(redis, room_code, room_data)
+
+                # 다른 플레이어들에게 정답 브로드캐스트 (본인 제외)
+                await battle_manager.broadcast(room_code, {
+                    "type": "quiz_answer",
+                    "nickname": nickname,
+                    "question_key": data.get("question_key"),
+                    "answer_index": data.get("answer_index"),
+                    "answer_text": data.get("answer_text", ""),
+                    "score": data.get("score", 0),
+                    "message": data.get("message", "")
+                }, exclude=websocket)
+
+            # ── 퀴즈 채팅 메시지 ─────────────────────────────
+            elif msg_type == "quiz_chat":
+                await battle_manager.broadcast(room_code, {
+                    "type": "quiz_chat",
+                    "nickname": nickname,
+                    "message": data.get("message", "")
+                }, exclude=websocket)
+
             # ── 타이핑 진행도 업데이트 ──────────────────────
             elif msg_type == "progress":
-                room_data = await get_room_data(redis, room_code)
+                async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+                    room_data = await get_room_data(redis, room_code)
+                    if room_data and nickname in room_data["players"]:
+                        room_data["players"][nickname]["score"] = data.get("score", 0)
+                        room_data["players"][nickname]["progress"] = data.get("progress", 0.0)
+                        room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                        room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                        await save_room_data(redis, room_code, room_data)
+                
                 if room_data and nickname in room_data["players"]:
-                    room_data["players"][nickname]["score"] = data.get("score", 0)
-                    room_data["players"][nickname]["progress"] = data.get("progress", 0.0)
-                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
-                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
-                    await save_room_data(redis, room_code, room_data)
                     # 나머지 플레이어에게 브로드캐스트 (본인 제외)
                     await battle_manager.broadcast(room_code, {
                         "type": "player_update",
@@ -1573,15 +1743,27 @@ async def battle_websocket(
 
             # ── 게임 완료 ───────────────────────────────────
             elif msg_type == "finish":
-                room_data = await get_room_data(redis, room_code)
+                async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+                    room_data = await get_room_data(redis, room_code)
+                    if room_data and nickname in room_data["players"]:
+                        room_data["players"][nickname]["finished"] = True
+                        if room_data.get("mode") == "quiz":
+                            room_data["players"][nickname]["score"] = data.get("score", room_data["players"][nickname].get("score", 0))
+                            room_data["players"][nickname]["wpm"] = 0
+                            room_data["players"][nickname]["accuracy"] = 0.0
+                        else:
+                            room_data["players"][nickname]["score"] = data.get("score", 0)
+                            room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
+                            room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
+                        room_data["players"][nickname]["progress"] = 1.0
+                        
+                        all_finished = all(p["finished"] for p in room_data["players"].values())
+                        if all_finished and room_data.get("status") != "finished":
+                            room_data["status"] = "finished"
+                            
+                        await save_room_data(redis, room_code, room_data)
+                        
                 if room_data and nickname in room_data["players"]:
-                    room_data["players"][nickname]["finished"] = True
-                    room_data["players"][nickname]["score"] = data.get("score", 0)
-                    room_data["players"][nickname]["wpm"] = data.get("wpm", 0)
-                    room_data["players"][nickname]["accuracy"] = data.get("accuracy", 100.0)
-                    room_data["players"][nickname]["progress"] = 1.0
-                    await save_room_data(redis, room_code, room_data)
-
                     # 완료 알림 브로드캐스트
                     await battle_manager.broadcast_all(room_code, {
                         "type": "player_finished",
@@ -1589,12 +1771,7 @@ async def battle_websocket(
                         "players": room_data["players"]
                     })
 
-                    # 모든 플레이어가 완료했으면 게임 종료 (이미 finished 상태인 경우 중복 처리 방지)
-                    all_finished = all(p["finished"] for p in room_data["players"].values())
-                    if all_finished and room_data.get("status") != "finished":
-                        room_data["status"] = "finished"
-                        await save_room_data(redis, room_code, room_data)
-
+                    if room_data.get("status") == "finished":
                         # 순위 계산
                         sorted_players = sorted(
                             room_data["players"].items(),
@@ -1623,71 +1800,72 @@ async def battle_websocket(
 
     except WebSocketDisconnect:
         battle_manager.disconnect(room_code, websocket)
-        room_data = await get_room_data(redis, room_code)
-        if room_data and nickname in room_data["players"]:
-            if room_data.get("status") in ["playing", "countdown", "finished"]:
-                room_data["players"][nickname]["disconnected"] = True
-                room_data["players"][nickname]["finished"] = True
-                
-                # 방장이 나갔으면 다음 사람에게 양도
-                if nickname == room_data["host"]:
-                    active_players = [n for n, p in room_data["players"].items() if not p.get("disconnected")]
-                    if active_players:
-                        room_data["host"] = active_players[0]
-                        
-                await save_room_data(redis, room_code, room_data)
-                
-                await battle_manager.broadcast_all(room_code, {
-                    "type": "player_disconnected",
-                    "nickname": nickname,
-                    "players": room_data["players"],
-                    "new_host": room_data["host"]
-                })
-                
-                # 남은 사람들이 모두 완료했는지 체크
-                active_players_dict = {n: p for n, p in room_data["players"].items() if not p.get("disconnected")}
-                if active_players_dict:
-                    all_finished = all(p.get("finished") for p in active_players_dict.values())
-                    if all_finished and room_data["status"] != "finished":
-                        room_data["status"] = "finished"
-                        await save_room_data(redis, room_code, room_data)
-                        
-                        sorted_players = sorted(
-                            room_data["players"].items(),
-                            key=lambda x: x[1].get("score", 0),
-                            reverse=True
-                        )
-                        results = [
-                            {"rank": i+1, "nickname": n, **p}
-                            for i, (n, p) in enumerate(sorted_players)
-                        ]
-                        await battle_manager.broadcast_all(room_code, {
-                            "type": "game_end",
-                            "results": results
-                        })
-                        try:
-                            await save_battle_results(room_data, db)
-                        except Exception as e:
-                            print(f"Battle history save error: {e}")
-                        await asyncio.sleep(600)
-                        await delete_room(redis, room_code)
-                else:
-                    await delete_room(redis, room_code)
-            else:
-                del room_data["players"][nickname]
-                if not room_data["players"]:
-                    await delete_room(redis, room_code)
-                else:
-                    if nickname == room_data["host"] and room_data["players"]:
-                        room_data["host"] = next(iter(room_data["players"]))
+        async with redis.lock(f"battle:lock:{room_code}", timeout=10):
+            room_data = await get_room_data(redis, room_code)
+            if room_data and nickname in room_data["players"]:
+                if room_data.get("status") in ["playing", "countdown", "finished"]:
+                    room_data["players"][nickname]["disconnected"] = True
+                    room_data["players"][nickname]["finished"] = True
+                    
+                    # 방장이 나갔으면 다음 사람에게 양도
+                    if nickname == room_data["host"]:
+                        active_players = [n for n, p in room_data["players"].items() if not p.get("disconnected")]
+                        if active_players:
+                            room_data["host"] = active_players[0]
+                            
                     await save_room_data(redis, room_code, room_data)
+                    
                     await battle_manager.broadcast_all(room_code, {
-                        "type": "player_left",
+                        "type": "player_disconnected",
                         "nickname": nickname,
                         "players": room_data["players"],
                         "new_host": room_data["host"]
                     })
-                await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+                    
+                    # 남은 사람들이 모두 완료했는지 체크
+                    active_players_dict = {n: p for n, p in room_data["players"].items() if not p.get("disconnected")}
+                    if active_players_dict:
+                        all_finished = all(p.get("finished") for p in active_players_dict.values())
+                        if all_finished and room_data["status"] != "finished":
+                            room_data["status"] = "finished"
+                            await save_room_data(redis, room_code, room_data)
+                            
+                            sorted_players = sorted(
+                                room_data["players"].items(),
+                                key=lambda x: x[1].get("score", 0),
+                                reverse=True
+                            )
+                            results = [
+                                {"rank": i+1, "nickname": n, **p}
+                                for i, (n, p) in enumerate(sorted_players)
+                            ]
+                            await battle_manager.broadcast_all(room_code, {
+                                "type": "game_end",
+                                "results": results
+                            })
+                            try:
+                                await save_battle_results(room_data, db)
+                            except Exception as e:
+                                print(f"Battle history save error: {e}")
+                            await asyncio.sleep(600)
+                            await delete_room(redis, room_code)
+                    else:
+                        await delete_room(redis, room_code)
+                else:
+                    del room_data["players"][nickname]
+                    if not room_data["players"]:
+                        await delete_room(redis, room_code)
+                    else:
+                        if nickname == room_data["host"] and room_data["players"]:
+                            room_data["host"] = next(iter(room_data["players"]))
+                        await save_room_data(redis, room_code, room_data)
+                        await battle_manager.broadcast_all(room_code, {
+                            "type": "player_left",
+                            "nickname": nickname,
+                            "players": room_data["players"],
+                            "new_host": room_data["host"]
+                        })
+                    await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
     except Exception as e:
         print(f"WebSocket error: {e}")
         battle_manager.disconnect(room_code, websocket)

@@ -558,7 +558,6 @@
             <div class="footer-col">
                 <h4>타이핑</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
                     <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
                     <li><a href="typing_create.html">타이핑 작성하기</a></li>
                     <li><a href="battle.html">실시간 대전</a></li>
@@ -660,16 +659,6 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const contentId = urlParams.get("id");
-
-        function escapeHTML(str) {
-            if (!str) return "";
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
 
         let player = null;
         let quizData = [];
@@ -1023,8 +1012,8 @@
                 itemEl.setAttribute("data-question-key", key);
                 itemEl.innerHTML = `
                     <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
-                        ${escapeHTML(question.question || "질문")}<br>
-                        <span style="color: var(--color-pink); display: inline-block; margin-top: 5px;">${escapeHTML(displayText || "-")}</span>
+                        ${question.question || "질문"}<br>
+                        <span style="color: var(--color-pink); display: inline-block; margin-top: 5px;">${displayText || "-"}</span>
                     </div>
                 `;
                 boardItems.appendChild(itemEl);
@@ -1151,7 +1140,7 @@
                     grouped[qIdx].forEach(log => {
                         const itemDiv = document.createElement('div');
                         itemDiv.style.cssText = "font-size: 0.95rem; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;";
-                        itemDiv.innerHTML = `<span style="color: #666; line-height: 1.4; word-break: keep-all;">Q. ${escapeHTML(log.questionLabel)}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${escapeHTML(log.matchedAnswer)}</span>`;
+                        itemDiv.innerHTML = `<span style="color: #666; line-height: 1.4; word-break: keep-all;">Q. ${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${log.matchedAnswer}</span>`;
                         groupDiv.appendChild(itemDiv);
                     });
                     

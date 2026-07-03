@@ -496,16 +496,6 @@
         let youtubePlayer = null;
         let isPlayerReady = false;
 
-        function escapeHTML(str) {
-            if (!str) return "";
-            return String(str)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
         // DOM Elements
         const tbody = document.getElementById('lines-tbody');
         const lineTimeInput = document.getElementById('line-time');
@@ -613,9 +603,9 @@
                     <td style="text-align: center; color: #888;">${index + 1}</td>
                     <td style="font-weight: bold; color: var(--color-pink);">${line.time.toFixed(2)}</td>
                     ${line.lyrics === '[END]' ? '<td colspan="3" style="text-align: center; font-weight: bold; color: #e67700;">[타이핑 종료 지점]</td>' : `
-                    <td>${escapeHTML(line.lyrics)}</td>
-                    <td>${escapeHTML(line.hiragana)}</td>
-                    <td>${escapeHTML(line.romaji)}</td>`}
+                    <td>${line.lyrics}</td>
+                    <td>${line.hiragana}</td>
+                    <td>${line.romaji}</td>`}
                     <td style="text-align: center;">
                         <span class="action-icon edit-icon" data-index="${index}">✏️</span>
                         <span class="action-icon del-icon" data-index="${index}">🗑️</span>

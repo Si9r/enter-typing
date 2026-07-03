@@ -260,7 +260,7 @@
     <section class="content-section">
         <div class="section-header">
             <h2>🔥 인기 타이핑 콘텐츠</h2>
-            <a href="typing_popular.html" class="view-all">전체보기 ></a>
+            <a href="typing_list.html" class="view-all">전체보기 ></a>
         </div>
         <div class="card-grid" id="popular-typing-grid">
             <!-- 동적으로 렌더링됩니다 -->
@@ -297,7 +297,6 @@
             <div class="footer-col">
                 <h4>타이핑</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
                     <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
                     <li><a href="typing_create.html">타이핑 작성하기</a></li>
                     <li><a href="battle.html">실시간 대전</a></li>
@@ -338,7 +337,7 @@
                 const typingRes = await fetch('/api/typing-contents?t=' + Date.now());
                 const typingData = await typingRes.json();
                 if (typingData.success) {
-                    const sortedTyping = typingData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 3);
+                    const sortedTyping = typingData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 4);
                     const typingGrid = document.getElementById('popular-typing-grid');
                     typingGrid.innerHTML = '';
                     sortedTyping.forEach(item => {

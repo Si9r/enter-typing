@@ -181,7 +181,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -210,14 +214,18 @@
                 </div>
             </div>
 
-            <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div
+                style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div id="category-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
-                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
-                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;"
+                        onclick="setCategory('JPOP')">JPOP</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;"
+                        onclick="setCategory('ANIME')">애니메이션</button>
                 </div>
                 <div>
-                    <select id="sort-select" onchange="setSort(this.value)" style="padding: 10px 15px; border: 1.5px solid #ffe3e4; border-radius: 8px; outline: none; font-weight: 700; color: #555; background: white; cursor: pointer;">
+                    <select id="sort-select" onchange="setSort(this.value)"
+                        style="padding: 10px 15px; border: 1.5px solid #ffe3e4; border-radius: 8px; outline: none; font-weight: 700; color: #555; background: white; cursor: pointer;">
                         <option value="recent">등록순</option>
                         <option value="popular">인기순</option>
                     </select>
@@ -229,7 +237,8 @@
             </div>
 
             <div style="text-align: center; margin-top: 60px;">
-                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;" onclick="loadMore()">더 많은 콘텐츠 보기</button>
+                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;"
+                    onclick="loadMore()">더 많은 콘텐츠 보기</button>
             </div>
         </section>
     </main>
@@ -325,7 +334,8 @@
                     <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
                         ▶ 타이핑 시작하기
                     </button>
-                    <button id="modal-rank-btn" class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
+                    <button id="modal-rank-btn" class="btn btn-outline btn-large"
+                        onclick="location.href='ranking_song.html'">
                         🏆 랭킹 보기
                     </button>
                 </div>
@@ -528,7 +538,7 @@
                     const diffValue = data.difficulty || 3;
                     document.getElementById('modal-difficulty').innerText = '⭐'.repeat(diffValue);
                     document.getElementById('modal-play-count').innerText = (data.play_count || 0) + '회';
-                    
+
                     let mTotalSeconds = data.best_time || 0;
                     if (mTotalSeconds === 0 && data.timestamps) {
                         try {

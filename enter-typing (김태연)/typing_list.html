@@ -210,12 +210,18 @@
                 </div>
             </div>
 
-            <div id="category-buttons" style="margin-bottom: 40px; display: flex; gap: 12px; flex-wrap: wrap;">
-                <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('KPOP')">KPOP</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
-                <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('팝송')">팝송</button>
+            <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div id="category-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
+                </div>
+                <div>
+                    <select id="sort-select" onchange="setSort(this.value)" style="padding: 10px 15px; border: 1.5px solid #ffe3e4; border-radius: 8px; outline: none; font-weight: 700; color: #555; background: white; cursor: pointer;">
+                        <option value="recent">등록순</option>
+                        <option value="popular">인기순</option>
+                    </select>
+                </div>
             </div>
 
             <div class="card-grid" id="card-grid">
@@ -334,7 +340,8 @@
         let allTypingContents = [];
         let isAdminMode = false;
         let currentCategory = '전체';
-        let displayLimit = 4;
+        let currentSort = 'recent';
+        let displayLimit = 30;
 
         function toggleAdminMode() {
             isAdminMode = !isAdminMode;
@@ -348,9 +355,15 @@
 
         function setCategory(cat) {
             currentCategory = cat;
-            displayLimit = 4; // 카테고리 변경 시 표시 개수 초기화
+            displayLimit = 30; // 카테고리 변경 시 표시 개수 초기화
             renderCards();
             updateCategoryButtons();
+        }
+
+        function setSort(sortType) {
+            currentSort = sortType;
+            displayLimit = 30; // 정렬 변경 시 표시 개수 초기화
+            renderCards();
         }
 
         function updateCategoryButtons() {
@@ -368,7 +381,7 @@
         }
 
         function loadMore() {
-            displayLimit += 4;
+            displayLimit += 30;
             renderCards();
         }
 
@@ -408,9 +421,15 @@
             const grid = document.getElementById('card-grid');
             grid.innerHTML = '';
 
-            let filtered = allTypingContents;
+            let filtered = [...allTypingContents];
             if (currentCategory !== '전체') {
-                filtered = allTypingContents.filter(item => item.genre === currentCategory);
+                filtered = filtered.filter(item => item.genre === currentCategory);
+            }
+
+            if (currentSort === 'popular') {
+                filtered.sort((a, b) => (b.play_count || 0) - (a.play_count || 0));
+            } else {
+                filtered.sort((a, b) => b.id - a.id);
             }
 
             const itemsToShow = filtered.slice(0, displayLimit);

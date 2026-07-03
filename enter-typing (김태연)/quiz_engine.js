@@ -1,3 +1,4 @@
+
 let audioPlayer = new Audio();
 let isPlaying = false;
 let quizStarted = false;

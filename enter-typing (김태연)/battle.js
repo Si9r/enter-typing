@@ -518,7 +518,7 @@ function enterWaitingRoom() {
         document.getElementById("wait-room-title").textContent = currentRoom.title;
     }
 
-    document.getElementById("wait-room-code").innerHTML = `코드: ${currentRoom.code} <span style="font-size: 0.85rem;">📋</span>`;
+    document.getElementById("wait-room-code").innerHTML = `코드: ${currentRoom.code} <span style="font-size: 0.85rem;"></span>`;
     document.getElementById("wait-song-title").textContent = currentRoom.song_title;
     document.getElementById("wait-song-artist").textContent = currentRoom.song_artist;
 
@@ -542,7 +542,7 @@ window.copyRoomCode = function () {
         function showSuccess() {
             const el = document.getElementById("wait-room-code");
             const originalHTML = el.innerHTML;
-            el.innerHTML = `복사되었습니다! <span style="font-size: 0.85rem;">✅</span>`;
+            el.innerHTML = `복사되었습니다! <span style="font-size: 0.85rem;"></span>`;
             setTimeout(() => {
                 el.innerHTML = originalHTML;
             }, 1500);
@@ -642,7 +642,7 @@ function renderPlayersInLobby() {
     for (let i = playerList.length; i < maxUsers; i++) {
         const card = document.createElement("div");
         card.className = "player-card empty-slot";
-        card.innerHTML = `<div>👤 대기 중...</div>`;
+        card.innerHTML = `<div> 대기 중...</div>`;
         grid.appendChild(card);
     }
 
@@ -822,7 +822,7 @@ function startSyncLoop() {
             return;
         }
 
-        // 👇 가상 시간 흐름 계산 (현실 시간 기반)
+        //  가상 시간 흐름 계산 (현실 시간 기반)
         let now = Date.now();
         let delta = (now - lastTickTime) / 1000;
         lastTickTime = now;
@@ -974,7 +974,7 @@ function handleLineCompletion() {
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = '<span class="success-text">✨ 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
+        statusPanel.innerHTML = '<span class="success-text"> 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
     }
 
     calculateMyProgress();
@@ -1682,7 +1682,7 @@ function updateQuizAnswerBoard() {
         hintRow.style.marginTop = "6px";
 
         const hintBtn = document.createElement("button");
-        hintBtn.textContent = "💡 힌트 보기";
+        hintBtn.textContent = " 힌트 보기";
         hintBtn.style.cssText = "background: rgba(255,209,123,0.15); border: 1.5px solid rgba(255,209,123,0.4); color: #a07000; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: all 0.2s; flex-shrink: 0;";
 
         const hintText = document.createElement("span");
@@ -1692,7 +1692,7 @@ function updateQuizAnswerBoard() {
         hintBtn.onclick = () => {
             const isHidden = hintText.style.display === "none";
             hintText.style.display = isHidden ? "inline" : "none";
-            hintBtn.textContent = isHidden ? "💡 힌트 숨기기" : "💡 힌트 보기";
+            hintBtn.textContent = isHidden ? " 힌트 숨기기" : " 힌트 보기";
         };
 
         hintRow.appendChild(hintBtn);
@@ -1890,7 +1890,7 @@ function addQuizUserChat(sender, msg, isCorrect) {
     bubble.className = "chat-bubble me";
     if (isCorrect) {
         bubble.style.border = "2px solid #34a853";
-        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender} <span style="color:#34a853">✅</span></div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender} <span style="color:#34a853"></span></div>${escapeHTML(msg)}`;
     } else {
         bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender}</div>${escapeHTML(msg)}`;
     }
@@ -2055,7 +2055,7 @@ function addQuizOpponentChat(sender, msg, isCorrect) {
     bubble.className = 'chat-bubble';
     if (isCorrect) {
         bubble.style.border = '2px solid #1a73e8';
-        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender} <span style="color:#1a73e8">✅</span></div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender} <span style="color:#1a73e8"></span></div>${escapeHTML(msg)}`;
     } else {
         bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender}</div>${escapeHTML(msg)}`;
     }

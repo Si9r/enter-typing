@@ -41,8 +41,15 @@
         .rank-score { font-size: 1.4rem; font-weight: 900; color: var(--color-blue); text-align: right; width: 150px;}
         .rank-date { font-size: 0.8rem; color: #aaa; text-align: right; width: 100px; }
         
-        .empty-state { text-align: center; padding: 50px; color: #888; font-weight: 500; font-size: 1.1rem;}
+        .empty-state { text-align: center; padding: 50px; color: var(--theme-text-muted); font-weight: 500; font-size: 1.1rem;}
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <!-- 상단 네비게이션 바 -->
@@ -61,13 +68,13 @@
         </div>
         <div class="nav-center">
             <div class="search-bar">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -75,15 +82,15 @@
         </div>
     </header>
 
-    <script src="navbar.js?v=1.0.3"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 
     <!-- 메인 컨텐츠 -->
     <main style="margin-top: 80px;">
         <div class="song-ranking-layout">
             <aside class="sidebar">
-                <h3 class="sidebar-title">🎵 플레이리스트</h3>
+                <h3 class="sidebar-title"> 플레이리스트</h3>
                 <div id="song-list-container">
-                    <div style="text-align:center; color:#888; padding: 20px;">곡을 불러오는 중...</div>
+                    <div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">곡을 불러오는 중...</div>
                 </div>
             </aside>
             
@@ -108,7 +115,7 @@
                 </div>
                 
                 <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🎧</div>
+                    <div style="font-size: 4rem; margin-bottom: 20px;"></div>
                     <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
                 </div>
             </section>
@@ -185,15 +192,15 @@
                 
                 if (data.success) {
                     if (data.data.length === 0) {
-                        container.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">등록된 곡이 없습니다.</div>';
+                        container.innerHTML = '<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">등록된 곡이 없습니다.</div>';
                         return;
                     }
                     
                     let html = '';
                     data.data.forEach(item => {
-                        let iconChar = '🎵';
-                        if (item.genre === '애니메이션' || item.genre === 'ANIME') iconChar = '🌸';
-                        if (item.genre === '문학') iconChar = '📖';
+                        let iconChar = '';
+                        if (item.genre === '애니메이션' || item.genre === 'ANIME') iconChar = '';
+                        if (item.genre === '문학') iconChar = '';
                         
                         html += `
                             <div class="song-item" id="song-item-${item.id}" onclick="selectSong(${item.id})">
@@ -256,7 +263,7 @@
             if (!list || list.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <div style="font-size: 3rem; margin-bottom: 10px;">🤔</div>
+                        <div style="font-size: 3rem; margin-bottom: 10px;"></div>
                         아직 이 곡을 플레이한 기록이 없습니다.<br>
                         지금 바로 첫 번째 기록의 주인공이 되어보세요!
                     </div>

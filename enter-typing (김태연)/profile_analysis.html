@@ -113,7 +113,7 @@
     .typo-bar-bg {
       flex: 1;
       height: 12px;
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border-radius: 12px;
       overflow: hidden;
     }
@@ -274,13 +274,20 @@
     .hm-high   { background: rgba(255,159,171,.45); color: #B03050; }
     .hm-med    { background: rgba(255,197,130,.35); color: #A0600A; }
     .hm-low    { background: rgba(168,216,168,.35); color: #2F6A2F; }
-    .hm-none   { background: #f0f0f0; color: #aaa; }
+    .hm-none   { background: var(--theme-bg-hover); color: #aaa; }
 
     @media (max-width: 600px) {
       .summary-row { grid-template-columns: 1fr 1fr; }
       .heatmap-grid { grid-template-columns: repeat(5, 1fr); }
     }
   </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -299,20 +306,20 @@
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='search.html'">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
         <input type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
       </div>
     </div>
   </header>
-  <script src="navbar.js?v=1.0.3"></script>
+  <script src="navbar.js?v=2.0.0"></script>
 
   <div class="analysis-wrap">
 
@@ -320,7 +327,7 @@
     <div class="page-header">
       <a href="profile.html" class="back-btn">← 마이페이지</a>
       <div>
-        <div class="page-title">📉 일본어 오타 상세 분석</div>
+        <div class="page-title"> 일본어 오타 상세 분석</div>
         <div class="page-subtitle">최근 30일 타이핑 기록을 기반으로 분석했습니다.</div>
       </div>
     </div>
@@ -343,22 +350,22 @@
 
     <!-- 가나 오타 히트맵 -->
     <div class="card-block">
-      <h3>🗾 히라가나 오타 히트맵</h3>
+      <h3> 히라가나 오타 히트맵</h3>
       <p style="font-size:.82rem; color:#7F8C8D; margin-bottom:16px;">
-        🔴 높음 &nbsp;|&nbsp; 🟡 보통 &nbsp;|&nbsp; 🟢 낮음 &nbsp;|&nbsp; ⬜ 없음 (셀 위에 마우스를 올리면 상세 확인)
+         높음 &nbsp;|&nbsp;  보통 &nbsp;|&nbsp;  낮음 &nbsp;|&nbsp; ⬜ 없음 (셀 위에 마우스를 올리면 상세 확인)
       </p>
       <div class="heatmap-grid" id="heatmap"></div>
     </div>
 
     <!-- 오타 TOP 차트 -->
     <div class="card-block">
-      <h3>📊 오타율 TOP 10 문자</h3>
+      <h3> 오타율 TOP 10 문자</h3>
       <div id="typo-bars"></div>
     </div>
 
     <!-- 혼동 쌍 -->
     <div class="card-block">
-      <h3>🔀 자주 혼동하는 문자 쌍</h3>
+      <h3> 자주 혼동하는 문자 쌍</h3>
       <div class="pair-grid" id="pair-grid"></div>
     </div>
 
@@ -381,38 +388,38 @@
 
     <!-- 개선 팁 -->
     <div class="card-block">
-      <h3>💡 개선 포인트</h3>
+      <h3> 개선 포인트</h3>
       <ul class="tip-list">
         <li>
-          <div class="tip-icon">🔤</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「つ」 입력 — tsu 정확히 연습하기</strong>
             <span>「つ」는 <b>tsu</b>로 입력해야 합니다. <b>tu</b>도 허용되지만 혼용하면 오타율이 올라갑니다. 하나의 방법으로 통일하세요.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🔚</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「ん」 — 단어 끝 처리 주의</strong>
             <span>「ん」은 단어 끝이나 자음 앞에서는 <b>n</b> 한 번으로 OK. 하지만 모음 앞에서는 <b>nn</b> 또는 <b>n'</b>을 입력해야 합니다.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🆑</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「っ」 — 촉음(小文字) 입력 패턴</strong>
             <span>「っ」는 다음 자음을 두 번 입력(<b>kk, ss, tt…</b>)하거나, <b>xtsu / ltsu</b>로 단독 입력할 수 있습니다. 뒤 글자와 함께 치는 습관을 들이세요.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🔄</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「ぢ」 vs 「じ」 혼동</strong>
             <span>일반적으로 <b>じ → ji</b>, <b>ぢ → di (또는 zi)</b>입니다. 두 글자의 모양 차이(ぢ vs じ)를 시각적으로 익히는 것이 중요합니다.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🎯</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>오타 많은 문자 집중 연습</strong>
             <span>오타율 상위 문자들을 모아 짧은 문장을 직접 만들어 반복 연습하면 효과적입니다. 예: 「つつじの花が咲いた」</span>
@@ -607,7 +614,7 @@
             </div>`;
         });
       } else {
-        barsEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center;">오타 기록이 없습니다. 완벽한 타이핑입니다! 🎉</div>';
+        barsEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center;">오타 기록이 없습니다. 완벽한 타이핑입니다! </div>';
       }
 
       // 4. 혼동 쌍 렌더
@@ -771,7 +778,7 @@
     .typo-bar-bg {
       flex: 1;
       height: 12px;
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border-radius: 12px;
       overflow: hidden;
     }
@@ -932,13 +939,14 @@
     .hm-high   { background: rgba(255,159,171,.45); color: #B03050; }
     .hm-med    { background: rgba(255,197,130,.35); color: #A0600A; }
     .hm-low    { background: rgba(168,216,168,.35); color: #2F6A2F; }
-    .hm-none   { background: #f0f0f0; color: #aaa; }
+    .hm-none   { background: var(--theme-bg-hover); color: #aaa; }
 
     @media (max-width: 600px) {
       .summary-row { grid-template-columns: 1fr 1fr; }
       .heatmap-grid { grid-template-columns: repeat(5, 1fr); }
     }
   </style>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -957,20 +965,20 @@
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='search.html'">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
         <input type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
       </div>
     </div>
   </header>
-  <script src="navbar.js?v=1.0.3"></script>
+  <script src="navbar.js?v=2.0.0"></script>
 
   <div class="analysis-wrap">
 
@@ -978,7 +986,7 @@
     <div class="page-header">
       <a href="profile.html" class="back-btn">← 마이페이지</a>
       <div>
-        <div class="page-title">📉 일본어 오타 상세 분석</div>
+        <div class="page-title"> 일본어 오타 상세 분석</div>
         <div class="page-subtitle">최근 30일 타이핑 기록을 기반으로 분석했습니다.</div>
       </div>
     </div>
@@ -1001,22 +1009,22 @@
 
     <!-- 가나 오타 히트맵 -->
     <div class="card-block">
-      <h3>🗾 히라가나 오타 히트맵</h3>
+      <h3> 히라가나 오타 히트맵</h3>
       <p style="font-size:.82rem; color:#7F8C8D; margin-bottom:16px;">
-        🔴 높음 &nbsp;|&nbsp; 🟡 보통 &nbsp;|&nbsp; 🟢 낮음 &nbsp;|&nbsp; ⬜ 없음 (셀 위에 마우스를 올리면 상세 확인)
+         높음 &nbsp;|&nbsp;  보통 &nbsp;|&nbsp;  낮음 &nbsp;|&nbsp; ⬜ 없음 (셀 위에 마우스를 올리면 상세 확인)
       </p>
       <div class="heatmap-grid" id="heatmap"></div>
     </div>
 
     <!-- 오타 TOP 차트 -->
     <div class="card-block">
-      <h3>📊 오타율 TOP 10 문자</h3>
+      <h3> 오타율 TOP 10 문자</h3>
       <div id="typo-bars"></div>
     </div>
 
     <!-- 혼동 쌍 -->
     <div class="card-block">
-      <h3>🔀 자주 혼동하는 문자 쌍</h3>
+      <h3> 자주 혼동하는 문자 쌍</h3>
       <div class="pair-grid" id="pair-grid"></div>
     </div>
 
@@ -1039,38 +1047,38 @@
 
     <!-- 개선 팁 -->
     <div class="card-block">
-      <h3>💡 개선 포인트</h3>
+      <h3> 개선 포인트</h3>
       <ul class="tip-list">
         <li>
-          <div class="tip-icon">🔤</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「つ」 입력 — tsu 정확히 연습하기</strong>
             <span>「つ」는 <b>tsu</b>로 입력해야 합니다. <b>tu</b>도 허용되지만 혼용하면 오타율이 올라갑니다. 하나의 방법으로 통일하세요.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🔚</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「ん」 — 단어 끝 처리 주의</strong>
             <span>「ん」은 단어 끝이나 자음 앞에서는 <b>n</b> 한 번으로 OK. 하지만 모음 앞에서는 <b>nn</b> 또는 <b>n'</b>을 입력해야 합니다.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🆑</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「っ」 — 촉음(小文字) 입력 패턴</strong>
             <span>「っ」는 다음 자음을 두 번 입력(<b>kk, ss, tt…</b>)하거나, <b>xtsu / ltsu</b>로 단독 입력할 수 있습니다. 뒤 글자와 함께 치는 습관을 들이세요.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🔄</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>「ぢ」 vs 「じ」 혼동</strong>
             <span>일반적으로 <b>じ → ji</b>, <b>ぢ → di (또는 zi)</b>입니다. 두 글자의 모양 차이(ぢ vs じ)를 시각적으로 익히는 것이 중요합니다.</span>
           </div>
         </li>
         <li>
-          <div class="tip-icon">🎯</div>
+          <div class="tip-icon"></div>
           <div class="tip-text">
             <strong>오타 많은 문자 집중 연습</strong>
             <span>오타율 상위 문자들을 모아 짧은 문장을 직접 만들어 반복 연습하면 효과적입니다. 예: 「つつじの花が咲いた」</span>
@@ -1264,7 +1272,7 @@
             </div>`;
         });
       } else {
-        barsEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center;">오타 기록이 없습니다. 완벽한 타이핑입니다! 🎉</div>';
+        barsEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center;">오타 기록이 없습니다. 완벽한 타이핑입니다! </div>';
       }
 
       // 4. 혼동 쌍 렌더

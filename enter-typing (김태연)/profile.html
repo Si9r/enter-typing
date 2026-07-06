@@ -109,7 +109,7 @@
     }
 
     .tab-btn:hover:not(.active) {
-      background: #f5f5f5;
+      background: var(--theme-bg-hover);
       color: #2C3E50;
     }
 
@@ -251,7 +251,7 @@
     .bar-bg {
       flex: 1;
       height: 10px;
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -316,7 +316,7 @@
     .typo-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
     .typo-char { width:70px; flex-shrink:0; font-size:1rem; font-weight:800; color:#2C3E50; font-family:monospace; }
     .typo-char small { font-size:.72rem; color:#7F8C8D; font-weight:500; display:block; }
-    .typo-bar-bg { flex:1; height:12px; background:#f0f0f0; border-radius:12px; overflow:hidden; }
+    .typo-bar-bg { flex:1; height:12px; background: var(--theme-bg-hover); border-radius:12px; overflow:hidden; }
     .typo-bar-fill { height:100%; border-radius:12px; background:linear-gradient(90deg,#FFB6C1,#FF9EAB); transition:width .9s ease; }
     .typo-bar-fill.med { background:linear-gradient(90deg,#FFDAA0,#FFB74D); }
     .typo-bar-fill.low { background:linear-gradient(90deg,#A8D8A8,#5CB85C); }
@@ -425,7 +425,7 @@
     }
 
     .month-nav button {
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border: none;
       border-radius: 8px;
       padding: 6px 12px;
@@ -582,14 +582,14 @@
     }
 
     .modal-close:hover {
-      color: #333;
+      color: var(--theme-text-main);
     }
 
     .modal-tabs {
       display: flex;
       gap: 8px;
       margin-bottom: 28px;
-      background: #f5f5f5;
+      background: var(--theme-bg-hover);
       border-radius: 12px;
       padding: 5px;
     }
@@ -793,6 +793,13 @@
       box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
     }
   </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -811,13 +818,13 @@
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='search.html'">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
         <input type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -826,19 +833,19 @@
   </header>
 
   <!-- 공통 navbar 상태 관리 -->
-  <script src="navbar.js?v=1.0.2"></script>
+  <script src="navbar.js?v=2.0.0"></script>
 
   <div class="profile-wrap">
     <!-- 프로필 카드 -->
     <div class="profile-card">
-      <div class="avatar" id="profile-avatar">🐱</div>
+      <div class="avatar" id="profile-avatar"></div>
       <div class="profile-info">
         <h2 id="profile-nickname">엔터핑유저</h2>
         <p id="profile-email">enterping@example.com</p>
       </div>
       <div style="margin-left:auto;text-align:right; display:flex; gap:10px; align-items:center;">
         <button class="btn"
-          style="border-radius:12px;padding:10px; background:#f0f0f0; border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
+          style="border-radius:12px;padding:10px; background: var(--theme-bg-hover); border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
           onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'"
           onclick="openSettingsModal()" title="게임 설정">⚙️</button>
         <button class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
@@ -848,11 +855,11 @@
 
     <!-- 탭 네비게이션 -->
     <div class="tab-nav">
-      <button class="tab-btn active" id="tab-profile-btn" onclick="switchTab('profile')">👤 프로필 &amp; 뱃지</button>
-      <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')">📊 분석</button>
-      <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')">📜 히스토리</button>
-      <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')">📅 출석체크</button>
-      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')">📦 내 컨텐츠</button>
+      <button class="tab-btn active" id="tab-profile-btn" onclick="switchTab('profile')"> 프로필 &amp; 뱃지</button>
+      <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')"> 분석</button>
+      <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')"> 히스토리</button>
+      <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')"> 출석체크</button>
+      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')"> 내 컨텐츠</button>
     </div>
 
     <!-- 탭 1: 프로필 & 뱃지 -->
@@ -872,46 +879,46 @@
         </div>
       </div>
       <div class="badges-section">
-        <h3>🏅 획득한 뱃지</h3>
+        <h3> 획득한 뱃지</h3>
         <div class="badge-grid" id="badge-grid">
           <div class="badge-item locked" id="badge-passion">
-            <div class="badge-icon">🔥</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">타이핑 열정왕</div>
           </div>
           <div class="badge-item locked" id="badge-speed">
-            <div class="badge-icon">⚡</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">스피드스타</div>
           </div>
           <div class="badge-item locked" id="badge-accuracy">
-            <div class="badge-icon">🎯</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">정확도 달인</div>
           </div>
           <div class="badge-item locked" id="badge-attendance">
-            <div class="badge-icon">🌸</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">7일 연속 출석</div>
           </div>
           <div class="badge-item locked" id="badge-jpop">
-            <div class="badge-icon">🎵</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">JPOP 마니아</div>
           </div>
           <div class="badge-item locked" id="badge-ranking">
-            <div class="badge-icon">🏆</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">랭킹 TOP 10</div>
           </div>
           <div class="badge-item locked" id="badge-diamond">
-            <div class="badge-icon">💎</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">다이아 유저</div>
           </div>
           <div class="badge-item locked" id="badge-attendance30">
-            <div class="badge-icon">🌙</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">30일 개근</div>
           </div>
           <div class="badge-item locked" id="badge-king">
-            <div class="badge-icon">👑</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">랭킹 1위</div>
           </div>
           <div class="badge-item locked" id="badge-battle">
-            <div class="badge-icon">🎖️</div>
+            <div class="badge-icon">️</div>
             <div class="badge-name">배틀 100승</div>
           </div>
         </div>
@@ -964,7 +971,7 @@
         </div>
 
         <div class="analysis-card">
-          <h4>📈 활동별 플레이 수</h4>
+          <h4> 활동별 플레이 수</h4>
           <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
             <div class="bar-row" style="margin-bottom:0;">
               <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
@@ -974,14 +981,14 @@
               <div class="bar-val" id="analysis-play-typing-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">🧩 퀴즈</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 퀴즈</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-quiz-bar" style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
               </div>
               <div class="bar-val" id="analysis-play-quiz-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⚔️ 대전</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 대전</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-battle-bar" style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
               </div>
@@ -997,20 +1004,20 @@
             <div style="width:1px; height:40px; background:#EAEAEA;"></div>
             <div style="text-align:center;">
               <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">🧩 퀴즈</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;"> 퀴즈</div>
             </div>
             <div style="width:1px; height:40px; background:#EAEAEA;"></div>
             <div style="text-align:center;">
               <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">⚔️ 대전</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;"> 대전</div>
             </div>
           </div>
         </div>
         <div class="analysis-card">
-          <h4>🏆 퀴즈 결과 분석</h4>
+          <h4> 퀴즈 결과 분석</h4>
           <!-- Perfect -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-gold-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
@@ -1018,7 +1025,7 @@
           </div>
           <!-- Good -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-silver-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
@@ -1026,7 +1033,7 @@
           </div>
           <!-- Normal -->
           <div class="bar-row" style="margin-bottom:20px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-bronze-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
@@ -1036,37 +1043,37 @@
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
             <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-quiz-gold-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 만점</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 만점</div>
             </div>
-            <div style="flex:1; background:#F5F5F5; border-radius:10px; padding:10px; text-align:center;">
+            <div style="flex:1; background: var(--theme-bg-hover); border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#808080;" id="analysis-quiz-silver-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥈 80%+</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 80%+</div>
             </div>
             <div style="flex:1; background:#FDF0E6; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#8B4513;" id="analysis-quiz-bronze-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥉 60%+</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 60%+</div>
             </div>
           </div>
         </div>
         <div class="analysis-card">
-          <h4>⚔️ 실시간 대전 결과</h4>
+          <h4> 실시간 대전 결과</h4>
           <!-- 순위별 바 -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-1st-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
             <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;" id="analysis-battle-1st-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-2nd-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
             <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;" id="analysis-battle-2nd-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-3rd-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
@@ -1083,11 +1090,11 @@
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
             <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-battle-total">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">⚔️ 총 대전</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 총 대전</div>
             </div>
             <div style="flex:1; background:#FFF0E6; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#FF7043;" id="analysis-battle-win-rate">0%</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 우승률</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 우승률</div>
             </div>
             <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-battle-avg-wpm">0</div>
@@ -1097,7 +1104,7 @@
         </div>
         <div class="analysis-card" style="grid-column: span 2;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h4 style="margin-bottom:0;">📉 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
+            <h4 style="margin-bottom:0;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
             <a href="profile_analysis.html"
               style="font-size:.78rem; font-weight:700; color:#FF9EAB; text-decoration:none; padding:4px 12px; border:1.5px solid #FF9EAB; border-radius:20px; transition:all .2s;"
               onmouseover="this.style.background='#FF9EAB';this.style.color='#fff';"
@@ -1126,7 +1133,7 @@
     <div class="tab-panel" id="tab-attend">
       <div class="attend-streak">
         <div class="streak-box">
-          <div class="s-num" id="attend-streak-num">🔥 0</div>
+          <div class="s-num" id="attend-streak-num"> 0</div>
           <div class="s-lbl">연속 출석일</div>
         </div>
         <div class="streak-box">
@@ -1141,7 +1148,7 @@
       <div
         style="background:#fff;border-radius:22px;padding:34px;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-top:20px;">
         <div class="attend-header">
-          <h3>📅 출석 캘린더</h3>
+          <h3> 출석 캘린더</h3>
           <div class="month-nav">
             <button onclick="prevMonth()">&#8592;</button>
             <span id="month-label">2026년 5월</span>
@@ -1162,7 +1169,7 @@
         style="margin-top:20px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:center;max-width:550px !important;margin-left:auto !important;margin-right:auto !important;">
         <p style="color:#7F8C8D;font-size:.9rem;margin-bottom:14px;">오늘 출석체크를 하셨나요?</p>
         <button class="btn btn-pink" style="border-radius:14px;padding:12px 36px;font-size:1rem;" id="attend-btn"
-          onclick="doAttend()">✅ 출석체크 하기</button>
+          onclick="doAttend()"> 출석체크 하기</button>
       </div>
     </div>
 
@@ -1170,7 +1177,7 @@
     <div class="tab-panel" id="tab-mytyping">
       <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
         <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
-        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: #555; border: none;"> 퀴즈 컨텐츠</button>
       </div>
       <div class="history-list" id="mytyping-list">
         <!-- JS가 데이터를 채워줍니다 -->
@@ -1331,13 +1338,13 @@
       const btn = document.getElementById('attend-btn');
       if (attendanceData[todayStr()]) {
         // 이미 오늘 출석한 경우
-        btn.textContent = '🎉 오늘 출석 완료!';
+        btn.textContent = ' 오늘 출석 완료!';
         btn.disabled = true;
         btn.style.background = '#90EE90';
         btn.style.color = '#2F7A2F';
       } else {
         // 오늘 아직 출석 안 한 경우 버튼 초기화
-        btn.textContent = '✅ 오늘 출석체크 하기';
+        btn.textContent = ' 오늘 출석체크 하기';
         btn.disabled = false;
         btn.style.background = '';
         btn.style.color = '';
@@ -1374,7 +1381,7 @@
           attendanceData[today] = true;
 
           // 버튼 상태 변경
-          btn.textContent = '🎉 오늘 출석 완료!';
+          btn.textContent = ' 오늘 출석 완료!';
           btn.disabled = true;
           btn.style.background = '#90EE90';
           btn.style.color = '#2F7A2F';
@@ -1433,7 +1440,7 @@
         }
       }
 
-      document.getElementById('attend-streak-num').innerHTML = `🔥 ${streak}`;
+      document.getElementById('attend-streak-num').innerHTML = ` ${streak}`;
       document.getElementById('attend-month-num').textContent = thisMonthCount;
       document.getElementById('attend-total-num').textContent = total;
 
@@ -1485,14 +1492,14 @@
               <div class="history-icon typing">⌨️</div>
               <div class="history-info">
                 <div class="title">${item.title} — ${item.artist}</div>
-                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)} · 장르: ${item.genre || 'JPOP'}</div>
+                <div class="sub">난이도: ${` X ${item.difficulty || 3}`} · 장르: ${item.genre || 'JPOP'}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">
                 <div class="score">⏱️ ${item.best_time || 0}초</div>
                 <div class="date">플레이: ${item.play_count || 0}회</div>
               </div>
               <button onclick="event.stopPropagation(); location.href='typing_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-              <button onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
+              <button onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
             </div>
           `).join('');
         } else {
@@ -1846,11 +1853,11 @@
               url = `typing.html?id=${item.content_id}`;
               typeLabel = '타이핑';
             } else if (item.type === 'battle') {
-              icon = '<div class="history-icon battle">⚔️</div>';
+              icon = '<div class="history-icon battle"></div>';
               url = 'battle.html';
               typeLabel = '실시간 대전';
             } else {
-              icon = '<div class="history-icon quiz">🧩</div>';
+              icon = '<div class="history-icon quiz"></div>';
               url = item.content_id ? `quiz.html?id=${item.content_id}` : 'quiz_list.html';
               typeLabel = '퀴즈';
             }
@@ -1891,16 +1898,16 @@
         if (resData.success && resData.data.length > 0) {
           container.innerHTML = resData.data.map(item => `
             <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='quiz.html?id=${item.id}'">
-              <div class="history-icon quiz">🧩</div>
+              <div class="history-icon quiz"></div>
               <div class="history-info">
                 <div class="title">${item.title}</div>
-                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)}</div>
+                <div class="sub">난이도: ${` X ${item.difficulty || 3}`}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">
-                <div class="score">🏆 최고 점수: ${item.best_score || 0}</div>
+                <div class="score"> 최고 점수: ${item.best_score || 0}</div>
               </div>
               <button onclick="event.stopPropagation(); location.href='quiz_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
+              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
             </div>
           `).join('');
         } else {
@@ -1922,9 +1929,9 @@
 
       <!-- 탭 -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')">📝 닉네임<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')">🔑 비밀번호<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">🗑️ 회원 탈퇴</button>
+        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')"> 닉네임<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')"> 비밀번호<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">️ 회원 탈퇴</button>
       </div>
 
       <!-- 닉네임 변경 패널 -->
@@ -2445,7 +2452,7 @@
     }
 
     .tab-btn:hover:not(.active) {
-      background: #f5f5f5;
+      background: var(--theme-bg-hover);
       color: #2C3E50;
     }
 
@@ -2587,7 +2594,7 @@
     .bar-bg {
       flex: 1;
       height: 10px;
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -2652,7 +2659,7 @@
     .typo-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
     .typo-char { width:70px; flex-shrink:0; font-size:1rem; font-weight:800; color:#2C3E50; font-family:monospace; }
     .typo-char small { font-size:.72rem; color:#7F8C8D; font-weight:500; display:block; }
-    .typo-bar-bg { flex:1; height:12px; background:#f0f0f0; border-radius:12px; overflow:hidden; }
+    .typo-bar-bg { flex:1; height:12px; background: var(--theme-bg-hover); border-radius:12px; overflow:hidden; }
     .typo-bar-fill { height:100%; border-radius:12px; background:linear-gradient(90deg,#FFB6C1,#FF9EAB); transition:width .9s ease; }
     .typo-bar-fill.med { background:linear-gradient(90deg,#FFDAA0,#FFB74D); }
     .typo-bar-fill.low { background:linear-gradient(90deg,#A8D8A8,#5CB85C); }
@@ -2761,7 +2768,7 @@
     }
 
     .month-nav button {
-      background: #f0f0f0;
+      background: var(--theme-bg-hover);
       border: none;
       border-radius: 8px;
       padding: 6px 12px;
@@ -2918,14 +2925,14 @@
     }
 
     .modal-close:hover {
-      color: #333;
+      color: var(--theme-text-main);
     }
 
     .modal-tabs {
       display: flex;
       gap: 8px;
       margin-bottom: 28px;
-      background: #f5f5f5;
+      background: var(--theme-bg-hover);
       border-radius: 12px;
       padding: 5px;
     }
@@ -3129,6 +3136,7 @@
       box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.12);
     }
   </style>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -3147,13 +3155,13 @@
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='search.html'">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
         <input type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -3162,19 +3170,19 @@
   </header>
 
   <!-- 공통 navbar 상태 관리 -->
-  <script src="navbar.js?v=1.0.2"></script>
+  <script src="navbar.js?v=2.0.0"></script>
 
   <div class="profile-wrap">
     <!-- 프로필 카드 -->
     <div class="profile-card">
-      <div class="avatar" id="profile-avatar">🐱</div>
+      <div class="avatar" id="profile-avatar"></div>
       <div class="profile-info">
         <h2 id="profile-nickname">엔터핑유저</h2>
         <p id="profile-email">enterping@example.com</p>
       </div>
       <div style="margin-left:auto;text-align:right; display:flex; gap:10px; align-items:center;">
         <button class="btn"
-          style="border-radius:12px;padding:10px; background:#f0f0f0; border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
+          style="border-radius:12px;padding:10px; background: var(--theme-bg-hover); border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
           onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'"
           onclick="openSettingsModal()" title="게임 설정">⚙️</button>
         <button class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
@@ -3184,11 +3192,11 @@
 
     <!-- 탭 네비게이션 -->
     <div class="tab-nav">
-      <button class="tab-btn active" id="tab-profile-btn" onclick="switchTab('profile')">👤 프로필 &amp; 뱃지</button>
-      <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')">📊 분석</button>
-      <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')">📜 히스토리</button>
-      <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')">📅 출석체크</button>
-      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')">📦 내 컨텐츠</button>
+      <button class="tab-btn active" id="tab-profile-btn" onclick="switchTab('profile')"> 프로필 &amp; 뱃지</button>
+      <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')"> 분석</button>
+      <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')"> 히스토리</button>
+      <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')"> 출석체크</button>
+      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')"> 내 컨텐츠</button>
     </div>
 
     <!-- 탭 1: 프로필 & 뱃지 -->
@@ -3208,46 +3216,46 @@
         </div>
       </div>
       <div class="badges-section">
-        <h3>🏅 획득한 뱃지</h3>
+        <h3> 획득한 뱃지</h3>
         <div class="badge-grid" id="badge-grid">
           <div class="badge-item locked" id="badge-passion">
-            <div class="badge-icon">🔥</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">타이핑 열정왕</div>
           </div>
           <div class="badge-item locked" id="badge-speed">
-            <div class="badge-icon">⚡</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">스피드스타</div>
           </div>
           <div class="badge-item locked" id="badge-accuracy">
-            <div class="badge-icon">🎯</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">정확도 달인</div>
           </div>
           <div class="badge-item locked" id="badge-attendance">
-            <div class="badge-icon">🌸</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">7일 연속 출석</div>
           </div>
           <div class="badge-item locked" id="badge-jpop">
-            <div class="badge-icon">🎵</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">JPOP 마니아</div>
           </div>
           <div class="badge-item locked" id="badge-ranking">
-            <div class="badge-icon">🏆</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">랭킹 TOP 10</div>
           </div>
           <div class="badge-item locked" id="badge-diamond">
-            <div class="badge-icon">💎</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">다이아 유저</div>
           </div>
           <div class="badge-item locked" id="badge-attendance30">
-            <div class="badge-icon">🌙</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">30일 개근</div>
           </div>
           <div class="badge-item locked" id="badge-king">
-            <div class="badge-icon">👑</div>
+            <div class="badge-icon"></div>
             <div class="badge-name">랭킹 1위</div>
           </div>
           <div class="badge-item locked" id="badge-battle">
-            <div class="badge-icon">🎖️</div>
+            <div class="badge-icon">️</div>
             <div class="badge-name">배틀 100승</div>
           </div>
         </div>
@@ -3300,7 +3308,7 @@
         </div>
 
         <div class="analysis-card">
-          <h4>📈 활동별 플레이 수</h4>
+          <h4> 활동별 플레이 수</h4>
           <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
             <div class="bar-row" style="margin-bottom:0;">
               <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
@@ -3310,14 +3318,14 @@
               <div class="bar-val" id="analysis-play-typing-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">🧩 퀴즈</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 퀴즈</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-quiz-bar" style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
               </div>
               <div class="bar-val" id="analysis-play-quiz-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⚔️ 대전</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 대전</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-battle-bar" style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
               </div>
@@ -3333,20 +3341,20 @@
             <div style="width:1px; height:40px; background:#EAEAEA;"></div>
             <div style="text-align:center;">
               <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">🧩 퀴즈</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;"> 퀴즈</div>
             </div>
             <div style="width:1px; height:40px; background:#EAEAEA;"></div>
             <div style="text-align:center;">
               <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">⚔️ 대전</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;"> 대전</div>
             </div>
           </div>
         </div>
         <div class="analysis-card">
-          <h4>🏆 퀴즈 결과 분석</h4>
+          <h4> 퀴즈 결과 분석</h4>
           <!-- Perfect -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-gold-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
@@ -3354,7 +3362,7 @@
           </div>
           <!-- Good -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-silver-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
@@ -3362,7 +3370,7 @@
           </div>
           <!-- Normal -->
           <div class="bar-row" style="margin-bottom:20px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-quiz-bronze-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
@@ -3372,37 +3380,37 @@
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
             <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-quiz-gold-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 만점</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 만점</div>
             </div>
-            <div style="flex:1; background:#F5F5F5; border-radius:10px; padding:10px; text-align:center;">
+            <div style="flex:1; background: var(--theme-bg-hover); border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#808080;" id="analysis-quiz-silver-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥈 80%+</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 80%+</div>
             </div>
             <div style="flex:1; background:#FDF0E6; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#8B4513;" id="analysis-quiz-bronze-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥉 60%+</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 60%+</div>
             </div>
           </div>
         </div>
         <div class="analysis-card">
-          <h4>⚔️ 실시간 대전 결과</h4>
+          <h4> 실시간 대전 결과</h4>
           <!-- 순위별 바 -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-1st-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
             </div>
             <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;" id="analysis-battle-1st-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-2nd-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
             </div>
             <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;" id="analysis-battle-2nd-val">0회</div>
           </div>
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
+            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;"></div>
             <div class="bar-bg" style="flex:1;">
               <div class="bar-fill" id="analysis-battle-3rd-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
             </div>
@@ -3419,11 +3427,11 @@
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
             <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-battle-total">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">⚔️ 총 대전</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 총 대전</div>
             </div>
             <div style="flex:1; background:#FFF0E6; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#FF7043;" id="analysis-battle-win-rate">0%</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 우승률</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;"> 우승률</div>
             </div>
             <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
               <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-battle-avg-wpm">0</div>
@@ -3433,7 +3441,7 @@
         </div>
         <div class="analysis-card" style="grid-column: span 2;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h4 style="margin-bottom:0;">📉 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
+            <h4 style="margin-bottom:0;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
             <a href="profile_analysis.html"
               style="font-size:.78rem; font-weight:700; color:#FF9EAB; text-decoration:none; padding:4px 12px; border:1.5px solid #FF9EAB; border-radius:20px; transition:all .2s;"
               onmouseover="this.style.background='#FF9EAB';this.style.color='#fff';"
@@ -3462,7 +3470,7 @@
     <div class="tab-panel" id="tab-attend">
       <div class="attend-streak">
         <div class="streak-box">
-          <div class="s-num" id="attend-streak-num">🔥 0</div>
+          <div class="s-num" id="attend-streak-num"> 0</div>
           <div class="s-lbl">연속 출석일</div>
         </div>
         <div class="streak-box">
@@ -3477,7 +3485,7 @@
       <div
         style="background:#fff;border-radius:22px;padding:34px;box-shadow:0 4px 16px rgba(0,0,0,.06);margin-top:20px;">
         <div class="attend-header">
-          <h3>📅 출석 캘린더</h3>
+          <h3> 출석 캘린더</h3>
           <div class="month-nav">
             <button onclick="prevMonth()">&#8592;</button>
             <span id="month-label">2026년 5월</span>
@@ -3498,7 +3506,7 @@
         style="margin-top:20px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);text-align:center;max-width:550px !important;margin-left:auto !important;margin-right:auto !important;">
         <p style="color:#7F8C8D;font-size:.9rem;margin-bottom:14px;">오늘 출석체크를 하셨나요?</p>
         <button class="btn btn-pink" style="border-radius:14px;padding:12px 36px;font-size:1rem;" id="attend-btn"
-          onclick="doAttend()">✅ 출석체크 하기</button>
+          onclick="doAttend()"> 출석체크 하기</button>
       </div>
     </div>
 
@@ -3506,7 +3514,7 @@
     <div class="tab-panel" id="tab-mytyping">
       <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
         <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
-        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: #f0f0f0; color: #555; border: none;">🧩 퀴즈 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: #555; border: none;"> 퀴즈 컨텐츠</button>
       </div>
       <div class="history-list" id="mytyping-list">
         <!-- JS가 데이터를 채워줍니다 -->
@@ -3666,13 +3674,13 @@
       const btn = document.getElementById('attend-btn');
       if (attendanceData[todayStr()]) {
         // 이미 오늘 출석한 경우
-        btn.textContent = '🎉 오늘 출석 완료!';
+        btn.textContent = ' 오늘 출석 완료!';
         btn.disabled = true;
         btn.style.background = '#90EE90';
         btn.style.color = '#2F7A2F';
       } else {
         // 오늘 아직 출석 안 한 경우 버튼 초기화
-        btn.textContent = '✅ 오늘 출석체크 하기';
+        btn.textContent = ' 오늘 출석체크 하기';
         btn.disabled = false;
         btn.style.background = '';
         btn.style.color = '';
@@ -3709,7 +3717,7 @@
           attendanceData[today] = true;
 
           // 버튼 상태 변경
-          btn.textContent = '🎉 오늘 출석 완료!';
+          btn.textContent = ' 오늘 출석 완료!';
           btn.disabled = true;
           btn.style.background = '#90EE90';
           btn.style.color = '#2F7A2F';
@@ -3768,7 +3776,7 @@
         }
       }
 
-      document.getElementById('attend-streak-num').innerHTML = `🔥 ${streak}`;
+      document.getElementById('attend-streak-num').innerHTML = ` ${streak}`;
       document.getElementById('attend-month-num').textContent = thisMonthCount;
       document.getElementById('attend-total-num').textContent = total;
 
@@ -3820,14 +3828,14 @@
               <div class="history-icon typing">⌨️</div>
               <div class="history-info">
                 <div class="title">${item.title} — ${item.artist}</div>
-                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)} · 장르: ${item.genre || 'JPOP'}</div>
+                <div class="sub">난이도: ${` X ${item.difficulty || 3}`} · 장르: ${item.genre || 'JPOP'}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">
                 <div class="score">⏱️ ${item.best_time || 0}초</div>
                 <div class="date">플레이: ${item.play_count || 0}회</div>
               </div>
               <button onclick="event.stopPropagation(); location.href='typing_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-              <button onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
+              <button onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
             </div>
           `).join('');
         } else {
@@ -4181,11 +4189,11 @@
               url = `typing.html?id=${item.content_id}`;
               typeLabel = '타이핑';
             } else if (item.type === 'battle') {
-              icon = '<div class="history-icon battle">⚔️</div>';
+              icon = '<div class="history-icon battle"></div>';
               url = 'battle.html';
               typeLabel = '실시간 대전';
             } else {
-              icon = '<div class="history-icon quiz">🧩</div>';
+              icon = '<div class="history-icon quiz"></div>';
               url = item.content_id ? `quiz.html?id=${item.content_id}` : 'quiz_list.html';
               typeLabel = '퀴즈';
             }
@@ -4226,16 +4234,16 @@
         if (resData.success && resData.data.length > 0) {
           container.innerHTML = resData.data.map(item => `
             <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='quiz.html?id=${item.id}'">
-              <div class="history-icon quiz">🧩</div>
+              <div class="history-icon quiz"></div>
               <div class="history-info">
                 <div class="title">${item.title}</div>
-                <div class="sub">난이도: ${'⭐'.repeat(item.difficulty || 3)}</div>
+                <div class="sub">난이도: ${` X ${item.difficulty || 3}`}</div>
               </div>
               <div class="history-result" style="margin-right: 80px;">
-                <div class="score">🏆 최고 점수: ${item.best_score || 0}</div>
+                <div class="score"> 최고 점수: ${item.best_score || 0}</div>
               </div>
               <button onclick="event.stopPropagation(); location.href='quiz_create.html?id=${item.id}'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">🗑️</button>
+              <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
             </div>
           `).join('');
         } else {
@@ -4257,9 +4265,9 @@
 
       <!-- 탭 -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')">📝 닉네임<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')">🔑 비밀번호<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">🗑️ 회원 탈퇴</button>
+        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')"> 닉네임<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')"> 비밀번호<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">️ 회원 탈퇴</button>
       </div>
 
       <!-- 닉네임 변경 패널 -->

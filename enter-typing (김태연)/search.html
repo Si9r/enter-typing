@@ -28,7 +28,7 @@
             position: absolute; top: 20px; right: 25px; background: transparent;
             border: none; font-size: 2rem; cursor: pointer; color: #aaa; transition: color 0.2s;
         }
-        .modal-close-btn:hover { color: #333; }
+        .modal-close-btn:hover { color: var(--theme-text-main); }
         .detail-cover {
             width: 320px; height: 320px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue));
             border-radius: 20px; display: flex; align-items: center; justify-content: center;
@@ -48,8 +48,15 @@
         .stat-item .value { font-size: 1.2rem; font-weight: 900; color: var(--color-text-main); }
         .detail-desc { font-size: 1.05rem; color: #555; line-height: 1.7; margin-bottom: 35px; flex-grow: 1; font-weight: 500; }
         .detail-actions { display: flex; gap: 15px; }
-        .empty-search { text-align: center; margin: 80px 0; font-size: 1.2rem; color: #888; font-weight: 500; }
+        .empty-search { text-align: center; margin: 80px 0; font-size: 1.2rem; color: var(--theme-text-muted); font-weight: 500; }
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -69,13 +76,13 @@
         </div>
         <div class="nav-center">
             <div class="search-bar">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -83,14 +90,14 @@
         </div>
     </header>
 
-    <script src="navbar.js?v=1.0.3"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 
     <!-- 메인 컨텐츠 -->
     <main style="margin-top: 80px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center; min-height: 60vh;">
         <section class="content-section" style="padding-top: 40px; width: 100%; max-width: 1200px;">
             <div class="section-header" style="margin-bottom: 30px;">
-                <h2 id="search-result-title">🔍 "<span id="query-text" style="color: var(--color-pink);"></span>" 검색 결과</h2>
-                <p style="color: #666; margin-top: 10px; font-weight: 500;">타이핑 콘텐츠 내 검색 결과입니다.</p>
+                <h2 id="search-result-title"><i class="ph-bold ph-magnifying-glass"></i> "<span id="query-text" style="color: var(--color-pink);"></span>" 검색 결과</h2>
+                <p style="color: var(--theme-text-muted); margin-top: 10px; font-weight: 500;">타이핑 콘텐츠 내 검색 결과입니다.</p>
             </div>
 
             <div class="card-grid" id="search-results-grid">
@@ -98,7 +105,7 @@
             </div>
             
             <div id="empty-state" class="empty-search" style="display: none;">
-                <div style="font-size: 4rem; margin-bottom: 20px;">😵</div>
+                <div style="font-size: 4rem; margin-bottom: 20px;"></div>
                 검색 결과가 없습니다.<br>
                 <span style="font-size: 0.95rem; color: #aaa; margin-top: 10px; display: inline-block;">다른 키워드로 검색해 보세요!</span>
             </div>
@@ -154,13 +161,13 @@
     <div class="modal-overlay" id="detail-modal" onclick="closeModal(event)">
         <div class="detail-container" onclick="event.stopPropagation()">
             <button class="modal-close-btn" onclick="closeModal(event)">×</button>
-            <div class="detail-cover">🎵</div>
+            <div class="detail-cover"></div>
             <div class="detail-info">
                 <div class="card-badge pink" style="margin-bottom: 15px;" id="modal-genre">JPOP</div>
                 <h1 class="detail-title" id="modal-title">로딩 중...</h1>
                 <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
                     <div class="detail-artist" id="modal-artist" style="margin-bottom: 0;">-</div>
-                    <div style="font-size: 0.95rem; color: #888; font-weight: 500;">
+                    <div style="font-size: 0.95rem; color: var(--theme-text-muted); font-weight: 500;">
                         제작자: <span id="modal-creator" style="color: var(--color-pink); font-weight: 700;">엔터핑</span>
                     </div>
                 </div>
@@ -168,7 +175,7 @@
                 <div class="detail-stats">
                     <div class="stat-item">
                         <span class="label">난이도</span>
-                        <span id="modal-difficulty" class="value">⭐⭐⭐</span>
+                        <span id="modal-difficulty" class="value"></span>
                     </div>
                     <div class="stat-item">
                         <span class="label">플레이 수</span>
@@ -189,7 +196,7 @@
                         ▶ 타이핑 시작하기
                     </button>
                     <button id="modal-rank-btn" class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
-                        🏆 랭킹 보기
+                         랭킹 보기
                     </button>
                 </div>
             </div>
@@ -213,7 +220,7 @@
                 // 검색어가 없을 경우
                 document.getElementById('search-result-title').style.display = 'none';
                 const emptyState = document.getElementById('empty-state');
-                emptyState.innerHTML = '<div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>검색어를 입력해 주세요.<br><span style="font-size: 0.95rem; color: #aaa; margin-top: 10px; display: inline-block;">상단 검색창에 곡명이나 아티스트를 입력하고 엔터를 누르세요!</span>';
+                emptyState.innerHTML = '<div style="font-size: 4rem; margin-bottom: 20px;"><i class="ph-bold ph-magnifying-glass"></i></div>검색어를 입력해 주세요.<br><span style="font-size: 0.95rem; color: #aaa; margin-top: 10px; display: inline-block;">상단 검색창에 곡명이나 아티스트를 입력하고 엔터를 누르세요!</span>';
                 emptyState.style.display = 'block';
                 return; // 통신하지 않고 종료
             }
@@ -264,7 +271,7 @@
                     ? item.description.substring(0, 30) + '...'
                     : (item.description || '가사 타이핑 연습하기');
 
-                const diffStars = '⭐'.repeat(item.difficulty || 3);
+                const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
                 let totalSeconds = item.best_time || 0;
                 const m = Math.floor(totalSeconds / 60);
                 const s = totalSeconds % 60;
@@ -278,7 +285,7 @@
                         <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                             <div>
                                 <span class="difficulty">${diffStars}</span>
-                                <span class="time" style="margin-left: 10px;">⏱️ ${timeStr}</span>
+                                <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-clock" style="vertical-align: middle; margin-right: 3px;"></i> ${timeStr}</span>
                             </div>
                         </div>
                     </div>
@@ -308,8 +315,8 @@
                     genreBadge.className = 'card-badge ' + badgeColor;
 
                     const diffValue = data.difficulty || 3;
-                    document.getElementById('modal-difficulty').innerText = '⭐'.repeat(diffValue);
-                    document.getElementById('modal-play-count').innerText = (data.play_count || 0) + '회';
+                    document.getElementById('modal-difficulty').innerHTML = `<i class=\"ph-fill ph-star\" style=\"color:var(--color-pink); vertical-align: middle; margin-right:4px;\"></i> X ${diffValue}`;
+                    document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${(data.play_count || 0)}회`;
                     
                     let mTotalSeconds = data.best_time || 0;
                     const mm = Math.floor(mTotalSeconds / 60);

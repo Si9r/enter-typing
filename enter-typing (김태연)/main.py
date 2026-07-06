@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Header, WebSocket, WebSocketDisconnect, Query
+from fastapi import FastAPI, HTTPException, Depends, Header, WebSocket, WebSocketDisconnect, Query, UploadFile, File
 from fastapi.responses import JSONResponse
 import asyncio
 import redis.asyncio as aioredis
@@ -13,6 +13,8 @@ import string
 import os
 import re
 import json
+import uuid
+import shutil
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -23,6 +25,7 @@ import models
 import bcrypt
 from jose import jwt, JWTError
 import pykakasi
+from sqlalchemy import text
 
 kks = pykakasi.kakasi()
 
@@ -78,6 +81,14 @@ app = FastAPI()
 @app.on_event("startup")
 def startup_event():
     db = next(get_db())
+    
+    # DB 스키마 업데이트 (퀴즈 썸네일 컬럼)
+    try:
+        db.execute(text("ALTER TABLE quiz_contents ADD COLUMN thumbnail_url VARCHAR(255) DEFAULT NULL;"))
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        
     if db.query(models.TypingContent).count() == 0:
         # 최초 실행 시에만 기본 데이터를 추가합니다. 기존 데이터는 절대 삭제하지 않습니다.
         
@@ -194,6 +205,7 @@ class QuizContentCreate(BaseModel):
     quiz_data: str
     difficulty: int = 3
     youtube_id: str | None = None
+    thumbnail_url: str | None = None
 
 class ConvertRequest(BaseModel):
     text: str
@@ -214,6 +226,29 @@ class QuizHistoryCreate(BaseModel):
 def validate_email(email: str):
     if not EMAIL_REGEX.match(email):
         raise HTTPException(status_code=422, detail="올바른 이메일 형식이 아닙니다.")
+
+# ════════════════════════════════════════════════════════════
+# API: 이미지 업로드
+# POST /api/upload-image
+# ════════════════════════════════════════════════════════════
+@app.post("/api/upload-image")
+def upload_image(file: UploadFile = File(...)):
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="이미지 파일만 업로드 가능합니다.")
+    
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{uuid.uuid4()}.{ext}"
+    filepath = os.path.join("assets", "thumbnails", filename)
+    
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    
+    try:
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"파일 업로드 실패: {str(e)}")
+        
+    return {"success": True, "url": f"/assets/thumbnails/{filename}"}
 
 
 # ════════════════════════════════════════════════════════════
@@ -772,6 +807,7 @@ def get_all_quiz_contents(db: Session = Depends(get_db)):
             "artist": c.artist,
             "genre": c.genre,
             "description": c.description,
+            "thumbnail_url": c.thumbnail_url,
             "creator_nickname": c.creator.nickname if c.creator else "엔터핑",
             "difficulty": c.difficulty,
             "best_score": c.best_score,
@@ -796,6 +832,7 @@ def get_my_quiz_contents(current_user: models.User = Depends(get_current_user), 
             "artist": c.artist,
             "genre": c.genre,
             "description": c.description,
+            "thumbnail_url": c.thumbnail_url,
             "difficulty": c.difficulty,
             "best_score": c.best_score,
             "play_count": c.play_count,
@@ -812,6 +849,7 @@ def create_quiz_content(req: QuizContentCreate, current_user: models.User = Depe
         description=req.description,
         creator_id=current_user.id,
         youtube_id=req.youtube_id,
+        thumbnail_url=req.thumbnail_url,
         quiz_data=req.quiz_data,
         difficulty=req.difficulty,
         play_count=0,
@@ -835,6 +873,7 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
         "genre": content.genre,
         "description": content.description,
         "youtube_id": content.youtube_id,
+        "thumbnail_url": content.thumbnail_url,
         "creator_nickname": content.creator.nickname if content.creator else "엔터핑",
         "difficulty": content.difficulty,
         "play_count": content.play_count,
@@ -866,6 +905,7 @@ def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: m
     content.genre = req.genre
     content.description = req.description
     content.youtube_id = req.youtube_id
+    content.thumbnail_url = req.thumbnail_url
     content.quiz_data = req.quiz_data
     content.difficulty = req.difficulty
     

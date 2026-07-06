@@ -107,6 +107,7 @@ class QuizContent(Base):
     description = Column(Text, nullable=True)
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     youtube_id = Column(String(50), nullable=True)
+    thumbnail_url = Column(String(255), nullable=True)
     quiz_data = Column(Text, nullable=False) # JSON 형태로 퀴즈 데이터 저장
     difficulty = Column(Integer, default=3, nullable=False)
     play_count = Column(Integer, default=0, nullable=False)

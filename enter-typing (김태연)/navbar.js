@@ -66,9 +66,9 @@
             </div>
           </div>
           <hr class="dropdown-divider">
-          <a class="dropdown-item" href="profile.html">👤 마이페이지</a>
+          <a class="dropdown-item" href="profile.html"><i class="ph-fill ph-user"></i> 마이페이지</a>
           <hr class="dropdown-divider">
-          <button class="dropdown-item dropdown-logout" id="nav-logout-btn">🚪 로그아웃</button>
+          <button class="dropdown-item dropdown-logout" id="nav-logout-btn"><i class="ph-fill ph-door"></i> 로그아웃</button>
         </div>
       </div>
     `;
@@ -302,3 +302,54 @@
   /* 외부에서 사용 가능하도록 노출 */
   window.NavAuth = { getUser, setUser, clearUser, logout };
 })();
+
+
+// ============================================
+// Dark Mode Toggle Logic
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+    const navRight = document.querySelector('.nav-right');
+    if (navRight) {
+        const themeBtn = document.createElement('button');
+        themeBtn.id = 'theme-toggle';
+        themeBtn.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? '<i class="ph-fill ph-sun"></i>' : '<i class="ph-fill ph-moon"></i>';
+        themeBtn.style.cssText = `
+            background: var(--theme-bg-card);
+            border: 1.5px solid var(--theme-border);
+            color: var(--theme-text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        `;
+        themeBtn.onmouseover = () => themeBtn.style.background = 'var(--theme-bg-hover)';
+        themeBtn.onmouseout = () => themeBtn.style.background = 'none';
+
+        themeBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('ep_theme', 'light');
+                themeBtn.innerHTML = '<i class="ph-fill ph-moon"></i>';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('ep_theme', 'dark');
+                themeBtn.innerHTML = '<i class="ph-fill ph-sun"></i>';
+            }
+        });
+
+        const authGroup = navRight.querySelector('.auth-group') || navRight.querySelector('.profile-menu-container');
+        if (authGroup) {
+            navRight.insertBefore(themeBtn, authGroup);
+        } else {
+            navRight.appendChild(themeBtn);
+        }
+    }
+});

@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="style.css?v=1.0.3">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
         rel="stylesheet">
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -27,13 +34,13 @@
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='search.html'">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -42,12 +49,11 @@
     </header>
 
     <!-- 공통 navbar 상태 관리 -->
-    <script src="navbar.js?v=1.0.2"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 
     <!-- 메인 히어로 섹션 -->
     <main class="hero">
         <div class="hero-left">
-            <div class="badge" style="display: inline-block;">🔥 즐거운 타이핑 플랫폼</div>
             <h1 class="hero-title">
                 좋아하는 콘텐츠로<br>
                 <span class="highlight">타이핑</span>을 즐겨라
@@ -66,7 +72,7 @@
             </div>
         </div>
         <div class="hero-right">
-            <img src="assets/a2.png" class="hero-anime-girl" alt="엔터핑 캐릭터">
+
             <div class="jp-typing-wrapper">
                 <div class="jp-typing-bg">
                     <div class="jp-line hiragana-line">
@@ -256,26 +262,42 @@
         </script>
     </main>
 
-    <!-- 콘텐츠 목록 섹션 -->
-    <section class="content-section">
-        <div class="section-header">
-            <h2>🔥 인기 타이핑 콘텐츠</h2>
-            <a href="typing_list.html" class="view-all">전체보기 ></a>
+    <!-- 프리미엄 디자인 구분선 -->
+    <div class="custom-divider" style="margin: 80px auto 60px; max-width: 1100px; display: flex; align-items: center; justify-content: center; gap: 15px; opacity: 0.85;">
+        <div style="height: 2px; flex: 1; background: linear-gradient(90deg, transparent, var(--theme-border)); border-radius: 2px;"></div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-blue); opacity: 0.6;"></div>
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); box-shadow: 0 0 12px rgba(255,182,193,0.6);"></div>
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-pink); opacity: 0.6;"></div>
         </div>
-        <div class="card-grid" id="popular-typing-grid">
-            <!-- 동적으로 렌더링됩니다 -->
-        </div>
-    </section>
+        <div style="height: 2px; flex: 1; background: linear-gradient(270deg, transparent, var(--theme-border)); border-radius: 2px;"></div>
+    </div>
 
-    <section class="content-section" style="margin-bottom: 60px;">
-        <div class="section-header">
-            <h2>💡 추천 퀴즈</h2>
-            <a href="quiz_list.html" class="view-all">전체보기 ></a>
-        </div>
-        <div class="card-grid" id="popular-quiz-grid">
-            <!-- 동적으로 렌더링됩니다 -->
-        </div>
-    </section>
+    <!-- 콘텐츠 목록 섹션 (타이핑) -->
+    <div class="section-card-wrapper">
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i class="ph-bold ph-fire" style="color:var(--color-pink); margin-right:8px; vertical-align: middle;"></i> 인기 타이핑 콘텐츠</h2>
+                <a href="typing_list.html" class="view-all">전체보기 ></a>
+            </div>
+            <div class="card-grid" id="popular-typing-grid">
+                <!-- 동적으로 렌더링됩니다 -->
+            </div>
+        </section>
+    </div>
+
+    <!-- 콘텐츠 목록 섹션 (퀴즈) -->
+    <div class="section-card-wrapper">
+        <section class="content-section" style="margin-bottom: 0;">
+            <div class="section-header">
+                <h2><i class="ph-bold ph-lightbulb" style="color:var(--color-blue); margin-right:8px; vertical-align: middle;"></i> 추천 퀴즈</h2>
+                <a href="quiz_list.html" class="view-all">전체보기 ></a>
+            </div>
+            <div class="card-grid" id="popular-quiz-grid">
+                <!-- 동적으로 렌더링됩니다 -->
+            </div>
+        </section>
+    </div>
 
     <!-- Footer / Sitemap -->
     <footer class="site-footer">
@@ -345,13 +367,47 @@
                         if (item.genre === 'ANIME' || item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
                         else if (item.genre === '문학' || item.genre === '기타') badgeColor = 'green';
                         const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '가사 타이핑 연습하기');
+                        const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
+                        let totalSeconds = item.best_time || 0;
+                        if (totalSeconds === 0 && item.timestamps) {
+                            try {
+                                let tArr = [];
+                                if (item.timestamps.trim().startsWith('[')) {
+                                    tArr = JSON.parse(item.timestamps);
+                                } else {
+                                    tArr = item.timestamps.split('\n').map(s => s.trim()).filter(s => s !== '');
+                                }
+                                if (tArr && tArr.length > 0) {
+                                    totalSeconds = Math.round(parseFloat(tArr[tArr.length - 1]));
+                                }
+                            } catch (e) { }
+                        }
+                        const m = Math.floor(totalSeconds / 60);
+                        const s = totalSeconds % 60;
+                        const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
+
+                        let thumbnailHTML = '';
+                        if (item.youtube_id) {
+                            thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                                <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                            </div>`;
+                        } else {
+                            thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                            </div>`;
+                        }
+
                         typingGrid.insertAdjacentHTML('beforeend', `
                             <div class="card" onclick="location.href='typing.html?id=${item.id}'">
+                                ${thumbnailHTML}
                                 <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
                                 <h3 class="card-title">${item.title}</h3>
                                 <p class="card-desc">${descPreview}</p>
-                                <div class="card-footer">
-                                    <span class="plays">▶ ${item.play_count || 0}</span>
+                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
+                                    <div>
+                                        <span class="difficulty">${diffStars}</span>
+                                        <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-clock" style="vertical-align: middle; margin-right: 3px;"></i> ${timeStr}</span>
+                                        <span class="play-count" style="margin-left: 10px; font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600;"><i class="ph-bold ph-play-circle" style="vertical-align: middle; margin-right: 3px;"></i> ${item.play_count || 0}</span>
+                                    </div>
                                 </div>
                             </div>
                         `);
@@ -370,13 +426,41 @@
                         if (item.genre === '영어' || item.genre === '일본어' || item.genre === 'ANIME') badgeColor = 'blue';
                         else if (item.genre === '상식' || item.genre === '역사' || item.genre === '문학') badgeColor = 'green';
                         const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '퀴즈 풀기');
+                        const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
+                        const bestScore = item.best_score || 0;
+
+                        let thumbnailHTML = '';
+                        if (item.thumbnail_url) {
+                            thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                                <img src="${item.thumbnail_url}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                            </div>`;
+                        } else if (item.youtube_id) {
+                            thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                                <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                            </div>`;
+                        } else {
+                            thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative; background: var(--theme-bg-hover); display:flex; align-items:center; justify-content:center;">
+                                <img src="assets/logo_icon.png" alt="기본 썸네일" style="height: 60%; opacity: 0.5;">
+                            </div>`;
+                        }
+
                         quizGrid.insertAdjacentHTML('beforeend', `
                             <div class="card" onclick="location.href='quiz.html?id=${item.id}'">
-                                <div class="card-badge ${badgeColor}">${item.genre || '퀴즈'}</div>
+                                ${thumbnailHTML}
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                    <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${item.genre || '퀴즈'}</div>
+                                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--theme-text-muted); background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--theme-border); display: flex; align-items: center; gap: 4px;">
+                                         ${item.quiz_count || 0}문제
+                                    </div>
+                                </div>
                                 <h3 class="card-title">${item.title}</h3>
                                 <p class="card-desc">${descPreview}</p>
-                                <div class="card-footer">
-                                    <span class="plays">▶ ${item.play_count || 0}</span>
+                                <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
+                                    <div>
+                                        <span class="difficulty">${diffStars}</span>
+                                        <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${bestScore}점</span>
+                                        <span class="play-count" style="margin-left: 10px; font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600;"><i class="ph-bold ph-play-circle" style="vertical-align: middle; margin-right: 3px;"></i> ${item.play_count || 0}</span>
+                                    </div>
                                 </div>
                             </div>
                         `);

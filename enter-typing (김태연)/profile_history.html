@@ -11,6 +11,13 @@
         a { text-decoration: none; color: var(--color-blue); font-weight: bold; font-size: 1.2rem; padding: 10px 20px; border: 2px solid var(--color-blue); border-radius: 10px; transition: all 0.3s; }
         a:hover { background-color: var(--color-blue); color: white; }
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
     <h1>이곳은 히스토리 페이지입니다.</h1>

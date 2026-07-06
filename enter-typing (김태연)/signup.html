@@ -301,7 +301,7 @@
 
         .btn-auth-primary {
             background: linear-gradient(135deg, var(--color-pink) 0%, #FFD6DC 100%);
-            color: #333;
+            color: var(--theme-text-main);
             box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
         }
 
@@ -393,6 +393,13 @@
             text-decoration: underline;
         }
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -412,13 +419,13 @@
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='search.html'">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
                 <button class="auth-signup" onclick="location.href='signup.html'" style="background-color: var(--color-pink-hover);">회원가입</button>
@@ -436,7 +443,7 @@
             </a>
 
             <h1 class="auth-heading">엔터핑에 오신 걸 환영해요!</h1>
-            <p class="auth-subheading">계정을 만들고 즐거운 타이핑을 시작하세요 🚀</p>
+            <p class="auth-subheading">계정을 만들고 즐거운 타이핑을 시작하세요 </p>
 
             <form id="signupForm" novalidate>
                 <!-- 이름 -->
@@ -854,7 +861,7 @@
             document.getElementById('email-success').classList.remove('visible');
         });
     </script>
-    <script src="navbar.js?v=1.0.3"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 </body>
 
 </html>

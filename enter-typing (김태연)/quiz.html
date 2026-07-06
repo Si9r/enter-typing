@@ -80,7 +80,7 @@
         .vinyl-question {
             font-size: 2.5rem;
             font-weight: 900;
-            color: #333;
+            color: var(--theme-text-main);
             position: absolute;
             z-index: 2;
             /* To keep ? upright while record spins: */
@@ -145,8 +145,8 @@
 
         .chat-system {
             align-self: flex-start;
-            background: #f0f0f0;
-            color: #333;
+            background: var(--theme-bg-hover);
+            color: var(--theme-text-main);
             border-bottom-left-radius: 4px;
             font-weight: bold;
             border: 1px solid #ddd;
@@ -181,6 +181,13 @@
             cursor: pointer;
         }
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -199,13 +206,13 @@
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href = 'search.html'">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly />
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔 공지</a>
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href = 'login.html'">
                     로그인
@@ -217,7 +224,7 @@
         </div>
     </header>
 
-    <script src="navbar.js?v=1.0.2"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 
     <main style="
         margin-top: 120px;
@@ -245,7 +252,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            color: #666;
+            color: var(--theme-text-muted);
             text-decoration: none;
             font-weight: 700;
             font-size: 1.05rem;
@@ -279,7 +286,7 @@
               padding-bottom: 6px;
               margin-bottom: 14px;
               width: max-content;
-              color: #333;
+              color: var(--theme-text-main);
               font-size: 1rem;
             ">
                     퀴즈 통계
@@ -305,7 +312,7 @@
                 ">
                             현재 점수
                         </div>
-                        <div id="score" style="font-size: 1.4rem; font-weight: 900; color: #333">
+                        <div id="score" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
                             0
                         </div>
                     </div>
@@ -318,12 +325,12 @@
                         <div style="
                   font-size: 0.85rem;
                   font-weight: bold;
-                  color: #666;
+                  color: var(--theme-text-muted);
                   margin-bottom: 5px;
                 ">
                             최고 점수
                         </div>
-                        <div style="font-size: 1.4rem; font-weight: 900; color: #333">0</div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
@@ -342,12 +349,12 @@
                         <div style="
                   font-size: 0.85rem;
                   font-weight: bold;
-                  color: #666;
+                  color: var(--theme-text-muted);
                   margin-bottom: 5px;
                 ">
                             정답률
                         </div>
-                        <div id="accuracy" style="font-size: 1.4rem; font-weight: 900; color: #333">
+                        <div id="accuracy" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
                             100%
                         </div>
                     </div>
@@ -360,12 +367,12 @@
                         <div style="
                   font-size: 0.85rem;
                   font-weight: bold;
-                  color: #666;
+                  color: var(--theme-text-muted);
                   margin-bottom: 5px;
                 ">
                             콤보
                         </div>
-                        <div id="combo" style="font-size: 1.4rem; font-weight: 900; color: #333">
+                        <div id="combo" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
                             0
                         </div>
                     </div>
@@ -462,7 +469,7 @@
 
             <!-- Bottom Left: 문제 정보 -->
             <div class="box-panel" style="border: 2px solid #ffe3e4; border-radius: 16px; padding: 15px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
-                <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: #333; font-size: 1rem;">문제 정보</div>
+                <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">문제 정보</div>
 
                 <div id="answer-board" style="display: flex; flex-direction: column; gap: 16px;">
                     <div id="board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
@@ -489,7 +496,7 @@
                             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
                             width: 85%;
                             margin-bottom: 5px;
-                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)';">💡 힌트 보기</button>
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)';"> 힌트 보기</button>
                         <div id="board-hint" onclick="toggleHintDisplay()" style="
                             display: none;
                             position: absolute;
@@ -612,8 +619,8 @@
             gap: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         ">
-            <div style="font-size: 1.6rem; font-weight: 900; color: #333; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
-                🎉 퀴즈 결과 🎉
+            <div style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+                 퀴즈 결과 
             </div>
             <div style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
                 총 <span id="modal-total-score">0</span>개의 정답을 맞췄습니다!
@@ -643,7 +650,7 @@
                 ">목록으로</button>
                 <button onclick="document.getElementById('quiz-result-modal').style.display='none'" style="
                     background: #e0e0e0;
-                    color: #333;
+                    color: var(--theme-text-main);
                     border: none;
                     border-radius: 8px;
                     padding: 12px 30px;
@@ -960,7 +967,7 @@
                 chatSendBtn.disabled = true;
 
                 if (currentIndex >= quizData.length - 1) {
-                    addSystemChat("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다🎉");
+                    addSystemChat("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다");
                     currentIndex++;
                     updateQuizCountDisplay();
                     saveQuizHistory();
@@ -1011,7 +1018,7 @@
                 itemEl.style = "display:flex;flex-direction:column;gap:6px;";
                 itemEl.setAttribute("data-question-key", key);
                 itemEl.innerHTML = `
-                    <div style="font-size: 1.15rem; font-weight: bold; color: #333;">
+                    <div style="font-size: 1.15rem; font-weight: bold; color: var(--theme-text-main);">
                         ${question.question || "질문"}<br>
                         <span style="color: var(--color-pink); display: inline-block; margin-top: 5px;">${displayText || "-"}</span>
                     </div>
@@ -1085,7 +1092,7 @@
                 chatSendBtn.disabled = true;
 
                 if (currentIndex >= quizData.length - 1) {
-                    addSystemChat("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다🎉");
+                    addSystemChat("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다");
                     currentIndex++;
                     updateQuizCountDisplay();
                     saveQuizHistory();
@@ -1119,7 +1126,7 @@
             logContainer.innerHTML = '';
             
             if (quizLogs.length === 0) {
-                logContainer.innerHTML = '<div style="text-align:center; color:#888; padding: 20px;">맞춘 정답이 없습니다 😢</div>';
+                logContainer.innerHTML = '<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">맞춘 정답이 없습니다 </div>';
             } else {
                 // Group by quizIndex
                 const grouped = {};
@@ -1140,7 +1147,7 @@
                     grouped[qIdx].forEach(log => {
                         const itemDiv = document.createElement('div');
                         itemDiv.style.cssText = "font-size: 0.95rem; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;";
-                        itemDiv.innerHTML = `<span style="color: #666; line-height: 1.4; word-break: keep-all;">Q. ${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${log.matchedAnswer}</span>`;
+                        itemDiv.innerHTML = `<span style="color: var(--theme-text-muted); line-height: 1.4; word-break: keep-all;">Q. ${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${log.matchedAnswer}</span>`;
                         groupDiv.appendChild(itemDiv);
                     });
                     

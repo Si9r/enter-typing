@@ -1,4 +1,5 @@
 const romajiTable = {
+  "ー": ["-"],
   あ: ["a"],
   い: ["i", "yi"],
   う: ["u", "wu"],

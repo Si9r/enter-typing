@@ -471,7 +471,7 @@ function handleLineCompletion() {
   if (typingInput) typingInput.disabled = true;
   if (statusPanel) {
     statusPanel.innerHTML =
-      '<span class="success-text">✨ 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
+      '<span class="success-text"> 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
   }
 }
 
@@ -613,7 +613,7 @@ function endGame(completed = false) {
   }
 
   if (statusPanel) {
-    statusPanel.innerHTML = '<span class="success-text">✨ 모든 타이핑이 종료되었습니다!</span>';
+    statusPanel.innerHTML = '<span class="success-text"> 모든 타이핑이 종료되었습니다!</span>';
   }
 
   const resultModal = document.getElementById("resultModal");
@@ -652,7 +652,7 @@ function endGame(completed = false) {
         if (topTypoList) {
             topTypoList.innerHTML = "";
             if (topTypos.length === 0) {
-                topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 👏</div>";
+                topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 </div>";
             } else {
                 topTypos.forEach((item, idx) => {
                     const row = document.createElement("div");
@@ -737,7 +737,7 @@ function endGame(completed = false) {
 
            let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: #666; margin-left: 10px;">${coloredLineHtml}</span></span>`;
            if (errors.length === 0) {
-              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! ✨)</span>`;
+              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! )</span>`;
            } else {
               let typingErrors = errors.filter(e => e.type === 'typing').length;
               let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
@@ -949,7 +949,7 @@ function highlightCurrentChar() {
  * 상태 패널(Status Panel)에 업데이트하여 화면에 표시하는 함수입니다.
  */
 function updateStatus() {
-  TypingEngine.getStatusHTML(statusPanel, targetUnits, currentUnitIndex, currentBuffer, '<span class="success-text">✨ 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>');
+  TypingEngine.getStatusHTML(statusPanel, targetUnits, currentUnitIndex, currentBuffer, '<span class="success-text"> 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>');
 }
 
 

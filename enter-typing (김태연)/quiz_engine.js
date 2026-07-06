@@ -33,9 +33,9 @@ async function loadQuizData() {
 
     quizData = data;
 
-    document.getElementById('overlay-title').textContent = '🎵 ' + data.title;
+    document.getElementById('overlay-title').textContent = ' ' + data.title;
     document.getElementById('overlay-count').textContent = data.question_count;
-    document.getElementById('page-title').textContent = '🎵 ' + data.title;
+    document.getElementById('page-title').textContent = ' ' + data.title;
 
     document.getElementById('loading-overlay').style.display = 'none';
     document.getElementById('start-overlay').classList.add('show');
@@ -44,7 +44,7 @@ async function loadQuizData() {
     const overlay = document.getElementById('loading-overlay');
     if(overlay) {
         overlay.innerHTML = `
-        <p style="color:#fff;font-size:1.1rem;">❌ ${err.message}</p>
+        <p style="color:#fff;font-size:1.1rem;"> ${err.message}</p>
         <button onclick="location.href='quiz_list.html'" style="margin-top:16px;background:#fff;color:#6C3FE8;border:none;border-radius:12px;padding:10px 24px;font-weight:800;cursor:pointer;">목록으로 돌아가기</button>
         `;
     }
@@ -152,10 +152,10 @@ function loadQuestionUI() {
   const q = quizData.questions[currentQ];
 
   document.getElementById('stat-cur').textContent = (currentQ + 1) + ' / ' + quizData.questions.length;
-  document.getElementById('record-icon').textContent = '🎵';
+  document.getElementById('record-icon').textContent = '';
   document.getElementById('record-hint').textContent = q.question_text;
   document.getElementById('record-hint').className = 'record-hint active';
-  document.getElementById('album-thumb').textContent = '🎵';
+  document.getElementById('album-thumb').textContent = '';
   document.getElementById('album-thumb').className = 'album-thumb';
   document.getElementById('info-title').textContent = '???';
   document.getElementById('info-title').className = 'info-value info-hidden';
@@ -179,7 +179,7 @@ function loadQuestionUI() {
   document.getElementById('hint-box').style.display = 'none';
   document.getElementById('hint-box').textContent = q.hint || '힌트 없음';
   document.getElementById('hint-btn').disabled = false;
-  document.getElementById('hint-btn').textContent = '💡 힌트 보기';
+  document.getElementById('hint-btn').textContent = ' 힌트 보기';
 
   // UI 초기화
   document.getElementById('record-wrap').classList.remove('spinning');
@@ -305,23 +305,23 @@ function processResult(isPass, userRaw = '') {
     item.style.color = '#777';
     item.textContent = `Q${currentQ + 1}. [패스] 다음 문제로 넘어갑니다. (정답: ${q.answer})`;
   } else if (isCorrect) {
-    thumb.textContent = '✅';
+    thumb.textContent = '';
     correctCount++;
     let earnedScore = 100;
     score += earnedScore;
     
-    banner.textContent = `✅ 정답입니다! +${earnedScore}점`;
+    banner.textContent = ` 정답입니다! +${earnedScore}점`;
     banner.style.background = 'linear-gradient(135deg,#52c41a,#73d13d)';
     
     item.className = 'log-item correct';
-    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 정답 ✅`;
+    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 정답 `;
   } else {
-    thumb.textContent = '❌';
-    banner.textContent = `❌ 오답! 정답: ${q.answer}`;
+    thumb.textContent = '';
+    banner.textContent = ` 오답! 정답: ${q.answer}`;
     banner.style.background = 'linear-gradient(135deg,#ff4d4f,#ff7875)';
     
     item.className = 'log-item wrong';
-    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 오답 ❌ (정답: ${q.answer})`;
+    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 오답  (정답: ${q.answer})`;
   }
 
   document.getElementById('record-wrap').classList.remove('spinning');
@@ -364,12 +364,12 @@ async function endQuiz() {
   document.getElementById('pass-btn').disabled = true;
   document.getElementById('hint-btn').disabled = true;
   document.getElementById('record-wrap').classList.remove('spinning');
-  document.getElementById('record-icon').textContent = '🏆';
+  document.getElementById('record-icon').textContent = '';
   document.getElementById('record-hint').textContent = '퀴즈 완료!';
   const banner = document.getElementById('result-banner');
   banner.style.display = 'block';
   banner.style.background = 'linear-gradient(135deg,#6C3FE8,#FF8FAB)';
-  banner.innerHTML = `🎉 완료! ${quizData.questions.length}문제 중 ${correctCount}개 정답 · ${score}점
+  banner.innerHTML = ` 완료! ${quizData.questions.length}문제 중 ${correctCount}개 정답 · ${score}점
     <div style="margin-top:12px; display:flex; gap:10px; justify-content:center;">
         <button onclick="location.reload()" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:#fff; color:#6C3FE8;">다시 풀기</button>
         <button onclick="location.href='quiz_list.html'" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:rgba(255,255,255,0.2); color:#fff;">목록으로</button>

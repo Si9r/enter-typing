@@ -115,6 +115,13 @@
             gap: 15px;
         }
     </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -133,7 +140,7 @@
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='search.html'">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
@@ -142,7 +149,7 @@
             <a href="notice.html" class="nav-notice-link"
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
-                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';">🔔
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
                 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>
@@ -151,13 +158,13 @@
         </div>
     </header>
 
-    <script src="navbar.js?v=1.0.2"></script>
+    <script src="navbar.js?v=2.0.0"></script>
 
     <main
         style="margin-top: 120px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
         <div class="detail-container">
             <div class="detail-cover">
-                🎵
+                
             </div>
             <div class="detail-info">
                 <div class="card-badge pink" style="margin-bottom: 15px;">-</div>
@@ -167,7 +174,7 @@
                 <div class="detail-stats">
                     <div class="stat-item">
                         <span class="label">난이도</span>
-                        <span id="detail-difficulty" class="value">⭐⭐⭐</span>
+                        <span id="detail-difficulty" class="value"></span>
                     </div>
                     <div class="stat-item">
                         <span class="label">플레이 수</span>
@@ -189,7 +196,7 @@
                         ▶ 타이핑 시작하기
                     </button>
                     <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
-                        🏆 랭킹 보기
+                         랭킹 보기
                     </button>
                 </div>
             </div>
@@ -209,7 +216,7 @@
                     document.querySelector('.card-badge').innerText = data.genre || 'JPOP';
 
                     const diffValue = data.difficulty || 3;
-                    document.getElementById('detail-difficulty').innerText = '⭐'.repeat(diffValue);
+                    document.getElementById('detail-difficulty').innerHTML = ` X ${diffValue}`;
                     document.getElementById('detail-play-count').innerText = (data.play_count || 0) + '회';
                     document.getElementById('detail-best-time').innerText = (data.best_time || 0) + '초';
 
@@ -224,7 +231,7 @@
                         cover.style.backgroundImage = `url('https://img.youtube.com/vi/${data.youtube_id}/maxresdefault.jpg')`;
                         cover.style.backgroundSize = 'cover';
                         cover.style.backgroundPosition = 'center';
-                        cover.innerHTML = ''; // 🎵 이모지 제거
+                        cover.innerHTML = ''; //  이모지 제거
                     }
 
                     document.getElementById('btn-start-typing').setAttribute('onclick', `location.href='typing.html?id=${contentId}'`);

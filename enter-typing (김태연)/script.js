@@ -872,14 +872,31 @@ function endGame(completed = false) {
         character: char,
         error_count: cnt
       }));
-      if (typoPayload.length > 0) {
+
+      // 총 등장 횟수(total) 서버 저장
+      const totalCountsForSave = {};
+      allTargetUnits.forEach(units => {
+        if (units) {
+          units.forEach(u => {
+            if (u.text) {
+              totalCountsForSave[u.text] = (totalCountsForSave[u.text] || 0) + 1;
+            }
+          });
+        }
+      });
+      const totalsPayload = Object.entries(totalCountsForSave).map(([char, cnt]) => ({
+        character: char,
+        total_count: cnt
+      }));
+
+      if (typoPayload.length > 0 || totalsPayload.length > 0) {
         fetch("/api/typo-stats", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
           },
-          body: JSON.stringify({ typos: typoPayload })
+          body: JSON.stringify({ typos: typoPayload, totals: totalsPayload })
         })
         .then(res => res.json())
         .then(d => console.log("오타 통계 저장:", d))
@@ -1161,7 +1178,7 @@ function forceSkipToNextLine() {
 
   if (
     currentLineIndex >= contentLines.length ||
-    currentLineIndex >= contentRomajiLines.length
+    currentLineIndex >= contentHiraganaLines.length
   ) {
     endGame(true);
   } else {

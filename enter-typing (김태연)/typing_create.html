@@ -806,7 +806,7 @@
             linesData.sort((a, b) => a.time - b.time); // ensure strictly sorted
             const lyrics = linesData.map(l => l.lyrics).join('\n');
             const hiragana = linesData.map(l => l.hiragana).join('\n');
-            const romaji = "";
+            const romaji = linesData.map(() => "-").join('\n');
             const timestamps = linesData.map(l => l.time.toFixed(2)).join('\n');
 
             let video_duration = 0;

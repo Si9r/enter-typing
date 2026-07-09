@@ -33,7 +33,7 @@
         .detail-container {
             width: 100%;
             max-width: 900px;
-            background: var(--color-white);
+            background: var(--theme-bg-card);
             border-radius: 24px;
             padding: 50px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -101,14 +101,14 @@
         .detail-title {
             font-size: 2.5rem;
             font-weight: 900;
-            color: var(--color-text-main);
+            color: var(--theme-text-main);
             margin-bottom: 8px;
             line-height: 1.2;
         }
 
         .detail-artist {
             font-size: 1.2rem;
-            color: var(--color-text-muted);
+            color: var(--theme-text-muted);
             font-weight: 700;
             margin-bottom: 25px;
         }
@@ -118,8 +118,8 @@
             gap: 30px;
             margin-bottom: 30px;
             padding: 20px 0;
-            border-top: 1px solid var(--color-border);
-            border-bottom: 1px solid var(--color-border);
+            border-top: 1px solid var(--theme-border);
+            border-bottom: 1px solid var(--theme-border);
         }
 
         .stat-item {
@@ -130,7 +130,7 @@
 
         .stat-item .label {
             font-size: 0.85rem;
-            color: var(--color-text-muted);
+            color: var(--theme-text-muted);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -139,12 +139,12 @@
         .stat-item .value {
             font-size: 1.2rem;
             font-weight: 900;
-            color: var(--color-text-main);
+            color: var(--theme-text-main);
         }
 
         .detail-desc {
             font-size: 1.05rem;
-            color: #555;
+            color: var(--theme-text-sub);
             line-height: 1.7;
             margin-bottom: 35px;
             flex-grow: 1;
@@ -189,9 +189,9 @@
         </div>
         <div class="nav-right">
             <a href="notice.html" class="nav-notice-link"
-                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                style="margin-right: 20px; text-decoration: none; color: var(--theme-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
-                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
+                onmouseout="this.style.color='var(--theme-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
                 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='login.html'">로그인</button>

@@ -249,7 +249,6 @@
             <div class="footer-col">
                 <h4>타이핑</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
                     <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
                     <li><a href="typing_create.html">타이핑 작성하기</a></li>
                     <li><a href="battle.html">실시간 대전</a></li>
@@ -460,6 +459,18 @@
                     document.getElementById('modal-best-score').innerText = (data.best_score || 0) + '점';
 
                     document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 퀴즈를 시작해보세요!`;
+
+                    if (data.youtube_id) {
+                        const cover = document.querySelector('.detail-cover');
+                        cover.style.backgroundImage = `url('https://img.youtube.com/vi/${data.youtube_id}/maxresdefault.jpg')`;
+                        cover.style.backgroundSize = 'cover';
+                        cover.style.backgroundPosition = 'center';
+                        cover.innerHTML = '';
+                    } else {
+                        const cover = document.querySelector('.detail-cover');
+                        cover.style.backgroundImage = 'none';
+                        cover.innerHTML = '🎵';
+                    }
 
                     document.getElementById('modal-start-btn').onclick = () => location.href = `quiz.html?id=${id}`;
                 }

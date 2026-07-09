@@ -137,7 +137,7 @@
     /* 혼동 쌍 카드 */
     .pair-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 14px;
     }
     .pair-item {
@@ -278,6 +278,7 @@
     @media (max-width: 600px) {
       .summary-row { grid-template-columns: 1fr 1fr; }
       .heatmap-grid { grid-template-columns: repeat(5, 1fr); }
+      .quiz-bar-title { width: 110px; }
     }
   </style>
 </head>
@@ -319,12 +320,13 @@
     <div class="page-header">
       <a href="profile.html" class="back-btn">← 마이페이지</a>
       <div>
-        <div class="page-title">📉 일본어 오타 상세 분석</div>
-        <div class="page-subtitle">최근 30일 타이핑 기록을 기반으로 분석했습니다.</div>
+        <div class="page-title" id="analysis-page-title">📉 일본어 오타 상세 분석</div>
+        <div class="page-subtitle" id="analysis-page-subtitle">타이핑 기록을 기반으로 분석했습니다.</div>
       </div>
     </div>
 
     <!-- 요약 통계 -->
+    <div id="tab-section-typing">
     <div class="summary-row">
       <div class="summary-box red">
         <div class="s-val" id="avg-error-rate-val">11.3%</div>
@@ -336,7 +338,7 @@
       </div>
       <div class="summary-box green">
         <div class="s-val" id="improvement-val">+2.1%</div>
-        <div class="s-lbl">지난 달 대비 개선</div>
+        <div class="s-lbl" id="improvement-lbl">최근 정확도 변화</div>
       </div>
     </div>
 
@@ -351,7 +353,7 @@
 
     <!-- 오타 TOP 차트 -->
     <div class="card-block">
-      <h3>📊 오타율 TOP 10 문자</h3>
+      <h3>📊 최다 오타 TOP 10 문자</h3>
       <div id="typo-bars"></div>
     </div>
 
@@ -361,22 +363,7 @@
       <div class="pair-grid" id="pair-grid"></div>
     </div>
 
-    <!-- 로마자 입력 실수 테이블 -->
-    <div class="card-block">
-      <h3>⌨️ 로마자 입력 실수 패턴</h3>
-      <table class="romaji-table">
-        <thead>
-          <tr>
-            <th>문자</th>
-            <th>올바른 입력</th>
-            <th>잘못 입력한 내용</th>
-            <th>발생 빈도</th>
-            <th>오타율</th>
-          </tr>
-        </thead>
-        <tbody id="romaji-tbody"></tbody>
-      </table>
-    </div>
+    <!-- 로마자 입력 실수 테이블 제거됨 -->
 
     <!-- 개선 팁 -->
     <div class="card-block">
@@ -423,51 +410,7 @@
   </div><!-- /analysis-wrap -->
 
   <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-col brand-col">
-        <div class="footer-logo">
-          <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
-          <span class="logo-text">엔터핑</span>
-        </div>
-        <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
-        <div class="social-links">
-          <a href="#">X</a>
-          <a href="#">IG</a>
-          <a href="#">YT</a>
-          <a href="#">DC</a>
-        </div>
-      </div>
 
-      <div class="footer-col">
-        <h4>타이핑</h4>
-        <ul>
-          <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
-          <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
-          <li><a href="typing_create.html">타이핑 작성하기</a></li>
-          <li><a href="battle.html">실시간 대전</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>퀴즈 &amp; 랭킹</h4>
-        <ul>
-          <li><a href="quiz_list.html">퀴즈 리스트</a></li>
-          <li><a href="quiz_create.html">퀴즈 작성하기</a></li>
-          <li><a href="ranking.html">전체 랭킹</a></li>
-          <li><a href="ranking_song.html">곡 별 랭킹</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>서비스</h4>
-        <ul>
-          <li><a href="notice.html">공지사항</a></li>
-          <li><a href="profile.html">마이페이지</a></li>
-          <li><a href="#" id="footer-open-terms">이용약관</a></li>
-          <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
-        </ul>
-      </div>
-    </div>
 
     <div class="footer-bottom">
       <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
@@ -481,22 +424,38 @@
       location.href = "login.html";
     }
 
+    document.addEventListener("DOMContentLoaded", () => {
+      loadTypoStats();
+    });
+
     const romajiLookup = {
       'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
       'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
       'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
       'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
-      '나': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+      'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
       'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
       'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
-      '야': 'ya', '유': 'yu', '요': 'yo',
+      'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
       'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
       'わ': 'wa', 'を': 'wo', 'ん': 'n/nn', 'っ': 'xtsu',
       'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
       'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
-      '다': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
-      '바': 'ba', '비': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
-      'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po'
+      'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+      'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+      'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+      'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+      'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+      'ちゃ': 'cha (tya)', 'ちゅ': 'chu (tyu)', 'ちょ': 'cho (tyo)',
+      'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+      'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+      'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+      'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+      'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+      'じゃ': 'ja (zya)', 'じゅ': 'ju (zyu)', 'じょ': 'jo (zyo)',
+      'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+      'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+      'ねぇ': 'nee (ne+xe)', 'なぁ': 'naa (na+xa)', 'てぇ': 'tee (te+xe)'
     };
 
     const baseChars = [
@@ -507,53 +466,68 @@
       'な','に','ぬ','ね','の',
       'は','ひ','ふ','へ','ほ',
       'ま','み','む','め','も',
-      'や','유','よ','ん','っ',
+      'や','ゆ','よ','ん','っ',
       'ら','り','る','れ','ろ',
-      'わ','을','ぢ','づ','ぜ'
+      'わ','を','ぢ','づ','ぜ'
     ];
 
-    // Convert any Korean/placeholders to standard Japanese in baseChars
-    for (let i = 0; i < baseChars.length; i++) {
-      if (baseChars[i] === '유') baseChars[i] = 'ゆ';
-      if (baseChars[i] === '을') baseChars[i] = 'を';
+    function loadTypoStats() {
+      fetch("/api/typo-stats", {
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("인증 실패");
+        return res.json();
+      })
+      .then(result => {
+        if (result.success) {
+          renderAnalysis(result);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("데이터를 가져오는 중 오류가 발생했습니다.");
+        location.href = "login.html";
+      });
     }
 
-    fetch("/api/typo-stats", {
-      headers: {
-        "Authorization": "Bearer " + token
-      }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error("인증 실패");
-      return res.json();
-    })
-    .then(result => {
-      if (result.success) {
-        renderAnalysis(result);
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      alert("데이터를 가져오는 중 오류가 발생했습니다.");
-      location.href = "login.html";
-    });
-
     function renderAnalysis(result) {
+      if (!result.data || result.data.length === 0 || (result.summary && result.summary.total_typos === 0 && result.summary.avg_error_rate === 0)) {
+        const wrap = document.querySelector('.analysis-wrap');
+        wrap.innerHTML = `
+          <div style="text-align:center; padding: 100px 20px; background: #fff; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🐣</div>
+            <h2 style="color: #2C3E50; font-weight: 900; margin-bottom: 15px;">아직 분석할 타이핑 데이터가 없어요!</h2>
+            <p style="color: #7F8C8D; font-size: 1.05rem; line-height: 1.6; margin-bottom: 30px;">
+              첫 번째 타이핑 연습이나 퀴즈를 플레이하면<br>나만의 오타 패턴과 개선 포인트를 정밀하게 분석해 드립니다.
+            </p>
+            <button class="btn" style="background: linear-gradient(135deg, #FFB6C1, #FF9EAB); color: white; padding: 15px 30px; font-size: 1.1rem; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4); transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="location.href='typing_list.html'">지금 타이핑하러 가기 🎮</button>
+          </div>
+        `;
+        return;
+      }
+
       // 1. 요약 통계 렌더
       document.getElementById('avg-error-rate-val').innerText = result.summary.avg_error_rate.toFixed(1) + "%";
       document.getElementById('total-typos-val').innerText = result.summary.total_typos + "회";
       
       const imp = result.summary.improvement;
       const impValEl = document.getElementById('improvement-val');
+      const impLblEl = document.getElementById('improvement-lbl');
       if (imp > 0) {
-        impValEl.innerText = "+" + imp.toFixed(1) + "%";
+        impValEl.innerText = "▲ " + imp.toFixed(1) + "%";
         impValEl.parentElement.className = "summary-box green";
+        if (impLblEl) impLblEl.innerText = "최근 정확도 상승";
       } else if (imp < 0) {
-        impValEl.innerText = imp.toFixed(1) + "%";
+        impValEl.innerText = "▼ " + Math.abs(imp).toFixed(1) + "%";
         impValEl.parentElement.className = "summary-box red";
+        if (impLblEl) impLblEl.innerText = "최근 정확도 하락";
       } else {
-        impValEl.innerText = "0.0%";
+        impValEl.innerText = "- 0.0%";
         impValEl.parentElement.className = "summary-box blue";
+        if (impLblEl) impLblEl.innerText = "최근 정확도 변화 없음";
       }
 
       // 2. 히트맵 렌더
@@ -567,7 +541,7 @@
       
       baseChars.forEach(ch => {
         const item = dataMap[ch];
-        const pct = item && item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
+        const pct = item && item.total_count > 0 ? Math.min(100, Math.round((item.error_count / item.total_count) * 100)) : 0;
         
         const cell = document.createElement('div');
         cell.className = 'hm-cell ' + (pct >= 10 ? 'hm-high' : pct >= 5 ? 'hm-med' : pct > 0 ? 'hm-low' : 'hm-none');
@@ -581,28 +555,25 @@
       barsEl.innerHTML = '';
       
       const sortedStats = result.data
-        .map(item => {
-          const rate = item.total_count > 0 ? Math.round((item.error_count / item.total_count) * 100) : 0;
-          return { ...item, pct: rate };
-        })
-        .filter(item => item.total_count >= 1 && item.error_count > 0)
-        .sort((a, b) => b.pct - a.pct || b.error_count - a.error_count)
+        .filter(item => item.error_count > 0)
+        .sort((a, b) => b.error_count - a.error_count)
         .slice(0, 10);
 
       if (sortedStats.length > 0) {
+        const maxErrors = sortedStats[0].error_count;
         sortedStats.forEach(d => {
-          const level = d.pct >= 10 ? 'high' : d.pct >= 5 ? 'med' : 'low';
-          const fillCls = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
-          const pctCls  = level === 'high' ? '' : level === 'med' ? ' med' : ' low';
           const roma = romajiLookup[d.kana] || '';
+          const barWidth = maxErrors > 0 ? (d.error_count / maxErrors) * 100 : 0;
+          const pct = Math.round(barWidth);
+          const level = d.error_count <= 10 ? ' low' : ((pct >= 60 && d.error_count >= 20) ? '' : ' med');
           
           barsEl.innerHTML += `
             <div class="typo-row">
               <div class="typo-char">${d.kana}<small>${roma}</small></div>
               <div class="typo-bar-bg">
-                <div class="typo-bar-fill${fillCls}" style="width:${d.pct}%;"></div>
+                <div class="typo-bar-fill${level}" style="width:${barWidth}%;"></div>
               </div>
-              <div class="typo-pct${pctCls}">${d.pct}%</div>
+              <div class="typo-pct${level}">${d.error_count}회</div>
             </div>`;
         });
       } else {
@@ -632,25 +603,95 @@
         pairEl.innerHTML = '<div style="color:var(--color-text-muted); padding:20px; text-align:center; grid-column:span 2;">충분한 분석 데이터가 없거나 혼동하는 문자 쌍이 없습니다.</div>';
       }
 
-      // 5. 로마자 테이블 렌더
-      const tbody = document.getElementById('romaji-tbody');
-      tbody.innerHTML = '';
-      if (result.romaji_patterns && result.romaji_patterns.length > 0) {
-        result.romaji_patterns.forEach(d => {
-          const statItem = dataMap[d.char];
-          const errorCount = statItem ? statItem.error_count : 0;
-          tbody.innerHTML += `
-            <tr>
-              <td><b>${d.char}</b></td>
-              <td><span class="tag-correct">${d.correct}</span></td>
-              <td><span class="tag-wrong">${d.wrong}</span></td>
-              <td>${errorCount}회</td>
-              <td><b style="color:#FF9EAB;">${d.pct}%</b></td>
-            </tr>`;
-        });
-      } else {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--color-text-muted);">로마자 입력 실수 패턴 데이터가 없습니다.</td></tr>';
+      // 로마자 테이블 렌더 제거됨
+
+      // 6. 개선 포인트 동적 생성 (유저 실제 오타 데이터 기반)
+      const tipDB = {
+        'つ': { icon: '🔤', title: '「つ」— tsu / tu 중 하나로 통일하기', desc: '「つ」는 <b>tsu</b> 또는 <b>tu</b> 모두 허용됩니다. 하지만 두 방법을 혼용하면 리듬이 깨져 오타율이 올라갑니다. 하나로 통일하는 습관을 들이세요.' },
+        'ん': { icon: '🔚', title: '「ん」— 모음 앞에서 nn 처리', desc: '「ん」은 자음 앞이나 단어 끝에서는 <b>n</b> 하나로 OK. 단, 모음(あいうえお) 앞에서는 <b>nn</b> 또는 <b>n\'</b>으로 입력해야 합니다.' },
+        'っ': { icon: '🆑', title: '「っ」— 다음 자음 두 번 or xtsu', desc: '「っ」는 뒤에 오는 자음을 두 번 치면 자동 처리됩니다 (예: <b>kk, ss, tt</b>). 혹은 <b>xtsu</b> / <b>ltsu</b>로 단독 입력도 가능합니다.' },
+        'し': { icon: '🔡', title: '「し」— shi vs si 혼동 주의', desc: '「し」는 <b>shi</b> 또는 <b>si</b> 모두 허용됩니다. 어떤 방법을 쓸지 정하고 일관되게 입력하세요.' },
+        'ち': { icon: '🔡', title: '「ち」— chi vs ti 혼동 주의', desc: '「ち」는 <b>chi</b> 또는 <b>ti</b> 모두 허용됩니다. 어떤 방법을 선택할지 결정하고 통일해서 연습하세요.' },
+        'じ': { icon: '🔄', title: '「じ」— ji / zi 둘 다 정답', desc: '「じ」는 <b>ji</b> 또는 <b>zi</b>로 입력 가능합니다. 「ぢ」와 모양이 비슷하므로 구분에 주의하세요.' },
+        'ぢ': { icon: '🔄', title: '「ぢ」vs「じ」— 모양 구분 필수', desc: '「ぢ」는 <b>di</b> (또는 zi)로 입력합니다. 「じ」와 점의 위치가 미묘하게 달라 자주 혼동됩니다. 획의 방향 차이를 시각적으로 외우세요.' },
+        'ふ': { icon: '🔤', title: '「ふ」— fu / hu 중 하나로 통일', desc: '「ふ」는 <b>fu</b> 또는 <b>hu</b> 모두 허용됩니다. 일관되게 하나를 선택해서 근육 기억을 만들어 가세요.' },
+        'ず': { icon: '🔡', title: '「ず」— zu / du 입력', desc: '「ず」는 <b>zu</b>가 일반적입니다. <b>du</b>도 허용되지만 「づ」와 혼동될 수 있으니 zu를 권장합니다.' },
+        'づ': { icon: '🔄', title: '「づ」— du vs zu 구분', desc: '「づ」는 <b>du</b>로 입력하는 것이 명확합니다. 「ず」(zu)와 시각적으로 비슷하므로 가나 자체를 먼저 익히세요.' },
+        'は': { icon: '🔡', title: '「は」— ha 입력, 조사와 혼동 주의', desc: '「は」는 <b>ha</b>로 입력합니다. 조사로 쓰일 때는 발음이 "wa"지만 타이핑할 때는 항상 <b>ha</b>입니다.' },
+        'を': { icon: '🔡', title: '「を」— wo 입력', desc: '「を」는 <b>wo</b>로 입력합니다. 조사로만 쓰이는 문자이므로 wo 패턴을 꼭 기억해두세요.' },
+        'や': { icon: '📖', title: '「や」행 — ya, yu, yo 패턴', desc: '「や」「ゆ」「よ」는 각각 <b>ya / yu / yo</b>입니다. 작은 글자(ゃゅょ)가 포함된 복합 문자에서도 같은 패턴이 반복됩니다.' },
+        'ら': { icon: '📖', title: '「ら」행 — ra ri ru re ro 패턴', desc: '「ら」행은 <b>ra / ri / ru / re / ro</b>입니다. 영어의 "l"이 아니라 "r"임에 유의하세요.' },
+        'ちゃ': { icon: '⌨️', title: '「ちゃ」— cha / tya', desc: '「ちゃ」는 <b>cha</b> 또는 <b>tya</b>로 입력합니다. 일본 현지에서는 tya 방식을 쓰는 사람도 많습니다. 따로 치지 말고 한 번에 입력하는 습관을 들이세요.' },
+        'ちょ': { icon: '⌨️', title: '「ちょ」— cho / tyo', desc: '「ちょ」는 <b>cho</b> 또는 <b>tyo</b>로 입력합니다. c가 직관적이지만 t 방식도 널리 쓰이므로 본인에게 맞는 방식을 하나 정해 일관되게 연습하세요.' },
+        'ねぇ': { icon: '🔤', title: '「ねぇ」— 연속 모음 및 작은 글자', desc: '「ねぇ」는 <b>nee</b>로 이어 치거나, <b>ne</b> 입력 후 작은 ぇ를 위해 <b>xe</b> (또는 le)를 따로 쳐서 입력할 수 있습니다.' }
+      };
+
+      const tipListEl = document.querySelector('.tip-list');
+      const topErrorChars = sortedStats.slice(0, 3); // 오타 TOP 3 문자 기반
+
+      let tipsHTML = '';
+      const usedTips = new Set();
+
+      // 실제 오타가 많은 문자 기반 팁 먼저 생성
+      topErrorChars.forEach(stat => {
+        const tip = tipDB[stat.kana];
+        if (tip && !usedTips.has(stat.kana)) {
+          usedTips.add(stat.kana);
+          tipsHTML += `
+            <li>
+              <div class="tip-icon">${tip.icon}</div>
+              <div class="tip-text">
+                <strong>${tip.title} <span style="font-size:.78rem; color:#FF9EAB; font-weight:700; background:rgba(255,182,193,.15); padding:2px 8px; border-radius:10px; margin-left:4px;">오타 ${stat.error_count}회</span></strong>
+                <span>${tip.desc}</span>
+              </div>
+            </li>`;
+        } else if (!tip && !usedTips.has(stat.kana)) {
+          // tipDB에 없는 문자도 일반 팁으로 생성
+          usedTips.add(stat.kana);
+          const roma = romajiLookup[stat.kana] || '?';
+          tipsHTML += `
+            <li>
+              <div class="tip-icon">🎯</div>
+              <div class="tip-text">
+                <strong>「${stat.kana}」(${roma}) 집중 연습 필요 <span style="font-size:.78rem; color:#FF9EAB; font-weight:700; background:rgba(255,182,193,.15); padding:2px 8px; border-radius:10px; margin-left:4px;">오타 ${stat.error_count}회</span></strong>
+                <span>이 문자를 포함한 짧은 단어를 반복 타이핑하며 손가락 위치를 익혀보세요.</span>
+              </div>
+            </li>`;
+        }
+      });
+
+      // 오타 데이터가 있고 5개 미만이면 일반 팁 보완
+      const generalTips = [
+        { icon: '⏱️', title: '속도보다 정확도 먼저', desc: '빠른 속도보다 정확도 90% 이상을 먼저 목표로 삼으세요. 정확도가 안정되면 속도는 자연스럽게 올라옵니다.' },
+        { icon: '🎯', title: '오타 많은 문자 집중 연습', desc: '위의 히트맵에서 붉게 표시된 문자를 포함한 짧은 문장을 직접 만들어 반복 연습하면 효과적입니다.' },
+        { icon: '🎵', title: '익숙한 노래로 연습', desc: '좋아하는 노래 가사로 연습하면 자연스럽게 몰입도가 올라갑니다. 즐기면서 연습하는 것이 가장 빠른 성장 방법입니다.' },
+      ];
+
+      let generalIdx = 0;
+      while (tipsHTML.split('<li>').length - 1 < 5 && generalIdx < generalTips.length) {
+        const t = generalTips[generalIdx++];
+        tipsHTML += `
+          <li>
+            <div class="tip-icon">${t.icon}</div>
+            <div class="tip-text">
+              <strong>${t.title}</strong>
+              <span>${t.desc}</span>
+            </div>
+          </li>`;
       }
+
+      if (tipsHTML === '') {
+        tipsHTML = `
+          <li>
+            <div class="tip-icon">🎉</div>
+            <div class="tip-text">
+              <strong>현재 오타 기록이 없습니다!</strong>
+              <span>타이핑을 더 많이 연습하면 오타 패턴을 분석해 개인화된 팁을 제공해 드립니다.</span>
+            </div>
+          </li>`;
+      }
+
+      tipListEl.innerHTML = tipsHTML;
     }
   </script>
 </body>

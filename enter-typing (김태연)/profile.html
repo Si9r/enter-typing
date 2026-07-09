@@ -210,6 +210,51 @@
       color: #aaa;
     }
 
+    /* 뱃지 커스텀 툴팁 */
+    .badge-item {
+      position: relative;
+    }
+    .badge-item::after {
+      content: attr(data-title);
+      position: absolute;
+      bottom: calc(100% + 5px);
+      left: 50%;
+      transform: translateX(-50%) translateY(5px);
+      background: rgba(44, 62, 80, 0.95);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .badge-item::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(5px);
+      border: 5px solid transparent;
+      border-top-color: rgba(44, 62, 80, 0.95);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+    .badge-item:hover::after,
+    .badge-item:hover::before {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
     /* Analysis Tab */
     .analysis-grid {
       display: grid;
@@ -873,45 +918,45 @@
       <div class="badges-section">
         <h3>🏅 획득한 뱃지</h3>
         <div class="badge-grid" id="badge-grid">
-          <div class="badge-item locked" id="badge-passion">
+          <div class="badge-item locked" id="badge-passion" data-title="타이핑 콘텐츠를 누적 10회 이상 플레이하면 획득할 수 있습니다.">
             <div class="badge-icon">🔥</div>
             <div class="badge-name">타이핑 열정왕</div>
           </div>
-          <div class="badge-item locked" id="badge-speed">
+          <div class="badge-item locked" id="badge-speed" data-title="타이핑 최고 속도 250 WPM 이상을 달성하면 획득할 수 있습니다.">
             <div class="badge-icon">⚡</div>
             <div class="badge-name">스피드스타</div>
           </div>
-          <div class="badge-item locked" id="badge-accuracy">
+          <div class="badge-item locked" id="badge-accuracy" data-title="타이핑 5회 이상 플레이 및 평균 정확도 90% 이상을 유지하면 획득합니다.">
             <div class="badge-icon">🎯</div>
             <div class="badge-name">정확도 달인</div>
           </div>
-          <div class="badge-item locked" id="badge-attendance">
+          <div class="badge-item locked" id="badge-attendance" data-title="매일 꾸준히 7일 연속으로 출석체크를 완료하면 획득합니다.">
             <div class="badge-icon">🌸</div>
             <div class="badge-name">7일 연속 출석</div>
           </div>
-          <div class="badge-item locked" id="badge-jpop">
+          <div class="badge-item locked" id="badge-jpop" data-title="JPOP 장르의 타이핑을 누적 5회 이상 플레이하면 획득할 수 있습니다.">
             <div class="badge-icon">🎵</div>
             <div class="badge-name">JPOP 마니아</div>
           </div>
-          <div class="badge-item locked" id="badge-ranking">
+          <div class="badge-item locked" id="badge-ranking" data-title="단일 타이핑 플레이에서 5,000점 이상의 고득점을 기록하면 획득합니다.">
             <div class="badge-icon">🏆</div>
             <div class="badge-name">랭킹 TOP 10</div>
           </div>
-          <div class="badge-item locked" id="badge-diamond">
+          <div class="badge-item locked" id="badge-diamond" data-title="타이핑/퀴즈/대전 상관없이 누적 50회 이상 플레이한 열혈 유저에게 주어집니다.">
             <div class="badge-icon">💎</div>
             <div class="badge-name">다이아 유저</div>
           </div>
-          <div class="badge-item locked" id="badge-attendance30">
+          <div class="badge-item locked" id="badge-attendance30" data-title="누적 출석일 30일을 달성하면 획득하는 영광의 뱃지입니다.">
             <div class="badge-icon">🌙</div>
             <div class="badge-name">30일 개근</div>
           </div>
-          <div class="badge-item locked" id="badge-king">
+          <div class="badge-item locked" id="badge-king" data-title="타이핑 최고 속도 350 WPM의 신의 경지에 도달하면 획득할 수 있습니다.">
             <div class="badge-icon">👑</div>
-            <div class="badge-name">랭킹 1위</div>
+            <div class="badge-name">타이핑 마스터</div>
           </div>
-          <div class="badge-item locked" id="badge-battle">
+          <div class="badge-item locked" id="badge-battle" data-title="실시간 대전에서 당당히 1위를 차지하면 획득하는 승리의 뱃지입니다.">
             <div class="badge-icon">🎖️</div>
-            <div class="badge-name">배틀 100승</div>
+            <div class="badge-name">배틀 우승자</div>
           </div>
         </div>
       </div>
@@ -938,27 +983,27 @@
           </div>
 
           <!-- WPM 추이 막대 -->
-          <div style="font-size:.78rem; font-weight:700; color:#aaa; margin-bottom:10px;">⏰ 주간/월간 WPM</div>
-          <div class="bar-row">
-            <div class="bar-label">이번 주</div>
-            <div class="bar-bg">
+          <div style="font-size:.85rem; font-weight:700; color:#aaa; margin-bottom:18px; margin-top:10px;">주간/월간 WPM</div>
+          <div class="bar-row" style="margin-bottom: 18px;">
+            <div class="bar-label" style="font-size: 0.95rem;">이번 주</div>
+            <div class="bar-bg" style="height: 14px;">
               <div class="bar-fill" id="analysis-wpm-week-bar" style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
             </div>
-            <div class="bar-val" id="analysis-wpm-week-val">0</div>
+            <div class="bar-val" id="analysis-wpm-week-val" style="font-size: 0.95rem;">0</div>
           </div>
-          <div class="bar-row">
-            <div class="bar-label">지난 주</div>
-            <div class="bar-bg">
+          <div class="bar-row" style="margin-bottom: 18px;">
+            <div class="bar-label" style="font-size: 0.95rem;">지난 주</div>
+            <div class="bar-bg" style="height: 14px;">
               <div class="bar-fill" id="analysis-wpm-lastweek-bar" style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
             </div>
-            <div class="bar-val" id="analysis-wpm-lastweek-val">0</div>
+            <div class="bar-val" id="analysis-wpm-lastweek-val" style="font-size: 0.95rem;">0</div>
           </div>
-          <div class="bar-row">
-            <div class="bar-label">이번 달</div>
-            <div class="bar-bg">
+          <div class="bar-row" style="margin-bottom: 0;">
+            <div class="bar-label" style="font-size: 0.95rem;">이번 달</div>
+            <div class="bar-bg" style="height: 14px;">
               <div class="bar-fill" id="analysis-wpm-month-bar" style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
             </div>
-            <div class="bar-val" id="analysis-wpm-month-val">0</div>
+            <div class="bar-val" id="analysis-wpm-month-val" style="font-size: 0.95rem;">0</div>
           </div>
         </div>
 
@@ -966,21 +1011,21 @@
           <h4>📈 활동별 플레이 수</h4>
           <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">타이핑</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-typing-bar" style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
               </div>
               <div class="bar-val" id="analysis-play-typing-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">🧩 퀴즈</div>
+              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">퀴즈</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-quiz-bar" style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
               </div>
               <div class="bar-val" id="analysis-play-quiz-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
             </div>
             <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⚔️ 대전</div>
+              <div class="bar-label" style="font-size: 0.85rem; font-weight: 600; width: 80px; line-height: 1.2;">실시간<br>대전</div>
               <div class="bar-bg" style="height: 20px; border-radius: 10px;">
                 <div class="bar-fill" id="analysis-play-battle-bar" style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
               </div>
@@ -988,62 +1033,64 @@
             </div>
           </div>
           <!-- 비율 표시 -->
-          <div style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
-            <div style="text-align:center;">
+          <div style="display:flex; align-items:flex-start; justify-content:center; gap:28px; padding:12px 0; margin-top:auto;">
+            <div style="text-align:center; width:64px;">
               <div style="font-size:1.8rem; font-weight:900; color:#FF9EAB;" id="analysis-pct-typing">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">⌨️ 타이핑</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">타이핑</div>
             </div>
-            <div style="width:1px; height:40px; background:#EAEAEA;"></div>
-            <div style="text-align:center;">
+            <div style="width:1px; height:40px; background:#EAEAEA; align-self:center;"></div>
+            <div style="text-align:center; width:64px;">
               <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">🧩 퀴즈</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">퀴즈</div>
             </div>
-            <div style="width:1px; height:40px; background:#EAEAEA;"></div>
-            <div style="text-align:center;">
+            <div style="width:1px; height:40px; background:#EAEAEA; align-self:center;"></div>
+            <div style="text-align:center; width:64px;">
               <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
-              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">⚔️ 대전</div>
+              <div style="font-size:.8rem; color:#7F8C8D; margin-top:4px;">실시간<br>대전</div>
             </div>
           </div>
         </div>
         <div class="analysis-card">
-          <h4>🏆 퀴즈 결과 분석</h4>
-          <!-- Perfect -->
-          <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥇</div>
-            <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-gold-bar" style="width:0%; background: linear-gradient(90deg, #FFD700, #FFA500);"></div>
-            </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#B8860B; font-size:.9rem;" id="analysis-quiz-gold-val">0회</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <h4 style="margin-bottom:0;">🎯 퀴즈 결과 분석</h4>
           </div>
-          <!-- Good -->
+          <!-- 100% 정답 -->
           <div class="bar-row" style="margin-bottom:14px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥈</div>
+            <div style="width:60px; text-align:left; font-size:.85rem; font-weight:800; color:#E74C3C; flex-shrink:0; word-break:keep-all; line-height:1.2;">100%<br>정답</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-silver-bar" style="width:0%; background: linear-gradient(90deg, #C0C0C0, #A8A8A8);"></div>
+              <div class="bar-fill" id="analysis-quiz-gold-bar" style="width:0%; background: linear-gradient(90deg, #FF9A9E, #FECFEF);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#808080; font-size:.9rem;" id="analysis-quiz-silver-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#E74C3C; font-size:.9rem;" id="analysis-quiz-gold-val">0회</div>
           </div>
-          <!-- Normal -->
+          <!-- 80% 이상 -->
+          <div class="bar-row" style="margin-bottom:14px;">
+            <div style="width:60px; text-align:left; font-size:.85rem; font-weight:800; color:#F39C12; flex-shrink:0; word-break:keep-all; line-height:1.2;">80%<br>이상</div>
+            <div class="bar-bg" style="flex:1;">
+              <div class="bar-fill" id="analysis-quiz-silver-bar" style="width:0%; background: linear-gradient(90deg, #FAD961, #F76B1C);"></div>
+            </div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#F39C12; font-size:.9rem;" id="analysis-quiz-silver-val">0회</div>
+          </div>
+          <!-- 60% 이상 -->
           <div class="bar-row" style="margin-bottom:20px;">
-            <div style="width:36px; text-align:center; font-size:1.3rem; flex-shrink:0;">🥉</div>
+            <div style="width:60px; text-align:left; font-size:.85rem; font-weight:800; color:#27AE60; flex-shrink:0; word-break:keep-all; line-height:1.2;">60%<br>이상</div>
             <div class="bar-bg" style="flex:1;">
-              <div class="bar-fill" id="analysis-quiz-bronze-bar" style="width:0%; background: linear-gradient(90deg, #CD7F32, #A0522D);"></div>
+              <div class="bar-fill" id="analysis-quiz-bronze-bar" style="width:0%; background: linear-gradient(90deg, #A8E063, #56AB2F);"></div>
             </div>
-            <div style="width:44px; text-align:right; font-weight:800; color:#8B4513; font-size:.9rem;" id="analysis-quiz-bronze-val">0회</div>
+            <div style="width:44px; text-align:right; font-weight:800; color:#27AE60; font-size:.9rem;" id="analysis-quiz-bronze-val">0회</div>
           </div>
           <!-- 요약 -->
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
-            <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-quiz-gold-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 만점</div>
+            <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-quiz-total-plays">0</div>
+              <div style="font-size:.7rem; color:#7F8C8D; margin-top:2px; font-weight:bold; word-break:keep-all; line-height:1.3;">총<br>퀴즈</div>
             </div>
-            <div style="flex:1; background:#F5F5F5; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#808080;" id="analysis-quiz-silver-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥈 80%+</div>
+            <div style="flex:1; background:#FEF5E7; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:1.4rem; font-weight:900; color:#F39C12;" id="analysis-quiz-avg-acc">0%</div>
+              <div style="font-size:.7rem; color:#7F8C8D; margin-top:2px; font-weight:bold; word-break:keep-all; line-height:1.3;">평균<br>정답률</div>
             </div>
-            <div style="flex:1; background:#FDF0E6; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#8B4513;" id="analysis-quiz-bronze-summary">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥉 60%+</div>
+            <div style="flex:1; background:#FDEDEC; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:1.4rem; font-weight:900; color:#E74C3C;" id="analysis-quiz-gold-summary">0</div>
+              <div style="font-size:.7rem; color:#7F8C8D; margin-top:2px; font-weight:bold; word-break:keep-all; line-height:1.3;">100%<br>정답</div>
             </div>
           </div>
         </div>
@@ -1080,16 +1127,16 @@
           </div>
           <!-- 요약 -->
           <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
+            <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
+              <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-battle-total">0</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">총 대전</div>
+            </div>
             <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-battle-total">0</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">⚔️ 총 대전</div>
+              <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-battle-win-rate">0%</div>
+              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">우승률</div>
             </div>
             <div style="flex:1; background:#FFF0E6; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#FF7043;" id="analysis-battle-win-rate">0%</div>
-              <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">🥇 우승률</div>
-            </div>
-            <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-battle-avg-wpm">0</div>
+              <div style="font-size:1.4rem; font-weight:900; color:#FF7043;" id="analysis-battle-avg-wpm">0</div>
               <div style="font-size:.75rem; color:#7F8C8D; margin-top:2px;">평균 WPM</div>
             </div>
           </div>
@@ -1199,7 +1246,6 @@
       <div class="footer-col">
         <h4>타이핑</h4>
         <ul>
-          <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
           <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
           <li><a href="typing_create.html">타이핑 작성하기</a></li>
           <li><a href="battle.html">실시간 대전</a></li>
@@ -1574,7 +1620,15 @@
         const resData = await res.json();
         const container = document.getElementById('profile-typo-list');
         if (resData.success && resData.data && resData.data.length > 0) {
-          const topTypos = resData.data.slice(0, 5);
+          const topTypos = resData.data
+            .filter(item => item.error_count > 0)
+            .sort((a, b) => b.error_count - a.error_count)
+            .slice(0, 5);
+            
+          if (topTypos.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding: 40px 20px; color: #7F8C8D; background: #fff4f3; border-radius: 16px; border: 1px dashed #FFB6C1; margin: 10px 0;"><strong>아직 오타 데이터가 없어요!</strong><br><span style="font-size: 0.9em; margin-top: 10px; display: inline-block;">첫 번째 타이핑 게임을 플레이하고<br>나의 약점을 분석해보세요 🎮</span></div>';
+            return;
+          }
           const maxErrors = topTypos[0].error_count || 1;
           const kanaRoma = {
             'あ':'a','い':'i','う':'u','え':'e','お':'o',
@@ -1606,7 +1660,7 @@
           };
           container.innerHTML = topTypos.map((item, idx) => {
               const pct = Math.round((item.error_count / maxErrors) * 100);
-              const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
+              const level = item.error_count <= 10 ? ' low' : ((pct >= 60 && item.error_count >= 20) ? '' : ' med');
               const roma = kanaRoma[item.kana] || item.kana;
               return `
                 <div class="typo-row">
@@ -1746,13 +1800,16 @@
 
       // 3-5. 퀴즈 결과 분석
       let gold = 0, silver = 0, bronze = 0;
+      let totalQuizAcc = 0;
       quizPlays.forEach(item => {
         let acc = item.accuracy || 0;
+        totalQuizAcc += acc;
         if (acc >= 100) gold++;
         else if (acc >= 80) silver++;
         else if (acc >= 60) bronze++;
       });
       const maxMedal = Math.max(gold, silver, bronze, 1);
+      const avgQuizAcc = quizPlays.length > 0 ? Math.round(totalQuizAcc / quizPlays.length) : 0;
       
       document.getElementById('analysis-quiz-gold-val').textContent = gold + '회';
       document.getElementById('analysis-quiz-gold-bar').style.width = Math.round((gold / maxMedal) * 100) + '%';
@@ -1760,11 +1817,12 @@
       
       document.getElementById('analysis-quiz-silver-val').textContent = silver + '회';
       document.getElementById('analysis-quiz-silver-bar').style.width = Math.round((silver / maxMedal) * 100) + '%';
-      document.getElementById('analysis-quiz-silver-summary').textContent = silver;
       
       document.getElementById('analysis-quiz-bronze-val').textContent = bronze + '회';
       document.getElementById('analysis-quiz-bronze-bar').style.width = Math.round((bronze / maxMedal) * 100) + '%';
-      document.getElementById('analysis-quiz-bronze-summary').textContent = bronze;
+
+      document.getElementById('analysis-quiz-total-plays').textContent = quizPlays.length;
+      document.getElementById('analysis-quiz-avg-acc').textContent = avgQuizAcc + '%';
     }
 
     function updateBadges(data) {

@@ -18,7 +18,7 @@ from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 import time
 from sqlalchemy.orm import Session
-from database import engine, get_db
+from database import engine, get_db, SessionLocal
 import models
 import bcrypt
 from jose import jwt, JWTError
@@ -245,6 +245,7 @@ class TypingHistoryCreate(BaseModel):
     wpm: int
     accuracy: float
     text: str
+    score: int = 0
 
 class QuizHistoryCreate(BaseModel):
     quiz_id: Optional[int] = None
@@ -704,6 +705,10 @@ def delete_typing_content(content_id: int, db: Session = Depends(get_db)):
     # if content.creator_id != current_user.id:
     #     raise HTTPException(status_code=403, detail="삭제 권한이 없습니다.")
         
+    # 외래 키 제약 조건 방지: 관련 기록 먼저 삭제
+    db.query(models.TypingHistory).filter(models.TypingHistory.content_id == content_id).delete()
+    db.query(models.BattleHistory).filter(models.BattleHistory.content_id == content_id).delete()
+    
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}
@@ -889,6 +894,10 @@ def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
     if not content:
         raise HTTPException(status_code=404, detail="콘텐츠를 찾을 수 없습니다.")
         
+    # 외래 키 제약 조건 방지: 관련 기록 먼저 삭제
+    db.query(models.QuizHistory).filter(models.QuizHistory.quiz_id == content_id).delete()
+    db.query(models.BattleHistory).filter(models.BattleHistory.quiz_id == content_id).delete()
+
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}
@@ -1066,11 +1075,19 @@ def hiragana_to_romaji(hira_str: str) -> str:
         char = hira_str[i]
         next_char = hira_str[i+1] if i + 1 < len(hira_str) else None
         
-        if char == "っ" and next_char and next_char in ROMAJI_TABLE:
-            next_romaji = ROMAJI_TABLE[next_char]
-            romaji += next_romaji[0]
-            i += 1
-            continue
+        if char == "っ" and next_char:
+            # 다음 두 글자가 결합 법칙(요음)에 해당하는지 확인 (예: っちゃ, っじゅ 등)
+            third_char = hira_str[i+2] if i + 2 < len(hira_str) else None
+            if third_char and (next_char + third_char) in COMBINATION_RULES:
+                next_romaji = COMBINATION_RULES[next_char + third_char]
+                romaji += next_romaji[0]
+                i += 1
+                continue
+            elif next_char in ROMAJI_TABLE:
+                next_romaji = ROMAJI_TABLE[next_char]
+                romaji += next_romaji[0]
+                i += 1
+                continue
             
         if next_char and (char + next_char) in COMBINATION_RULES:
             romaji += COMBINATION_RULES[char + next_char]
@@ -1198,7 +1215,8 @@ def save_typing_history(req: TypingHistoryCreate, db: Session = Depends(get_db),
         content_title=req.content_title,
         genre=req.genre,
         wpm=req.wpm,
-        accuracy=req.accuracy
+        accuracy=req.accuracy,
+        score=req.score
     )
     db.add(history)
 
@@ -1285,6 +1303,8 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
         })
         
     for qh in quiz_histories:
+        acc = round((qh.score / qh.total_questions * 100), 1) if qh.total_questions and qh.total_questions > 0 else 0.0
+        acc = min(100.0, acc)
         combined.append({
             "type": "quiz",
             "content_id": qh.quiz_id,
@@ -1292,6 +1312,7 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
             "genre": "퀴즈",
             "score": qh.score,
             "total_questions": qh.total_questions,
+            "accuracy": acc,
             "score_str": f"{qh.score} / {qh.total_questions} 정답",
             "played_at": qh.played_at.isoformat(),
             "_raw_date": qh.played_at
@@ -1299,23 +1320,38 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
 
     for bh in battle_histories:
         song_title = "알 수 없음"
-        if bh.content_id:
+        genre_label = ""
+        
+        if bh.quiz_id:
+            genre_label = "퀴즈"
+            quiz_content = db.query(models.QuizContent).filter(models.QuizContent.id == bh.quiz_id).first()
+            if quiz_content:
+                song_title = quiz_content.title
+        elif bh.content_id:
+            genre_label = "타이핑"
             content = db.query(models.TypingContent).filter(models.TypingContent.id == bh.content_id).first()
             if content:
                 song_title = content.title
+
         rank_labels = {1: "🥇 1위", 2: "🥈 2위", 3: "🥉 3위"}
         rank_str = rank_labels.get(bh.rank, f"{bh.rank}위")
+        
+        if bh.quiz_id:
+            score_str = f"{rank_str} · {bh.score}점"
+        else:
+            score_str = f"{rank_str} · {bh.score}점 · {bh.wpm} WPM · {int(bh.accuracy)}%"
+
         combined.append({
             "type": "battle",
-            "content_id": bh.content_id,
+            "content_id": bh.content_id or bh.quiz_id,
             "title": song_title,
-            "genre": "실시간 대전",
+            "genre": genre_label,
             "rank": bh.rank,
             "wpm": bh.wpm,
             "accuracy": bh.accuracy,
             "score": bh.score,
             "room_code": bh.room_code,
-            "score_str": f"{rank_str} · {bh.score}점 · {bh.wpm} WPM · {int(bh.accuracy)}%",
+            "score_str": score_str,
             "played_at": bh.played_at.isoformat(),
             "_raw_date": bh.played_at
         })
@@ -1527,8 +1563,7 @@ async def save_battle_results(room_data: dict, db: Session):
 async def battle_websocket(
     websocket: WebSocket,
     room_code: str,
-    token: str = Query(...),
-    db: Session = Depends(get_db)
+    token: str = Query(...)
 ):
     # 1. JWT 토큰 검증
     try:
@@ -1541,12 +1576,13 @@ async def battle_websocket(
         await websocket.close(code=4001)
         return
 
-    user = db.query(models.User).filter(models.User.email == email).first()
-    if not user:
-        await websocket.close(code=4001)
-        return
-
-    nickname = user.nickname
+    with SessionLocal() as db_session:
+        user = db_session.query(models.User).filter(models.User.email == email).first()
+        if not user:
+            await websocket.close(code=4001)
+            return
+        nickname = user.nickname
+        user_id = user.id
     redis = await get_redis()
 
     # 2. 방 상태 로드 (Lock 적용)
@@ -1567,7 +1603,7 @@ async def battle_websocket(
         # 플레이어 등록 (재접속 시 기존 데이터 유지)
         if nickname not in room_data["players"]:
             room_data["players"][nickname] = {
-                "user_id": user.id,
+                "user_id": user_id,
                 "ready": False,
                 "score": 0,
                 "progress": 0.0,
@@ -1790,7 +1826,8 @@ async def battle_websocket(
 
                         # MySQL에 기록 저장
                         try:
-                            await save_battle_results(room_data, db)
+                            with SessionLocal() as db_session:
+                                await save_battle_results(room_data, db_session)
                         except Exception as e:
                             print(f"Battle history save error: {e}")
 
@@ -1844,7 +1881,8 @@ async def battle_websocket(
                                 "results": results
                             })
                             try:
-                                await save_battle_results(room_data, db)
+                                with SessionLocal() as db_session:
+                                    await save_battle_results(room_data, db_session)
                             except Exception as e:
                                 print(f"Battle history save error: {e}")
                             await asyncio.sleep(600)
@@ -1926,7 +1964,7 @@ async def get_typo_stats(
     
     avg_error_rate = 0.0
     if total_inputs > 0:
-        avg_error_rate = (total_typos / total_inputs) * 100
+        avg_error_rate = min(100.0, (total_typos / total_inputs) * 100)
         
     # 개선도 계산 (이전 50% vs 최근 50% 정확도 차이)
     histories = (
@@ -1952,7 +1990,7 @@ async def get_typo_stats(
     for s in stats:
         rate = 0.0
         if s.total_count > 0:
-            rate = (s.error_count / s.total_count) * 100
+            rate = min(100.0, (s.error_count / s.total_count) * 100)
         stats_list.append({
             "kana": s.character_typed,
             "error_count": s.error_count,
@@ -1976,33 +2014,26 @@ async def get_typo_stats(
     top_error_kanas = {s["kana"] for s in sorted_by_rate[:5] if s["error_count"] > 0}
     
     pair_data = []
-    romaji_data = []
     
     # 미리 정의된 전형적인 오타 패턴 템플릿
     typical_confusions = {
         "ぢ": {
-            "pair": {"a": "ぢ", "b": "じ", "aRoma": "di", "bRoma": "ji", "rate": "지연발생", "desc": "ぢ(di)와 じ(ji)는 발음이 같아 헷갈리기 쉽습니다."},
-            "romaji": {"char": "ぢ", "correct": "di", "wrong": "ji", "pct": 40, "desc": "발음 혼동으로 인한 입력 시도 오류"}
+            "pair": {"a": "ぢ", "b": "じ", "aRoma": "di", "bRoma": "ji", "rate": "지연발생", "desc": "ぢ(di)와 じ(ji)는 발음이 같아 헷갈리기 쉽습니다."}
         },
         "じ": {
-            "pair": {"a": "じ", "b": "zi", "aRoma": "ji", "bRoma": "zi", "rate": "혼동", "desc": "じ를 ji 대신 zi로 잘못 치는 경향이 있습니다."},
-            "romaji": {"char": "じ", "correct": "ji", "wrong": "zi", "pct": 30, "desc": "zi 대신 표준 ji 입력을 추천합니다."}
+            "pair": {"a": "じ", "b": "zi", "aRoma": "ji", "bRoma": "zi", "rate": "혼동", "desc": "じ를 ji 대신 zi로 잘못 치는 경향이 있습니다."}
         },
         "つ": {
-            "pair": {"a": "つ", "b": "치", "aRoma": "tsu", "bRoma": "chi", "rate": "입력속도 지연", "desc": "tsu 대신 tu를 쳐서 생기는 속도 저하입니다."},
-            "romaji": {"char": "つ", "correct": "tsu", "wrong": "tu", "pct": 50, "desc": "tu도 허용되지만 tsu가 표준 타법입니다."}
+            "pair": {"a": "つ", "b": "치", "aRoma": "tsu", "bRoma": "chi", "rate": "입력속도 지연", "desc": "tsu 대신 tu를 쳐서 생기는 속도 저하입니다."}
         },
         "っ": {
-            "pair": {"a": "っ", "b": "자음연타", "aRoma": "자음 연타", "bRoma": "xtsu", "rate": "속도 지연", "desc": "촉음 입력 시 다음 자음을 두 번 치는 것이 빠릅니다."},
-            "romaji": {"char": "っ", "correct": "자음연타", "wrong": "xtsu", "pct": 60, "desc": "xtsu 입력보다 자음 연속 입력이 효율적입니다."}
+            "pair": {"a": "っ", "b": "자음연타", "aRoma": "자음 연타", "bRoma": "xtsu", "rate": "속도 지연", "desc": "촉음 입력 시 다음 자음을 두 번 치는 것이 빠릅니다."}
         },
         "ん": {
-            "pair": {"a": "ん", "b": "n", "aRoma": "nn", "bRoma": "n", "rate": "오타율 높음", "desc": "ん 뒤에 모음이나 야행이 올 때 nn을 쳐야 오타가 안 납니다."},
-            "romaji": {"char": "ん", "correct": "nn", "wrong": "n", "pct": 45, "desc": "단독 n 입력으로 다음 글자와 결합하는 오류"}
+            "pair": {"a": "ん", "b": "n", "aRoma": "nn", "bRoma": "n", "rate": "오타율 높음", "desc": "ん 뒤에 모음이나 야행이 올 때 nn을 쳐야 오타가 안 납니다."}
         },
         "づ": {
-            "pair": {"a": "づ", "b": "ず", "aRoma": "du", "bRoma": "zu", "rate": "혼동", "desc": "づ(du)와 ず(zu)는 발음이 같아 헷갈리기 쉽습니다."},
-            "romaji": {"char": "づ", "correct": "du", "wrong": "zu", "pct": 35, "desc": "두음(づ) 입력 시 du 타법 인지 필요"}
+            "pair": {"a": "づ", "b": "ず", "aRoma": "du", "bRoma": "zu", "rate": "혼동", "desc": "づ(du)와 ず(zu)는 발음이 같아 헷갈리기 쉽습니다."}
         }
     }
     
@@ -2010,26 +2041,58 @@ async def get_typo_stats(
         if kana in typical_confusions:
             item = typical_confusions[kana]
             pair_data.append(item["pair"])
-            romaji_data.append(item["romaji"])
             
+    # 로마자 사전 (로컬 정의)
+    romajiLookup = {
+        'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+        'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+        'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+        'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+        'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+        'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+        'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+        'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+        'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+        'わ': 'wa', 'を': 'wo', 'ん': 'n', 'っ': 'xtsu',
+        'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+        'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+        'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+        'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+        'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+        'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+        'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+        'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+        'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+        'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+        'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+        'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+        'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+        'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+        'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+        'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo'
+    }
+
     # 만약 유저의 오타 데이터에 전형적인 혼동 패턴이 없다면, 탑 에러 글자 중 상위 항목들로 일반 리포트 생성
     if not pair_data:
         for s in sorted_by_rate[:2]:
             if s["error_count"] > 0:
+                correct_roma = romajiLookup.get(s["kana"], s["kana"])
+                # Generate a plausible typo example
+                typo_roma = correct_roma
+                if len(correct_roma) > 0:
+                    last_char = correct_roma[-1]
+                    adj = {'a':'s', 'i':'o', 'u':'i', 'e':'w', 'o':'p'}
+                    typo_roma = correct_roma[:-1] + adj.get(last_char, 'x')
+                else:
+                    typo_roma = "오입력"
+                    
                 pair_data.append({
                     "a": s["kana"],
-                    "b": "타 건반",
-                    "aRoma": s["kana"],
-                    "bRoma": "오타",
+                    "b": "?",
+                    "aRoma": correct_roma,
+                    "bRoma": f"예: {typo_roma}",
                     "rate": f"{round(s['error_rate'])}%",
-                    "desc": f"'{s['kana']}' 입력 시 정확도가 낮아 오타가 빈번하게 발생하고 있습니다."
-                })
-                romaji_data.append({
-                    "char": s["kana"],
-                    "correct": "정타",
-                    "wrong": "오타",
-                    "pct": round(s["error_rate"]),
-                    "desc": "정확한 키 스토크 연습이 필요합니다."
+                    "desc": f"'{s['kana']}'({correct_roma})를 칠 때 인접한 키({typo_roma} 등)를 잘못 누르는 실수가 잦습니다."
                 })
                 
     return {
@@ -2040,8 +2103,153 @@ async def get_typo_stats(
             "improvement": round(improvement, 1)
         },
         "data": stats_list,
-        "pairs": pair_data,
-        "romaji_patterns": romaji_data
+        "pairs": pair_data
     }
 
+
+# ════════════════════════════════════════════════════════════
+# API: 퀴즈 통계 (제목별 정답률 + 성장 추세)
+# GET /api/quiz-stats
+# ════════════════════════════════════════════════════════════
+@app.get("/api/quiz-stats")
+def get_quiz_stats(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    histories = (
+        db.query(models.QuizHistory)
+        .filter(models.QuizHistory.user_id == current_user.id)
+        .order_by(models.QuizHistory.played_at.asc())
+        .all()
+    )
+
+    if not histories:
+        return {
+            "success": True,
+            "summary": {"total_played": 0, "avg_accuracy": 0.0, "total_correct": 0, "total_questions": 0, "best_accuracy": 0.0},
+            "title_stats": [],
+            "growth_data": [],
+            "recent_records": []
+        }
+
+    # 1. 요약 통계
+    total_played = len(histories)
+    total_correct = sum(h.score for h in histories)
+    total_questions_sum = sum(h.total_questions for h in histories)
+    # 정답률은 0~100% 사이로 상한 처리
+    raw_avg = (total_correct / total_questions_sum * 100) if total_questions_sum > 0 else 0.0
+    avg_accuracy = round(min(100.0, raw_avg), 1)
+
+    best_accuracy = 0.0
+    for h in histories:
+        if h.total_questions > 0:
+            acc = min(100.0, round((h.score / h.total_questions * 100), 1))
+            if acc > best_accuracy:
+                best_accuracy = acc
+
+    # 2. 퀴즈 제목별 정답률
+    title_map = {}
+    for h in histories:
+        title = h.quiz_category or "기타"
+        if title not in title_map:
+            title_map[title] = {"total_correct": 0, "total_questions": 0, "play_count": 0, "quiz_id": h.quiz_id}
+        title_map[title]["total_correct"] += h.score
+        title_map[title]["total_questions"] += h.total_questions
+        title_map[title]["play_count"] += 1
+
+    title_stats = []
+    for title, data in title_map.items():
+        raw = (data["total_correct"] / data["total_questions"] * 100) if data["total_questions"] > 0 else 0.0
+        acc = round(min(100.0, raw), 1)
+        title_stats.append({
+            "title": title,
+            "accuracy": acc,
+            "play_count": data["play_count"],
+            "total_correct": min(data["total_correct"], data["total_questions"]),
+            "total_questions": data["total_questions"],
+            "quiz_id": data["quiz_id"]
+        })
+    # 정답률 낮은 순 정렬 (약점 먼저)
+    title_stats.sort(key=lambda x: x["accuracy"])
+
+    # 3. 재도전 성장 추세: quiz_id가 있으면 quiz_id, 없으면 quiz_category(제목) 기준으로 그룹
+    def safe_acc(score, total):
+        if total <= 0:
+            return 0.0
+        return round(min(100.0, (score / total) * 100), 1)
+
+    # quiz_id 목록 추출하여 Eager Loading 수행 (N+1 쿼리 문제 해결)
+    quiz_ids = {h.quiz_id for h in histories if h.quiz_id}
+    quiz_map = {}
+    if quiz_ids:
+        quizzes = db.query(models.QuizContent).filter(models.QuizContent.id.in_(quiz_ids)).all()
+        quiz_map = {q.id: q.title for q in quizzes}
+
+    trends = {}
+    for h in histories:
+        if h.quiz_id:
+            key = f"id:{h.quiz_id}"
+            title = quiz_map.get(h.quiz_id) or h.quiz_category or "기타"
+            qid_val = h.quiz_id
+        else:
+            title = h.quiz_category or "기타"
+            key = f"title:{title}"
+            qid_val = None
+
+        if key not in trends:
+            trends[key] = {
+                "quiz_id": qid_val,
+                "title": title,
+                "records": []
+            }
+        trends[key]["records"].append({
+            "score": h.score,
+            "total": h.total_questions,
+            "accuracy": safe_acc(h.score, h.total_questions),
+            "played_at": h.played_at.isoformat() if h.played_at else None
+        })
+
+    # 두 그룹 합산 후 2회 이상 도전한 것만 성장 추세 표시
+    growth_data = [v for v in trends.values() if len(v["records"]) >= 2]
+    growth_data.sort(key=lambda x: len(x["records"]), reverse=True)
+
+    # 각 항목에 개선도 계산
+    for item in growth_data:
+        first_acc = item["records"][0]["accuracy"]
+        last_acc = item["records"][-1]["accuracy"]
+        item["improvement"] = round(last_acc - first_acc, 1)
+
+    # 4. 최근 기록 10개
+    recent_qs = (
+        db.query(models.QuizHistory)
+        .filter(models.QuizHistory.user_id == current_user.id)
+        .order_by(models.QuizHistory.played_at.desc())
+        .limit(10)
+        .all()
+    )
+    recent_records = []
+    for h in recent_qs:
+        acc = safe_acc(h.score, h.total_questions)
+        correct_display = min(h.score, h.total_questions)
+        recent_records.append({
+            "title": h.quiz_category or "기타",
+            "score": correct_display,
+            "total": h.total_questions,
+            "accuracy": acc,
+            "played_at": h.played_at.isoformat() if h.played_at else None
+        })
+
+    return {
+        "success": True,
+        "summary": {
+            "total_played": total_played,
+            "avg_accuracy": avg_accuracy,
+            "total_correct": total_correct,
+            "total_questions": total_questions_sum,
+            "best_accuracy": best_accuracy
+        },
+        "title_stats": title_stats,
+        "growth_data": growth_data[:5],
+        "recent_records": recent_records
+    }
 

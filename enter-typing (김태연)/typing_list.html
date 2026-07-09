@@ -248,7 +248,6 @@
             <div class="footer-col">
                 <h4>타이핑</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
                     <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
                     <li><a href="typing_create.html">타이핑 작성하기</a></li>
                     <li><a href="battle.html">실시간 대전</a></li>
@@ -420,9 +419,10 @@
                 if (item.genre === 'ANIME' || item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
                 else if (item.genre === '문학' || item.genre === '기타') badgeColor = 'green';
 
+                const fallbackDesc = (item.artist ? item.artist + "의 " : "") + `'${item.title}' 가사로 타자 연습을 시작해보세요!`;
                 const descPreview = (item.description && item.description.length > 30)
                     ? item.description.substring(0, 30) + '...'
-                    : (item.description || '가사 타이핑 연습하기');
+                    : (item.description || fallbackDesc);
 
                 const diffStars = '⭐'.repeat(item.difficulty || 3);
                 let totalSeconds = item.best_time || 0;
@@ -529,6 +529,18 @@
                     document.getElementById('modal-best-time').innerText = mm > 0 ? `${mm}분 ${ms}초` : `${ms}초`;
 
                     document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 가사로 타자 연습을 시작해보세요!`;
+
+                    if (data.youtube_id) {
+                        const cover = document.querySelector('.detail-cover');
+                        cover.style.backgroundImage = `url('https://img.youtube.com/vi/${data.youtube_id}/maxresdefault.jpg')`;
+                        cover.style.backgroundSize = 'cover';
+                        cover.style.backgroundPosition = 'center';
+                        cover.innerHTML = '';
+                    } else {
+                        const cover = document.querySelector('.detail-cover');
+                        cover.style.backgroundImage = 'none';
+                        cover.innerHTML = '🎵';
+                    }
 
                     document.getElementById('modal-start-btn').onclick = () => location.href = `typing.html?id=${id}`;
                     document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking_song.html?id=${id}`;

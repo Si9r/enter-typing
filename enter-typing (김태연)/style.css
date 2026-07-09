@@ -790,10 +790,14 @@ body {
 
 /* Footer */
 .site-footer {
+    margin-top: 60px;
+    background-color: transparent;
+}
+
+.site-footer:has(.footer-container) {
     background-color: var(--color-white);
     border-top: 1px solid var(--color-border);
-    padding: 60px 40px 20px;
-    margin-top: 60px;
+    padding-top: 60px;
 }
 
 .footer-container {
@@ -804,6 +808,7 @@ body {
     flex-wrap: wrap;
     gap: 40px;
     margin-bottom: 50px;
+    padding: 0 40px;
 }
 
 .footer-col {
@@ -889,15 +894,15 @@ body {
 }
 
 .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 25px;
-    border-top: 1px solid var(--color-border);
+    background-color: transparent;
+    padding: 20px 40px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     color: #a0a0a0;
     font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
     flex-wrap: wrap;
     gap: 10px;
 }

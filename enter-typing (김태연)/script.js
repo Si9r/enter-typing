@@ -843,6 +843,8 @@ function endGame(completed = false) {
           genre = tagsContainer.children[0].innerText;
       }
       
+      const finalScore = parseInt(document.getElementById("final-score").innerText) || 0;
+
       fetch("/api/typing-history", {
           method: "POST",
           headers: {
@@ -854,6 +856,7 @@ function endGame(completed = false) {
               genre: genre,
               wpm: finalWpm,
               accuracy: finalAcc,
+              score: finalScore,
               text: "history_record"
           })
       })

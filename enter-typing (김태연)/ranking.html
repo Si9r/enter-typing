@@ -157,9 +157,9 @@
                 const data = await res.json();
                 
                 if(data.success) {
-                    renderRanking('typing', data.typing, item => `<span>평균 타수: <strong>${item.avg_wpm}WPM</strong></span><span>평균 정확도: <strong>${item.avg_accuracy}%</strong></span>`);
-                    renderRanking('quiz', data.quiz, item => `<span>총 맞춘 문제: <strong>${item.total_questions}개</strong></span>`);
-                    renderRanking('battle', data.battle, item => `<span>플레이 횟수: <strong>${item.play_count}회</strong></span>`);
+                    renderRanking('typing', data.typing, item => `<span>클리어한 곡: <strong>${item.unique_content_count}개</strong></span><span>평균 타수: <strong>${item.avg_wpm}WPM</strong></span><span>평균 정확도: <strong>${item.avg_accuracy}%</strong></span>`);
+                    renderRanking('quiz', data.quiz, item => `<span>클리어한 퀴즈 수: <strong>${item.unique_quiz_count}개</strong></span>`);
+                    renderRanking('battle', data.battle, item => `<span>승률: <strong>${item.win_rate}%</strong></span><span>(총 ${item.play_count}전)</span>`);
                 }
             } catch (err) {
                 console.error("랭킹 로드 실패", err);
@@ -178,6 +178,7 @@
             list.forEach(item => {
                 let rankClass = item.rank <= 3 ? `rank-${item.rank}` : '';
                 let avatarColor = `hsl(${(item.nickname.length * 50) % 360}, 70%, 60%)`;
+                let scoreUnit = type === 'battle' ? '승' : '점';
                 
                 html += `
                     <div class="rank-item ${rankClass}">
@@ -189,7 +190,7 @@
                                 ${statsFormatter(item)}
                             </div>
                         </div>
-                        <div class="rank-score">${item.total_score.toLocaleString()} 점</div>
+                        <div class="rank-score">${item.total_score.toLocaleString()} ${scoreUnit}</div>
                     </div>
                 `;
             });

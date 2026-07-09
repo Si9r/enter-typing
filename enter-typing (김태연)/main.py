@@ -924,17 +924,38 @@ def update_quiz_content(content_id: int, req: QuizContentCreate, current_user: m
 # ════════════════════════════════════════════════════════════
 # API: 랭킹 시스템
 # ════════════════════════════════════════════════════════════
-from sqlalchemy import func
+from sqlalchemy import func, case
+
+# 랭킹 데이터 인메모리 캐시 (1분 TTL)
+ranking_cache = {
+    "data": None,
+    "timestamp": 0
+}
+CACHE_TTL = 60  # 60초(1분) 동안 캐시 유지
 
 @app.get("/api/ranking/total")
 def get_total_ranking(db: Session = Depends(get_db)):
-    # 타이핑 랭킹 (누적 점수 기준)
-    typing_histories = db.query(
+    current_time = time.time()
+    if ranking_cache["data"] and (current_time - ranking_cache["timestamp"] < CACHE_TTL):
+        return ranking_cache["data"]
+
+    # 타이핑 랭킹 (최고 점수 합산 기준)
+    typing_subq = db.query(
         models.TypingHistory.user_id,
-        func.sum(models.TypingHistory.score).label("total_score"),
-        func.avg(models.TypingHistory.wpm).label("avg_wpm"),
-        func.avg(models.TypingHistory.accuracy).label("avg_accuracy")
-    ).group_by(models.TypingHistory.user_id).order_by(func.sum(models.TypingHistory.score).desc()).limit(100).all()
+        models.TypingHistory.content_id,
+        models.TypingHistory.content_title,
+        func.max(models.TypingHistory.score).label("max_score"),
+        func.max(models.TypingHistory.wpm).label("max_wpm"),
+        func.max(models.TypingHistory.accuracy).label("max_accuracy")
+    ).group_by(models.TypingHistory.user_id, models.TypingHistory.content_id, models.TypingHistory.content_title).subquery()
+
+    typing_histories = db.query(
+        typing_subq.c.user_id,
+        func.sum(typing_subq.c.max_score).label("total_score"),
+        func.avg(typing_subq.c.max_wpm).label("avg_wpm"),
+        func.avg(typing_subq.c.max_accuracy).label("avg_accuracy"),
+        func.count().label("unique_content_count")
+    ).group_by(typing_subq.c.user_id).order_by(func.sum(typing_subq.c.max_score).desc()).limit(100).all()
     
     typing_ranking = []
     for rank, h in enumerate(typing_histories):
@@ -944,15 +965,25 @@ def get_total_ranking(db: Session = Depends(get_db)):
             "nickname": user.nickname if user else "알 수 없음",
             "total_score": int(h.total_score) if h.total_score else 0,
             "avg_wpm": int(h.avg_wpm) if h.avg_wpm else 0,
-            "avg_accuracy": round(h.avg_accuracy, 1) if h.avg_accuracy else 0.0
+            "avg_accuracy": round(h.avg_accuracy, 1) if h.avg_accuracy else 0.0,
+            "unique_content_count": int(h.unique_content_count) if h.unique_content_count else 0
         })
 
-    # 퀴즈 랭킹 (누적 점수 기준)
-    quiz_histories = db.query(
+    # 퀴즈 랭킹 (최고 점수 합산 기준)
+    # 서브쿼리: 각 유저별, 퀴즈별(과거 데이터 호환을 위해 category도 포함)로 가장 높은 점수를 구함
+    quiz_subq = db.query(
         models.QuizHistory.user_id,
-        func.sum(models.QuizHistory.score).label("total_score"),
-        func.sum(models.QuizHistory.total_questions).label("total_questions")
-    ).group_by(models.QuizHistory.user_id).order_by(func.sum(models.QuizHistory.score).desc()).limit(100).all()
+        models.QuizHistory.quiz_id,
+        models.QuizHistory.quiz_category,
+        func.max(models.QuizHistory.score).label("max_score")
+    ).group_by(models.QuizHistory.user_id, models.QuizHistory.quiz_id, models.QuizHistory.quiz_category).subquery()
+
+    # 메인쿼리: 서브쿼리의 최고 점수들을 합산하고, 참여한 고유 퀴즈 개수(count)를 구함
+    quiz_histories = db.query(
+        quiz_subq.c.user_id,
+        func.sum(quiz_subq.c.max_score).label("total_score"),
+        func.count().label("unique_quiz_count")
+    ).group_by(quiz_subq.c.user_id).order_by(func.sum(quiz_subq.c.max_score).desc()).limit(100).all()
 
     quiz_ranking = []
     for rank, h in enumerate(quiz_histories):
@@ -961,32 +992,46 @@ def get_total_ranking(db: Session = Depends(get_db)):
             "rank": rank + 1,
             "nickname": user.nickname if user else "알 수 없음",
             "total_score": int(h.total_score) if h.total_score else 0,
-            "total_questions": int(h.total_questions) if h.total_questions else 0
+            "unique_quiz_count": int(h.unique_quiz_count) if h.unique_quiz_count else 0
         })
 
-    # 대전 랭킹 (누적 점수 기준)
+    # 대전 랭킹 (우승 횟수 기준)
     battle_histories = db.query(
         models.BattleHistory.user_id,
-        func.sum(models.BattleHistory.score).label("total_score"),
+        func.sum(case((models.BattleHistory.rank == 1, 1), else_=0)).label("win_count"),
         func.count(models.BattleHistory.id).label("play_count")
-    ).group_by(models.BattleHistory.user_id).order_by(func.sum(models.BattleHistory.score).desc()).limit(100).all()
+    ).group_by(models.BattleHistory.user_id).order_by(
+        func.sum(case((models.BattleHistory.rank == 1, 1), else_=0)).desc(),
+        func.count(models.BattleHistory.id).asc()
+    ).limit(100).all()
 
     battle_ranking = []
-    for rank, h in enumerate(battle_histories):
+    for rank_idx, h in enumerate(battle_histories):
         user = db.query(models.User).filter(models.User.id == h.user_id).first()
+        win_count = int(h.win_count) if h.win_count else 0
+        play_count = int(h.play_count) if h.play_count else 0
+        win_rate = round((win_count / play_count) * 100, 1) if play_count > 0 else 0.0
+        
         battle_ranking.append({
-            "rank": rank + 1,
+            "rank": rank_idx + 1,
             "nickname": user.nickname if user else "알 수 없음",
-            "total_score": int(h.total_score) if h.total_score else 0,
-            "play_count": int(h.play_count) if h.play_count else 0
+            "total_score": win_count,  # 프론트엔드 호환성을 위해 total_score 필드에 win_count 매핑
+            "play_count": play_count,
+            "win_rate": win_rate
         })
 
-    return {
+    result = {
         "success": True,
         "typing": typing_ranking,
         "quiz": quiz_ranking,
         "battle": battle_ranking
     }
+    
+    # 캐시 갱신
+    ranking_cache["data"] = result
+    ranking_cache["timestamp"] = time.time()
+    
+    return result
 
 @app.get("/api/ranking/content/{content_id}")
 def get_content_ranking(content_id: int, db: Session = Depends(get_db)):

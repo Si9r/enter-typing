@@ -16,7 +16,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
             display: none;
             justify-content: center;
@@ -33,7 +33,7 @@
         .detail-container {
             width: 100%;
             max-width: 900px;
-            background: var(--color-white);
+            background: var(--theme-bg-card);
             border-radius: 24px;
             padding: 50px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -56,7 +56,7 @@
             border: none;
             font-size: 2rem;
             cursor: pointer;
-            color: #aaa;
+            color: var(--theme-text-muted);
             transition: color 0.2s;
         }
 
@@ -98,17 +98,32 @@
             justify-content: center;
         }
 
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(255, 123, 142, 0.1), rgba(255, 209, 123, 0.1));
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        [data-theme="dark"] #sort-select option {
+            background-color: var(--theme-bg-main);
+            color: var(--theme-text-main);
+        }
+
         .detail-title {
             font-size: 2.5rem;
             font-weight: 900;
-            color: var(--color-text-main);
+            color: var(--theme-text-main);
             margin-bottom: 8px;
             line-height: 1.2;
         }
 
         .detail-artist {
             font-size: 1.2rem;
-            color: var(--color-text-muted);
+            color: var(--theme-text-muted);
             font-weight: 700;
             margin-bottom: 25px;
         }
@@ -118,8 +133,8 @@
             gap: 30px;
             margin-bottom: 30px;
             padding: 20px 0;
-            border-top: 1px solid var(--color-border);
-            border-bottom: 1px solid var(--color-border);
+            border-top: 1px solid var(--theme-border);
+            border-bottom: 1px solid var(--theme-border);
         }
 
         .stat-item {
@@ -130,7 +145,7 @@
 
         .stat-item .label {
             font-size: 0.85rem;
-            color: var(--color-text-muted);
+            color: var(--theme-text-muted);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -139,12 +154,12 @@
         .stat-item .value {
             font-size: 1.2rem;
             font-weight: 900;
-            color: var(--color-text-main);
+            color: var(--theme-text-main);
         }
 
         .detail-desc {
             font-size: 1.05rem;
-            color: #555;
+            color: var(--theme-text-sub);
             line-height: 1.7;
             margin-bottom: 35px;
             flex-grow: 1;
@@ -225,7 +240,7 @@
                     <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
                 </div>
                 <div>
-                    <select id="sort-select" onchange="setSort(this.value)" style="padding: 10px 15px; border: 1.5px solid #ffe3e4; border-radius: 8px; outline: none; font-weight: 700; color: #555; background: white; cursor: pointer;">
+                    <select id="sort-select" onchange="setSort(this.value)" style="padding: 10px 15px; border: 1.5px solid var(--theme-border); border-radius: 8px; outline: none; font-weight: 700; color: var(--theme-text-sub); background: var(--theme-bg-card); cursor: pointer;">
                         <option value="recent">등록순</option>
                         <option value="popular">인기순</option>
                     </select>

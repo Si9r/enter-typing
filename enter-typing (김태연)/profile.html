@@ -8,8 +8,6 @@
   <link rel="stylesheet" href="style.css?v=1.0.3">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
-    
-
     .profile-wrap {
       width: 100%;
       max-width: 960px;
@@ -304,16 +302,230 @@
     }
 
     /* 오타 분석 바 (profile_analysis 스타일 공유) */
-    .typo-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-    .typo-char { width:70px; flex-shrink:0; font-size:1rem; font-weight:800; color:var(--theme-text-main); font-family:monospace; }
-    .typo-char small { font-size:.72rem; color:var(--theme-text-muted); font-weight:500; display:block; }
-    .typo-bar-bg { flex:1; height:12px; background: var(--theme-bg-hover); border-radius:12px; overflow:hidden; }
-    .typo-bar-fill { height:100%; border-radius:12px; background:linear-gradient(90deg,#FFB6C1,#FF9EAB); transition:width .9s ease; }
-    .typo-bar-fill.med { background:linear-gradient(90deg,#FFDAA0,#FFB74D); }
-    .typo-bar-fill.low { background:linear-gradient(90deg,#A8D8A8,#5CB85C); }
-    .typo-pct { width:42px; text-align:right; font-size:.88rem; font-weight:800; color:#FF9EAB; flex-shrink:0; }
-    .typo-pct.med { color:#FFB74D; }
-    .typo-pct.low { color:#5CB85C; }
+    .typo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .typo-char {
+      width: 70px;
+      flex-shrink: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--theme-text-main);
+      font-family: monospace;
+    }
+
+    .typo-char small {
+      font-size: .72rem;
+      color: var(--theme-text-muted);
+      font-weight: 500;
+      display: block;
+    }
+
+    .typo-bar-bg {
+      flex: 1;
+      height: 12px;
+      background: var(--theme-bg-hover);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .typo-bar-fill {
+      height: 100%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #FFB6C1, #FF9EAB);
+      transition: width .9s ease;
+    }
+
+    .typo-bar-fill.med {
+      background: linear-gradient(90deg, #FFDAA0, #FFB74D);
+    }
+
+    .typo-bar-fill.low {
+      background: linear-gradient(90deg, #A8D8A8, #5CB85C);
+    }
+
+    .typo-pct {
+      width: 42px;
+      text-align: right;
+      font-size: .88rem;
+      font-weight: 800;
+      color: #FF9EAB;
+      flex-shrink: 0;
+    }
+
+    .typo-pct.med {
+      color: #FFB74D;
+    }
+
+    .typo-pct.low {
+      color: #5CB85C;
+    }
+
+    /* 혼동 쌍 카드 */
+    .pair-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .pair-item {
+      background: var(--theme-bg-main);
+      border: 1.5px solid var(--theme-border);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all .2s;
+    }
+
+    .pair-item:hover {
+      border-color: #FFB6C1;
+      box-shadow: 0 4px 14px rgba(255, 182, 193, .2);
+      transform: translateY(-2px);
+    }
+
+    .pair-chars {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--theme-text-main);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pair-arrow {
+      color: #FFB6C1;
+      font-size: 1rem;
+    }
+
+    .pair-desc {
+      font-size: .8rem;
+      color: var(--theme-text-muted);
+      line-height: 1.5;
+    }
+
+    .pair-rate {
+      margin-top: 10px;
+      font-size: .82rem;
+      font-weight: 700;
+      color: #FF9EAB;
+      background: rgba(255, 182, 193, .12);
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+
+    /* 로마자 입력 실수 테이블 */
+    .romaji-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .romaji-table th {
+      background: var(--theme-bg-main);
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--theme-text-muted);
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 2px solid var(--theme-border);
+    }
+
+    .romaji-table td {
+      padding: 12px 14px;
+      font-size: .9rem;
+      color: var(--theme-text-main);
+      border-bottom: 1px solid var(--theme-border);
+    }
+
+    .romaji-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .romaji-table tr:hover td {
+      background: var(--theme-bg-hover);
+    }
+
+    .tag-wrong {
+      background: rgba(255, 158, 171, .12);
+      color: #D84B6B;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-family: monospace;
+    }
+
+    .tag-correct {
+      background: rgba(90, 187, 214, .12);
+      color: #3C7A92;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-family: monospace;
+    }
+
+    /* 가나 오타 히트맵 */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hm-cell {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: default;
+      transition: transform .15s;
+      position: relative;
+    }
+
+    .hm-cell:hover {
+      transform: scale(1.15);
+      z-index: 2;
+    }
+
+    .hm-char {
+      font-size: .95rem;
+      line-height: 1;
+    }
+
+    .hm-rate {
+      font-size: .6rem;
+      margin-top: 2px;
+    }
+
+    .hm-high {
+      background: var(--hm-high-bg);
+      color: var(--hm-high-text);
+    }
+
+    .hm-med {
+      background: var(--hm-med-bg);
+      color: var(--hm-med-text);
+    }
+
+    .hm-low {
+      background: var(--hm-low-bg);
+      color: var(--hm-low-text);
+    }
+
+    .hm-none {
+      background: var(--theme-bg-hover);
+      color: var(--theme-text-muted);
+    }
 
     /* History Tab */
     .history-list {
@@ -786,12 +998,12 @@
     }
   </style>
 
-    <script>
-        if (localStorage.getItem('ep_theme') === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-    </script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    if (localStorage.getItem('ep_theme') === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  </script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
@@ -816,7 +1028,11 @@
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+      <a href="notice.html" class="nav-notice-link"
+        style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+        onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+        onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
+          class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
         <button class="auth-login" onclick="location.href='login.html'">로그인</button>
         <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
@@ -838,8 +1054,9 @@
       <div style="margin-left:auto;text-align:right; display:flex; gap:10px; align-items:center;">
         <button class="btn"
           style="border-radius:12px;padding:10px; background: var(--theme-bg-hover); border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
-          onmouseover="this.style.background='var(--theme-border)'" onmouseout="this.style.background='var(--theme-bg-hover)'"
-          onclick="openSettingsModal()" title="게임 설정">⚙️</button>
+          onmouseover="this.style.background='var(--theme-border)'"
+          onmouseout="this.style.background='var(--theme-bg-hover)'" onclick="openSettingsModal()"
+          title="게임 설정">⚙️</button>
         <button class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
           수정</button>
       </div>
@@ -919,130 +1136,196 @@
 
     <!-- 탭 2: 분석 -->
     <div class="tab-panel" id="tab-analysis">
-      <div class="analysis-grid">
-        <!-- ⌨️ WPM + 정확도 카드 (단일 칸) -->
-        <div class="analysis-card">
-          <h4>⌨️ 속도 &amp; 정확도</h4>
-          
-          <!-- Hidden elements to prevent JS errors -->
-          <div style="display: none;">
-            <span id="analysis-wpm-week-stat"></span>
-            <span id="analysis-max-wpm-stat"></span>
-            <span id="analysis-avg-accuracy"></span>
+      <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-pink" id="subtab-overall-btn" onclick="switchAnalysisTab('overall')"
+          style="flex: 1; border-radius: 12px; padding: 12px;">종합 요약</button>
+        <button class="btn" id="subtab-detail-btn" onclick="switchAnalysisTab('detail')"
+          style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: var(--theme-text-sub); border: none;">상세
+          오타 분석</button>
+      </div>
+
+      <div id="analysis-overall-panel">
+        <div class="analysis-grid">
+          <!-- ⌨️ WPM + 정확도 카드 (단일 칸) -->
+          <div class="analysis-card">
+            <h4>⌨️ 속도 &amp; 정확도</h4>
+
+            <!-- Hidden elements to prevent JS errors -->
+            <div style="display: none;">
+              <span id="analysis-wpm-week-stat"></span>
+              <span id="analysis-max-wpm-stat"></span>
+              <span id="analysis-avg-accuracy"></span>
+            </div>
+
+            <!-- 전체 평균 WPM 단일 표시 -->
+            <div
+              style="background:#F0F8FF; border-radius:12px; padding:16px 8px; text-align:center; margin-bottom:20px;">
+              <div style="font-size:2.2rem; font-weight:900; color:#4A90D9;" id="analysis-avg-wpm">0</div>
+              <div style="font-size:.85rem; color:var(--theme-text-muted); margin-top:4px; font-weight:600;">평균 WPM
+              </div>
+            </div>
+
+            <!-- WPM 추이 막대 -->
+            <div style="font-size:.78rem; font-weight:700; color:#aaa; margin-bottom:10px;">⏰ 주간/월간 WPM</div>
+            <div class="bar-row">
+              <div class="bar-label">이번 주</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-week-bar"
+                  style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-week-val">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">지난 주</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-lastweek-bar"
+                  style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-lastweek-val">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">이번 달</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-month-bar"
+                  style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-month-val">0</div>
+            </div>
           </div>
 
-          <!-- 전체 평균 WPM 단일 표시 -->
-          <div style="background:#F0F8FF; border-radius:12px; padding:16px 8px; text-align:center; margin-bottom:20px;">
-            <div style="font-size:2.2rem; font-weight:900; color:#4A90D9;" id="analysis-avg-wpm">0</div>
-            <div style="font-size:.85rem; color:var(--theme-text-muted); margin-top:4px; font-weight:600;">평균 WPM</div>
+          <div class="analysis-card">
+            <h4> 활동별 플레이 수</h4>
+            <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-typing-bar"
+                    style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-typing-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 퀴즈</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-quiz-bar"
+                    style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-quiz-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 대전</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-battle-bar"
+                    style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-battle-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+            </div>
+            <!-- 비율 표시 -->
+            <div
+              style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#FF9EAB;" id="analysis-pct-typing">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;">⌨️ 타이핑</div>
+              </div>
+              <div style="width:1px; height:40px; background:var(--theme-border);"></div>
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 퀴즈</div>
+              </div>
+              <div style="width:1px; height:40px; background:var(--theme-border);"></div>
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 대전</div>
+              </div>
+            </div>
           </div>
 
-          <!-- WPM 추이 막대 -->
-          <div style="font-size:.78rem; font-weight:700; color:#aaa; margin-bottom:10px;">⏰ 주간/월간 WPM</div>
-          <div class="bar-row">
-            <div class="bar-label">이번 주</div>
-            <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-week-bar" style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
+          <div class="analysis-card">
+            <h4> 실시간 대전 결과</h4>
+
+            <!-- 요약 -->
+            <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
+              <div style="flex:1; background:var(--bg-battle-total); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-total);" id="analysis-battle-total">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 총 대전</div>
+              </div>
+              <div style="flex:1; background:var(--bg-battle-win); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-win);" id="analysis-battle-win-rate">0%</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 우승률</div>
+              </div>
+              <div style="flex:1; background:var(--bg-battle-wpm); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-wpm);" id="analysis-battle-avg-wpm">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">평균 WPM</div>
+              </div>
             </div>
-            <div class="bar-val" id="analysis-wpm-week-val">0</div>
           </div>
-          <div class="bar-row">
-            <div class="bar-label">지난 주</div>
-            <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-lastweek-bar" style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
+
+          <div class="analysis-card">
+            <h4> 퀴즈 결과 요약</h4>
+            <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
+              <div style="flex:1; background:var(--bg-quiz-total); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-total);" id="analysis-quiz-total">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">총 퀴즈 플레이</div>
+              </div>
+              <div style="flex:1; background:var(--bg-quiz-correct); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-correct);" id="analysis-quiz-correct">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">누적 정답 수</div>
+              </div>
+              <div style="flex:1; background:var(--bg-quiz-rate); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-rate);" id="analysis-quiz-rate">0%</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">평균 정답률</div>
+              </div>
             </div>
-            <div class="bar-val" id="analysis-wpm-lastweek-val">0</div>
           </div>
-          <div class="bar-row">
-            <div class="bar-label">이번 달</div>
-            <div class="bar-bg">
-              <div class="bar-fill" id="analysis-wpm-month-bar" style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
-            </div>
-            <div class="bar-val" id="analysis-wpm-month-val">0</div>
+
+        </div> <!-- /analysis-grid (overall) -->
+      </div> <!-- /analysis-overall-panel -->
+
+      <!-- 상세 오타 분석 서브 탭 -->
+      <div id="analysis-detail-panel" style="display: none;">
+        <div style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: flex-end;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="content-selector"
+              style="padding: 10px 15px; border-radius: 10px; border: 1px solid var(--theme-border); font-size: 1rem; background: var(--theme-bg-card); color: var(--theme-text-main); outline: none; cursor: pointer; min-width: 250px;">
+              <option value="">(전체 통계 모아보기)</option>
+            </select>
+            <button onclick="resetTypoStats()" class="btn btn-outline" style="padding: 10px 15px; border-radius: 10px; font-weight: bold;">
+              오타 기록 초기화
+            </button>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--theme-text-muted); margin-top: 8px;">
+            * 각 콘텐츠마다는 가장 최근에 플레이한 기록만 분석됩니다.
           </div>
         </div>
 
-        <div class="analysis-card">
-          <h4> 활동별 플레이 수</h4>
-          <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
-            <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
-              <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-typing-bar" style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
-              </div>
-              <div class="bar-val" id="analysis-play-typing-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
-            </div>
-            <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 퀴즈</div>
-              <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-quiz-bar" style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
-              </div>
-              <div class="bar-val" id="analysis-play-quiz-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
-            </div>
-            <div class="bar-row" style="margin-bottom:0;">
-              <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 대전</div>
-              <div class="bar-bg" style="height: 20px; border-radius: 10px;">
-                <div class="bar-fill" id="analysis-play-battle-bar" style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
-              </div>
-              <div class="bar-val" id="analysis-play-battle-val" style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
-            </div>
-          </div>
-          <!-- 비율 표시 -->
-          <div style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
-            <div style="text-align:center;">
-              <div style="font-size:1.8rem; font-weight:900; color:#FF9EAB;" id="analysis-pct-typing">0%</div>
-              <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;">⌨️ 타이핑</div>
-            </div>
-            <div style="width:1px; height:40px; background:var(--theme-border);"></div>
-            <div style="text-align:center;">
-              <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
-              <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 퀴즈</div>
-            </div>
-            <div style="width:1px; height:40px; background:var(--theme-border);"></div>
-            <div style="text-align:center;">
-              <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
-              <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 대전</div>
-            </div>
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 히라가나 오타 히트맵</h3>
+          <div class="heatmap-grid" id="heatmap">
+            <div style="text-align:center; grid-column:span 10; padding:20px; color:var(--theme-text-muted);">오타 기록이 없습니다.</div>
           </div>
         </div>
 
-        <div class="analysis-card">
-          <h4> 실시간 대전 결과</h4>
-
-          <!-- 요약 -->
-          <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
-            <div style="flex:1; background:#FFF8DC; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#B8860B;" id="analysis-battle-total">0</div>
-              <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 총 대전</div>
-            </div>
-            <div style="flex:1; background:#FFF0E6; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#FF7043;" id="analysis-battle-win-rate">0%</div>
-              <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 우승률</div>
-            </div>
-            <div style="flex:1; background:#F0F8FF; border-radius:10px; padding:10px; text-align:center;">
-              <div style="font-size:1.4rem; font-weight:900; color:#4A90D9;" id="analysis-battle-avg-wpm">0</div>
-              <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">평균 WPM</div>
-            </div>
-          </div>
-        </div>
-        <div class="analysis-card" style="grid-column: span 2;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-            <h4 style="margin-bottom:0;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h4>
-            <a href="profile_analysis.html"
-              style="font-size:.78rem; font-weight:700; color:#FF9EAB; text-decoration:none; padding:4px 12px; border:1.5px solid #FF9EAB; border-radius:20px; transition:all .2s;"
-              onmouseover="this.style.background='#FF9EAB';this.style.color='var(--theme-bg-card)';"
-              onmouseout="this.style.background='transparent';this.style.color='#FF9EAB';">
-              자세히보기 →
-            </a>
-          </div>
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h3>
           <div id="profile-typo-list">
             <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
           </div>
-          <div style="font-size: 0.82rem; color: #bbb; margin-top: 20px; font-weight: 500;">
-            * 타이핑 시 누적된 오타 회수 기준입니다. — 자세히보기에서 전체 오타 트렌드를 확인하세요.
+        </div>
+
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 상세 오입력 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 입력 패턴)</span></h3>
+          <div id="profile-romaji-list">
+            <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
           </div>
         </div>
-      </div>
+
+
+
+      </div> <!-- analysis-detail-panel -->
     </div>
 
     <!-- 탭 3: 히스토리 -->
@@ -1099,8 +1382,11 @@
     <!-- 탭 5: 내 컨텐츠 -->
     <div class="tab-panel" id="tab-mytyping">
       <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')" style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
-        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')" style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: var(--theme-text-sub); border: none;"> 퀴즈 컨텐츠</button>
+        <button class="btn btn-pink" id="subtab-typing-btn" onclick="switchSubTab('typing')"
+          style="flex: 1; border-radius: 12px; padding: 12px;">⌨️ 타이핑 컨텐츠</button>
+        <button class="btn" id="subtab-quiz-btn" onclick="switchSubTab('quiz')"
+          style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: var(--theme-text-sub); border: none;">
+          퀴즈 컨텐츠</button>
       </div>
       <div class="history-list" id="mytyping-list">
         <!-- JS가 데이터를 채워줍니다 -->
@@ -1378,10 +1664,10 @@
     function switchSubTab(type) {
       document.getElementById('mytyping-list').style.display = type === 'typing' ? 'block' : 'none';
       document.getElementById('myquiz-list').style.display = type === 'quiz' ? 'block' : 'none';
-      
+
       const btnTyping = document.getElementById('subtab-typing-btn');
       const btnQuiz = document.getElementById('subtab-quiz-btn');
-      
+
       if (type === 'typing') {
         btnTyping.className = 'btn btn-pink';
         btnTyping.style.background = '';
@@ -1493,7 +1779,6 @@
     renderCalendar(curYear, curMonth);
     loadAttendanceData();
     loadMyHistory();
-    loadProfileTypoStats();
     loadProfileAnalysis();
 
     async function loadProfileAnalysis() {
@@ -1506,29 +1791,29 @@
         const resData = await res.json();
         if (resData.success) {
           document.getElementById('analysis-avg-wpm').textContent = resData.avg_wpm;
-          
+
           document.getElementById('analysis-wpm-week-val').textContent = resData.wpm_week + ' WPM';
           document.getElementById('analysis-wpm-lastweek-val').textContent = resData.wpm_lastweek + ' WPM';
           document.getElementById('analysis-wpm-month-val').textContent = resData.wpm_month + ' WPM';
-          
+
           const maxWpm = Math.max(resData.wpm_week, resData.wpm_lastweek, resData.wpm_month, 10);
           document.getElementById('analysis-wpm-week-bar').style.width = (resData.wpm_week / maxWpm * 100) + '%';
           document.getElementById('analysis-wpm-lastweek-bar').style.width = (resData.wpm_lastweek / maxWpm * 100) + '%';
           document.getElementById('analysis-wpm-month-bar').style.width = (resData.wpm_month / maxWpm * 100) + '%';
-          
+
           document.getElementById('analysis-play-typing-val').textContent = resData.play_typing + '회';
           document.getElementById('analysis-play-quiz-val').textContent = resData.play_quiz + '회';
           document.getElementById('analysis-play-battle-val').textContent = resData.play_battle + '회';
-          
+
           const totalPlays = resData.play_typing + resData.play_quiz + resData.play_battle;
           const pctTyping = totalPlays > 0 ? Math.round((resData.play_typing / totalPlays) * 100) : 0;
           const pctQuiz = totalPlays > 0 ? Math.round((resData.play_quiz / totalPlays) * 100) : 0;
           const pctBattle = totalPlays > 0 ? Math.round((resData.play_battle / totalPlays) * 100) : 0;
-          
+
           document.getElementById('analysis-play-typing-bar').style.width = pctTyping + '%';
           document.getElementById('analysis-play-quiz-bar').style.width = pctQuiz + '%';
           document.getElementById('analysis-play-battle-bar').style.width = pctBattle + '%';
-          
+
           document.getElementById('analysis-pct-typing').textContent = pctTyping + '%';
           document.getElementById('analysis-pct-quiz').textContent = pctQuiz + '%';
           document.getElementById('analysis-pct-battle').textContent = pctBattle + '%';
@@ -1536,6 +1821,10 @@
           document.getElementById('analysis-battle-total').textContent = resData.play_battle;
           document.getElementById('analysis-battle-win-rate').textContent = resData.battle_win_rate + '%';
           document.getElementById('analysis-battle-avg-wpm').textContent = resData.battle_avg_wpm;
+
+          document.getElementById('analysis-quiz-total').textContent = resData.play_quiz;
+          document.getElementById('analysis-quiz-correct').textContent = resData.quiz_total_correct;
+          document.getElementById('analysis-quiz-rate').textContent = resData.quiz_correct_rate + '%';
         }
       } catch (e) {
         console.error("분석 데이터를 불러오는데 실패했습니다.", e);
@@ -1543,70 +1832,6 @@
     }
 
 
-    async function loadProfileTypoStats() {
-      const token = sessionStorage.getItem('ep_token');
-      if (!token) return;
-      try {
-        const res = await fetch('/api/typo-stats', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const resData = await res.json();
-        const container = document.getElementById('profile-typo-list');
-        if (resData.success && resData.data && resData.data.length > 0) {
-          const topTypos = resData.data.slice(0, 5);
-          const maxErrors = topTypos[0].error_count || 1;
-          const kanaRoma = {
-            'あ':'a','い':'i','う':'u','え':'e','お':'o',
-            'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
-            'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
-            'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
-            'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
-            'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
-            'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
-            'や':'ya','ゆ':'yu','よ':'yo',
-            'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
-            'わ':'wa','を':'wo','ん':'n','っ':'xtsu',
-            'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
-            'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo',
-            'だ':'da','ぢ':'di','づ':'du','で':'de','ど':'do',
-            'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
-            'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po',
-            'きゃ':'kya','きゅ':'kyu','きょ':'kyo',
-            'しゃ':'sha','しゅ':'shu','しょ':'sho',
-            'ちゃ':'cha','ちゅ':'chu','ちょ':'cho',
-            'にゃ':'nya','にゅ':'nyu','にょ':'nyo',
-            'ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo',
-            'みゃ':'mya','みゅ':'myu','みょ':'myo',
-            'りゃ':'rya','りゅ':'ryu','りょ':'ryo',
-            'ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo',
-            'じゃ':'ja','じゅ':'ju','じょ':'jo',
-            'びゃ':'bya','びゅ':'byu','びょ':'byo',
-            'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo',
-          };
-          container.innerHTML = topTypos.map((item, idx) => {
-              const pct = Math.round((item.error_count / maxErrors) * 100);
-              const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
-              const roma = kanaRoma[item.kana] || item.kana;
-              return `
-                <div class="typo-row">
-                  <div class="typo-char">
-                    ${item.kana}
-                    <small>${roma}</small>
-                  </div>
-                  <div class="typo-bar-bg">
-                    <div class="typo-bar-fill${level}" style="width:${pct}%;"></div>
-                  </div>
-                  <div class="typo-pct${level}">${item.error_count}회</div>
-                </div>
-              `;
-            }).join('');
-        } else {
-          container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
-        }
-      } catch (e) {
-        console.error("오타 통계를 불러오는 도중 오류가 발생했습니다:", e);
-      }
-    }
 
     function updateProfileDashboard(data) {
       window.latestHistoryData = data;
@@ -1658,9 +1883,9 @@
           monthWpms.push(item.wpm);
         }
       });
-      const weekAvg = weekWpms.length > 0 ? Math.round(weekWpms.reduce((a,b)=>a+b, 0)/weekWpms.length) : 0;
-      const lastWeekAvg = lastWeekWpms.length > 0 ? Math.round(lastWeekWpms.reduce((a,b)=>a+b, 0)/lastWeekWpms.length) : 0;
-      const monthAvg = monthWpms.length > 0 ? Math.round(monthWpms.reduce((a,b)=>a+b, 0)/monthWpms.length) : 0;
+      const weekAvg = weekWpms.length > 0 ? Math.round(weekWpms.reduce((a, b) => a + b, 0) / weekWpms.length) : 0;
+      const lastWeekAvg = lastWeekWpms.length > 0 ? Math.round(lastWeekWpms.reduce((a, b) => a + b, 0) / lastWeekWpms.length) : 0;
+      const monthAvg = monthWpms.length > 0 ? Math.round(monthWpms.reduce((a, b) => a + b, 0) / monthWpms.length) : 0;
 
       const maxTargetWpm = 500;
       document.getElementById('analysis-wpm-week-val').textContent = weekAvg;
@@ -1712,9 +1937,9 @@
       const battleAvgWpm = battleCount > 0 ? Math.round(battleWpmTotal / battleCount) : 0;
 
       if (document.getElementById('analysis-battle-total')) {
-          document.getElementById('analysis-battle-total').textContent = battleCount;
-          document.getElementById('analysis-battle-win-rate').textContent = battleWinRate + '%';
-          document.getElementById('analysis-battle-avg-wpm').textContent = battleAvgWpm;
+        document.getElementById('analysis-battle-total').textContent = battleCount;
+        document.getElementById('analysis-battle-win-rate').textContent = battleWinRate + '%';
+        document.getElementById('analysis-battle-avg-wpm').textContent = battleAvgWpm;
       }
     }
 
@@ -2246,6 +2471,267 @@
         btn.disabled = false; btn.textContent = '회원 탈퇴하기';
       }
     }
+
+    // ── 상세 분석 탭 로직 ─────────────────────────
+    const romajiLookup = {
+      'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+      'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+      'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+      'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+      'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+      'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+      'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+      'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+      'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+      'わ': 'wa', 'を': 'wo', 'ん': 'n/nn', 'っ': 'xtsu',
+      'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+      'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+      'だ': 'da', 'ぢ': 'di', 'づ': 'du', 'で': 'de', 'ど': 'do',
+      'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+      'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+      'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+      'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+      'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+      'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+      'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+      'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+      'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo',
+      'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+      'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+      'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+      'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+    };
+
+    const baseChars = [
+      'あ', 'い', 'う', 'え', 'お',
+      'か', 'き', 'く', 'け', 'こ',
+      'さ', 'し', 'す', 'せ', 'そ',
+      'た', 'ち', 'つ', 'て', 'と',
+      'な', 'に', 'ぬ', 'ね', 'の',
+      'は', 'ひ', 'ふ', 'へ', 'ほ',
+      'ま', 'み', 'む', 'め', 'も',
+      'や', 'ゆ', 'よ', 'ん', 'っ',
+      'ら', 'り', 'る', 'れ', 'ろ',
+      'わ', 'を', 'ぢ', 'づ', 'ぜ'
+    ];
+
+    function switchAnalysisTab(tab) {
+      const btnOverall = document.getElementById('subtab-overall-btn');
+      const btnDetail = document.getElementById('subtab-detail-btn');
+      const pnlOverall = document.getElementById('analysis-overall-panel');
+      const pnlDetail = document.getElementById('analysis-detail-panel');
+
+      if (tab === 'overall') {
+        btnOverall.className = 'btn btn-pink';
+        btnOverall.style.background = '';
+        btnOverall.style.color = '';
+        btnDetail.className = 'btn';
+        btnDetail.style.background = 'var(--theme-bg-hover)';
+        btnDetail.style.color = 'var(--theme-text-sub)';
+        pnlOverall.style.display = 'block';
+        pnlDetail.style.display = 'none';
+      } else {
+        btnDetail.className = 'btn btn-pink';
+        btnDetail.style.background = '';
+        btnDetail.style.color = '';
+        btnOverall.className = 'btn';
+        btnOverall.style.background = 'var(--theme-bg-hover)';
+        btnOverall.style.color = 'var(--theme-text-sub)';
+        pnlDetail.style.display = 'block';
+        pnlOverall.style.display = 'none';
+
+        if (!window.detailStatsLoaded) {
+          loadDetailStats();
+          loadTypoContentList();
+          window.detailStatsLoaded = true;
+        }
+      }
+    }
+
+    function loadTypoContentList() {
+      const contentSelector = document.getElementById("content-selector");
+      const tk = sessionStorage.getItem('ep_token');
+      fetch("/api/typo-content-list", { headers: { "Authorization": "Bearer " + tk } })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.contents.length > 0) {
+            data.contents.forEach(c => {
+              const opt = document.createElement("option");
+              opt.value = c.id;
+              opt.innerText = c.title;
+              contentSelector.appendChild(opt);
+            });
+          }
+        });
+      contentSelector.addEventListener("change", (e) => loadDetailStats(e.target.value));
+    }
+
+    function loadDetailStats(contentId = "") {
+      const url = contentId ? `/api/typo-stats?content_id=${contentId}` : "/api/typo-stats";
+      const tk = sessionStorage.getItem('ep_token');
+      fetch(url, { headers: { "Authorization": "Bearer " + tk } })
+        .then(res => res.json())
+        .then(result => {
+          if (result.success) {
+            renderDetailAnalysis(result);
+          }
+        })
+        .catch(err => console.error(err));
+    }
+
+    async function resetTypoStats() {
+      if (!confirm('정말로 오타 기록을 모두 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+      
+      const tk = sessionStorage.getItem('ep_token');
+      try {
+        const res = await fetch('/api/typo-stats', {
+          method: 'DELETE',
+          headers: { "Authorization": "Bearer " + tk }
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          alert(data.message);
+          // Reload both stats
+          loadAnalysisSummary();
+          const sel = document.getElementById('content-selector');
+          if (sel) loadDetailStats(sel.value);
+        } else {
+          alert('초기화에 실패했습니다.');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('서버 오류가 발생했습니다.');
+      }
+    }
+
+    function renderDetailAnalysis(result) {
+      const container = document.getElementById('profile-typo-list');
+      const hm = document.getElementById('heatmap');
+      
+      // 데이터 병합 (중복 kana 처리)
+      const aggregatedData = [];
+      if (result.data && result.data.length > 0) {
+        const aggMap = {};
+        result.data.forEach(item => {
+          if (aggMap[item.kana]) {
+            aggMap[item.kana].error_count += item.error_count;
+            aggMap[item.kana].total_count += item.total_count;
+          } else {
+            aggMap[item.kana] = { ...item };
+          }
+        });
+        aggregatedData.push(...Object.values(aggMap));
+      }
+
+      // 로마자 패턴 병합
+      const aggRomajiMap = {};
+      if (result.romaji_patterns && result.romaji_patterns.length > 0) {
+        result.romaji_patterns.forEach(rm => {
+          const key = rm.char + "_" + rm.wrong;
+          if (aggRomajiMap[key]) {
+            aggRomajiMap[key].error_count += (rm.error_count || 0);
+          } else {
+            aggRomajiMap[key] = { ...rm };
+            if (!aggRomajiMap[key].error_count) aggRomajiMap[key].error_count = 0;
+          }
+        });
+      }
+      const aggregatedRomaji = Object.values(aggRomajiMap);
+
+      // 1. 히트맵 랜더링 (횟수 기반 단순화)
+      if (aggregatedData.length > 0) {
+        let errStats = aggregatedData.filter(item => item.error_count > 0);
+        errStats.sort((a, b) => b.error_count - a.error_count);
+        const maxErrors = errStats.length > 0 ? errStats[0].error_count : 1;
+
+        const dataMap = {};
+        aggregatedData.forEach(item => { dataMap[item.kana] = item; });
+        
+        hm.innerHTML = '';
+        baseChars.forEach(ch => {
+          const item = dataMap[ch];
+          const errorCount = item ? item.error_count : 0;
+          
+          let levelClass = 'hm-none';
+          if (errorCount > 0) {
+            const ratio = errorCount / maxErrors;
+            if (ratio >= 0.6) levelClass = 'hm-high';
+            else if (ratio >= 0.3) levelClass = 'hm-med';
+            else levelClass = 'hm-low';
+          }
+
+          const cell = document.createElement('div');
+          cell.className = 'hm-cell ' + levelClass;
+          cell.title = `${ch} — 오타 ${errorCount}회`;
+          cell.innerHTML = `<span class="hm-char">${ch}</span><span class="hm-rate">${errorCount > 0 ? errorCount + '회' : '-'}</span>`;
+          hm.appendChild(cell);
+        });
+      } else {
+        hm.innerHTML = '<div style="text-align:center; grid-column:span 10; padding:20px; color:var(--theme-text-muted);">오타 기록이 아직 없습니다.</div>';
+      }
+
+      // 2. 오타 패턴 분석 (TOP 5)
+      if (aggregatedData.length > 0) {
+        let errStats = aggregatedData.filter(item => item.error_count > 0);
+        errStats.sort((a, b) => b.error_count - a.error_count);
+        
+        if (errStats.length > 0) {
+          const topTypos = errStats.slice(0, 5);
+          const maxErrors = topTypos[0].error_count || 1;
+          
+          container.innerHTML = topTypos.map((item) => {
+            const pct = Math.round((item.error_count / maxErrors) * 100);
+            const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
+            const roma = romajiLookup[item.kana] || item.kana;
+            return `
+                <div class="typo-row">
+                  <div class="typo-char">
+                    ${item.kana}
+                    <small>${roma}</small>
+                  </div>
+                  <div class="typo-bar-bg">
+                    <div class="typo-bar-fill${level}" style="width:${pct}%;"></div>
+                  </div>
+                  <div class="typo-pct${level}">${item.error_count}회</div>
+                </div>
+              `;
+          }).join('');
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
+        }
+      } else {
+        container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
+      }
+
+      // 3. 상세 오입력 분석 (TOP 5)
+      const romajiContainer = document.getElementById('profile-romaji-list');
+      if (aggregatedRomaji && aggregatedRomaji.length > 0) {
+        aggregatedRomaji.sort((a, b) => b.error_count - a.error_count);
+        const topRomaji = aggregatedRomaji.slice(0, 5);
+        
+        romajiContainer.innerHTML = topRomaji.map(rm => {
+          return `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--theme-bg-hover); border-radius: 12px; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="font-size: 1.3rem; font-weight: 800; color: var(--theme-text-main); width: 40px; text-align: center;">
+                  ${rm.char}
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; font-family: monospace; font-size: 1.1rem;">
+                  <span style="color: #27ae60; font-weight: 700; background: rgba(39, 174, 96, 0.12); padding: 4px 10px; border-radius: 6px;">${rm.correct}</span>
+                  <i class="ph-bold ph-arrow-right" style="color: var(--theme-text-muted);"></i>
+                  <span style="color: #e74c3c; font-weight: 700; background: rgba(231, 76, 60, 0.12); padding: 4px 10px; border-radius: 6px;">${rm.wrong || '(없음)'}</span>
+                </div>
+              </div>
+              <div style="font-weight: 800; color: var(--theme-text-main); font-size: 1.15rem;">
+                ${rm.error_count}<span style="font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600; margin-left: 2px;">회</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        romajiContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
+      }
+    }
   </script>
   <!-- ══ 게임 설정 모달 ══════════════════════════════════════════ -->
   <div class="modal-overlay" id="settingsModal" onclick="closeSettingsModalOutside(event)">
@@ -2256,8 +2742,10 @@
       <div class="m-form-group"
         style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 24px; background: var(--theme-bg-hover); padding: 18px; border-radius: 14px; border: 1.5px solid var(--theme-border);">
         <div>
-          <div style="font-weight:800; color:var(--theme-text-main); margin-bottom:6px; font-size: 1rem;">촉음(っ) 분리 입력 허용</div>
-          <div style="font-size:0.85rem; color:var(--theme-text-muted); line-height: 1.4;">기본 방식(katta) 대신 ltsu, xtsu를<br>사용한 분리
+          <div style="font-weight:800; color:var(--theme-text-main); margin-bottom:6px; font-size: 1rem;">촉음(っ) 분리 입력 허용
+          </div>
+          <div style="font-size:0.85rem; color:var(--theme-text-muted); line-height: 1.4;">기본 방식(katta) 대신 ltsu,
+            xtsu를<br>사용한 분리
             입력(kaltsuta)을 허용합니다.</div>
         </div>
         <label class="toggle-switch" style="position:relative; display:inline-block; width:52px; height:30px;">

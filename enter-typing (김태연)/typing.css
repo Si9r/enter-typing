@@ -264,8 +264,8 @@ h1 {
 }
 
 .sentence-display .lyric-unit.current {
-  background: rgba(255, 182, 193, 0.2);
-  color: #D84B6B; /* Deep pink for current word */
+  background: var(--analysis-wrong-bg);
+  color: var(--color-pink-hover); /* Dynamic pink/blue for current word */
 }
 
 .sentence-display .lyric-unit.typed {
@@ -276,7 +276,7 @@ h1 {
 }
 
 .sentence-display .lyric-unit.pending {
-  color: #444;
+  color: var(--theme-text-muted);
 }
 
 .sentence-display .roma-text span {
@@ -284,7 +284,7 @@ h1 {
 }
 
 .sentence-display .roma-text span.pending {
-  color: #999;
+  color: var(--theme-text-sub);
 }
 
 .sentence-display .lyric-unit.current .roma-text span.typed {

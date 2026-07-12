@@ -403,6 +403,10 @@
         </div>
 
         <!-- Bottom: Lines Table -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
+            <button class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
+        </div>
         <div class="editor-bottom">
             <table class="lines-table" id="lines-table">
                 <thead>
@@ -626,13 +630,13 @@
                 tr.innerHTML = `
                     <td style="text-align: center; color: var(--theme-text-muted);">${index + 1}</td>
                     <td style="font-weight: bold; color: var(--color-pink);">${line.time.toFixed(2)}</td>
-                    ${line.lyrics === '[END]' ? '<td colspan="3" style="text-align: center; font-weight: bold; color: #e67700;">[타이핑 종료 지점]</td>' : `
+                    ${line.lyrics === '[END]' ? '<td colspan="2" style="text-align: center; font-weight: bold; color: #e67700;">[타이핑 종료 지점]</td>' : `
                     <td>${line.lyrics}</td>
                     <td>${line.hiragana}</td>
                     `}
                     <td style="text-align: center;">
-                        <span class="action-icon edit-icon" data-index="${index}">✏️</span>
-                        <span class="action-icon del-icon" data-index="${index}">️</span>
+                        <span class="action-icon edit-icon" data-index="${index}" title="수정">✏️</span>
+                        <span class="action-icon del-icon" data-index="${index}" title="삭제">🗑️</span>
                     </td>
                 `;
 
@@ -722,6 +726,18 @@
             renderTable();
         });
 
+        const btnClearAll = document.getElementById('btn-clear-all');
+        if (btnClearAll) {
+            btnClearAll.addEventListener('click', () => {
+                if (linesData.length === 0) return alert('삭제할 항목이 없습니다.');
+                if (confirm('등록된 모든 가사 싱크 목록을 삭제하시겠습니까?')) {
+                    linesData = [];
+                    resetForm();
+                    renderTable();
+                }
+            });
+        }
+
         function deleteLine(index) {
             if (confirm("정말 이 줄을 삭제하시겠습니까?")) {
                 linesData.splice(index, 1);
@@ -810,7 +826,10 @@
             const timestamps = linesData.map(l => l.time.toFixed(2)).join('\n');
 
             let video_duration = 0;
-            if (typeof youtubePlayer !== 'undefined' && youtubePlayer && typeof youtubePlayer.getDuration === 'function') {
+            const endLine = linesData.find(l => l.lyrics === '[END]');
+            if (endLine) {
+                video_duration = Math.round(endLine.time);
+            } else if (typeof youtubePlayer !== 'undefined' && youtubePlayer && typeof youtubePlayer.getDuration === 'function') {
                 video_duration = Math.round(youtubePlayer.getDuration());
             }
 

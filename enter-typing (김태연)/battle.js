@@ -1,5 +1,6 @@
 let databaseSongs = [];
 let databaseQuizzes = [];
+let selectedContentItem = null;
 let currentRoom = null;
 let isHost = false;
 
@@ -146,10 +147,9 @@ async function fetchBackendSongs() {
         console.log("Failed to fetch songs");
     }
 
-    const selectEl = document.getElementById("page-create-song-select");
     const modeEl = document.getElementById("page-create-mode-select");
-    if (selectEl && modeEl && modeEl.value === "typing") {
-        populateSelectBox(selectEl, databaseSongs);
+    if (modeEl && modeEl.value === "typing") {
+        onModeChange();
     }
 }
 
@@ -163,6 +163,7 @@ async function fetchBackendQuizzes() {
                 title: item.title,
                 artist: item.artist || "알 수 없음",
                 genre: item.genre || "",
+                thumbnail_url: item.thumbnail_url || "assets/vinyl.svg"
             }));
         }
     } catch (e) {
@@ -171,32 +172,73 @@ async function fetchBackendQuizzes() {
 }
 
 function onModeChange() {
-    const mode = document.getElementById("page-create-mode-select").value;
-    const selectEl = document.getElementById("page-create-song-select");
-    if (!selectEl) return;
-    
-    if (mode === "typing") {
-        populateSelectBox(selectEl, databaseSongs);
-    } else if (mode === "quiz") {
-        populateSelectBox(selectEl, databaseQuizzes);
-    }
+    selectedContentItem = null;
+    const thumbEl = document.getElementById("page-create-song-thumb");
+    const titleEl = document.getElementById("page-create-song-title");
+    const artistEl = document.getElementById("page-create-song-artist");
+    if (thumbEl) { thumbEl.style.display = "none"; thumbEl.src = ""; }
+    if (titleEl) { titleEl.textContent = "콘텐츠를 선택해주세요"; titleEl.style.color = "var(--color-battle-text)"; }
+    if (artistEl) { artistEl.style.display = "none"; artistEl.textContent = ""; }
 }
 
-function populateSelectBox(selectEl, list) {
-    selectEl.innerHTML = "";
+function openContentSelectorModal() {
+    const mode = document.getElementById("page-create-mode-select").value;
+    const grid = document.getElementById("modal-content-grid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    const list = mode === "typing" ? databaseSongs : databaseQuizzes;
+    
     if (list.length === 0) {
-        const opt = document.createElement("option");
-        opt.value = "";
-        opt.textContent = "콘텐츠가 없습니다.";
-        selectEl.appendChild(opt);
-        return;
+        grid.innerHTML = "<div style='color: var(--theme-text-muted); grid-column: 1 / -1; text-align: center; padding: 40px;'>선택 가능한 콘텐츠가 없습니다.</div>";
+    } else {
+        list.forEach(item => {
+            const card = document.createElement("div");
+            card.style.cssText = "background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;";
+            card.onmouseover = () => { card.style.transform = "translateY(-4px)"; card.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; card.style.borderColor = "var(--color-battle-primary)"; };
+            card.onmouseout = () => { card.style.transform = "translateY(0)"; card.style.boxShadow = "none"; card.style.borderColor = "var(--theme-border)"; };
+            
+            card.onclick = () => selectContentForRoom(item, mode);
+            
+            const thumbSrc = mode === "typing" ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : (item.thumbnail_url || "assets/vinyl.svg");
+            
+            card.innerHTML = `
+                <div style="width: 100%; height: 130px; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <img src="${thumbSrc}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" onerror="this.src='assets/vinyl.svg'">
+                    <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                        ${mode === 'typing' ? '타이핑' : '퀴즈'}
+                    </div>
+                </div>
+                <div style="padding: 16px;">
+                    <div style="font-weight: bold; color: var(--theme-text-main); font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;">${item.title}</div>
+                    <div style="font-size: 0.85rem; color: var(--theme-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.artist}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
     }
-    list.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.id;
-        opt.textContent = `${item.title} - ${item.artist}`;
-        selectEl.appendChild(opt);
-    });
+    
+    document.getElementById("modal-content-selector").style.display = "flex";
+}
+
+function closeContentSelectorModal() {
+    const modal = document.getElementById("modal-content-selector");
+    if (modal) modal.style.display = "none";
+}
+
+function selectContentForRoom(item, mode) {
+    selectedContentItem = item;
+    const thumbSrc = mode === "typing" ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : (item.thumbnail_url || "assets/vinyl.svg");
+    
+    const thumbEl = document.getElementById("page-create-song-thumb");
+    const titleEl = document.getElementById("page-create-song-title");
+    const artistEl = document.getElementById("page-create-song-artist");
+    
+    if (thumbEl) { thumbEl.src = thumbSrc; thumbEl.style.display = "block"; }
+    if (titleEl) { titleEl.textContent = item.title; titleEl.style.color = "var(--theme-text-main)"; }
+    if (artistEl) { artistEl.textContent = item.artist; artistEl.style.display = "block"; }
+    
+    closeContentSelectorModal();
 }
 
 // 2. Room Join & Create
@@ -226,13 +268,12 @@ function joinRoomByEntranceCode() {
 async function createRoomFromPageSubmit() {
     const title = document.getElementById("page-create-title-input").value.trim() || "즐거운 대전방";
     const mode = document.getElementById("page-create-mode-select").value;
-    const songSelect = document.getElementById("page-create-song-select");
     
-    if (!songSelect || !songSelect.value) {
-        alert("선택 가능한 콘텐츠가 없습니다.");
+    if (!selectedContentItem) {
+        alert("대전할 콘텐츠를 선택해주세요.");
         return;
     }
-    const songId = parseInt(songSelect.value);
+    const songId = parseInt(selectedContentItem.id);
     const maxSlots = parseInt(document.getElementById("page-create-slots-select").value);
 
     await createBattleRoom(title, songId, mode, maxSlots);
@@ -1549,10 +1590,8 @@ function startQuizBattle() {
 
     const vinylRecord = document.getElementById("quiz-vinyl-record");
     if (quizIsPlayingSegment) {
-        if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-        if (vinylRecord) vinylRecord.classList.add("paused");
-        quizIsPlayingSegment = false;
-        quizIsPausedManually = true;
+        // 일시정지 기능 제거: 재생 중에는 아무 동작도 하지 않음
+        return;
     } else {
         if (quizIsPausedManually) {
             if (ytPlayer && ytPlayer.playVideo) ytPlayer.playVideo();
@@ -1617,10 +1656,30 @@ function playQuizSegment() {
         }
 
         if (currentTime >= item.end && item.end > item.start) {
-            ytPlayer.pauseVideo();
+            clearInterval(quizCheckInterval);
+            if(ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
             if(vinylRecord) vinylRecord.classList.add("paused");
             quizIsPlayingSegment = false;
-            clearInterval(quizCheckInterval);
+
+            addQuizSystemChat("시간 초과! 잠시 후 다음 문제로 넘어갑니다.");
+            
+            currentQuizCombo = 0;
+            const comboEl = document.getElementById("quiz-my-combo");
+            if (comboEl) comboEl.innerText = "0";
+
+            const chatInput = document.getElementById("quiz-chat-input");
+            if(chatInput) chatInput.disabled = true;
+            const sendBtn = document.getElementById("quiz-chat-send-btn");
+            if(sendBtn) sendBtn.disabled = true;
+            
+            setTimeout(() => {
+                currentQuizIndex++;
+                if (currentQuizIndex < quizData.length) {
+                    playQuizSegment();
+                } else {
+                    finishQuizBattle();
+                }
+            }, 1500);
         }
     }, 100);
 }
@@ -1687,7 +1746,7 @@ function updateQuizAnswerBoard() {
 
         const hintText = document.createElement("span");
         hintText.textContent = item.hint;
-        hintText.style.cssText = "font-size: 0.95rem; font-weight: 800; color: #333; display: none; word-break: keep-all;";
+        hintText.style.cssText = "font-size: 0.95rem; font-weight: 800; color: var(--theme-text-main); display: none; word-break: keep-all;";
 
         hintBtn.onclick = () => {
             const isHidden = hintText.style.display === "none";
@@ -1741,14 +1800,14 @@ function updateQuizAnswerBoard() {
             
             if (isGuessed) {
                 slot.textContent = guessedArray[i];
-                slot.style.background = "#e6f4ea";
+                slot.style.background = "rgba(52, 168, 83, 0.15)";
                 slot.style.border = "1.5px solid #34a853";
-                slot.style.color = "#137333";
+                slot.style.color = "var(--color-green, #27ae60)";
             } else {
                 slot.textContent = "?";
-                slot.style.background = "#f5f5f5";
-                slot.style.border = "1.5px dashed #ccc";
-                slot.style.color = "#999";
+                slot.style.background = "var(--theme-bg-hover)";
+                slot.style.border = "1.5px dashed var(--theme-border)";
+                slot.style.color = "var(--theme-text-muted)";
                 slot.style.minWidth = "40px";
                 slot.style.textAlign = "center";
             }

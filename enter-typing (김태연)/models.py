@@ -73,6 +73,44 @@ class TypoStat(Base):
 
     user = relationship("User", back_populates="typo_stats")
 
+# 5-1. 로마자 입력 실수 통계 테이블
+class RomajiMistake(Base):
+    __tablename__ = "romaji_mistakes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    kana = Column(String(10), nullable=False)
+    expected_romaji = Column(String(50), nullable=False)
+    typed_romaji = Column(String(50), nullable=False)
+    error_count = Column(Integer, default=0)
+
+    user = relationship("User")
+# 5-2. 콘텐츠별 오타 분석 테이블
+class ContentTypoStat(Base):
+    __tablename__ = "content_typo_stats"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=False)
+    character_typed = Column(String(10), nullable=False)
+    error_count = Column(Integer, default=0)
+    total_count = Column(Integer, default=0)
+
+    user = relationship("User")
+
+# 5-3. 콘텐츠별 로마자 입력 실수 통계 테이블
+class ContentRomajiMistake(Base):
+    __tablename__ = "content_romaji_mistakes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=False)
+    kana = Column(String(10), nullable=False)
+    expected_romaji = Column(String(50), nullable=False)
+    typed_romaji = Column(String(50), nullable=False)
+    error_count = Column(Integer, default=0)
+
+    user = relationship("User")
 # 6. 타이핑 콘텐츠 (가사/명대사 등) 테이블
 class TypingContent(Base):
     __tablename__ = "typing_contents"

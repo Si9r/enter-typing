@@ -61,14 +61,14 @@
             justify-content: center;
             box-shadow:
                 inset 0 0 0 3px rgba(0, 0, 0, 0.8),
-                0 4px 10px rgba(0, 0, 0, 0.4);
+                0 4px 10px rgba(0, 0, 0, 0.6);
             animation: spin 3s linear infinite;
         }
 
         .vinyl-label {
             width: 90px;
             height: 90px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, var(--color-pink) 0%, var(--color-pink-hover) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -106,9 +106,9 @@
 
         /* Chat UI Styles */
         .chat-panel {
-            border: 2px solid #ffe3e4;
+            border: 2px solid var(--theme-border);
             border-radius: 16px;
-            background: #fff;
+            background: var(--theme-bg-card);
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             display: flex;
             flex-direction: column;
@@ -122,7 +122,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #fdfdfd;
+            background: var(--theme-bg-hover);
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
         }
@@ -149,21 +149,21 @@
             color: var(--theme-text-main);
             border-bottom-left-radius: 4px;
             font-weight: bold;
-            border: 1px solid #ddd;
+            border: 1px solid var(--theme-border);
         }
 
         .chat-input-area {
             display: flex;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid var(--theme-border);
             padding: 10px;
-            background: #fff;
+            background: var(--theme-bg-card);
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
         }
 
         .chat-input {
             flex: 1;
-            border: 1px solid #ccc;
+            border: 1px solid var(--theme-border);
             border-radius: 20px;
             padding: 10px 15px;
             font-size: 1rem;
@@ -179,6 +179,13 @@
             margin-left: 10px;
             font-weight: bold;
             cursor: pointer;
+        }
+
+        /* 다크모드 대응 */
+        [data-theme="dark"] #quiz-count-display {
+            background: rgba(30, 41, 59, 0.9) !important;
+            color: var(--theme-text-main) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
         }
     </style>
 
@@ -257,7 +264,7 @@
             font-weight: 700;
             font-size: 1.05rem;
             transition: color 0.2s;
-          " onmouseover="this.style.color = '#ff9a9e'" onmouseout="this.style.color = '#666'">
+          " onmouseover="this.style.color = 'var(--color-pink)'" onmouseout="this.style.color = 'var(--theme-text-muted)'">
                 ← 뒤로가기
             </a>
         </div>
@@ -272,10 +279,10 @@
         ">
             <!-- Top Left: Stats -->
             <div class="box-panel stats-panel" style="
-            border: 2px solid #ffe3e4;
+            border: 2px solid var(--theme-border);
             border-radius: 16px;
             padding: 15px;
-            background: #fff;
+            background: var(--theme-bg-card);
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             min-height: 0;
             overflow-y: auto;
@@ -300,7 +307,7 @@
               text-align: center;
             ">
                     <div style="
-                background: #fff0f2;
+                background: var(--analysis-pair-bg);
                 border-radius: 12px;
                 padding: 10px;
               ">
@@ -317,8 +324,8 @@
                         </div>
                     </div>
                     <div style="
-                background: #fdfdfd;
-                border: 1.5px solid #ffe3e4;
+                background: var(--theme-bg-hover);
+                border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
                 padding: 10px;
               ">
@@ -341,8 +348,8 @@
               text-align: center;
             ">
                     <div style="
-                background: #fdfdfd;
-                border: 1.5px solid #ffe3e4;
+                background: var(--theme-bg-hover);
+                border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
                 padding: 10px;
               ">
@@ -359,8 +366,8 @@
                         </div>
                     </div>
                     <div style="
-                background: #fdfdfd;
-                border: 1.5px solid #ffe3e4;
+                background: var(--theme-bg-hover);
+                border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
                 padding: 10px;
               ">
@@ -380,13 +387,13 @@
 
                 <div style="
               margin-top: 25px;
-              border-top: 2px dashed #ccc;
+              border-top: 2px dashed var(--theme-border);
               padding-top: 15px;
             ">
                     <div style="
                 font-size: 0.95rem;
                 font-weight: bold;
-                color: #555;
+                color: var(--theme-text-sub);
                 margin-bottom: 10px;
                 display: flex;
                 align-items: center;
@@ -405,7 +412,7 @@
 
             <!-- Top Right: Video (Vinyl Record for Quiz) -->
             <div class="box-panel video-panel" style="
-            border: 2px solid #ffe3e4;
+            border: 2px solid var(--theme-border);
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             border-radius: 16px;
             display: flex;
@@ -414,7 +421,7 @@
             justify-content: center;
             gap: 20px;
             min-height: 0;
-            background: #fff;
+            background: var(--theme-bg-card);
             position: relative;
             overflow: hidden;
           ">
@@ -425,11 +432,11 @@
               left: 15px;
               font-weight: bold;
               font-size: 1.05rem;
-              color: #555;
+              color: var(--theme-text-sub);
               background: rgba(255, 255, 255, 0.9);
               padding: 5px 12px;
               border-radius: 20px;
-              border: 1.5px solid #ffe3e4;
+              border: 1.5px solid var(--theme-border);
               z-index: 20;
               box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             ">
@@ -468,7 +475,7 @@
 
 
             <!-- Bottom Left: 문제 정보 -->
-            <div class="box-panel" style="border: 2px solid #ffe3e4; border-radius: 16px; padding: 15px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
+            <div class="box-panel" style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
                 <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">문제 정보</div>
 
                 <div id="answer-board" style="display: flex; flex-direction: column; gap: 16px;">
@@ -480,7 +487,7 @@
                         justify-content: center;
                         position: relative;
                         padding-top: 10px;
-                        border-top: 1px dashed #ccc;
+                        border-top: 1px dashed var(--theme-border);
                         margin-top: 5px;
                     ">
                         <button id="hint-toggle-btn" onclick="toggleHintDisplay()" style="
@@ -505,7 +512,7 @@
                             transform: translateX(-50%) rotate(-1.5deg);
                             cursor: pointer;
                             background: #fff7d6;
-                            color: #444;
+                            color: var(--theme-text-main);
                             padding: 15px 20px;
                             font-size: 1rem;
                             font-weight: 700;
@@ -515,7 +522,7 @@
                             width: 95%;
                             z-index: 10;
                         ">
-                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 60px; height: 20px; background: rgba(255,154,158,0.6); box-shadow: 1px 1px 3px rgba(0,0,0,0.05); mix-blend-mode: multiply;"></div>
+                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 60px; height: 20px; background: var(--analysis-high-bg); box-shadow: 1px 1px 3px transparent; mix-blend-mode: multiply;"></div>
                             <span id="board-hint-text" style="display: block; text-align: center; word-break: keep-all;">???</span>
                         </div>
                     </div>
@@ -608,7 +615,7 @@
         justify-content: center;
     ">
         <div style="
-            background: #fff;
+            background: var(--theme-bg-card);
             border-radius: 12px;
             padding: 40px;
             width: 90%;
@@ -619,7 +626,7 @@
             gap: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         ">
-            <div style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <div style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid var(--theme-border); padding-bottom: 20px;">
                  퀴즈 결과 
             </div>
             <div style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
@@ -628,13 +635,13 @@
             <div id="modal-log-container" style="
                 flex: 1;
                 overflow-y: auto;
-                background: #fff;
+                background: var(--theme-bg-card);
                 border-radius: 8px;
                 padding: 15px;
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                border: 1px solid #ddd;
+                border: 1px solid var(--theme-border);
             ">
             </div>
             <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
@@ -1137,10 +1144,10 @@
                 
                 Object.keys(grouped).forEach(qIdx => {
                     const groupDiv = document.createElement('div');
-                    groupDiv.style.cssText = "background: #fff; border: 1px solid #eaeaea; border-radius: 6px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);";
+                    groupDiv.style.cssText = "background: var(--theme-bg-card); border: 1px solid #eaeaea; border-radius: 6px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);";
                     
                     const header = document.createElement('div');
-                    header.style.cssText = "font-weight: 800; font-size: 1.05rem; color: #444; margin-bottom: 12px; border-bottom: 1px dashed #ccc; padding-bottom: 8px;";
+                    header.style.cssText = "font-weight: 800; font-size: 1.05rem; color: var(--theme-text-main); margin-bottom: 12px; border-bottom: 1px dashed var(--theme-border); padding-bottom: 8px;";
                     header.innerText = `문제 ${qIdx}`;
                     groupDiv.appendChild(header);
                     

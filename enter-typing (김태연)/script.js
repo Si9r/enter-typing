@@ -889,14 +889,37 @@ function endGame(completed = false) {
         total_count: cnt
       }));
 
-      if (typoPayload.length > 0 || totalsPayload.length > 0) {
+      // 로마자 실수 패턴 서버 저장
+      const romajiMistakesForSave = {};
+      typoDetails.forEach(t => {
+        if (t.type === 'typing' && t.word && t.expected && t.typed) {
+          const key = t.word + "|" + t.expected + "|" + t.typed;
+          romajiMistakesForSave[key] = (romajiMistakesForSave[key] || 0) + 1;
+        }
+      });
+      const romajiPayload = Object.entries(romajiMistakesForSave).map(([key, cnt]) => {
+        const parts = key.split("|");
+        return {
+          kana: parts[0],
+          expected: parts[1],
+          typed: parts[2],
+          error_count: cnt
+        };
+      });
+
+      if (typoPayload.length > 0 || totalsPayload.length > 0 || romajiPayload.length > 0) {
         fetch("/api/typo-stats", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + token
           },
-          body: JSON.stringify({ typos: typoPayload, totals: totalsPayload })
+          body: JSON.stringify({ 
+            typos: typoPayload, 
+            totals: totalsPayload, 
+            romaji_patterns: romajiPayload,
+            content_id: parseInt(contentId) || null
+          })
         })
         .then(res => res.json())
         .then(d => console.log("오타 통계 저장:", d))
@@ -1011,7 +1034,7 @@ typingInput.addEventListener("input", (e) => {
       unitIndex: currentUnitIndex,
       word: currentUnit.text,
       expected: expectedCharStr,
-      typed: newChar
+      typed: testBuffer
     });
 
     updateStats();
@@ -1205,7 +1228,11 @@ document.addEventListener("keydown", function(e) {
   if (isPlaying) {
     if (e.key === "Tab") {
       e.preventDefault();
-      skipTo80Percent();
+      const hira = contentHiraganaLines[currentLineIndex];
+      const isLyricsEmpty = !hira || hira.trim() === "-" || hira.trim() === "";
+      if (lineCompleted || isLyricsEmpty) {
+        skipTo80Percent();
+      }
     } else if (e.code === "Space" || e.key === " ") {
       e.preventDefault();
       if (isYoutubeMode && youtubePlayer && isPlayerReady) {

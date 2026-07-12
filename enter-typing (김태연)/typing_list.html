@@ -98,6 +98,21 @@
             justify-content: center;
         }
 
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(255, 123, 142, 0.1), rgba(255, 209, 123, 0.1));
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        [data-theme="dark"] #sort-select option {
+            background-color: var(--theme-bg-main);
+            color: var(--theme-text-main);
+        }
+
         .detail-title {
             font-size: 2.5rem;
             font-weight: 900;
@@ -232,7 +247,7 @@
                 </div>
                 <div>
                     <select id="sort-select" onchange="setSort(this.value)"
-                        style="padding: 10px 15px; border: 1.5px solid #ffe3e4; border-radius: 8px; outline: none; font-weight: 700; color: #555; background: white; cursor: pointer;">
+                        style="padding: 10px 15px; border: 1.5px solid var(--theme-border); border-radius: 8px; outline: none; font-weight: 700; color: var(--theme-text-sub); background: var(--theme-bg-card); cursor: pointer;">
                         <option value="recent">등록순</option>
                         <option value="popular">인기순</option>
                     </select>

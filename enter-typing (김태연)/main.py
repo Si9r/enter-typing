@@ -225,9 +225,17 @@ class TotalPayloadItem(BaseModel):
     character: str
     total_count: int
 
+class RomajiPatternItem(BaseModel):
+    kana: str
+    expected: str
+    typed: str
+    error_count: int
+
 class TypoStatsRequest(BaseModel):
     typos: List[TypoPayloadItem]
     totals: List[TotalPayloadItem] = []
+    romaji_patterns: List[RomajiPatternItem] = []
+    content_id: int | None = None
 
 class QuizHistoryCreate(BaseModel):
     quiz_id: Optional[int] = None
@@ -1248,6 +1256,18 @@ def save_quiz_history(req: QuizHistoryCreate, db: Session = Depends(get_db), cur
 @app.post("/api/typo-stats")
 def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     try:
+        if req.content_id:
+            # 콘텐츠의 가장 최근 플레이 기록만 유지하도록 기존 통계 삭제
+            db.query(models.ContentTypoStat).filter(
+                models.ContentTypoStat.user_id == current_user.id,
+                models.ContentTypoStat.content_id == req.content_id
+            ).delete()
+            db.query(models.ContentRomajiMistake).filter(
+                models.ContentRomajiMistake.user_id == current_user.id,
+                models.ContentRomajiMistake.content_id == req.content_id
+            ).delete()
+            db.flush()
+
         # 1. Update totals
         for total_item in req.totals:
             existing = db.query(models.TypoStat).filter(
@@ -1263,7 +1283,25 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                     error_count=0,
                     total_count=total_item.total_count
                 ))
+            # 콘텐츠별 기록
+            if req.content_id:
+                content_existing = db.query(models.ContentTypoStat).filter(
+                    models.ContentTypoStat.user_id == current_user.id,
+                    models.ContentTypoStat.content_id == req.content_id,
+                    models.ContentTypoStat.character_typed == total_item.character
+                ).first()
+                if content_existing:
+                    content_existing.total_count += total_item.total_count
+                else:
+                    db.add(models.ContentTypoStat(
+                        user_id=current_user.id,
+                        content_id=req.content_id,
+                        character_typed=total_item.character,
+                        error_count=0,
+                        total_count=total_item.total_count
+                    ))
                 
+        db.flush()
         # 2. Update errors
         for typo_item in req.typos:
             existing = db.query(models.TypoStat).filter(
@@ -1279,6 +1317,63 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                     error_count=typo_item.error_count,
                     total_count=0
                 ))
+            # 콘텐츠별 기록
+            if req.content_id:
+                content_existing = db.query(models.ContentTypoStat).filter(
+                    models.ContentTypoStat.user_id == current_user.id,
+                    models.ContentTypoStat.content_id == req.content_id,
+                    models.ContentTypoStat.character_typed == typo_item.character
+                ).first()
+                if content_existing:
+                    content_existing.error_count += typo_item.error_count
+                else:
+                    db.add(models.ContentTypoStat(
+                        user_id=current_user.id,
+                        content_id=req.content_id,
+                        character_typed=typo_item.character,
+                        error_count=typo_item.error_count,
+                        total_count=0
+                    ))
+
+        db.flush()
+        # 3. Update romaji patterns
+        for pattern_item in req.romaji_patterns:
+            existing = db.query(models.RomajiMistake).filter(
+                models.RomajiMistake.user_id == current_user.id,
+                models.RomajiMistake.kana == pattern_item.kana,
+                models.RomajiMistake.expected_romaji == pattern_item.expected,
+                models.RomajiMistake.typed_romaji == pattern_item.typed
+            ).first()
+            if existing:
+                existing.error_count += pattern_item.error_count
+            else:
+                db.add(models.RomajiMistake(
+                    user_id=current_user.id,
+                    kana=pattern_item.kana,
+                    expected_romaji=pattern_item.expected,
+                    typed_romaji=pattern_item.typed,
+                    error_count=pattern_item.error_count
+                ))
+            # 콘텐츠별 기록
+            if req.content_id:
+                content_existing = db.query(models.ContentRomajiMistake).filter(
+                    models.ContentRomajiMistake.user_id == current_user.id,
+                    models.ContentRomajiMistake.content_id == req.content_id,
+                    models.ContentRomajiMistake.kana == pattern_item.kana,
+                    models.ContentRomajiMistake.expected_romaji == pattern_item.expected,
+                    models.ContentRomajiMistake.typed_romaji == pattern_item.typed
+                ).first()
+                if content_existing:
+                    content_existing.error_count += pattern_item.error_count
+                else:
+                    db.add(models.ContentRomajiMistake(
+                        user_id=current_user.id,
+                        content_id=req.content_id,
+                        kana=pattern_item.kana,
+                        expected_romaji=pattern_item.expected,
+                        typed_romaji=pattern_item.typed,
+                        error_count=pattern_item.error_count
+                    ))
         db.commit()
         return {"success": True, "message": "오타 통계가 저장되었습니다."}
     except Exception as e:
@@ -1291,8 +1386,14 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
 # GET /api/typo-stats
 # ════════════════════════════════════════════════════════════
 @app.get("/api/typo-stats")
-def get_typo_stats(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    stats = db.query(models.TypoStat).filter(models.TypoStat.user_id == current_user.id).all()
+def get_typo_stats(content_id: Optional[int] = None, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    if content_id:
+        stats = db.query(models.ContentTypoStat).filter(
+            models.ContentTypoStat.user_id == current_user.id,
+            models.ContentTypoStat.content_id == content_id
+        ).all()
+    else:
+        stats = db.query(models.TypoStat).filter(models.TypoStat.user_id == current_user.id).all()
     
     total_typos = sum(stat.error_count for stat in stats)
     total_chars = sum(stat.total_count for stat in stats)
@@ -1300,11 +1401,32 @@ def get_typo_stats(db: Session = Depends(get_db), current_user: models.User = De
     avg_error_rate = (total_typos / total_chars * 100) if total_chars > 0 else 0
     
     data = []
+    kana_total_errors = {}
     for stat in stats:
         data.append({
             "kana": stat.character_typed,
             "error_count": stat.error_count,
             "total_count": stat.total_count
+        })
+        kana_total_errors[stat.character_typed] = stat.error_count
+        
+    if content_id:
+        romaji_stats = db.query(models.ContentRomajiMistake).filter(
+            models.ContentRomajiMistake.user_id == current_user.id,
+            models.ContentRomajiMistake.content_id == content_id
+        ).all()
+    else:
+        romaji_stats = db.query(models.RomajiMistake).filter(models.RomajiMistake.user_id == current_user.id).all()
+    romaji_patterns = []
+    for rm in romaji_stats:
+        total_for_kana = kana_total_errors.get(rm.kana, 0)
+        pct = int((rm.error_count / total_for_kana * 100)) if total_for_kana > 0 else 0
+        romaji_patterns.append({
+            "char": rm.kana,
+            "correct": rm.expected_romaji,
+            "wrong": rm.typed_romaji,
+            "error_count": rm.error_count,
+            "pct": pct
         })
         
     return {
@@ -1316,9 +1438,46 @@ def get_typo_stats(db: Session = Depends(get_db), current_user: models.User = De
         },
         "data": data,
         "pairs": [],
-        "romaji_patterns": []
+        "romaji_patterns": romaji_patterns
     }
 
+# ════════════════════════════════════════════════════════════
+# API: 오타 통계 초기화
+# DELETE /api/typo-stats
+# ════════════════════════════════════════════════════════════
+@app.delete("/api/typo-stats")
+def reset_typo_stats(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    db.query(models.TypoStat).filter(models.TypoStat.user_id == current_user.id).delete()
+    db.query(models.RomajiMistake).filter(models.RomajiMistake.user_id == current_user.id).delete()
+    db.query(models.ContentTypoStat).filter(models.ContentTypoStat.user_id == current_user.id).delete()
+    db.query(models.ContentRomajiMistake).filter(models.ContentRomajiMistake.user_id == current_user.id).delete()
+    db.commit()
+    return {"success": True, "message": "오타 기록이 초기화되었습니다."}
+# ════════════════════════════════════════════════════════════
+# API: 오타 분석 대상 콘텐츠 목록 조회
+# GET /api/typo-content-list
+# ════════════════════════════════════════════════════════════
+@app.get("/api/typo-content-list")
+def get_typo_content_list(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # 사용자가 플레이하여 오타 기록이 있는 고유한 content_id 추출
+    content_ids = db.query(models.ContentTypoStat.content_id).filter(
+        models.ContentTypoStat.user_id == current_user.id
+    ).distinct().all()
+    
+    content_ids = [c[0] for c in content_ids]
+    
+    if not content_ids:
+        return {"success": True, "contents": []}
+        
+    # 해당 콘텐츠의 제목 가져오기
+    contents = db.query(models.TypingContent).filter(
+        models.TypingContent.id.in_(content_ids)
+    ).all()
+    
+    return {
+        "success": True, 
+        "contents": [{"id": c.id, "title": c.title} for c in contents]
+    }
 
 # ════════════════════════════════════════════════════════════
 # API: 내 플레이 히스토리 조회
@@ -1487,7 +1646,11 @@ def get_profile_analysis(db: Session = Depends(get_db), current_user: models.Use
     avg_month_wpm = month_wpm // month_cnt if month_cnt > 0 else 0
 
     # 2. 퀴즈 통계
-    play_quiz = db.query(models.QuizHistory).filter(models.QuizHistory.user_id == current_user.id).count()
+    quiz_records = db.query(models.QuizHistory).filter(models.QuizHistory.user_id == current_user.id).all()
+    play_quiz = len(quiz_records)
+    quiz_correct = sum(q.score for q in quiz_records)
+    quiz_total = sum(q.total_questions for q in quiz_records)
+    quiz_correct_rate = int((quiz_correct / quiz_total) * 100) if quiz_total > 0 else 0
 
     # 3. 실시간 대전 통계
     battle_records = db.query(models.BattleHistory).filter(models.BattleHistory.user_id == current_user.id).all()
@@ -1510,6 +1673,8 @@ def get_profile_analysis(db: Session = Depends(get_db), current_user: models.Use
         "wpm_month": avg_month_wpm,
         "play_typing": play_typing,
         "play_quiz": play_quiz,
+        "quiz_correct_rate": quiz_correct_rate,
+        "quiz_total_correct": quiz_correct,
         "play_battle": play_battle,
         "battle_win_rate": battle_win_rate,
         "battle_avg_wpm": avg_battle_wpm
@@ -2060,173 +2225,6 @@ async def battle_websocket(
 # 오타 통계 API
 # ──────────────────────────────────────────
 
-class TypoStatItem(BaseModel):
-    character: str
-    error_count: int
 
-class SaveTypoRequest(BaseModel):
-    typos: list[TypoStatItem]
-
-@app.post("/api/typo-stats")
-async def save_typo_stats(
-    request: SaveTypoRequest,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    for item in request.typos:
-        if not item.character or item.error_count <= 0:
-            continue
-        existing = db.query(models.TypoStat).filter(
-            models.TypoStat.user_id == current_user.id,
-            models.TypoStat.character_typed == item.character
-        ).first()
-        if existing:
-            # 버그 수정: 오타 수(error_count)만 누적하고 전체 시도 횟수(total_count)는 더하지 않음.
-            existing.error_count += item.error_count
-        else:
-            db.add(models.TypoStat(
-                user_id=current_user.id,
-                character_typed=item.character,
-                error_count=item.error_count,
-                total_count=item.error_count
-            ))
-    db.commit()
-    return {"success": True}
-
-@app.get("/api/typo-stats")
-async def get_typo_stats(
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    # 1. 모든 오타 통계 가져오기
-    stats = (
-        db.query(models.TypoStat)
-        .filter(models.TypoStat.user_id == current_user.id)
-        .all()
-    )
-    
-    # 2. 요약 정보 계산
-    total_typos = sum(s.error_count for s in stats)
-    total_inputs = sum(s.total_count for s in stats)
-    
-    avg_error_rate = 0.0
-    if total_inputs > 0:
-        avg_error_rate = (total_typos / total_inputs) * 100
-        
-    # 개선도 계산 (이전 50% vs 최근 50% 정확도 차이)
-    histories = (
-        db.query(models.TypingHistory)
-        .filter(models.TypingHistory.user_id == current_user.id)
-        .order_by(models.TypingHistory.played_at.asc())
-        .all()
-    )
-    
-    improvement = 0.0
-    if len(histories) >= 2:
-        mid = len(histories) // 2
-        first_half = histories[:mid]
-        second_half = histories[mid:]
-        
-        acc_first = sum(h.accuracy for h in first_half) / len(first_half)
-        acc_second = sum(h.accuracy for h in second_half) / len(second_half)
-        
-        improvement = acc_second - acc_first
-
-    # 3. 오타 데이터를 오타율(error_rate) 기준으로 내림차순 정렬한 TOP list 준비
-    stats_list = []
-    for s in stats:
-        rate = 0.0
-        if s.total_count > 0:
-            rate = (s.error_count / s.total_count) * 100
-        stats_list.append({
-            "kana": s.character_typed,
-            "error_count": s.error_count,
-            "total_count": s.total_count,
-            "error_rate": round(rate, 1)
-        })
-    
-    # 오타율이 높은 순으로 정렬 (시도 횟수가 최소 2회 이상인 것 우선 필터링해서 신뢰성 확보)
-    sorted_by_rate = sorted(
-        [s for s in stats_list if s["total_count"] >= 2],
-        key=lambda x: x["error_rate"],
-        reverse=True
-    )
-    
-    # 만약 시도 횟수 2회 이상이 부족하면 전체에서 정렬
-    if len(sorted_by_rate) < 5:
-        sorted_by_rate = sorted(stats_list, key=lambda x: x["error_rate"], reverse=True)
-
-    # 4. 동적 혼동 쌍 및 로마자 실수 패턴 추출
-    # 유저의 실제 에러 리스트 중 특정 키들이 포함되어 있는지 검사
-    top_error_kanas = {s["kana"] for s in sorted_by_rate[:5] if s["error_count"] > 0}
-    
-    pair_data = []
-    romaji_data = []
-    
-    # 미리 정의된 전형적인 오타 패턴 템플릿
-    typical_confusions = {
-        "ぢ": {
-            "pair": {"a": "ぢ", "b": "じ", "aRoma": "di", "bRoma": "ji", "rate": "지연발생", "desc": "ぢ(di)와 じ(ji)는 발음이 같아 헷갈리기 쉽습니다."},
-            "romaji": {"char": "ぢ", "correct": "di", "wrong": "ji", "pct": 40, "desc": "발음 혼동으로 인한 입력 시도 오류"}
-        },
-        "じ": {
-            "pair": {"a": "じ", "b": "zi", "aRoma": "ji", "bRoma": "zi", "rate": "혼동", "desc": "じ를 ji 대신 zi로 잘못 치는 경향이 있습니다."},
-            "romaji": {"char": "じ", "correct": "ji", "wrong": "zi", "pct": 30, "desc": "zi 대신 표준 ji 입력을 추천합니다."}
-        },
-        "つ": {
-            "pair": {"a": "つ", "b": "치", "aRoma": "tsu", "bRoma": "chi", "rate": "입력속도 지연", "desc": "tsu 대신 tu를 쳐서 생기는 속도 저하입니다."},
-            "romaji": {"char": "つ", "correct": "tsu", "wrong": "tu", "pct": 50, "desc": "tu도 허용되지만 tsu가 표준 타법입니다."}
-        },
-        "っ": {
-            "pair": {"a": "っ", "b": "자음연타", "aRoma": "자음 연타", "bRoma": "xtsu", "rate": "속도 지연", "desc": "촉음 입력 시 다음 자음을 두 번 치는 것이 빠릅니다."},
-            "romaji": {"char": "っ", "correct": "자음연타", "wrong": "xtsu", "pct": 60, "desc": "xtsu 입력보다 자음 연속 입력이 효율적입니다."}
-        },
-        "ん": {
-            "pair": {"a": "ん", "b": "n", "aRoma": "nn", "bRoma": "n", "rate": "오타율 높음", "desc": "ん 뒤에 모음이나 야행이 올 때 nn을 쳐야 오타가 안 납니다."},
-            "romaji": {"char": "ん", "correct": "nn", "wrong": "n", "pct": 45, "desc": "단독 n 입력으로 다음 글자와 결합하는 오류"}
-        },
-        "づ": {
-            "pair": {"a": "づ", "b": "ず", "aRoma": "du", "bRoma": "zu", "rate": "혼동", "desc": "づ(du)와 ず(zu)는 발음이 같아 헷갈리기 쉽습니다."},
-            "romaji": {"char": "づ", "correct": "du", "wrong": "zu", "pct": 35, "desc": "두음(づ) 입력 시 du 타법 인지 필요"}
-        }
-    }
-    
-    for kana in top_error_kanas:
-        if kana in typical_confusions:
-            item = typical_confusions[kana]
-            pair_data.append(item["pair"])
-            romaji_data.append(item["romaji"])
-            
-    # 만약 유저의 오타 데이터에 전형적인 혼동 패턴이 없다면, 탑 에러 글자 중 상위 항목들로 일반 리포트 생성
-    if not pair_data:
-        for s in sorted_by_rate[:2]:
-            if s["error_count"] > 0:
-                pair_data.append({
-                    "a": s["kana"],
-                    "b": "타 건반",
-                    "aRoma": s["kana"],
-                    "bRoma": "오타",
-                    "rate": f"{round(s['error_rate'])}%",
-                    "desc": f"'{s['kana']}' 입력 시 정확도가 낮아 오타가 빈번하게 발생하고 있습니다."
-                })
-                romaji_data.append({
-                    "char": s["kana"],
-                    "correct": "정타",
-                    "wrong": "오타",
-                    "pct": round(s["error_rate"]),
-                    "desc": "정확한 키 스토크 연습이 필요합니다."
-                })
-                
-    return {
-        "success": True,
-        "summary": {
-            "total_typos": total_typos,
-            "avg_error_rate": round(avg_error_rate, 1),
-            "improvement": round(improvement, 1)
-        },
-        "data": stats_list,
-        "pairs": pair_data,
-        "romaji_patterns": romaji_data
-    }
 
 

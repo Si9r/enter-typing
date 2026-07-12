@@ -280,8 +280,12 @@
                 <h2><i class="ph-bold ph-fire" style="color:var(--color-pink); margin-right:8px; vertical-align: middle;"></i> 인기 타이핑 콘텐츠</h2>
                 <a href="typing_list.html" class="view-all">전체보기 ></a>
             </div>
-            <div class="card-grid" id="popular-typing-grid">
-                <!-- 동적으로 렌더링됩니다 -->
+            <div class="slider-container" style="position: relative;">
+                <button class="slider-btn prev-btn" onclick="scrollSlider('popular-typing-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
+                <div class="card-grid card-slider" id="popular-typing-grid">
+                    <!-- 동적으로 렌더링됩니다 -->
+                </div>
+                <button class="slider-btn next-btn" onclick="scrollSlider('popular-typing-grid', 1)"><i class="ph-bold ph-caret-right"></i></button>
             </div>
         </section>
     </div>
@@ -293,8 +297,12 @@
                 <h2><i class="ph-bold ph-lightbulb" style="color:var(--color-blue); margin-right:8px; vertical-align: middle;"></i> 추천 퀴즈</h2>
                 <a href="quiz_list.html" class="view-all">전체보기 ></a>
             </div>
-            <div class="card-grid" id="popular-quiz-grid">
-                <!-- 동적으로 렌더링됩니다 -->
+            <div class="slider-container" style="position: relative;">
+                <button class="slider-btn prev-btn" onclick="scrollSlider('popular-quiz-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
+                <div class="card-grid card-slider" id="popular-quiz-grid">
+                    <!-- 동적으로 렌더링됩니다 -->
+                </div>
+                <button class="slider-btn next-btn" onclick="scrollSlider('popular-quiz-grid', 1)"><i class="ph-bold ph-caret-right"></i></button>
             </div>
         </section>
     </div>
@@ -470,6 +478,13 @@
                 console.error('Failed to load popular contents', err);
             }
         });
+        function scrollSlider(id, direction) {
+            const slider = document.getElementById(id);
+            if(slider) {
+                const scrollAmount = 300; // Amount to scroll per click
+                slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+            }
+        }
     </script>
 </body>
 

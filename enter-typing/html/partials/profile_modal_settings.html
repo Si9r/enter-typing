@@ -1,0 +1,27 @@
+  <!-- ══ 게임 설정 모달 ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="settingsModal" onclick="closeSettingsModalOutside(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+      <div class="modal-title" style="margin-bottom: 24px;">⚙️ 게임 설정</div>
+
+      <div class="m-form-group"
+        style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 24px; background: var(--theme-bg-hover); padding: 18px; border-radius: 14px; border: 1.5px solid var(--theme-border);">
+        <div>
+          <div style="font-weight:800; color:var(--theme-text-main); margin-bottom:6px; font-size: 1rem;">촉음(っ) 분리 입력 허용
+          </div>
+          <div style="font-size:0.85rem; color:var(--theme-text-muted); line-height: 1.4;">기본 방식(katta) 대신 ltsu,
+            xtsu를<br>사용한 분리
+            입력(kaltsuta)을 허용합니다.</div>
+        </div>
+        <label class="toggle-switch" style="position:relative; display:inline-block; width:52px; height:30px;">
+          <input type="checkbox" id="setting-split-sokuon-main" onchange="toggleSplitSokuonMain(this.checked)"
+            style="opacity:0; width:0; height:0;">
+          <span class="slider"
+            style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.3s; border-radius:34px;">
+            <span class="slider-circle"
+              style="position:absolute; content:''; height:22px; width:22px; left:4px; bottom:4px; background-color:white; transition:.3s; border-radius:50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+  </div>

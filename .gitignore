@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 .venv/
+
+PROJECT_STRUCTURE.md
+
+# 서버 실행 로그
+*.log

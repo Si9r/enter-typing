@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이핑 콘텐츠 생성 - 엔터핑</title>
+    <link rel="stylesheet" href="/style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--theme-bg-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .editor-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .editor-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: var(--theme-bg-card);
+            padding: 15px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid var(--theme-border);
+        }
+
+        .editor-top-bar input {
+            flex: 1;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--color-text-main);
+        }
+
+        .editor-top-bar input::placeholder {
+            color: var(--theme-text-muted);
+        }
+
+        .toolbar-btn {
+            background: transparent;
+            border: 1.5px solid var(--theme-border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--theme-text-sub);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--theme-bg-hover);
+            color: var(--color-pink);
+            border-color: var(--color-pink);
+        }
+
+        .btn-primary {
+            background: var(--color-pink);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-pink-hover);
+        }
+
+        .editor-main {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .editor-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .url-input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--theme-border);
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .editor-right {
+            width: 450px;
+            background: var(--theme-bg-card);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid var(--theme-border);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--theme-text-sub);
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--theme-border);
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--color-pink);
+            box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.2);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .time-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-row input {
+            width: 80px;
+            text-align: center;
+            font-weight: bold;
+            padding: 8px;
+            border: 1.5px solid var(--theme-border);
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .time-row input:focus {
+            border-color: var(--color-pink);
+            box-shadow: 0 0 0 3px rgba(255, 154, 158, 0.2);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .editor-bottom {
+            background: var(--theme-bg-card);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 2px solid var(--theme-border);
+            overflow: hidden;
+            margin-bottom: 50px;
+        }
+
+        .lines-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .lines-table th,
+        .lines-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--theme-border);
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .lines-table th {
+            background: var(--theme-bg-hover);
+            font-weight: 700;
+            color: var(--theme-text-sub);
+        }
+
+        .lines-table tr.active {
+            background: var(--theme-bg-hover);
+        }
+
+        .lines-table tr:hover {
+            background: var(--theme-bg-hover);
+        }
+
+        .action-icon {
+            cursor: pointer;
+            color: var(--theme-text-muted);
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .action-icon:hover {
+            color: var(--color-pink);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--theme-bg-card);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content code {
+            font-weight: 900;
+            color: var(--color-pink);
+            background: var(--theme-bg-hover);
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            border: 1px solid var(--theme-border);
+        }
+
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: 800;
+            border-bottom: 2px solid var(--theme-border);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            color: var(--theme-text-muted);
+        }
+    </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='/'">
+                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/typing" class="active">타이핑</a>
+                <a href="/quiz">퀴즈</a>
+                <a href="/ranking">랭킹</a>
+                <a href="/battle">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='/search'">
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
+                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="/notice" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
+                공지</a>
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <script src="/navbar.js?v=2.0.0"></script>
+
+    <div class="editor-container">
+
+        <!-- Top Bar -->
+        <div class="editor-top-bar">
+            <input type="text" id="title" placeholder="동영상 제목을 입력하세요" required>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="toolbar-btn" id="btn-show-guide" title="타이핑 작성 가이드 보기">❓ 가이드</button>
+                <button class="toolbar-btn" id="btn-settings" title="추가 정보 설정">⚙️ 설정</button>
+                <button class="toolbar-btn btn-primary" id="btn-save"> 저장</button>
+            </div>
+        </div>
+
+        <div class="editor-main">
+            <!-- Left: Video Area -->
+            <div class="editor-left">
+                <div class="video-placeholder" id="video-container">
+                    <div id="youtube-player"></div>
+                </div>
+                <div class="url-input-group">
+                    <input type="url" id="youtube_url" placeholder="YouTube URL을 입력하세요">
+                    <button class="toolbar-btn" id="btn-load-yt">불러오기</button>
+                </div>
+            </div>
+
+            <!-- Right: Editing Area -->
+            <div class="editor-right">
+                <div class="time-row">
+                    <label style="font-weight:700; color: var(--theme-text-sub); width:40px;">시간</label>
+                    <input type="number" id="line-time" step="0.01" min="0" placeholder="0.00">
+                    <button class="toolbar-btn" id="btn-sync-time" title="현재 영상 시간 가져오기">⏱️ 싱크</button>
+                    <button class="toolbar-btn" id="btn-end-here" title="이 시간에서 타이핑을 종료합니다."
+                        style="color: var(--color-pink); border-color: var(--color-pink);"> 여기서 종료하기</button>
+                </div>
+
+                <div class="input-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label>가사 텍스트</label>
+                        <button class="toolbar-btn" id="btn-auto-convert"
+                            style="font-size: 0.8rem; padding: 4px 8px; border-color: var(--color-pink); color: var(--color-pink);">
+                            자동 변환</button>
+                    </div>
+                    <textarea id="line-lyrics" placeholder="가사 원문을 입력하세요"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>읽기 (히라가나)</label>
+                    <textarea id="line-hiragana" placeholder="히라가나를 입력하세요"></textarea>
+                </div>
+
+                
+
+                <div class="action-row">
+                    <button class="toolbar-btn btn-primary" id="btn-add-line" style="flex:1;">+ 추가</button>
+                    <button class="toolbar-btn" id="btn-update-line" style="flex:1; display:none;">✏️ 수정</button>
+                    <button class="toolbar-btn" id="btn-cancel-edit" style="display:none;">취소</button>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--theme-text-muted); text-align: center; margin-top: 5px;">
+                    ※ 가사, 읽기를 모두 입력해야 추가됩니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom: Lines Table -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
+            <button class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
+        </div>
+        <div class="editor-bottom">
+            <table class="lines-table" id="lines-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px; text-align: center;">#</th>
+                        <th style="width: 100px;">시간(초)</th>
+                        <th>가사</th>
+                        <th>읽기 (히라가나)</th>
+                        
+                        <th style="width: 100px; text-align: center;">작업</th>
+                    </tr>
+                </thead>
+                <tbody id="lines-tbody">
+                    <!-- Lines will be dynamically added here -->
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px;">
+                            등록된 가사가 없습니다. 오른쪽 입력창에서 가사를 추가해주세요.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Guide Modal -->
+    <div class="modal-overlay" id="guide-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span> 타이핑 추가 가이드</span>
+                <span class="close-modal" id="close-guide">✕</span>
+            </div>
+
+            <div style="font-size: 0.95rem; color: var(--theme-text-main); line-height: 1.6;">
+                <p><strong>1. 영상 불러오기</strong><br>
+                    YouTube 영상의 URL을 입력하고 <code>불러오기</code> 버튼을 눌러 영상을 가져옵니다.</p>
+
+                <p><strong>2. 시간 맞추기 (싱크)</strong><br>
+                    영상을 재생하다가 원하는 구절이 시작되는 타이밍에 <code>⏱️ 싱크</code> 버튼을 누르면 현재 시간이 자동으로 채워집니다.</p>
+
+                <p><strong>3. 가사 자동 변환</strong><br>
+                    가사 텍스트를 입력하고 <code> 자동 변환</code> 버튼을 누르면 읽기(히라가나)가 알아서 변환됩니다! (직접 수정도 가능합니다)</p>
+
+                <p><strong>4. 목록에 추가</strong><br>
+                    내용이 올바른지 확인한 후 <code>+ 추가</code> 버튼을 눌러 소절을 등록하세요.</p>
+
+                <p><strong>5. 여기서 종료하기 (선택)</strong><br>
+                    노래가 끝난 후 반주가 너무 길다면, 원하는 시간에서 <code> 여기서 종료하기</code> 버튼을 눌러주세요. 게임 플레이 시 해당 지점에서 바로 종료되고 점수판으로
+                    이동합니다.</p>
+
+                <p style="margin-top: 15px; color: var(--color-pink); font-weight: bold;">
+                    모든 소절 등록을 마친 후 우측 상단의 <code> 저장</code>을 누르면 타이핑 등록이 완료됩니다!
+                </p>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid var(--theme-border);">
+                <label
+                    style="font-size: 0.9rem; color: var(--theme-text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
+                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루
+                    동안 보지 않기
+                </label>
+                <button class="toolbar-btn btn-primary" id="btn-close-guide"
+                    style="padding: 8px 20px; font-weight: bold;">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>콘텐츠 추가 정보 설정</span>
+                <span class="close-modal" id="close-settings">✕</span>
+            </div>
+
+            <div class="input-group">
+                <label>아티스트 / 출처</label>
+                <input type="text" id="artist" placeholder="예: YOASOBI">
+            </div>
+
+            <div class="input-group">
+                <label>장르 카테고리</label>
+                <select id="genre" style="padding:10px; border:1px solid var(--theme-border); border-radius:6px; outline:none;">
+                    <option value="JPOP">JPOP</option>
+                    <option value="애니메이션">애니메이션</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>상세 설명</label>
+                <textarea id="description" placeholder="팝업창에 표시될 노래나 대사에 대한 간단한 설명을 적어주세요."></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>난이도</label>
+                <select id="difficulty" style="padding:10px; border:1px solid var(--theme-border); border-radius:6px; outline:none;">
+                    <option value="1"> (매우 쉬움)</option>
+                    <option value="2"> (쉬움)</option>
+                    <option value="3" selected> (보통)</option>
+                    <option value="4"> (어려움)</option>
+                    <option value="5"> (매우 어려움)</option>
+                </select>
+            </div>
+
+            <button class="toolbar-btn btn-primary" id="btn-save-settings"
+                style="margin-top: 10px; justify-content: center;">설정 저장</button>
+        </div>
+    </div>
+
+    <script src="/js/shared/youtube_manager.js?v=1.0.0"></script>
+    <script src="/js/typing/create.js"></script>
+    <script src="/i18n.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>곡별 랭킹 - 엔터핑</title>
+    <link rel="stylesheet" href="/style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        .song-ranking-layout { display: flex; gap: 30px; max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 60vh;}
+        
+        .sidebar { width: 320px; background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px); flex-shrink: 0;}
+        .sidebar-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 20px; color: var(--color-text-main); padding-bottom: 10px; border-bottom: 2px solid var(--color-pink); }
+        .song-item { padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent; display: flex; align-items: center; gap: 15px;}
+        .song-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .song-item.active { border-color: var(--color-pink); background: rgba(255, 182, 193, 0.1); }
+        
+        .song-icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; justify-content: center; align-items: center; color: white; font-size: 1.2rem; flex-shrink: 0;}
+        .song-info { flex: 1; overflow: hidden;}
+        .song-item-title { font-weight: 700; color: var(--color-text-main); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .song-item-artist { font-size: 0.85rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .main-content { flex: 1; }
+        .content-header { background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); border-radius: 20px; padding: 40px; color: white; margin-bottom: 30px; box-shadow: 0 15px 35px rgba(255,182,193,0.3); display: flex; justify-content: space-between; align-items: flex-end;}
+        .content-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
+        .content-artist { font-size: 1.2rem; font-weight: 500; opacity: 0.9; }
+        .content-btn { background: white; color: var(--color-pink); padding: 10px 25px; border-radius: 30px; font-weight: 800; border: none; cursor: pointer; transition: transform 0.2s; }
+        .content-btn:hover { transform: scale(1.05); }
+
+        .ranking-list { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+        .rank-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; border-radius: 10px; }
+        .rank-item:hover { background: rgba(255, 255, 255, 0.9); transform: scale(1.01); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: transparent; }
+        .rank-number { font-size: 1.5rem; font-weight: 900; width: 60px; text-align: center; color: var(--color-text-muted); }
+        .rank-1 .rank-number { color: #FFD700; font-size: 2rem; }
+        .rank-2 .rank-number { color: #C0C0C0; font-size: 1.8rem; }
+        .rank-3 .rank-number { color: #CD7F32; font-size: 1.7rem; }
+        .rank-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--color-pink); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 700; margin-right: 20px; }
+        .rank-info-main { flex: 1; }
+        .rank-name { font-size: 1.2rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 5px; }
+        .rank-stats { font-size: 0.9rem; color: var(--color-text-muted); display: flex; gap: 15px; }
+        .rank-score { font-size: 1.4rem; font-weight: 900; color: var(--color-blue); text-align: right; width: 150px;}
+        .rank-date { font-size: 0.8rem; color: #aaa; text-align: right; width: 100px; }
+        
+        .empty-state { text-align: center; padding: 50px; color: var(--theme-text-muted); font-weight: 500; font-size: 1.1rem;}
+    </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='/'">
+                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/typing">타이핑</a>
+                <a href="/quiz">퀴즈</a>
+                <a href="/ranking" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
+                <a href="/battle">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar">
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
+                <input type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;"><i class="ph-fill ph-bell"></i> 공지</a>
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <script src="/navbar.js?v=2.0.0"></script>
+
+    <!-- 메인 컨텐츠 -->
+    <main style="margin-top: 80px;">
+        <div class="song-ranking-layout">
+            <aside class="sidebar">
+                <h3 class="sidebar-title"> 플레이리스트</h3>
+                <div id="song-list-container">
+                    <div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">곡을 불러오는 중...</div>
+                </div>
+            </aside>
+            
+            <section class="main-content">
+                <div id="content-header-container" style="display: none;">
+                    <div class="content-header">
+                        <div id="header-thumb" style="align-self: center; width: 90px; height: 90px; border-radius: 16px; background: rgba(255,255,255,0.2); background-size: cover; background-position: center; flex-shrink: 0; margin-right: 24px; display: flex; align-items: center; justify-content: center;"></div>
+                        <div style="flex: 1;">
+                            <div class="content-artist" id="header-artist">YOASOBI</div>
+                            <div class="content-title" id="header-title">夜に駆ける (밤을 달리다)</div>
+                            <div style="margin-top: 10px;">
+                                <span class="card-badge" style="background: rgba(255,255,255,0.2); border: none; color: white;" id="header-genre">JPOP</span>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="content-btn" id="play-now-btn">▶ 플레이하기</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ranking-list" id="ranking-list-container">
+                        <!-- 랭킹 렌더링 -->
+                    </div>
+                </div>
+                
+                <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🎶</div>
+                    <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>타이핑 & 퀴즈</h4>
+                <ul>
+                    <li><a href="/typing">타이핑 리스트</a></li>
+                    <li><a href="/typing/create">타이핑 작성</a></li>
+                    <li><a href="/quiz">퀴즈 리스트</a></li>
+                    <li><a href="/quiz/create">퀴즈 작성</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>실시간 & 랭킹</h4>
+                <ul>
+                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/ranking">전체 랭킹</a></li>
+                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="/notice">공지사항</a></li>
+                    <li><a href="/profile">마이페이지</a></li>
+                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/ranking/ranking_song.js"></script>
+    <script src="/i18n.js"></script>
+</body>
+</html>

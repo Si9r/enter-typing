@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이핑 플랫폼 메인</title>
+    <link rel="stylesheet" href="/style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='/'">
+                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="/typing">타이핑</a>
+                <a href="/quiz">퀴즈</a>
+                <a href="/ranking">랭킹</a>
+                <a href="/battle">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar" onclick="location.href='/search'">
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
+                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 공통 navbar 상태 관리 -->
+    <script src="/navbar.js?v=2.0.0"></script>
+
+    <!-- 메인 히어로 섹션 -->
+    <main class="hero">
+        <div class="hero-left">
+            <h1 class="hero-title">
+                좋아하는 콘텐츠로<br>
+                <span class="highlight">타이핑</span>을 즐겨라
+            </h1>
+            <p class="hero-desc">
+                다양한 노래 가사, 퀴즈 — 좋아하는 콘텐츠를 타이핑하며<br>
+                자연스럽게 타자 실력과 집중력을 키워보세요
+            </p>
+            <div class="hero-buttons">
+                <button id="hero-btn-primary" class="btn btn-large btn-pink" onclick="location.href='/signup'">
+                    회원가입하고 시작하기
+                </button>
+                <button id="hero-btn-secondary" class="btn btn-large btn-blue-outline" onclick="location.href='/login'">
+                    로그인하고 이어하기
+                </button>
+            </div>
+        </div>
+        <div class="hero-right">
+
+            <div class="jp-typing-wrapper">
+                <div class="jp-typing-bg">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg-h-typed" class="typed-text"></span><span id="bg-h-untyped" class="untyped-text">ゆめならばどれほどよかったでしょう</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg-r-typed" class="typed-text"></span><span id="bg-r-untyped" class="untyped-text">yumenarabadorehodoyokattadesyou</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        夢ならばどれほどよかったでしょう
+                    </div>
+                </div>
+
+                <div class="jp-typing-bg jp-typing-bg2">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg2-h-typed" class="typed-text"></span><span id="bg2-h-untyped" class="untyped-text">ありがとうございます</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg2-r-typed" class="typed-text"></span><span id="bg2-r-untyped" class="untyped-text">arigatougozaimasu</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        有難う御座います
+                    </div>
+                </div>
+
+                <div class="jp-typing-bg jp-typing-bg3">
+                    <div class="jp-line hiragana-line">
+                        <span id="bg3-h-typed" class="typed-text"></span><span id="bg3-h-untyped" class="untyped-text">きらきらひかるほしの</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="bg3-r-typed" class="typed-text"></span><span id="bg3-r-untyped" class="untyped-text">kirakirahikaruhoshino</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        きらきら光る星の
+                    </div>
+                </div>
+
+                <div class="jp-typing-box">
+                    <div class="jp-line hiragana-line">
+                        <span id="h-typed" class="typed-text"></span><span id="h-untyped" class="untyped-text">しずむようにとけてゆくように</span>
+                    </div>
+                    <div class="jp-line romaji-line">
+                        <span id="r-typed" class="typed-text"></span><span class="cursor">_</span><span id="r-untyped" class="untyped-text">sizumuyounitoketeyukuyouni</span>
+                    </div>
+                    <div class="jp-line kanji-line">
+                        沈むように溶けてゆくように
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 프리미엄 디자인 구분선 -->
+    <div class="custom-divider" style="margin: 80px auto 60px; max-width: 1100px; display: flex; align-items: center; justify-content: center; gap: 15px; opacity: 0.85;">
+        <div style="height: 2px; flex: 1; background: linear-gradient(90deg, transparent, var(--theme-border)); border-radius: 2px;"></div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-blue); opacity: 0.6;"></div>
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); box-shadow: 0 0 12px rgba(255,182,193,0.6);"></div>
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: var(--color-pink); opacity: 0.6;"></div>
+        </div>
+        <div style="height: 2px; flex: 1; background: linear-gradient(270deg, transparent, var(--theme-border)); border-radius: 2px;"></div>
+    </div>
+
+    <!-- 콘텐츠 목록 섹션 (타이핑) -->
+    <div class="section-card-wrapper">
+        <section class="content-section">
+            <div class="section-header">
+                <h2><i class="ph-bold ph-fire" style="color:var(--color-pink); margin-right:8px; vertical-align: middle;"></i> 인기 타이핑 콘텐츠</h2>
+                <a href="/typing" class="view-all">전체보기 ></a>
+            </div>
+            <div class="slider-container" style="position: relative;">
+                <button class="slider-btn prev-btn" onclick="scrollSlider('popular-typing-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
+                <div class="card-grid card-slider" id="popular-typing-grid">
+                    <!-- 동적으로 렌더링됩니다 -->
+                </div>
+                <button class="slider-btn next-btn" onclick="scrollSlider('popular-typing-grid', 1)"><i class="ph-bold ph-caret-right"></i></button>
+            </div>
+        </section>
+    </div>
+
+    <!-- 콘텐츠 목록 섹션 (퀴즈) -->
+    <div class="section-card-wrapper">
+        <section class="content-section" style="margin-bottom: 0;">
+            <div class="section-header">
+                <h2><i class="ph-bold ph-lightbulb" style="color:var(--color-blue); margin-right:8px; vertical-align: middle;"></i> 추천 퀴즈</h2>
+                <a href="/quiz" class="view-all">전체보기 ></a>
+            </div>
+            <div class="slider-container" style="position: relative;">
+                <button class="slider-btn prev-btn" onclick="scrollSlider('popular-quiz-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
+                <div class="card-grid card-slider" id="popular-quiz-grid">
+                    <!-- 동적으로 렌더링됩니다 -->
+                </div>
+                <button class="slider-btn next-btn" onclick="scrollSlider('popular-quiz-grid', 1)"><i class="ph-bold ph-caret-right"></i></button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer / Sitemap -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h4>타이핑 & 퀴즈</h4>
+                <ul>
+                    <li><a href="/typing">타이핑 리스트</a></li>
+                    <li><a href="/typing/create">타이핑 작성</a></li>
+                    <li><a href="/quiz">퀴즈 리스트</a></li>
+                    <li><a href="/quiz/create">퀴즈 작성</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>실시간 & 랭킹</h4>
+                <ul>
+                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/ranking">전체 랭킹</a></li>
+                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="/notice">공지사항</a></li>
+                    <li><a href="/profile">마이페이지</a></li>
+                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/home/home.js"></script>
+    <script src="/i18n.js"></script>
+</body>
+
+</html>

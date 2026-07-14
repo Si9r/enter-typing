@@ -106,12 +106,11 @@ const combinationRules = {
 
 /**
  * 주어진 가나(Kana) 문자열을 타이핑 가능한 로마자 입력 단위(TargetUnit) 배열로 파싱하는 함수입니다.
- * 촉음(っ)이나 요음(ゃ, ゅ, ょ 등)을 처리하여 가능한 모든 로마자 입력 조합을 생성합니다.
+ * 촉음(っ)이나 요음(ゃ, ゅ, ょ 등)을 처리하여 가능한 모든 로마자 입력 조합(기본 방식과 분리 입력 방식 모두)을 생성합니다.
  * @param {string} kanaString - 파싱할 히라가나/가타카나 문자열
- * @param {boolean} mustCombine - 요음/촉음 결합을 강제할지 여부
  * @returns {Array} 파싱된 입력 단위 배열
  */
-function parseKanaToTargetUnits(kanaString, mustCombine = true) {
+function parseKanaToTargetUnits(kanaString) {
   const rawChars = Array.from(kanaString);
   const targetUnits = [];
 
@@ -119,13 +118,13 @@ function parseKanaToTargetUnits(kanaString, mustCombine = true) {
     let char = rawChars[i];
     let nextChar = rawChars[i + 1];
 
-    if (char === "っ" && nextChar && mustCombine && romajiTable[nextChar]) {
+    if (char === "っ" && nextChar && romajiTable[nextChar]) {
       let nextValidRomajis = romajiTable[nextChar];
       let combinedRomajis = [];
       nextValidRomajis.forEach((r) => {
-        combinedRomajis.push(r[0] + r);
+        combinedRomajis.push(r[0] + r); // 기본 방식: 자음 중복 (katta)
         romajiTable["っ"].forEach((s) => {
-          combinedRomajis.push(s + r);
+          combinedRomajis.push(s + r); // 분리 입력: ltsu/xtu 등
         });
       });
       targetUnits.push({
@@ -136,16 +135,11 @@ function parseKanaToTargetUnits(kanaString, mustCombine = true) {
       continue;
     }
 
-    if (
-      mustCombine &&
-      combinationRules[char] &&
-      nextChar &&
-      combinationRules[char][nextChar]
-    ) {
-      let combinedRomajis = [...combinationRules[char][nextChar]];
+    if (combinationRules[char] && nextChar && combinationRules[char][nextChar]) {
+      let combinedRomajis = [...combinationRules[char][nextChar]]; // 기본 방식 (sho)
       romajiTable[char].forEach((c) => {
         romajiTable[nextChar].forEach((n) => {
-          combinedRomajis.push(c + n);
+          combinedRomajis.push(c + n); // 분리 입력 (shilyo 등)
         });
       });
       targetUnits.push({
@@ -157,7 +151,7 @@ function parseKanaToTargetUnits(kanaString, mustCombine = true) {
     }
 
     const smallKana = ["ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"];
-    if (mustCombine && nextChar && smallKana.includes(nextChar)) {
+    if (nextChar && smallKana.includes(nextChar)) {
       if (romajiTable[char] && romajiTable[nextChar]) {
         let combinedRomajis = [];
         romajiTable[char].forEach((c) => {
@@ -405,6 +399,79 @@ function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, comp
   return htmlStr;
 }
 
+// 키(키보드 자판) 단위 오타 수집기 팩토리
+// 한 가나 유닛을 입력하는 동안 발생한 오타 키들을, 그 유닛이 확정된
+// 로마자 패턴(예: "shi")의 각 구성 키에 각각 매핑해 통계로 누적한다.
+function createKeyTypoCollector() {
+  let pendingTypos = []; // 현재 유닛을 치는 동안 발생한 오타 키들
+  let totals = {};       // { key: 등장 횟수 }
+  let typoMap = {};      // { expected_key: { typo_key: 오타 횟수 } }
+
+  return {
+    // 잘못 누른 키 한 글자를 현재 유닛의 pending 목록에 추가
+    recordTypo(wrongChar) {
+      if (!wrongChar) return;
+      const ch = String(wrongChar).charAt(0).toLowerCase();
+      if (!ch) return;
+      pendingTypos.push(ch);
+    },
+    // 유닛 입력 완료: 확정 로마자 패턴의 각 키에 대해 totals/오타를 누적
+    commitUnit(confirmedRomaji) {
+      if (confirmedRomaji) {
+        const romaji = String(confirmedRomaji).toLowerCase();
+        for (let i = 0; i < romaji.length; i++) {
+          const k = romaji.charAt(i);
+          totals[k] = (totals[k] || 0) + 1;
+          if (pendingTypos.length > 0) {
+            if (!typoMap[k]) typoMap[k] = {};
+            for (const t of pendingTypos) {
+              typoMap[k][t] = (typoMap[k][t] || 0) + 1;
+            }
+          }
+        }
+      }
+      pendingTypos = [];
+    },
+    // 입력하지 못하고 지나간 유닛: totals만 누적 (pending은 건드리지 않음)
+    addTotalsOnly(romaji) {
+      if (!romaji) return;
+      const r = String(romaji).toLowerCase();
+      for (let i = 0; i < r.length; i++) {
+        const k = r.charAt(i);
+        totals[k] = (totals[k] || 0) + 1;
+      }
+    },
+    // pending 오타만 폐기
+    discardPending() {
+      pendingTypos = [];
+    },
+    // 서버 계약 형식으로 평탄화하여 반환
+    getPayload() {
+      const key_typos = [];
+      for (const expected_key in typoMap) {
+        for (const typo_key in typoMap[expected_key]) {
+          key_typos.push({
+            expected_key,
+            typo_key,
+            error_count: typoMap[expected_key][typo_key]
+          });
+        }
+      }
+      const key_totals = [];
+      for (const key in totals) {
+        key_totals.push({ key, total_count: totals[key] });
+      }
+      return { key_typos, key_totals };
+    },
+    // 전체 초기화
+    reset() {
+      pendingTypos = [];
+      totals = {};
+      typoMap = {};
+    }
+  };
+}
+
 // 브라우저 전역 범위에 노출
 if (typeof window !== "undefined") {
   window.TypingEngine = {
@@ -421,7 +488,8 @@ if (typeof window !== "undefined") {
     checkRomajiMatch,
     renderActiveLyrics,
     highlightCurrentChar,
-    getStatusHTML
+    getStatusHTML,
+    createKeyTypoCollector
   };
 
   // 기존 전역 변수 하위 호환성 유지
@@ -449,5 +517,6 @@ if (typeof module !== "undefined" && module.exports) {
     ko2en,
     calculateTypingScore,
     checkRomajiMatch,
+    createKeyTypoCollector,
   };
 }

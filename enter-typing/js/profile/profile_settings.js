@@ -1,4 +1,4 @@
-// ── 정보 수정 모달: 닉네임 변경, 비밀번호 변경, 회원 탈퇴, 게임 설정 ──
+// ── 정보 수정 모달: 닉네임 변경, 비밀번호 변경, 회원 탈퇴 ──
 
 // ── 모달 닉네임 중복 체크 상태 ────────────────────────────────
 let isModalNicknameChecked = false;
@@ -9,7 +9,7 @@ export function openEditModal() {
     const user = (typeof NavAuth !== 'undefined') ? NavAuth.getUser() : null;
     if (!user || !user.email) {
         alert('로그인이 필요합니다.');
-        location.href = 'login.html';
+        location.href = '/login';
         return;
     }
     document.getElementById('editModal').classList.add('open');
@@ -161,7 +161,7 @@ export async function submitChangeNickname() {
     btn.disabled = true; btn.textContent = '변경 중...';
 
     try {
-        const token = sessionStorage.getItem('ep_token') || '';
+        const token = localStorage.getItem('ep_token') || '';
         const res = await fetch('/api/change-nickname', {
             method: 'POST',
             headers: {
@@ -177,7 +177,7 @@ export async function submitChangeNickname() {
 
             // 업데이트된 사용자 정보 저장
             const updatedUser = { ...user, nickname: data.nickname || newNick };
-            sessionStorage.setItem('ep_user', JSON.stringify(updatedUser));
+            localStorage.setItem('ep_user', JSON.stringify(updatedUser));
 
             // 화면에 즉시 반영
             document.getElementById('profile-nickname').textContent = updatedUser.nickname;
@@ -231,7 +231,7 @@ export async function submitChangePassword() {
         }
 
         // Step 2: 새 비밀번호로 변경
-        const token = sessionStorage.getItem('ep_token') || '';
+        const token = localStorage.getItem('ep_token') || '';
         const res = await fetch('/api/change-password', {
             method: 'POST',
             headers: {
@@ -246,7 +246,7 @@ export async function submitChangePassword() {
             alert('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
             NavAuth.logout();
             closeEditModal();
-            location.href = 'login.html';
+            location.href = '/login';
         } else {
             showMErr('m-new-pw-err', data.detail || '변경에 실패했습니다.');
         }
@@ -272,7 +272,7 @@ export async function submitDeleteAccount() {
     btn.disabled = true; btn.textContent = '처리 중...';
 
     try {
-        const token = sessionStorage.getItem('ep_token') || '';
+        const token = localStorage.getItem('ep_token') || '';
         const res = await fetch('/api/delete-account', {
             method: 'DELETE',
             headers: {
@@ -286,7 +286,7 @@ export async function submitDeleteAccount() {
         if (res.ok && data.success) {
             NavAuth.logout();
             alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
-            location.href = 'index.html';
+            location.href = '/';
         } else {
             showMErr('m-del-pw-err', data.detail || '탈퇴에 실패했습니다.');
         }
@@ -297,17 +297,3 @@ export async function submitDeleteAccount() {
     }
 }
 
-// ── 게임 설정 모달 제어 ──────────────────────────────────────
-export function openSettingsModal() {
-    document.getElementById('settingsModal').classList.add('open');
-    document.getElementById('setting-split-sokuon-main').checked = localStorage.getItem('allowSplitSokuon') === 'true';
-}
-export function closeSettingsModal() {
-    document.getElementById('settingsModal').classList.remove('open');
-}
-export function closeSettingsModalOutside(e) {
-    if (e.target === document.getElementById('settingsModal')) closeSettingsModal();
-}
-export function toggleSplitSokuonMain(checked) {
-    localStorage.setItem('allowSplitSokuon', checked ? 'true' : 'false');
-}

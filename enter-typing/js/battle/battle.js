@@ -24,7 +24,7 @@ Object.assign(window, {
 
 document.addEventListener("DOMContentLoaded", () => {
     // Check login state
-    const sessUser = sessionStorage.getItem('ep_user');
+    const sessUser = localStorage.getItem('ep_user');
     if (sessUser) {
         try {
             const parsed = JSON.parse(sessUser);
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) { }
     } else {
         alert("로그인이 필요합니다.");
-        location.href = "login.html";
+        location.href = "/login";
         return;
     }
 

@@ -11,7 +11,6 @@ import { loadProfileAnalysis, switchAnalysisTab, resetTypoStats } from './profil
 import {
     openEditModal, closeEditModal, closeEditModalOutside, switchModalTab,
     checkNewNicknameDuplicate, submitChangeNickname, submitChangePassword, submitDeleteAccount,
-    openSettingsModal, closeSettingsModal, closeSettingsModalOutside, toggleSplitSokuonMain,
     initSettingsModalListeners
 } from './profile_settings.js';
 
@@ -22,15 +21,14 @@ function switchTab(name) {
     document.getElementById('tab-' + name + '-btn').classList.add('active');
 }
 
-// html/profile.html의 inline onclick="..." 핸들러들이 참조하는 전역 함수 바인딩
+// html/profile의 inline onclick="..." 핸들러들이 참조하는 전역 함수 바인딩
 Object.assign(window, {
     switchTab,
     prevMonth, nextMonth, doAttend,
     switchSubTab, deleteMyTyping, deleteMyQuiz,
     switchAnalysisTab, resetTypoStats,
     openEditModal, closeEditModal, closeEditModalOutside, switchModalTab,
-    checkNewNicknameDuplicate, submitChangeNickname, submitChangePassword, submitDeleteAccount,
-    openSettingsModal, closeSettingsModal, closeSettingsModalOutside, toggleSplitSokuonMain
+    checkNewNicknameDuplicate, submitChangeNickname, submitChangePassword, submitDeleteAccount
 });
 
 // ── 프로필 정보 로드 ─────────────────────────────────────────
@@ -38,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const user = (typeof NavAuth !== 'undefined') ? NavAuth.getUser() : null;
     if (!user) {
         alert('로그인이 필요한 서비스입니다.');
-        location.href = 'login.html';
+        location.href = '/login';
         return;
     }
     document.getElementById('profile-nickname').textContent = user.nickname || '엔터핑유저';

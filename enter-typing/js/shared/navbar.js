@@ -2,34 +2,34 @@
  * navbar.js — 엔터핑 공통 네비게이션 바 로그인 상태 관리
  * 모든 페이지에서 <script src="navbar.js"></script> 로 포함
  *
- * sessionStorage 키:
- *   ep_user  → { email, nickname }   (로그인 중)
+ * localStorage 키:
+ *   ep_user  → { id, email, nickname, is_admin }   (로그인 중)
  */
 
 (function () {
   function getUser() {
-    try { return JSON.parse(sessionStorage.getItem('ep_user')); }
+    try { return JSON.parse(localStorage.getItem('ep_user')); }
     catch { return null; }
   }
 
   function setUser(data) {
     if (data && data.token) {
-      sessionStorage.setItem('ep_token', data.token);
-      const userInfo = { email: data.email, nickname: data.nickname };
-      sessionStorage.setItem('ep_user', JSON.stringify(userInfo));
+      localStorage.setItem('ep_token', data.token);
+      const userInfo = { id: data.id, email: data.email, nickname: data.nickname, is_admin: !!data.is_admin };
+      localStorage.setItem('ep_user', JSON.stringify(userInfo));
     } else {
-      sessionStorage.setItem('ep_user', JSON.stringify(data));
+      localStorage.setItem('ep_user', JSON.stringify(data));
     }
   }
 
   function clearUser() {
-    sessionStorage.removeItem('ep_user');
-    sessionStorage.removeItem('ep_token');
+    localStorage.removeItem('ep_user');
+    localStorage.removeItem('ep_token');
   }
 
   function logout() {
     clearUser();
-    location.href = 'index.html';
+    location.href = '/';
   }
 
   /* 닉네임 첫 글자(아바타) */
@@ -66,7 +66,7 @@
             </div>
           </div>
           <hr class="dropdown-divider">
-          <a class="dropdown-item" href="profile.html"><i class="ph-fill ph-user"></i> 마이페이지</a>
+          <a class="dropdown-item" href="/profile"><i class="ph-fill ph-user"></i> 마이페이지</a>
           <hr class="dropdown-divider">
           <button class="dropdown-item dropdown-logout" id="nav-logout-btn"><i class="ph-fill ph-door"></i> 로그아웃</button>
         </div>
@@ -266,7 +266,7 @@
         const executeSearch = () => {
             const query = input.value.trim();
             if (query) {
-                location.href = 'search.html?q=' + encodeURIComponent(query);
+                location.href = '/search?q=' + encodeURIComponent(query);
             } else {
                 alert('검색어를 입력해주세요.');
             }

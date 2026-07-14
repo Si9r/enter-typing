@@ -25,13 +25,16 @@ async function loadSongList() {
 
             let html = '';
             data.data.forEach(item => {
-                let iconChar = '';
-                if (item.genre === '애니메이션' || item.genre === 'ANIME') iconChar = '';
-                if (item.genre === '문학') iconChar = '';
+                const thumbStyle = item.youtube_id
+                    ? `background-image: url('https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg'); background-size: cover; background-position: center;`
+                    : `background: var(--theme-bg-hover, #f0f0f0);`;
+                const thumbInner = item.youtube_id
+                    ? ''
+                    : `<img src="/assets/logo_icon.png" alt="기본 썸네일" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.5;">`;
 
                 html += `
                     <div class="song-item" id="song-item-${item.id}" onclick="selectSong(${item.id})">
-                        <div class="song-icon">${iconChar}</div>
+                        <div class="song-icon" style="${thumbStyle}">${thumbInner}</div>
                         <div class="song-info">
                             <div class="song-item-title">${item.title}</div>
                             <div class="song-item-artist">${item.artist || '아티스트 미상'}</div>
@@ -73,6 +76,15 @@ async function selectSong(id) {
                 document.getElementById('header-title').innerText = data.content_info.title || '제목 없음';
                 document.getElementById('header-artist').innerText = data.content_info.artist || '-';
                 document.getElementById('header-genre').innerText = data.content_info.genre || '장르 미상';
+
+                const headerThumb = document.getElementById('header-thumb');
+                if (data.content_info.youtube_id) {
+                    headerThumb.style.backgroundImage = `url('https://img.youtube.com/vi/${data.content_info.youtube_id}/mqdefault.jpg')`;
+                    headerThumb.innerHTML = '';
+                } else {
+                    headerThumb.style.backgroundImage = '';
+                    headerThumb.innerHTML = `<img src="/assets/logo_icon.png" alt="기본 썸네일" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.7;">`;
+                }
             }
             document.getElementById('play-now-btn').onclick = () => location.href = '/typing/' + id + '/play';
 
@@ -90,7 +102,7 @@ function renderRanking(list) {
     if (!list || list.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
-                <div style="font-size: 3rem; margin-bottom: 10px;"></div>
+                <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
                 아직 이 곡을 플레이한 기록이 없습니다.<br>
                 지금 바로 첫 번째 기록의 주인공이 되어보세요!
             </div>

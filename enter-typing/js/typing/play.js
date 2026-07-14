@@ -40,6 +40,7 @@ let isYoutubeMode = false;
 let isWaitingPhase = false;
 let typoDetails = [];
 let allTargetUnits = [];
+let keyTypoCollector = null;
 
 // Variables for new score logic
 let totalTypedChars = 0;
@@ -430,7 +431,7 @@ function renderLines() {
     nextPreviewDisplay.innerHTML = `<span class='prefix'>Next</span> ${nextKanji}`;
   }
 
-  targetUnits = parseKanaToTargetUnits(currentHiragana, true);
+  targetUnits = parseKanaToTargetUnits(currentHiragana);
   allTargetUnits[currentLineIndex] = targetUnits;
   currentUnitIndex = 0;
   currentBuffer = "";
@@ -514,6 +515,8 @@ function startGame(startedByYoutube = false) {
   totalTimeSum = 0;
   typoDetails = [];
   allTargetUnits = [];
+  keyTypoCollector = TypingEngine.createKeyTypoCollector();
+  keyTypoCollector.reset();
   if (scoreDisplay) scoreDisplay.innerText = 0;
   isYoutubeMode = !!(youtubePlayer && isPlayerReady && currentYoutubeId);
 
@@ -832,7 +835,7 @@ function endGame(completed = false) {
     resultModal.style.display = "flex";
 
     // --- 히스토리 저장 로직 추가 ---
-    const token = sessionStorage.getItem("ep_token");
+    const token = localStorage.getItem("ep_token");
     if (token) {
       const finalWpm = parseInt(document.getElementById("final-wpm").innerText) || 0;
       const finalAcc = parseFloat(document.getElementById("final-accuracy").innerText) || 0;
@@ -861,69 +864,37 @@ function endGame(completed = false) {
       .then(data => console.log("히스토리 저장:", data))
       .catch(err => console.error("히스토리 저장 오류:", err));
 
-      // 오타 통계 서버 저장
-      const typoCountsForSave = {};
-      typoDetails.forEach(t => {
-        if (t.type === 'typing' && t.word) {
-          typoCountsForSave[t.word] = (typoCountsForSave[t.word] || 0) + 1;
-        }
-      });
-      const typoPayload = Object.entries(typoCountsForSave).map(([char, cnt]) => ({
-        character: char,
-        error_count: cnt
-      }));
-
-      // 총 등장 횟수(total) 서버 저장
-      const totalCountsForSave = {};
-      allTargetUnits.forEach(units => {
-        if (units) {
-          units.forEach(u => {
-            if (u.text) {
-              totalCountsForSave[u.text] = (totalCountsForSave[u.text] || 0) + 1;
+      // 키 단위 오타 통계 서버 저장
+      if (keyTypoCollector) {
+        // 게임이 중간 종료되어 아직 처리되지 않은 현재 라인의 남은 유닛이 있으면
+        // totals 보강 (미완료 상태에서 endGame 진입 시 유실 방지)
+        if (!lineCompleted && targetUnits && currentUnitIndex < targetUnits.length) {
+          for (let ui = currentUnitIndex; ui < targetUnits.length; ui++) {
+            const u = targetUnits[ui];
+            if (u && u.validInputs && u.validInputs.length > 0) {
+              keyTypoCollector.addTotalsOnly(u.validInputs[0]);
             }
-          });
+          }
         }
-      });
-      const totalsPayload = Object.entries(totalCountsForSave).map(([char, cnt]) => ({
-        character: char,
-        total_count: cnt
-      }));
 
-      // 로마자 실수 패턴 서버 저장
-      const romajiMistakesForSave = {};
-      typoDetails.forEach(t => {
-        if (t.type === 'typing' && t.word && t.expected && t.typed) {
-          const key = t.word + "|" + t.expected + "|" + t.typed;
-          romajiMistakesForSave[key] = (romajiMistakesForSave[key] || 0) + 1;
-        }
-      });
-      const romajiPayload = Object.entries(romajiMistakesForSave).map(([key, cnt]) => {
-        const parts = key.split("|");
-        return {
-          kana: parts[0],
-          expected: parts[1],
-          typed: parts[2],
-          error_count: cnt
-        };
-      });
-
-      if (typoPayload.length > 0 || totalsPayload.length > 0 || romajiPayload.length > 0) {
-        fetch("/api/typo-stats", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          body: JSON.stringify({ 
-            typos: typoPayload, 
-            totals: totalsPayload, 
-            romaji_patterns: romajiPayload,
-            content_id: parseInt(contentId) || null
+        const payload = keyTypoCollector.getPayload();
+        if (payload.key_typos.length > 0 || payload.key_totals.length > 0) {
+          fetch("/api/typo-stats", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+              content_id: parseInt(TYPING_CONTENT_ID) || null,
+              key_typos: payload.key_typos,
+              key_totals: payload.key_totals
+            })
           })
-        })
-        .then(res => res.json())
-        .then(d => console.log("오타 통계 저장:", d))
-        .catch(err => console.error("오타 통계 저장 오류:", err));
+          .then(res => res.json())
+          .then(d => console.log("오타 통계 저장:", d))
+          .catch(err => console.error("오타 통계 저장 오류:", err));
+        }
       }
     }
   }
@@ -1037,12 +1008,17 @@ typingInput.addEventListener("input", (e) => {
       typed: testBuffer
     });
 
+    // 키 단위 오타 수집: 잘못 누른 키를 현재 유닛의 pending 목록에 기록
+    if (keyTypoCollector) keyTypoCollector.recordTypo(newChar);
+
     updateStats();
     return;
   }
 
   currentBuffer = testBuffer;
   if (isCompleteMatch) {
+    // 키 단위 오타 수집: 확정된 로마자 패턴(testBuffer) 기준으로 유닛 커밋
+    if (keyTypoCollector) keyTypoCollector.commitUnit(testBuffer);
     currentUnitIndex++;
     currentBuffer = "";
     typingInput.value = "";
@@ -1181,6 +1157,30 @@ function forceSkipToNextLine() {
 
     sessionCorrectChars += correctChars;
     sessionTotalChars += currentChars.length;
+  }
+
+  // 키 단위 오타 수집: 시간 초과로 스킵되는 라인의 미완료 유닛 집계
+  if (keyTypoCollector && !lineCompleted && targetUnits) {
+    if (currentUnitIndex < targetUnits.length) {
+      // 부분 입력 중이던 현재 유닛: 확정 패턴을 추정해 pending 오타 유실 방지
+      const partialUnit = targetUnits[currentUnitIndex];
+      if (partialUnit && partialUnit.validInputs && partialUnit.validInputs.length > 0) {
+        let bestMatch = partialUnit.validInputs.find(
+          (v) => v.indexOf(currentBuffer) === 0
+        );
+        if (!bestMatch) bestMatch = partialUnit.validInputs[0];
+        keyTypoCollector.commitUnit(bestMatch);
+      }
+      // 남은 미도달 유닛들: totals만 누적
+      for (let ui = currentUnitIndex + 1; ui < targetUnits.length; ui++) {
+        const u = targetUnits[ui];
+        if (u && u.validInputs && u.validInputs.length > 0) {
+          keyTypoCollector.addTotalsOnly(u.validInputs[0]);
+        }
+      }
+      // 이 라인은 수집 완료로 표시 (endGame 보강 시 중복 집계 방지)
+      currentUnitIndex = targetUnits.length;
+    }
   }
 
   let sectionCorrect = correctChars;

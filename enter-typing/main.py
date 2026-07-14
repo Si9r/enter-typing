@@ -24,6 +24,30 @@ def startup_event():
     except Exception:
         db.rollback()
 
+    # DB 스키마 정리 (촉음/요음 분리 입력 선택 기능 제거 - 분리 입력을 기본 알고리즘으로 통합)
+    try:
+        db.execute(text("ALTER TABLE users DROP COLUMN allow_split_sokuon;"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+    # 오타 통계 스키마 전환 (가나 유닛 기반 → 키보드 키 기반)
+    # 구 스키마 판별: typo_stats 테이블에 옛 컬럼 character_typed 가 남아 있으면 구 스키마다.
+    # 가나 기반 구 데이터는 키 기반으로 변환이 불가하므로, 관련 4개 테이블을 폐기(DROP)하고
+    # 새 스키마로 재생성한다. (구 데이터 삭제는 의도된 동작)
+    try:
+        old_col = db.execute(text("SHOW COLUMNS FROM typo_stats LIKE 'character_typed';")).fetchone()
+        if old_col is not None:
+            db.execute(text("DROP TABLE IF EXISTS content_romaji_mistakes;"))
+            db.execute(text("DROP TABLE IF EXISTS content_typo_stats;"))
+            db.execute(text("DROP TABLE IF EXISTS romaji_mistakes;"))
+            db.execute(text("DROP TABLE IF EXISTS typo_stats;"))
+            db.commit()
+            # 새 키 기반 스키마로 재생성
+            models.Base.metadata.create_all(bind=engine)
+    except Exception:
+        db.rollback()
+
     if db.query(models.TypingContent).count() == 0:
         # 최초 실행 시에만 기본 데이터를 추가합니다. 기존 데이터는 절대 삭제하지 않습니다.
         songs = []

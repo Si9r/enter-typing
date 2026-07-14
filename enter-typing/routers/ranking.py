@@ -153,7 +153,8 @@ def get_content_ranking(content_id: int, db: Session = Depends(get_db)):
         content_info = {
             "title": content.title,
             "artist": content.artist,
-            "genre": content.genre
+            "genre": content.genre,
+            "youtube_id": content.youtube_id
         }
 
     return {

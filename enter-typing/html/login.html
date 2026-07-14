@@ -355,6 +355,10 @@
         if (localStorage.getItem('ep_theme') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+        if (localStorage.getItem('ep_user')) {
+            alert('이미 로그인 한 상태입니다.');
+            location.href = '/';
+        }
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -363,29 +367,29 @@
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
+            <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
                 <a href="/typing">타이핑</a>
                 <a href="/quiz">퀴즈</a>
-                <a href="ranking.html">랭킹</a>
+                <a href="/ranking">랭킹</a>
                 <a href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
-            <div class="search-bar" onclick="location.href='search.html'">
+            <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'" style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+                <button class="auth-login" onclick="location.href='/login'" style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -396,7 +400,7 @@
     <main class="auth-page">
         <div class="auth-card">
             <!-- 로고 -->
-            <a href="index.html" class="auth-logo">
+            <a href="/" class="auth-logo">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:38px;width:auto;">
                 <span>엔터핑</span>
             </a>
@@ -435,7 +439,7 @@
 
                 <!-- 비밀번호 찾기 -->
                 <div class="form-extras">
-                    <a href="forgot_password.html">비밀번호를 잊으셨나요?</a>
+                    <a href="/forgot_password">비밀번호를 잊으셨나요?</a>
                 </div>
 
                 <!-- 로그인 버튼 -->
@@ -445,7 +449,7 @@
             <!-- 회원가입 유도 -->
             <p class="auth-footer-text">
                 아직 계정이 없으신가요?
-                <a href="signup.html">회원가입하기</a>
+                <a href="/signup">회원가입하기</a>
             </p>
         </div>
     </main>

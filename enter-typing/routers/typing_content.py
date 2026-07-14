@@ -47,6 +47,7 @@ def get_all_typing_contents(db: Session = Depends(get_db)):
             "artist": c.artist,
             "genre": c.genre,
             "description": c.description,
+            "creator_id": c.creator_id,
             "creator_nickname": creator_nickname(c),
             "difficulty": c.difficulty,
             "best_time": c.best_time,
@@ -114,9 +115,9 @@ def create_typing_content(req: TypingContentCreate, current_user: models.User = 
 # DELETE /api/typing-contents/{content_id}
 # ════════════════════════════════════════════════════════════
 @router.delete("/typing-contents/{content_id}")
-def delete_typing_content(content_id: int, db: Session = Depends(get_db)):
-    # 임시 관리자 모드: 작성자 권한 체크를 무시하고 모두 삭제 허용
+def delete_typing_content(content_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = get_content_or_404(models.TypingContent, content_id, db)
+    check_owner_or_403(content, current_user, "삭제 권한이 없습니다.")
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}
@@ -129,7 +130,7 @@ def delete_typing_content(content_id: int, db: Session = Depends(get_db)):
 @router.put("/typing-contents/{content_id}")
 def update_typing_content(content_id: int, req: TypingContentCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = get_content_or_404(models.TypingContent, content_id, db)
-    check_owner_or_403(content, current_user)
+    check_owner_or_403(content, current_user, "수정 권한이 없습니다.")
 
     content.title = req.title
     content.artist = req.artist
@@ -165,6 +166,7 @@ def get_typing_content(content_id: int, db: Session = Depends(get_db)):
         "genre": content.genre,
         "description": content.description,
         "youtube_id": content.youtube_id,
+        "creator_id": content.creator_id,
         "creator_nickname": creator_nickname(content),
         "difficulty": content.difficulty,
         "play_count": content.play_count,

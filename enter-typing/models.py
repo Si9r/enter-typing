@@ -61,53 +61,51 @@ class QuizHistory(Base):
 
     user = relationship("User", back_populates="quiz_histories")
 
-# 5. 오타 분석 테이블
+# 5. 오타 분석 테이블 (키보드 키 단위 통계)
 class TypoStat(Base):
     __tablename__ = "typo_stats"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    character_typed = Column(String(10), nullable=False)
+    key_char = Column(String(5), nullable=False)  # 집계 대상 키보드 키(소문자 단일 문자)
     error_count = Column(Integer, default=0)
     total_count = Column(Integer, default=0)
 
     user = relationship("User", back_populates="typo_stats")
 
-# 5-1. 로마자 입력 실수 통계 테이블
+# 5-1. 키 입력 실수(오타 키 매핑) 통계 테이블
 class RomajiMistake(Base):
     __tablename__ = "romaji_mistakes"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    kana = Column(String(10), nullable=False)
-    expected_romaji = Column(String(50), nullable=False)
-    typed_romaji = Column(String(50), nullable=False)
+    expected_key = Column(String(5), nullable=False)  # 의도했던 키
+    typo_key = Column(String(5), nullable=False)       # 실제로 잘못 누른 키
     error_count = Column(Integer, default=0)
 
     user = relationship("User")
-# 5-2. 콘텐츠별 오타 분석 테이블
+# 5-2. 콘텐츠별 오타 분석 테이블 (키보드 키 단위 통계)
 class ContentTypoStat(Base):
     __tablename__ = "content_typo_stats"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=False)
-    character_typed = Column(String(10), nullable=False)
+    key_char = Column(String(5), nullable=False)  # 집계 대상 키보드 키(소문자 단일 문자)
     error_count = Column(Integer, default=0)
     total_count = Column(Integer, default=0)
 
     user = relationship("User")
 
-# 5-3. 콘텐츠별 로마자 입력 실수 통계 테이블
+# 5-3. 콘텐츠별 키 입력 실수(오타 키 매핑) 통계 테이블
 class ContentRomajiMistake(Base):
     __tablename__ = "content_romaji_mistakes"
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     content_id = Column(Integer, ForeignKey("typing_contents.id"), nullable=False)
-    kana = Column(String(10), nullable=False)
-    expected_romaji = Column(String(50), nullable=False)
-    typed_romaji = Column(String(50), nullable=False)
+    expected_key = Column(String(5), nullable=False)  # 의도했던 키
+    typo_key = Column(String(5), nullable=False)       # 실제로 잘못 누른 키
     error_count = Column(Integer, default=0)
 
     user = relationship("User")

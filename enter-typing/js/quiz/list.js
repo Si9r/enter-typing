@@ -2,10 +2,15 @@ const modal = document.getElementById('detail-modal');
 
 // 페이지 로드 시 콘텐츠 불러오기
 let allQuizContents = [];
-let isAdminMode = false;
 let currentCategory = '전체';
 let currentSort = 'recent';
 let displayLimit = 30;
+
+function canManage(item) {
+    const user = window.NavAuth && window.NavAuth.getUser();
+    if (!user) return false;
+    return user.is_admin === true || user.id === item.creator_id;
+}
 
 function setCategory(cat) {
     currentCategory = cat;
@@ -33,21 +38,11 @@ function updateCategoryButtons() {
     });
 }
 
-function toggleAdminMode() {
-    isAdminMode = !isAdminMode;
-    const btn = document.getElementById('admin-mode-btn');
-    btn.innerText = `관리자 모드: ${isAdminMode ? 'ON' : 'OFF'}`;
-    btn.className = isAdminMode ? 'btn btn-blue-outline' : 'btn btn-outline';
-    btn.style.color = isAdminMode ? 'var(--color-blue)' : '';
-    btn.style.borderColor = isAdminMode ? 'var(--color-blue)' : '';
-    renderCards();
-}
-
 async function deleteQuizContent(id) {
     if (!confirm('정말로 이 퀴즈 콘텐츠를 삭제하시겠습니까?')) return;
 
     try {
-        const token = sessionStorage.getItem('ep_token');
+        const token = localStorage.getItem('ep_token');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
@@ -135,7 +130,7 @@ function renderCards() {
                         <span class="difficulty">${diffStars}</span>
                         <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${bestScore}점</span>
                     </div>
-                    ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
+                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
                 </div>
             </div>
         `;

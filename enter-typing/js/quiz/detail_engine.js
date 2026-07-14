@@ -376,7 +376,7 @@ async function endQuiz() {
     </div>`;
   document.getElementById('stat-cur').textContent = '완료!';
 
-  const token = sessionStorage.getItem('ep_token');
+  const token = localStorage.getItem('ep_token');
   if (token && quizData) {
       try {
           await fetch('/api/quiz-history', {
@@ -400,7 +400,7 @@ async function endQuiz() {
 // 초기화 로직
 document.addEventListener('DOMContentLoaded', () => {
     // 닉네임 표시
-    const userStr = sessionStorage.getItem('ep_user');
+    const userStr = localStorage.getItem('ep_user');
     const nick = userStr ? JSON.parse(userStr).nickname : '나';
     const playerEl = document.getElementById('player-name');
     if(playerEl) playerEl.textContent = nick;

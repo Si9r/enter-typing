@@ -591,10 +591,10 @@ document
             document.getElementById("difficulty").value,
         );
 
-        const token = sessionStorage.getItem("ep_token");
+        const token = localStorage.getItem("ep_token");
         if (!token) {
             alert("로그인이 필요합니다.");
-            location.href = "login.html";
+            location.href = "/login";
             return;
         }
 
@@ -634,10 +634,25 @@ document
 
 // Initialize on load
 async function loadEditData() {
+    const editCurrentUser = window.NavAuth && window.NavAuth.getUser();
+    const editToken = localStorage.getItem('ep_token');
+    if (!editCurrentUser || !editToken) {
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = '/login';
+        return;
+    }
+
     try {
         const res = await fetch(`/api/quiz-content/${editContentId}`);
         const data = await res.json();
         if (data.success) {
+            const isOwner = editCurrentUser.id === data.creator_id;
+            if (!isOwner && !editCurrentUser.is_admin) {
+                alert('수정 권한이 없습니다.');
+                location.href = '/quiz';
+                return;
+            }
+
             document.getElementById("title").value = data.title || "";
             document.getElementById("artist").value = data.artist || "";
             document.getElementById("genre").value = data.genre || "JPOP";

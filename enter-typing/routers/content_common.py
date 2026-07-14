@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 import models
+from core.security import is_admin
 
 
 def get_content_or_404(model, content_id: int, db: Session):
@@ -15,7 +16,7 @@ def get_content_or_404(model, content_id: int, db: Session):
 
 
 def check_owner_or_403(content, current_user: models.User, message: str = "수정 권한이 없습니다."):
-    if content.creator_id != current_user.id:
+    if content.creator_id != current_user.id and not is_admin(current_user):
         raise HTTPException(status_code=403, detail=message)
 
 

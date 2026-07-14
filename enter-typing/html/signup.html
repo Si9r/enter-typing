@@ -159,30 +159,43 @@
             font-weight: 500;
         }
 
+        /* 에러/성공 메시지가 같은 자리에 겹쳐서 표시되도록 하는 컨테이너 */
+        .form-msg {
+            display: grid;
+        }
+
         /* 에러 메시지 */
         .form-error {
+            grid-column: 1;
+            grid-row: 1;
             font-size: 0.82rem;
             color: #e74c3c;
             margin-top: 6px;
-            display: none;
+            min-height: 1.2em;
+            line-height: 1.2em;
             font-weight: 600;
+            visibility: hidden;
         }
 
         .form-error.visible {
-            display: block;
+            visibility: visible;
         }
 
         /* 성공 메시지 */
         .form-success {
+            grid-column: 1;
+            grid-row: 1;
             font-size: 0.82rem;
             color: #27ae60;
             margin-top: 6px;
-            display: none;
+            min-height: 1.2em;
+            line-height: 1.2em;
             font-weight: 600;
+            visibility: hidden;
         }
 
         .form-success.visible {
-            display: block;
+            visibility: visible;
         }
 
         /* 입력 오류 상태 */
@@ -230,6 +243,8 @@
             color: #aaa;
             margin-top: 4px;
             font-weight: 600;
+            min-height: 1.2em;
+            line-height: 1.2em;
         }
 
         /* 이용약관 동의 */
@@ -452,6 +467,10 @@
         if (localStorage.getItem('ep_theme') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
+        if (localStorage.getItem('ep_user')) {
+            alert('이미 로그인 한 상태입니다.');
+            location.href = '/';
+        }
     </script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
@@ -460,29 +479,29 @@
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
+            <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
                 <a href="/typing">타이핑</a>
                 <a href="/quiz">퀴즈</a>
-                <a href="ranking.html">랭킹</a>
+                <a href="/ranking">랭킹</a>
                 <a href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
-            <div class="search-bar" onclick="location.href='search.html'">
+            <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'" style="background-color: var(--color-pink-hover);">회원가입</button>
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'" style="background-color: var(--color-pink-hover);">회원가입</button>
             </div>
         </div>
     </header>
@@ -491,7 +510,7 @@
     <main class="auth-page">
         <div class="auth-card">
             <!-- 로고 -->
-            <a href="index.html" class="auth-logo">
+            <a href="/" class="auth-logo">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:38px;width:auto;">
                 <span>엔터핑</span>
             </a>
@@ -511,8 +530,10 @@
                         maxlength="12"
                         required
                     >
-                    <span class="form-error" id="name-error">닉네임은 2자 이상 12자 이하로 입력해주세요.</span>
-                    <span class="form-success" id="name-success">사용 가능한 닉네임입니다.</span>
+                    <div class="form-msg">
+                        <span class="form-error" id="name-error">닉네임은 2자 이상 12자 이하로 입력해주세요.</span>
+                        <span class="form-success" id="name-success">사용 가능한 닉네임입니다.</span>
+                    </div>
                 </div>
 
                 <!-- 이메일 -->
@@ -526,8 +547,10 @@
                         autocomplete="email"
                         required
                     >
-                    <span class="form-error" id="email-error">올바른 이메일 형식을 입력해주세요.</span>
-                    <span class="form-success" id="email-success">사용 가능한 이메일입니다.</span>
+                    <div class="form-msg">
+                        <span class="form-error" id="email-error">올바른 이메일 형식을 입력해주세요.</span>
+                        <span class="form-success" id="email-success">사용 가능한 이메일입니다.</span>
+                    </div>
                 </div>
 
                 <!-- 비밀번호 -->
@@ -563,8 +586,10 @@
                         autocomplete="new-password"
                         required
                     >
-                    <span class="form-error" id="confirm-error">비밀번호가 일치하지 않습니다.</span>
-                    <span class="form-success" id="confirm-success">비밀번호가 일치합니다 ✓</span>
+                    <div class="form-msg">
+                        <span class="form-error" id="confirm-error">비밀번호가 일치하지 않습니다.</span>
+                        <span class="form-success" id="confirm-success">비밀번호가 일치합니다 ✓</span>
+                    </div>
                 </div>
 
                 <!-- 이용약관 -->
@@ -592,7 +617,7 @@
                             (선택) 이벤트 및 마케팅 정보 수신에 동의합니다.
                         </span>
                     </label>
-                    <span class="form-error" id="terms-error" style="display:none;">필수 약관에 동의해주세요.</span>
+                    <span class="form-error" id="terms-error">필수 약관에 동의해주세요.</span>
                 </div>
 
                 <!-- 회원가입 버튼 -->
@@ -602,7 +627,7 @@
             <!-- 로그인 유도 -->
             <p class="auth-footer-text">
                 이미 계정이 있으신가요?
-                <a href="login.html">로그인하기</a>
+                <a href="/login">로그인하기</a>
             </p>
         </div>
     </main>

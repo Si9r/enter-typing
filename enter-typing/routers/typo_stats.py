@@ -11,27 +11,20 @@ from database import get_db
 router = APIRouter(prefix="/api", tags=["typo_stats"])
 
 
-class TypoPayloadItem(BaseModel):
-    character: str
+class KeyTypoItem(BaseModel):
+    expected_key: str   # 의도했던 키
+    typo_key: str       # 실제로 잘못 누른 키
     error_count: int
 
 
-class TotalPayloadItem(BaseModel):
-    character: str
+class KeyTotalItem(BaseModel):
+    key: str
     total_count: int
 
 
-class RomajiPatternItem(BaseModel):
-    kana: str
-    expected: str
-    typed: str
-    error_count: int
-
-
 class TypoStatsRequest(BaseModel):
-    typos: List[TypoPayloadItem]
-    totals: List[TotalPayloadItem] = []
-    romaji_patterns: List[RomajiPatternItem] = []
+    key_typos: List[KeyTypoItem] = []
+    key_totals: List[KeyTotalItem] = []
     content_id: int | None = None
 
 
@@ -54,18 +47,18 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
             ).delete()
             db.flush()
 
-        # 1. Update totals
-        for total_item in req.totals:
+        # 1. 키별 총 입력 횟수(total_count) 누적 (없으면 error_count=0으로 생성)
+        for total_item in req.key_totals:
             existing = db.query(models.TypoStat).filter(
                 models.TypoStat.user_id == current_user.id,
-                models.TypoStat.character_typed == total_item.character
+                models.TypoStat.key_char == total_item.key
             ).first()
             if existing:
                 existing.total_count += total_item.total_count
             else:
                 db.add(models.TypoStat(
                     user_id=current_user.id,
-                    character_typed=total_item.character,
+                    key_char=total_item.key,
                     error_count=0,
                     total_count=total_item.total_count
                 ))
@@ -73,7 +66,7 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                 content_existing = db.query(models.ContentTypoStat).filter(
                     models.ContentTypoStat.user_id == current_user.id,
                     models.ContentTypoStat.content_id == req.content_id,
-                    models.ContentTypoStat.character_typed == total_item.character
+                    models.ContentTypoStat.key_char == total_item.key
                 ).first()
                 if content_existing:
                     content_existing.total_count += total_item.total_count
@@ -81,24 +74,27 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                     db.add(models.ContentTypoStat(
                         user_id=current_user.id,
                         content_id=req.content_id,
-                        character_typed=total_item.character,
+                        key_char=total_item.key,
                         error_count=0,
                         total_count=total_item.total_count
                     ))
 
         db.flush()
-        # 2. Update errors
-        for typo_item in req.typos:
+        # 2. 키별 오타 통계 갱신
+        #    (a) TypoStat: expected_key(=key_char) 행의 error_count 누적
+        #    (b) RomajiMistake: (expected_key, typo_key) 조합의 error_count 누적
+        for typo_item in req.key_typos:
+            # (a) expected_key 기준 TypoStat error_count 누적
             existing = db.query(models.TypoStat).filter(
                 models.TypoStat.user_id == current_user.id,
-                models.TypoStat.character_typed == typo_item.character
+                models.TypoStat.key_char == typo_item.expected_key
             ).first()
             if existing:
                 existing.error_count += typo_item.error_count
             else:
                 db.add(models.TypoStat(
                     user_id=current_user.id,
-                    character_typed=typo_item.character,
+                    key_char=typo_item.expected_key,
                     error_count=typo_item.error_count,
                     total_count=0
                 ))
@@ -106,7 +102,7 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                 content_existing = db.query(models.ContentTypoStat).filter(
                     models.ContentTypoStat.user_id == current_user.id,
                     models.ContentTypoStat.content_id == req.content_id,
-                    models.ContentTypoStat.character_typed == typo_item.character
+                    models.ContentTypoStat.key_char == typo_item.expected_key
                 ).first()
                 if content_existing:
                     content_existing.error_count += typo_item.error_count
@@ -114,48 +110,42 @@ def save_typo_stats(req: TypoStatsRequest, db: Session = Depends(get_db), curren
                     db.add(models.ContentTypoStat(
                         user_id=current_user.id,
                         content_id=req.content_id,
-                        character_typed=typo_item.character,
+                        key_char=typo_item.expected_key,
                         error_count=typo_item.error_count,
                         total_count=0
                     ))
 
-        db.flush()
-        # 3. Update romaji patterns
-        for pattern_item in req.romaji_patterns:
-            existing = db.query(models.RomajiMistake).filter(
+            # (b) (expected_key, typo_key) 조합별 RomajiMistake error_count 누적
+            mistake_existing = db.query(models.RomajiMistake).filter(
                 models.RomajiMistake.user_id == current_user.id,
-                models.RomajiMistake.kana == pattern_item.kana,
-                models.RomajiMistake.expected_romaji == pattern_item.expected,
-                models.RomajiMistake.typed_romaji == pattern_item.typed
+                models.RomajiMistake.expected_key == typo_item.expected_key,
+                models.RomajiMistake.typo_key == typo_item.typo_key
             ).first()
-            if existing:
-                existing.error_count += pattern_item.error_count
+            if mistake_existing:
+                mistake_existing.error_count += typo_item.error_count
             else:
                 db.add(models.RomajiMistake(
                     user_id=current_user.id,
-                    kana=pattern_item.kana,
-                    expected_romaji=pattern_item.expected,
-                    typed_romaji=pattern_item.typed,
-                    error_count=pattern_item.error_count
+                    expected_key=typo_item.expected_key,
+                    typo_key=typo_item.typo_key,
+                    error_count=typo_item.error_count
                 ))
             if req.content_id:
-                content_existing = db.query(models.ContentRomajiMistake).filter(
+                content_mistake = db.query(models.ContentRomajiMistake).filter(
                     models.ContentRomajiMistake.user_id == current_user.id,
                     models.ContentRomajiMistake.content_id == req.content_id,
-                    models.ContentRomajiMistake.kana == pattern_item.kana,
-                    models.ContentRomajiMistake.expected_romaji == pattern_item.expected,
-                    models.ContentRomajiMistake.typed_romaji == pattern_item.typed
+                    models.ContentRomajiMistake.expected_key == typo_item.expected_key,
+                    models.ContentRomajiMistake.typo_key == typo_item.typo_key
                 ).first()
-                if content_existing:
-                    content_existing.error_count += pattern_item.error_count
+                if content_mistake:
+                    content_mistake.error_count += typo_item.error_count
                 else:
                     db.add(models.ContentRomajiMistake(
                         user_id=current_user.id,
                         content_id=req.content_id,
-                        kana=pattern_item.kana,
-                        expected_romaji=pattern_item.expected,
-                        typed_romaji=pattern_item.typed,
-                        error_count=pattern_item.error_count
+                        expected_key=typo_item.expected_key,
+                        typo_key=typo_item.typo_key,
+                        error_count=typo_item.error_count
                     ))
         db.commit()
         return {"success": True, "message": "오타 통계가 저장되었습니다."}
@@ -185,30 +175,30 @@ def get_typo_stats(content_id: Optional[int] = None, db: Session = Depends(get_d
     avg_error_rate = (total_typos / total_chars * 100) if total_chars > 0 else 0
 
     data = []
-    kana_total_errors = {}
+    key_total_errors = {}
     for stat in stats:
         data.append({
-            "kana": stat.character_typed,
+            "key": stat.key_char,
             "error_count": stat.error_count,
             "total_count": stat.total_count
         })
-        kana_total_errors[stat.character_typed] = stat.error_count
+        key_total_errors[stat.key_char] = stat.error_count
 
     if content_id:
-        romaji_stats = db.query(models.ContentRomajiMistake).filter(
+        mistake_stats = db.query(models.ContentRomajiMistake).filter(
             models.ContentRomajiMistake.user_id == current_user.id,
             models.ContentRomajiMistake.content_id == content_id
         ).all()
     else:
-        romaji_stats = db.query(models.RomajiMistake).filter(models.RomajiMistake.user_id == current_user.id).all()
-    romaji_patterns = []
-    for rm in romaji_stats:
-        total_for_kana = kana_total_errors.get(rm.kana, 0)
-        pct = int((rm.error_count / total_for_kana * 100)) if total_for_kana > 0 else 0
-        romaji_patterns.append({
-            "char": rm.kana,
-            "correct": rm.expected_romaji,
-            "wrong": rm.typed_romaji,
+        mistake_stats = db.query(models.RomajiMistake).filter(models.RomajiMistake.user_id == current_user.id).all()
+    key_patterns = []
+    for rm in mistake_stats:
+        # expected_key의 총 error_count 대비 이 (expected_key, typo_key) 조합의 비율
+        total_for_key = key_total_errors.get(rm.expected_key, 0)
+        pct = int((rm.error_count / total_for_key * 100)) if total_for_key > 0 else 0
+        key_patterns.append({
+            "expected_key": rm.expected_key,
+            "typo_key": rm.typo_key,
             "error_count": rm.error_count,
             "pct": pct
         })
@@ -221,8 +211,7 @@ def get_typo_stats(content_id: Optional[int] = None, db: Session = Depends(get_d
             "improvement": 0  # Dummy improvement for now
         },
         "data": data,
-        "pairs": [],
-        "romaji_patterns": romaji_patterns
+        "key_patterns": key_patterns
     }
 
 

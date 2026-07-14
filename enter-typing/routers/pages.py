@@ -30,6 +30,58 @@ def serve_html(page: str):
     raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다.")
 
 
+# ── 인증 페이지 (클린 URL) ──────────────────────────────
+@router.get("/login")
+def login_page():
+    return FileResponse("html/login.html")
+
+
+@router.get("/signup")
+def signup_page():
+    return FileResponse("html/signup.html")
+
+
+@router.get("/change_password")
+def change_password_page():
+    return FileResponse("html/change_password.html")
+
+
+@router.get("/forgot_password")
+def forgot_password_page():
+    return FileResponse("html/forgot_password.html")
+
+
+# ── 랭킹 / 공지 / 검색 / 마이페이지 (클린 URL) ──────────
+@router.get("/ranking")
+def ranking_page():
+    return FileResponse("html/ranking.html")
+
+
+@router.get("/ranking/songs")
+def ranking_song_page():
+    return FileResponse("html/ranking_song.html")
+
+
+@router.get("/notice")
+def notice_page():
+    return FileResponse("html/notice.html")
+
+
+@router.get("/search")
+def search_page():
+    return FileResponse("html/search.html")
+
+
+@router.get("/typing_popular")
+def typing_popular_page():
+    return FileResponse("html/typing_popular.html")
+
+
+@router.get("/profile")
+def profile_page_clean(request: Request):
+    return templates.TemplateResponse(request, "profile.html")
+
+
 # ── 타이핑 콘텐츠 페이지 (클린 URL) ──────────────────────
 @router.get("/typing")
 def typing_list_page():

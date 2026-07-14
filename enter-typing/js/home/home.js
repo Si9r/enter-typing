@@ -1,3 +1,19 @@
+// ── 로그인 상태에 따른 히어로 버튼 전환 ──────────────────
+(function () {
+    const user = window.NavAuth && window.NavAuth.getUser();
+    if (!user) return;
+    const primaryBtn = document.getElementById('hero-btn-primary');
+    const secondaryBtn = document.getElementById('hero-btn-secondary');
+    if (primaryBtn) {
+        primaryBtn.textContent = '타이핑 시작하기';
+        primaryBtn.onclick = () => location.href = '/typing';
+    }
+    if (secondaryBtn) {
+        secondaryBtn.textContent = '퀴즈 풀어보기';
+        secondaryBtn.onclick = () => location.href = '/quiz';
+    }
+})();
+
 // ── 히어로 섹션 장식용 타이핑 애니메이션 ──────────────
 const romajiStr = "sizumuyounitoketeyukuyouni";
 const hiraganaStr = "しずむようにとけてゆくように";

@@ -3,7 +3,8 @@ import { state } from './battle_state.js';
 import {
     enterWaitingRoom, appendSystemChat, appendOpponentChat, renderPlayersInLobby,
     updateReadyButton, renderLiveRanking, showSyncUI, hideSyncUI, showCountdown,
-    showResultsScreen, addQuizOpponentChat, updateVideoInfoPanel, returnToLobby
+    showResultsScreen, addQuizOpponentChat, updateVideoInfoPanel, returnToLobby,
+    updateWaitSongThumb, updateWaitContentMeta
 } from './battle_ui.js';
 import { checkAndSendSyncReady, startGamePlay, handleOpponentQuizAnswer } from './battle_game.js';
 
@@ -24,10 +25,10 @@ export function submitRoomPassword() {
 }
 
 export function connectToBattleRoom(roomCode, password = "") {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) {
         alert("로그인이 필요합니다.");
-        location.href = "login.html";
+        location.href = "/login";
         return;
     }
 
@@ -77,6 +78,8 @@ export function connectToBattleRoom(roomCode, password = "") {
                                 if (data.success) {
                                     state.selectedSong = data;
                                     console.log(`[Battle] 퀴즈 상세 데이터 조회 성공: ${state.selectedSong.title}`);
+                                    updateWaitSongThumb();
+                                    updateWaitContentMeta();
                                 }
                             })
                             .catch(err => console.error('[Battle] 퀴즈 상세 데이터 조회 실패:', err));
@@ -110,6 +113,8 @@ export function connectToBattleRoom(roomCode, password = "") {
                                     };
                                     console.log(`[Battle] fallback 조회 성공: ${data.title}`);
                                     updateVideoInfoPanel();
+                                    updateWaitSongThumb();
+                                    updateWaitContentMeta();
                                     if (state.ytPlayer && typeof state.ytPlayer.cueVideoById === 'function' && state.selectedSong.youtube_id) {
                                         state.ytPlayer.cueVideoById(state.selectedSong.youtube_id);
                                     }

@@ -2,19 +2,14 @@ const modal = document.getElementById('detail-modal');
 
 // 페이지 로드 시 콘텐츠 불러오기
 let allTypingContents = [];
-let isAdminMode = false;
 let currentCategory = '전체';
 let currentSort = 'recent';
 let displayLimit = 30;
 
-function toggleAdminMode() {
-    isAdminMode = !isAdminMode;
-    const btn = document.getElementById('admin-mode-btn');
-    btn.innerText = `관리자 모드: ${isAdminMode ? 'ON' : 'OFF'}`;
-    btn.className = isAdminMode ? 'btn btn-blue-outline' : 'btn btn-outline';
-    btn.style.color = isAdminMode ? 'var(--color-blue)' : '';
-    btn.style.borderColor = isAdminMode ? 'var(--color-blue)' : '';
-    renderCards();
+function canManage(item) {
+    const user = window.NavAuth && window.NavAuth.getUser();
+    if (!user) return false;
+    return user.is_admin === true || user.id === item.creator_id;
 }
 
 function setCategory(cat) {
@@ -53,7 +48,7 @@ async function deleteTypingContent(id) {
     if (!confirm('정말로 이 타이핑 콘텐츠를 삭제하시겠습니까?')) return;
 
     try {
-        const token = sessionStorage.getItem('ep_token');
+        const token = localStorage.getItem('ep_token');
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
@@ -149,7 +144,7 @@ function renderCards() {
                         <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-clock" style="vertical-align: middle; margin-right: 3px;"></i> ${timeStr}</span>
                         <span class="play-count" style="margin-left: 10px; font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600;"><i class="ph-bold ph-play-circle" style="vertical-align: middle; margin-right: 3px;"></i> ${item.play_count || 0}</span>
                     </div>
-                    ${isAdminMode ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
+                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
                 </div>
             </div>
         `;
@@ -234,7 +229,7 @@ async function openModal(id) {
             document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 가사로 타자 연습을 시작해보세요!`;
 
             document.getElementById('modal-start-btn').onclick = () => location.href = `/typing/${id}/play`;
-            document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking_song.html?id=${id}`;
+            document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking/songs?id=${id}`;
         }
     } catch (error) {
         console.error("Failed to fetch typing content details", error);

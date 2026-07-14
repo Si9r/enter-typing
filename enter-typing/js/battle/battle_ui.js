@@ -51,7 +51,8 @@ export async function fetchBackendQuizzes() {
                 title: item.title,
                 artist: item.artist || "알 수 없음",
                 genre: item.genre || "",
-                thumbnail_url: item.thumbnail_url || "/assets/vinyl.svg"
+                thumbnail_url: item.thumbnail_url || "/assets/vinyl.svg",
+                difficulty: item.difficulty || 3
             }));
         }
     } catch (e) {
@@ -81,10 +82,19 @@ function renderContentSelectorGrid() {
         grid.innerHTML = "<div style='color: var(--theme-text-muted); grid-column: 1 / -1; text-align: center; padding: 40px;'>선택 가능한 콘텐츠가 없습니다.</div>";
     } else {
         list.forEach(item => {
+            const isSelected = state.currentRoom && state.currentRoom.song_id === item.id && state.currentRoom.mode === mode;
             const card = document.createElement("div");
             card.style.cssText = "background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column;";
+            if (isSelected) {
+                card.style.border = "2px solid var(--color-battle-accent)";
+                card.style.boxShadow = "0 0 0 3px rgba(255, 209, 123, 0.25)";
+            }
             card.onmouseover = () => { card.style.transform = "translateY(-4px)"; card.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; card.style.borderColor = "var(--color-battle-primary)"; };
-            card.onmouseout = () => { card.style.transform = "translateY(0)"; card.style.boxShadow = "none"; card.style.borderColor = "var(--theme-border)"; };
+            card.onmouseout = () => {
+                card.style.transform = "translateY(0)";
+                card.style.boxShadow = isSelected ? "0 0 0 3px rgba(255, 209, 123, 0.25)" : "none";
+                card.style.borderColor = isSelected ? "var(--color-battle-accent)" : "var(--theme-border)";
+            };
 
             card.onclick = () => selectContentForRoom(item, mode);
 
@@ -119,7 +129,7 @@ export function closeContentSelectorModal() {
 }
 
 async function selectContentForRoom(item, mode) {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     try {
         const res = await fetch(`/api/battle/rooms/${state.currentRoom.code}/select-content`, {
             method: 'POST',
@@ -201,6 +211,55 @@ export function updateVideoInfoPanel() {
     }
 }
 
+// 대기실 상단 "선택된 콘텐츠" 미리보기의 종류 배지/난이도/제목 갱신 (databaseSongs/Quizzes
+// 캐시에 없어서 API로 뒤늦게 selectedSong을 채우는 fallback 경로에서도 재사용).
+export function updateWaitContentMeta() {
+    const currentRoom = state.currentRoom;
+    if (!currentRoom) return;
+
+    const titleEl = document.getElementById("wait-song-title");
+    const badgeEl = document.getElementById("wait-content-type-badge");
+    const diffEl = document.getElementById("wait-content-difficulty");
+
+    if (currentRoom.song_id) {
+        titleEl.textContent = currentRoom.song_title;
+        badgeEl.textContent = currentRoom.mode === 'quiz' ? '퀴즈' : '타이핑';
+        badgeEl.className = `content-type-badge ${currentRoom.mode === 'quiz' ? 'mode-quiz' : 'mode-typing'}`;
+        const difficulty = (state.selectedSong && state.selectedSong.difficulty) || 3;
+        diffEl.innerHTML = `<i class="ph-fill ph-star"></i> ${difficulty}`;
+        diffEl.classList.add('visible');
+    } else {
+        titleEl.textContent = state.isHost ? "콘텐츠를 선택해주세요" : "방장이 콘텐츠를 선택하는 중입니다...";
+        badgeEl.textContent = "";
+        badgeEl.className = "content-type-badge";
+        diffEl.classList.remove('visible');
+    }
+}
+
+// 대기실 상단 "선택된 콘텐츠" 썸네일만 갱신 (databaseSongs/Quizzes 캐시에 없어서
+// API로 뒤늦게 selectedSong을 채우는 fallback 경로에서도 재사용).
+export function updateWaitSongThumb() {
+    const songThumbEl = document.getElementById("wait-song-thumb");
+    if (!songThumbEl) return;
+    const currentRoom = state.currentRoom;
+    if (!currentRoom || !currentRoom.song_id) {
+        songThumbEl.style.backgroundImage = "none";
+        songThumbEl.textContent = "🎵";
+        return;
+    }
+    const selectedSong = state.selectedSong;
+    const thumbUrl = currentRoom.mode === 'quiz'
+        ? (selectedSong && selectedSong.thumbnail_url)
+        : (selectedSong && selectedSong.youtube_id ? `https://img.youtube.com/vi/${selectedSong.youtube_id}/mqdefault.jpg` : null);
+    if (thumbUrl) {
+        songThumbEl.style.backgroundImage = `url('${thumbUrl}')`;
+        songThumbEl.textContent = "";
+    } else {
+        songThumbEl.style.backgroundImage = "none";
+        songThumbEl.textContent = currentRoom.mode === 'quiz' ? "🎯" : "🎵";
+    }
+}
+
 export function enterWaitingRoom() {
     switchView("view-waiting");
     const currentRoom = state.currentRoom;
@@ -214,22 +273,12 @@ export function enterWaitingRoom() {
 
     document.getElementById("wait-room-code").innerHTML = `코드: ${currentRoom.code} <span style="font-size: 0.85rem;"></span>`;
 
-    const songLabelEl = document.getElementById("wait-song-label");
-    const songTitleEl = document.getElementById("wait-song-title");
-    const songArtistEl = document.getElementById("wait-song-artist");
-    if (currentRoom.song_id) {
-        songLabelEl.textContent = currentRoom.mode === 'quiz' ? "선택된 퀴즈" : "선택된 타이핑 곡";
-        songTitleEl.textContent = currentRoom.song_title;
-        songArtistEl.textContent = currentRoom.song_artist;
-    } else {
-        songLabelEl.textContent = "콘텐츠 미정";
-        songTitleEl.textContent = state.isHost ? "콘텐츠를 선택해주세요" : "방장이 콘텐츠를 선택하는 중입니다...";
-        songArtistEl.textContent = "";
-    }
+    updateWaitContentMeta();
+    updateWaitSongThumb();
 
     const selectBtn = document.getElementById("btn-select-content");
-    selectBtn.style.display = state.isHost ? "block" : "none";
-    selectBtn.textContent = currentRoom.song_id ? "🎵 콘텐츠 변경" : "🎵 콘텐츠 선택";
+    selectBtn.style.display = state.isHost ? "flex" : "none";
+    selectBtn.title = currentRoom.song_id ? "콘텐츠 변경" : "콘텐츠 선택";
 
     updateReadyButton();
 

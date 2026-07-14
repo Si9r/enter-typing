@@ -30,6 +30,7 @@ async function initQuiz() {
         if (data.success) {
             quizTitle = data.title || "알 수 없는 퀴즈";
             quizData = JSON.parse(data.quiz_data || "[]");
+            document.getElementById("best-score").innerText = data.best_score || 0;
             updateQuizCountDisplay();
             if (quizData.length > 0 && quizData[0].youtube_id) {
                 currentLoadedYoutubeId = quizData[0].youtube_id;
@@ -490,7 +491,7 @@ function showQuizResult() {
 }
 
 function saveQuizHistory() {
-    const token = sessionStorage.getItem("ep_token");
+    const token = localStorage.getItem("ep_token");
     if (!token) return;
 
     fetch("/api/quiz-history", {

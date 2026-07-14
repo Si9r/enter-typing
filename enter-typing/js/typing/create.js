@@ -246,12 +246,27 @@ const editIdMatch = window.location.pathname.match(/^\/typing\/(\d+)\/edit\/?$/)
 const editId = editIdMatch ? editIdMatch[1] : null;
 
 if (editId) {
-    document.getElementById('btn-save').innerHTML = " 수정하기";
+    const editCurrentUser = window.NavAuth && window.NavAuth.getUser();
+    const editToken = localStorage.getItem('ep_token');
 
-    fetch(`/api/typing-content/${editId}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
+    if (!editCurrentUser || !editToken) {
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = '/login';
+    } else {
+        document.getElementById('btn-save').innerHTML = " 수정하기";
+
+        fetch(`/api/typing-content/${editId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+
+                const isOwner = editCurrentUser.id === data.creator_id;
+                if (!isOwner && !editCurrentUser.is_admin) {
+                    alert('수정 권한이 없습니다.');
+                    location.href = '/typing';
+                    return;
+                }
+
                 document.getElementById('title').value = data.title || '';
                 document.getElementById('artist').value = data.artist || '';
                 document.getElementById('genre').value = data.genre || 'JPOP';
@@ -278,9 +293,9 @@ if (editId) {
                     });
                 }
                 renderTable();
-            }
-        })
-        .catch(err => console.error(err));
+            })
+            .catch(err => console.error(err));
+    }
 }
 
 // Save Content
@@ -316,7 +331,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     };
 
     try {
-        const token = sessionStorage.getItem('ep_token');
+        const token = localStorage.getItem('ep_token');
         if (!token) return alert('로그인이 필요한 서비스입니다.');
 
         const method = editId ? 'PUT' : 'POST';
@@ -334,7 +349,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
         const data = await response.json();
         if (data.success) {
             alert(editId ? '성공적으로 수정되었습니다!' : '성공적으로 등록되었습니다!');
-            location.href = editId ? 'profile.html' : '/typing';
+            location.href = editId ? 'profile' : '/typing';
         } else {
             alert((editId ? '수정에' : '등록에') + ' 실패했습니다: ' + (data.detail || '알 수 없는 오류'));
         }

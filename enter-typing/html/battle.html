@@ -226,6 +226,118 @@
             flex: 1;
         }
 
+        .content-select-box {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            max-width: 480px;
+            margin-bottom: 24px;
+        }
+
+        .content-preview {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+            padding: 14px 16px;
+        }
+
+        .content-preview-thumb {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--color-battle-primary), var(--color-battle-secondary));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .content-preview-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .content-preview-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .content-type-badge {
+            display: none;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .content-type-badge.mode-typing {
+            display: inline-flex;
+            background: rgba(255, 182, 193, 0.25);
+            color: var(--color-battle-primary);
+        }
+
+        .content-type-badge.mode-quiz {
+            display: inline-flex;
+            background: rgba(173, 216, 230, 0.3);
+            color: var(--color-battle-secondary);
+        }
+
+        .content-preview-diff {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--color-battle-text-muted);
+        }
+
+        .content-preview-diff.visible {
+            display: inline-flex;
+        }
+
+        .content-preview-title {
+            font-weight: 800;
+            font-size: 1.05rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--color-battle-text);
+        }
+
+        .content-select-btn {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 1px solid var(--theme-border);
+            background: var(--color-battle-card);
+            color: var(--color-battle-text);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .content-select-btn:hover {
+            background: var(--theme-bg-hover);
+            border-color: var(--color-battle-primary);
+            transform: translateY(-2px);
+        }
+
         .room-meta-header {
             display: flex;
             justify-content: space-between;
@@ -825,33 +937,33 @@
 
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
+            <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
                 <a href="/typing">타이핑</a>
                 <a href="/quiz">퀴즈</a>
-                <a href="ranking.html">랭킹</a>
+                <a href="/ranking">랭킹</a>
                 <a href="/battle" class="active">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
-            <div class="search-bar" onclick="location.href='search.html'">
+            <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link"
+            <a href="/notice" class="nav-notice-link"
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
                 공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -880,7 +992,7 @@
                         <div>
                             <span class="room-status waiting" id="wait-room-status">대기 중</span>
                             <h2 style="font-size: 1.6rem; font-weight: 900; margin-top: 8px;" id="wait-room-title">
-                                드라이플라워 900타 방</h2>
+                                로딩 중...</h2>
                         </div>
                         <div class="room-badge-code" id="wait-room-code" onclick="copyRoomCode()"
                             style="cursor: pointer;" title="클릭해서 복사하기">
@@ -888,21 +1000,23 @@
                         </div>
                     </div>
 
-                    <div
-                        style="display: flex; gap: 15px; background: rgba(0,0,0,0.15); border-radius: 12px; padding: 15px; margin-bottom: 24px; align-items: center;">
-                        <div
-                            style="flex-shrink: 0; background: linear-gradient(135deg, var(--color-battle-primary), var(--color-battle-secondary)); width: 50px; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                    <div class="content-select-box">
+                        <div class="content-preview">
+                            <div id="wait-song-thumb" class="content-preview-thumb">🎵</div>
+                            <div class="content-preview-body">
+                                <div class="content-preview-top">
+                                    <span id="wait-content-type-badge" class="content-type-badge"></span>
+                                    <span id="wait-content-difficulty" class="content-preview-diff">
+                                        <i class="ph-fill ph-star"></i> 3
+                                    </span>
+                                </div>
+                                <div id="wait-song-title" class="content-preview-title">방장이 콘텐츠를 선택하는 중입니다...</div>
                             </div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 0.8rem; color: var(--color-battle-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="wait-song-label">콘텐츠 미정</div>
-                            <div style="font-weight: 800; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="wait-song-title">방장이 콘텐츠를 선택하는 중입니다...
-                            </div>
-                            <div style="font-size: 0.85rem; color: var(--color-battle-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-                                id="wait-song-artist"></div>
                         </div>
-                        <button class="btn-battle btn-battle-secondary" id="btn-select-content"
-                            style="flex-shrink: 0; display: none; padding: 10px 16px; font-size: 0.9rem;"
-                            onclick="openContentSelectorModal()">🎵 콘텐츠 선택</button>
+                        <button class="content-select-btn" id="btn-select-content"
+                            onclick="openContentSelectorModal()" title="콘텐츠 선택">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </button>
                     </div>
 
                     <div class="player-grid" id="wait-player-grid">
@@ -1364,31 +1478,30 @@
             </div>
 
             <div class="footer-col">
-                <h4>타이핑</h4>
+                <h4>타이핑 & 퀴즈</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
-                    <li><a href="/typing">전체 타이핑 리스트</a></li>
-                    <li><a href="/typing/create">타이핑 작성하기</a></li>
-                    <li><a href="/battle" style="color: var(--color-battle-primary); font-weight: bold;">실시간 대전</a>
-                    </li>
+                    <li><a href="/typing">타이핑 리스트</a></li>
+                    <li><a href="/typing/create">타이핑 작성</a></li>
+                    <li><a href="/quiz">퀴즈 리스트</a></li>
+                    <li><a href="/quiz/create">퀴즈 작성</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>퀴즈 & 랭킹</h4>
+                <h4>실시간 & 랭킹</h4>
                 <ul>
-                    <li><a href="/quiz">퀴즈 리스트</a></li>
-                    <li><a href="/quiz/create">퀴즈 작성하기</a></li>
-                    <li><a href="ranking.html">전체 랭킹</a></li>
-                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                    <li><a href="/battle" style="color: var(--color-battle-primary); font-weight: bold;">실시간 대전</a>
+                    </li>
+                    <li><a href="/ranking">전체 랭킹</a></li>
+                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
-                    <li><a href="notice.html">공지사항</a></li>
-                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="/notice">공지사항</a></li>
+                    <li><a href="/profile">마이페이지</a></li>
                     <li><a href="#" id="footer-open-terms">이용약관</a></li>
                     <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>

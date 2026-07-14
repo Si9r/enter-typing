@@ -2,7 +2,7 @@
 const changeEmail = sessionStorage.getItem('change_pw_email') || '';
 if (!changeEmail) {
     // 직접 접근 방지: 이메일 정보 없으면 로그인 페이지로
-    location.href = 'login.html';
+    location.href = '/login';
 }
 
 // ─── 비밀번호 강도 ────────────────────────────────────

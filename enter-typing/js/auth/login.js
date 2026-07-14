@@ -49,17 +49,19 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             // 로그인 상태 저장 (navbar.js?v=2.0.0가 이 정보를 읽어 프로필 아이콘 표시)
             const nickname = data.nickname || emailInput.value.trim().split('@')[0];
             NavAuth.setUser({
+                id: data.id,
                 email: emailInput.value.trim(),
                 nickname: nickname,
+                is_admin: data.is_admin,
                 token: data.access_token
             });
 
             if (data.requires_password_change) {
                 // 임시 비밀번호 로그인 → 강제 비밀번호 변경
                 sessionStorage.setItem('change_pw_email', emailInput.value.trim());
-                location.href = 'change_password.html';
+                location.href = '/change_password';
             } else {
-                location.href = 'index.html';
+                location.href = '/';
             }
         } else {
             passwordInput.classList.add('error');

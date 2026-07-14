@@ -86,7 +86,7 @@ function joinByCode() {
 function openCreateModal() {
     if (!(window.NavAuth && window.NavAuth.getUser())) {
         alert('로그인이 필요한 서비스입니다.');
-        location.href = 'login.html';
+        location.href = '/login';
         return;
     }
     document.getElementById('create-title').value = '';
@@ -117,7 +117,7 @@ async function submitCreateRoom() {
         return;
     }
 
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     try {
         const res = await fetch('/api/battle/rooms', {
             method: 'POST',

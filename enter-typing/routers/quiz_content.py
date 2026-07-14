@@ -59,7 +59,9 @@ def get_all_quiz_contents(db: Session = Depends(get_db)):
             "artist": c.artist,
             "genre": c.genre,
             "description": c.description,
+            "youtube_id": c.youtube_id,
             "thumbnail_url": c.thumbnail_url,
+            "creator_id": c.creator_id,
             "creator_nickname": creator_nickname(c),
             "difficulty": c.difficulty,
             "best_score": c.best_score,
@@ -84,6 +86,7 @@ def get_my_quiz_contents(current_user: models.User = Depends(get_current_user), 
             "artist": c.artist,
             "genre": c.genre,
             "description": c.description,
+            "youtube_id": c.youtube_id,
             "thumbnail_url": c.thumbnail_url,
             "difficulty": c.difficulty,
             "best_score": c.best_score,
@@ -134,6 +137,7 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
         "description": content.description,
         "youtube_id": content.youtube_id,
         "thumbnail_url": content.thumbnail_url,
+        "creator_id": content.creator_id,
         "creator_nickname": creator_nickname(content),
         "difficulty": content.difficulty,
         "play_count": content.play_count,
@@ -147,8 +151,9 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
 # DELETE /api/quiz-contents/{content_id}
 # ════════════════════════════════════════════════════════════
 @router.delete("/quiz-contents/{content_id}")
-def delete_quiz_content(content_id: int, db: Session = Depends(get_db)):
+def delete_quiz_content(content_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = get_content_or_404(models.QuizContent, content_id, db)
+    check_owner_or_403(content, current_user, "삭제 권한이 없습니다.")
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}

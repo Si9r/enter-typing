@@ -27,7 +27,7 @@ export function switchSubTab(type) {
 
 // ── 내 타이핑 콘텐츠 로드 ──────────────────────────────────
 export async function loadMyTypingContents() {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) return;
     try {
         const res = await fetch('/api/my-typing-contents', {
@@ -37,18 +37,20 @@ export async function loadMyTypingContents() {
         const container = document.getElementById('mytyping-list');
         if (resData.success && resData.data.length > 0) {
             container.innerHTML = resData.data.map(item => `
-        <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='/typing/${item.id}'">
+        <div class="history-item" style="cursor:pointer;" onclick="location.href='/typing/${item.id}'">
           <div class="history-icon typing">⌨️</div>
           <div class="history-info">
             <div class="title">${item.title} — ${item.artist}</div>
             <div class="sub">난이도: ${` X ${item.difficulty || 3}`} · 장르: ${item.genre || 'JPOP'}</div>
           </div>
-          <div class="history-result" style="margin-right: 80px;">
+          <div class="history-result">
             <div class="score">⏱️ ${item.best_time || 0}초</div>
             <div class="date">플레이: ${item.play_count || 0}회</div>
           </div>
-          <button onclick="event.stopPropagation(); location.href='/typing/${item.id}/edit'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-          <button onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
+          <div style="display:flex; gap:8px; flex-shrink:0;">
+            <button title="수정" onclick="event.stopPropagation(); location.href='/typing/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
+            <button title="삭제" onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
+          </div>
         </div>
       `).join('');
         } else {
@@ -62,7 +64,7 @@ export async function loadMyTypingContents() {
 export async function deleteMyTyping(id) {
     if (!confirm("정말 이 타이핑 콘텐츠를 삭제하시겠습니까?")) return;
 
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -90,7 +92,7 @@ export async function deleteMyTyping(id) {
 export async function deleteMyQuiz(id) {
     if (!confirm("정말 이 퀴즈 콘텐츠를 삭제하시겠습니까?")) return;
 
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -225,7 +227,7 @@ function updateProfileDashboard(data) {
 }
 
 export async function loadMyHistory() {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) return;
     try {
         const res = await fetch('/api/my-history', {
@@ -255,7 +257,7 @@ export async function loadMyHistory() {
                     typeLabel = '타이핑 제작';
                 } else if (item.type === 'create_quiz') {
                     icon = '<div class="history-icon create-quiz" style="background:var(--color-purple);color:white;">➕</div>';
-                    url = `/quiz/${item.content_id}`;
+                    url = `/quiz/${item.content_id}/play`;
                     typeLabel = '퀴즈 제작';
                 }
                 let dateStr = new Date(item.played_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -285,7 +287,7 @@ export async function loadMyHistory() {
 }
 
 export async function loadMyQuizContents() {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) return;
     try {
         const res = await fetch('/api/my-quiz-contents', {
@@ -295,17 +297,19 @@ export async function loadMyQuizContents() {
         const container = document.getElementById('myquiz-list');
         if (resData.success && resData.data.length > 0) {
             container.innerHTML = resData.data.map(item => `
-        <div class="history-item" style="cursor:pointer; position: relative;" onclick="location.href='/quiz/${item.id}/play'">
+        <div class="history-item" style="cursor:pointer;" onclick="location.href='/quiz/${item.id}/play'">
           <div class="history-icon quiz"></div>
           <div class="history-info">
             <div class="title">${item.title}</div>
             <div class="sub">난이도: ${` X ${item.difficulty || 3}`}</div>
           </div>
-          <div class="history-result" style="margin-right: 80px;">
+          <div class="history-result">
             <div class="score"> 최고 점수: ${item.best_score || 0}</div>
           </div>
-          <button onclick="event.stopPropagation(); location.href='/quiz/${item.id}/edit'" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); background: #3498db; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);" title="수정">✏️</button>
-          <button onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); background: #ff4757; color: white; border: none; border-radius: 8px; width: 32px; height: 32px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3);" title="삭제">️</button>
+          <div style="display:flex; gap:8px; flex-shrink:0;">
+            <button title="수정" onclick="event.stopPropagation(); location.href='/quiz/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
+            <button title="삭제" onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
+          </div>
         </div>
       `).join('');
         } else {

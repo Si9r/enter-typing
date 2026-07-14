@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 import models
 from core.redis_client import sync_redis_client
-from core.security import create_access_token, get_current_user, get_password_hash, verify_password
+from core.security import create_access_token, get_current_user, get_password_hash, is_admin, verify_password
 from database import get_db
 from services.email_service import generate_code, generate_temp_password, send_email
 from core.config import CODE_EXPIRE_SECONDS
@@ -354,8 +354,10 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     return {
         "success": True,
         "requires_password_change": is_temp_login,
+        "id": user.id,
         "nickname": user.nickname,
         "email": user.email,
+        "is_admin": is_admin(user),
         "access_token": access_token,
         "token_type": "bearer",
         "message": "로그인 성공"

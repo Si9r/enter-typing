@@ -80,10 +80,10 @@ export async function doAttend() {
     const btn = document.getElementById('attend-btn');
     if (btn.disabled) return;
 
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) {
         alert('로그인이 필요한 기능입니다.');
-        location.href = 'login.html';
+        location.href = '/login';
         return;
     }
 
@@ -178,7 +178,7 @@ export function calculateStats() {
 }
 
 async function loadAttendanceData() {
-    const token = sessionStorage.getItem('ep_token');
+    const token = localStorage.getItem('ep_token');
     if (!token) return;
 
     try {

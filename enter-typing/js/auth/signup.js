@@ -248,10 +248,10 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
     // 필수 약관
     const termsError = document.getElementById('terms-error');
     if (!agreeTerms.checked || !agreePrivacy.checked) {
-        termsError.style.display = 'block';
+        termsError.classList.add('visible');
         valid = false;
     } else {
-        termsError.style.display = 'none';
+        termsError.classList.remove('visible');
     }
 
     if (valid) {
@@ -272,7 +272,7 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     alert('회원가입이 완료되었습니다. 로그인 해주세요.');
-                    location.href = 'login.html';
+                    location.href = '/login';
                 } else {
                     const emailInput = document.getElementById('signup-email');
                     const emailError = document.getElementById('email-error');

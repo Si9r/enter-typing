@@ -395,7 +395,7 @@ function loadGameplayLine() {
     currentHiraTarget = song.hiragana_lines[currentLineIndex];
 
     if (typeof parseKanaToTargetUnits === 'function') {
-        battleTargetUnits = parseKanaToTargetUnits(currentHiraTarget.replace(/\s+/g, ""), true);
+        battleTargetUnits = parseKanaToTargetUnits(currentHiraTarget.replace(/\s+/g, ""));
     } else {
         battleTargetUnits = [{ text: currentHiraTarget, validInputs: [song.romaji_lines[currentLineIndex].toLowerCase().replace(/\s+/g, "")] }];
     }

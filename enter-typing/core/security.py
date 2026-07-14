@@ -38,6 +38,11 @@ def get_current_user(authorization: str = Header(None), db: Session = Depends(ge
     return user
 
 
+# 관리자 권한: id가 한 자리 수(1~9)인 유저에게만 부여 (그 외에는 일절 부여하지 않음)
+def is_admin(user: models.User) -> bool:
+    return 1 <= user.id <= 9
+
+
 # 비밀번호 해시를 위한 설정 (bcrypt 직접 사용)
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:

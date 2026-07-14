@@ -184,29 +184,29 @@
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
+            <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
                 <a href="/typing">타이핑</a>
                 <a href="/quiz" class="active">퀴즈</a>
-                <a href="ranking.html">랭킹</a>
+                <a href="/ranking">랭킹</a>
                 <a href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
-            <div class="search-bar" onclick="location.href='search.html'">
+            <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
                 <input type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -220,12 +220,8 @@
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2> 모든 퀴즈 콘텐츠</h2>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-outline" id="admin-mode-btn" onclick="toggleAdminMode()"
-                        style="display: flex; align-items: center; border-radius: 30px; padding: 10px 22px;">
-                        관리자 모드: OFF
-                    </button>
                     <button class="btn btn-pink"
-                        onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='/quiz/create'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='login.html'; }"
+                        onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='/quiz/create'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='/login'; }"
                         style="display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 10px 22px;">
                         <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> 퀴즈 추가하기
                     </button>
@@ -275,30 +271,29 @@
             </div>
 
             <div class="footer-col">
-                <h4>타이핑</h4>
+                <h4>타이핑 & 퀴즈</h4>
                 <ul>
-                    <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
-                    <li><a href="/typing">전체 타이핑 리스트</a></li>
-                    <li><a href="/typing/create">타이핑 작성하기</a></li>
-                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/typing">타이핑 리스트</a></li>
+                    <li><a href="/typing/create">타이핑 작성</a></li>
+                    <li><a href="/quiz">퀴즈 리스트</a></li>
+                    <li><a href="/quiz/create">퀴즈 작성</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>퀴즈 & 랭킹</h4>
+                <h4>실시간 & 랭킹</h4>
                 <ul>
-                    <li><a href="/quiz">퀴즈 리스트</a></li>
-                    <li><a href="/quiz/create">퀴즈 작성하기</a></li>
-                    <li><a href="ranking.html">전체 랭킹</a></li>
-                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/ranking">전체 랭킹</a></li>
+                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
-                    <li><a href="notice.html">공지사항</a></li>
-                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="/notice">공지사항</a></li>
+                    <li><a href="/profile">마이페이지</a></li>
                     <li><a href="#" id="footer-open-terms">이용약관</a></li>
                     <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
@@ -348,7 +343,7 @@
                     <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
                         ▶ 퀴즈 시작하기
                     </button>
-                    <button class="btn btn-outline btn-large" onclick="location.href='ranking_song.html'">
+                    <button class="btn btn-outline btn-large" onclick="location.href='/ranking/songs'">
                          랭킹 보기
                     </button>
                 </div>

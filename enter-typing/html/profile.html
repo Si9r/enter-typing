@@ -469,17 +469,26 @@
       font-family: monospace;
     }
 
-    /* 가나 오타 히트맵 */
+    /* 키보드 오타 히트맵 */
     .heatmap-grid {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: 6px;
+      align-items: center;
       max-width: 700px;
       margin: 0 auto;
     }
 
+    /* 각 키보드 행 (QWERTY 스태거) */
+    .hm-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+    }
+
     .hm-cell {
-      aspect-ratio: 1;
+      width: 52px;
+      height: 52px;
       border-radius: 8px;
       display: flex;
       flex-direction: column;
@@ -498,13 +507,13 @@
     }
 
     .hm-char {
-      font-size: .95rem;
+      font-size: 1rem;
       line-height: 1;
     }
 
     .hm-rate {
       font-size: .6rem;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .hm-high {
@@ -1009,33 +1018,33 @@
 <body>
   <header class="navbar">
     <div class="nav-left">
-      <div class="logo" onclick="location.href='index.html'">
+      <div class="logo" onclick="location.href='/'">
         <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
         <span class="logo-text">엔터핑</span>
       </div>
       <nav class="nav-links">
         <a href="/typing">타이핑</a>
         <a href="/quiz">퀴즈</a>
-        <a href="ranking.html">랭킹</a>
+        <a href="/ranking">랭킹</a>
         <a href="/battle">실시간 대전</a>
       </nav>
     </div>
     <div class="nav-center">
-      <div class="search-bar" onclick="location.href='search.html'">
+      <div class="search-bar" onclick="location.href='/search'">
         <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
         <input type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="notice.html" class="nav-notice-link"
+      <a href="/notice" class="nav-notice-link"
         style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
         onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
         onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
           class="ph-fill ph-bell"></i> 공지</a>
       <div class="auth-group">
-        <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-        <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+        <button class="auth-login" onclick="location.href='/login'">로그인</button>
+        <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
       </div>
     </div>
   </header>
@@ -1052,11 +1061,6 @@
         <p id="profile-email">enterping@example.com</p>
       </div>
       <div style="margin-left:auto;text-align:right; display:flex; gap:10px; align-items:center;">
-        <button class="btn"
-          style="border-radius:12px;padding:10px; background: var(--theme-bg-hover); border:none; font-size: 1.2rem; cursor:pointer; transition: background .2s;"
-          onmouseover="this.style.background='var(--theme-border)'"
-          onmouseout="this.style.background='var(--theme-bg-hover)'" onclick="openSettingsModal()"
-          title="게임 설정">⚙️</button>
         <button class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
           수정</button>
       </div>
@@ -1097,30 +1101,29 @@
       </div>
 
       <div class="footer-col">
-        <h4>타이핑</h4>
+        <h4>타이핑 &amp; 퀴즈</h4>
         <ul>
-          <li><a href="typing_popular.html">인기 타이핑 리스트</a></li>
-          <li><a href="/typing">전체 타이핑 리스트</a></li>
-          <li><a href="/typing/create">타이핑 작성하기</a></li>
-          <li><a href="/battle">실시간 대전</a></li>
+          <li><a href="/typing">타이핑 리스트</a></li>
+          <li><a href="/typing/create">타이핑 작성</a></li>
+          <li><a href="/quiz">퀴즈 리스트</a></li>
+          <li><a href="/quiz/create">퀴즈 작성</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4>퀴즈 &amp; 랭킹</h4>
+        <h4>실시간 &amp; 랭킹</h4>
         <ul>
-          <li><a href="/quiz">퀴즈 리스트</a></li>
-          <li><a href="/quiz/create">퀴즈 작성하기</a></li>
-          <li><a href="ranking.html">전체 랭킹</a></li>
-          <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+          <li><a href="/battle">실시간 대전</a></li>
+          <li><a href="/ranking">전체 랭킹</a></li>
+          <li><a href="/ranking/songs">곡별 랭킹</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
         <h4>서비스</h4>
         <ul>
-          <li><a href="notice.html">공지사항</a></li>
-          <li><a href="profile.html">마이페이지</a></li>
+          <li><a href="/notice">공지사항</a></li>
+          <li><a href="/profile">마이페이지</a></li>
           <li><a href="#" id="footer-open-terms">이용약관</a></li>
           <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
         </ul>
@@ -1134,7 +1137,6 @@
 
 
   {% include "partials/profile_modal_edit.html" %}
-  {% include "partials/profile_modal_settings.html" %}
 
 
   <script type="module" src="/js/profile/profile.js"></script>

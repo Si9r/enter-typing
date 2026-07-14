@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 
 PROJECT_STRUCTURE.md
+README.md
 
 # 서버 실행 로그
 *.log

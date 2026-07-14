@@ -55,14 +55,14 @@
     <!-- 상단 네비게이션 바 -->
     <header class="navbar">
         <div class="nav-left">
-            <div class="logo" onclick="location.href='index.html'">
+            <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
                 <a href="/typing">타이핑</a>
                 <a href="/quiz">퀴즈</a>
-                <a href="ranking.html" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
+                <a href="/ranking" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
                 <a href="/battle">실시간 대전</a>
             </nav>
         </div>
@@ -74,10 +74,10 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;"><i class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
-                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+                <button class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -97,7 +97,8 @@
             <section class="main-content">
                 <div id="content-header-container" style="display: none;">
                     <div class="content-header">
-                        <div>
+                        <div id="header-thumb" style="align-self: center; width: 90px; height: 90px; border-radius: 16px; background: rgba(255,255,255,0.2); background-size: cover; background-position: center; flex-shrink: 0; margin-right: 24px; display: flex; align-items: center; justify-content: center;"></div>
+                        <div style="flex: 1;">
                             <div class="content-artist" id="header-artist">YOASOBI</div>
                             <div class="content-title" id="header-title">夜に駆ける (밤을 달리다)</div>
                             <div style="margin-top: 10px;">
@@ -115,7 +116,7 @@
                 </div>
                 
                 <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
-                    <div style="font-size: 4rem; margin-bottom: 20px;"></div>
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🎶</div>
                     <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
                 </div>
             </section>
@@ -139,27 +140,27 @@
                 </div>
             </div>
             <div class="footer-col">
-                <h4>타이핑</h4>
+                <h4>타이핑 & 퀴즈</h4>
                 <ul>
-                    <li><a href="/typing">전체 타이핑 리스트</a></li>
-                    <li><a href="/typing/create">타이핑 작성하기</a></li>
-                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/typing">타이핑 리스트</a></li>
+                    <li><a href="/typing/create">타이핑 작성</a></li>
+                    <li><a href="/quiz">퀴즈 리스트</a></li>
+                    <li><a href="/quiz/create">퀴즈 작성</a></li>
                 </ul>
             </div>
             <div class="footer-col">
-                <h4>퀴즈 & 랭킹</h4>
+                <h4>실시간 & 랭킹</h4>
                 <ul>
-                    <li><a href="/quiz">퀴즈 리스트</a></li>
-                    <li><a href="/quiz/create">퀴즈 작성하기</a></li>
-                    <li><a href="ranking.html">전체 랭킹</a></li>
-                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                    <li><a href="/battle">실시간 대전</a></li>
+                    <li><a href="/ranking">전체 랭킹</a></li>
+                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
-                    <li><a href="notice.html">공지사항</a></li>
-                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="/notice">공지사항</a></li>
+                    <li><a href="/profile">마이페이지</a></li>
                     <li><a href="#" id="footer-open-terms">이용약관</a></li>
                     <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>

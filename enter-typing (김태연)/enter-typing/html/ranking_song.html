@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>곡별 랭킹 - 엔터핑</title>
+    <link rel="stylesheet" href="style.css?v=1.0.3">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        .song-ranking-layout { display: flex; gap: 30px; max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 60vh;}
+        
+        .sidebar { width: 320px; background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px); flex-shrink: 0;}
+        .sidebar-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 20px; color: var(--color-text-main); padding-bottom: 10px; border-bottom: 2px solid var(--color-pink); }
+        .song-item { padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent; display: flex; align-items: center; gap: 15px;}
+        .song-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .song-item.active { border-color: var(--color-pink); background: rgba(255, 182, 193, 0.1); }
+        
+        .song-icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; justify-content: center; align-items: center; color: white; font-size: 1.2rem; flex-shrink: 0;}
+        .song-info { flex: 1; overflow: hidden;}
+        .song-item-title { font-weight: 700; color: var(--color-text-main); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .song-item-artist { font-size: 0.85rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        .main-content { flex: 1; }
+        .content-header { background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); border-radius: 20px; padding: 40px; color: white; margin-bottom: 30px; box-shadow: 0 15px 35px rgba(255,182,193,0.3); display: flex; justify-content: space-between; align-items: flex-end;}
+        .content-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
+        .content-artist { font-size: 1.2rem; font-weight: 500; opacity: 0.9; }
+        .content-btn { background: white; color: var(--color-pink); padding: 10px 25px; border-radius: 30px; font-weight: 800; border: none; cursor: pointer; transition: transform 0.2s; }
+        .content-btn:hover { transform: scale(1.05); }
+
+        .ranking-list { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+        .rank-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.2s; border-radius: 10px; }
+        .rank-item:hover { background: rgba(255, 255, 255, 0.9); transform: scale(1.01); box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: transparent; }
+        .rank-number { font-size: 1.5rem; font-weight: 900; width: 60px; text-align: center; color: var(--color-text-muted); }
+        .rank-1 .rank-number { color: #FFD700; font-size: 2rem; }
+        .rank-2 .rank-number { color: #C0C0C0; font-size: 1.8rem; }
+        .rank-3 .rank-number { color: #CD7F32; font-size: 1.7rem; }
+        .rank-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--color-pink); color: white; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 700; margin-right: 20px; }
+        .rank-info-main { flex: 1; }
+        .rank-name { font-size: 1.2rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 5px; }
+        .rank-stats { font-size: 0.9rem; color: var(--color-text-muted); display: flex; gap: 15px; }
+        .rank-score { font-size: 1.4rem; font-weight: 900; color: var(--color-blue); text-align: right; width: 150px;}
+        .rank-date { font-size: 0.8rem; color: #aaa; text-align: right; width: 100px; }
+        
+        .empty-state { text-align: center; padding: 50px; color: var(--theme-text-muted); font-weight: 500; font-size: 1.1rem;}
+    </style>
+
+    <script>
+        if (localStorage.getItem('ep_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- 공통 i18n 스크립트 -->
+    <script src="i18n.js"></script>
+</head>
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <header class="navbar">
+        <div class="nav-left">
+            <div class="logo" onclick="location.href='index.html'">
+                <img src="assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <span class="logo-text">엔터핑</span>
+            </div>
+            <nav class="nav-links">
+                <a href="typing_list.html">타이핑</a>
+                <a href="quiz_list.html">퀴즈</a>
+                <a href="ranking.html" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
+                <a href="battle.html">실시간 대전</a>
+            </nav>
+        </div>
+        <div class="nav-center">
+            <div class="search-bar">
+                <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
+                <input type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
+                <span class="shortcut">Enter</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="notice.html" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem;"><i class="ph-fill ph-bell"></i> 공지</a>
+            <div class="auth-group">
+                <button class="auth-login" onclick="location.href='login.html'">로그인</button>
+                <button class="auth-signup" onclick="location.href='signup.html'">회원가입</button>
+            </div>
+        </div>
+    </header>
+
+    <script src="navbar.js?v=2.0.0"></script>
+
+    <!-- 메인 컨텐츠 -->
+    <main style="margin-top: 80px;">
+        <div class="song-ranking-layout">
+            <aside class="sidebar">
+                <h3 class="sidebar-title"> 플레이리스트</h3>
+                <div id="song-list-container">
+                    <div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">곡을 불러오는 중...</div>
+                </div>
+            </aside>
+            
+            <section class="main-content">
+                <div id="content-header-container" style="display: none;">
+                    <div class="content-header">
+                        <div>
+                            <div class="content-artist" id="header-artist">YOASOBI</div>
+                            <div class="content-title" id="header-title">夜に駆ける (밤을 달리다)</div>
+                            <div style="margin-top: 10px;">
+                                <span class="card-badge" style="background: rgba(255,255,255,0.2); border: none; color: white;" id="header-genre">JPOP</span>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="content-btn" id="play-now-btn">▶ 플레이하기</button>
+                        </div>
+                    </div>
+                    
+                    <div class="ranking-list" id="ranking-list-container">
+                        <!-- 랭킹 렌더링 -->
+                    </div>
+                </div>
+                
+                <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;"></div>
+                    <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <div class="footer-logo">
+                    <img src="assets/logo_icon.png" alt="엔터핑 아이콘" style="height:32px;width:auto;">
+                    <span class="logo-text">엔터핑</span>
+                </div>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <div class="social-links">
+                    <a href="#">X</a>
+                    <a href="#">IG</a>
+                    <a href="#">YT</a>
+                    <a href="#">DC</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>타이핑</h4>
+                <ul>
+                    <li><a href="typing_list.html">전체 타이핑 리스트</a></li>
+                    <li><a href="typing_create.html">타이핑 작성하기</a></li>
+                    <li><a href="battle.html">실시간 대전</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>퀴즈 & 랭킹</h4>
+                <ul>
+                    <li><a href="quiz_list.html">퀴즈 리스트</a></li>
+                    <li><a href="quiz_create.html">퀴즈 작성하기</a></li>
+                    <li><a href="ranking.html">전체 랭킹</a></li>
+                    <li><a href="ranking_song.html">곡 별 랭킹</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>서비스</h4>
+                <ul>
+                    <li><a href="notice.html">공지사항</a></li>
+                    <li><a href="profile.html">마이페이지</a></li>
+                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentContentId = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadSongList();
+            
+            // 만약 URL에 ?id= 가 있다면 바로 해당 곡 랭킹 로드
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('id');
+            if (contentId) {
+                selectSong(parseInt(contentId));
+            }
+        });
+
+        async function loadSongList() {
+            try {
+                const res = await fetch('/api/typing-contents?t=' + Date.now());
+                const data = await res.json();
+                const container = document.getElementById('song-list-container');
+                
+                if (data.success) {
+                    if (data.data.length === 0) {
+                        container.innerHTML = '<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">등록된 곡이 없습니다.</div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    data.data.forEach(item => {
+                        let iconChar = '';
+                        if (item.genre === '애니메이션' || item.genre === 'ANIME') iconChar = '';
+                        if (item.genre === '문학') iconChar = '';
+                        
+                        html += `
+                            <div class="song-item" id="song-item-${item.id}" onclick="selectSong(${item.id})">
+                                <div class="song-icon">${iconChar}</div>
+                                <div class="song-info">
+                                    <div class="song-item-title">${item.title}</div>
+                                    <div class="song-item-artist">${item.artist || '아티스트 미상'}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (err) {
+                console.error("곡 리스트 로드 실패", err);
+            }
+        }
+
+        async function selectSong(id) {
+            // UI 변경
+            document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.getElementById('song-item-' + id);
+            if (activeItem) {
+                activeItem.classList.add('active');
+                // 해당 위치로 스크롤
+                activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            document.getElementById('select-prompt').style.display = 'none';
+            document.getElementById('content-header-container').style.display = 'block';
+            document.getElementById('ranking-list-container').innerHTML = '<div class="empty-state">로딩 중...</div>';
+            
+            currentContentId = id;
+
+            // 데이터 로드
+            try {
+                const res = await fetch('/api/ranking/content/' + id + '?t=' + Date.now());
+                const data = await res.json();
+                
+                if (data.success) {
+                    // 상단 헤더 업데이트
+                    if (data.content_info) {
+                        document.getElementById('header-title').innerText = data.content_info.title || '제목 없음';
+                        document.getElementById('header-artist').innerText = data.content_info.artist || '-';
+                        document.getElementById('header-genre').innerText = data.content_info.genre || '장르 미상';
+                    }
+                    document.getElementById('play-now-btn').onclick = () => location.href = 'typing.html?id=' + id;
+                    
+                    // 랭킹 리스트 렌더링
+                    renderRanking(data.ranking);
+                }
+            } catch (err) {
+                console.error("랭킹 데이터 로드 실패", err);
+                document.getElementById('ranking-list-container').innerHTML = '<div class="empty-state" style="color:red;">데이터를 불러오는 데 실패했습니다.</div>';
+            }
+        }
+
+        function renderRanking(list) {
+            const container = document.getElementById('ranking-list-container');
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3rem; margin-bottom: 10px;"></div>
+                        아직 이 곡을 플레이한 기록이 없습니다.<br>
+                        지금 바로 첫 번째 기록의 주인공이 되어보세요!
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            list.forEach(item => {
+                let rankClass = item.rank <= 3 ? `rank-${item.rank}` : '';
+                let avatarColor = `hsl(${(item.nickname.length * 50) % 360}, 70%, 60%)`;
+                
+                // 날짜 포맷
+                let dateStr = '';
+                if (item.played_at) {
+                    const d = new Date(item.played_at);
+                    dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+                }
+
+                html += `
+                    <div class="rank-item ${rankClass}">
+                        <div class="rank-number">${item.rank}</div>
+                        <div class="rank-avatar" style="background: ${avatarColor}">${item.nickname.charAt(0)}</div>
+                        <div class="rank-info-main">
+                            <div class="rank-name">${item.nickname}</div>
+                            <div class="rank-stats">
+                                <span>최고 타수: <strong>${item.wpm}WPM</strong></span>
+                                <span>정확도: <strong>${item.accuracy}%</strong></span>
+                            </div>
+                        </div>
+                        <div class="rank-score">${item.score.toLocaleString()} 점</div>
+                        <div class="rank-date">${dateStr}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

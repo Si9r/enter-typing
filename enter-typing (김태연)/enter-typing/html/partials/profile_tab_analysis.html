@@ -1,0 +1,193 @@
+    <!-- 탭 2: 분석 -->
+    <div class="tab-panel" id="tab-analysis">
+      <div class="content-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-pink" id="subtab-overall-btn" onclick="switchAnalysisTab('overall')"
+          style="flex: 1; border-radius: 12px; padding: 12px;">종합 요약</button>
+        <button class="btn" id="subtab-detail-btn" onclick="switchAnalysisTab('detail')"
+          style="flex: 1; border-radius: 12px; padding: 12px; background: var(--theme-bg-hover); color: var(--theme-text-sub); border: none;">상세
+          오타 분석</button>
+      </div>
+
+      <div id="analysis-overall-panel">
+        <div class="analysis-grid">
+          <!-- ⌨️ WPM + 정확도 카드 (단일 칸) -->
+          <div class="analysis-card">
+            <h4>⌨️ 속도 &amp; 정확도</h4>
+
+            <!-- Hidden elements to prevent JS errors -->
+            <div style="display: none;">
+              <span id="analysis-wpm-week-stat"></span>
+              <span id="analysis-max-wpm-stat"></span>
+              <span id="analysis-avg-accuracy"></span>
+            </div>
+
+            <!-- 전체 평균 WPM 단일 표시 -->
+            <div
+              style="background:#F0F8FF; border-radius:12px; padding:16px 8px; text-align:center; margin-bottom:20px;">
+              <div style="font-size:2.2rem; font-weight:900; color:#4A90D9;" id="analysis-avg-wpm">0</div>
+              <div style="font-size:.85rem; color:var(--theme-text-muted); margin-top:4px; font-weight:600;">평균 WPM
+              </div>
+            </div>
+
+            <!-- WPM 추이 막대 -->
+            <div style="font-size:.78rem; font-weight:700; color:#aaa; margin-bottom:10px;">⏰ 주간/월간 WPM</div>
+            <div class="bar-row">
+              <div class="bar-label">이번 주</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-week-bar"
+                  style="width:0%; background:linear-gradient(90deg,#FFB6C1,#FF9EAB);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-week-val">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">지난 주</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-lastweek-bar"
+                  style="width:0%; background:linear-gradient(90deg,#ADD8E6,#96C8DB);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-lastweek-val">0</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label">이번 달</div>
+              <div class="bar-bg">
+                <div class="bar-fill" id="analysis-wpm-month-bar"
+                  style="width:0%; background:linear-gradient(90deg,#C3B1E1,#9B8EC4);"></div>
+              </div>
+              <div class="bar-val" id="analysis-wpm-month-val">0</div>
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <h4> 활동별 플레이 수</h4>
+            <div style="margin-bottom:20px; display:flex; flex-direction:column; gap:32px; padding:25px 0;">
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;">⌨️ 타이핑</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-typing-bar"
+                    style="width:0%; background: linear-gradient(90deg, #FFB6C1, #FF9EAB);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-typing-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 퀴즈</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-quiz-bar"
+                    style="width:0%; background: linear-gradient(90deg, #ADD8E6, #96C8DB);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-quiz-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+              <div class="bar-row" style="margin-bottom:0;">
+                <div class="bar-label" style="font-size: 0.95rem; font-weight: 600; width: 80px;"> 대전</div>
+                <div class="bar-bg" style="height: 20px; border-radius: 10px;">
+                  <div class="bar-fill" id="analysis-play-battle-bar"
+                    style="width:0%; background: linear-gradient(90deg, #FFCC99, #FF9955);"></div>
+                </div>
+                <div class="bar-val" id="analysis-play-battle-val"
+                  style="font-size: 0.95rem; font-weight: 700; width: 45px;">0회</div>
+              </div>
+            </div>
+            <!-- 비율 표시 -->
+            <div
+              style="display:flex; align-items:center; justify-content:center; gap:16px; padding:12px 0; margin-top:auto;">
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#FF9EAB;" id="analysis-pct-typing">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;">⌨️ 타이핑</div>
+              </div>
+              <div style="width:1px; height:40px; background:var(--theme-border);"></div>
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#96C8DB;" id="analysis-pct-quiz">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 퀴즈</div>
+              </div>
+              <div style="width:1px; height:40px; background:var(--theme-border);"></div>
+              <div style="text-align:center;">
+                <div style="font-size:1.8rem; font-weight:900; color:#FF9955;" id="analysis-pct-battle">0%</div>
+                <div style="font-size:.8rem; color:var(--theme-text-muted); margin-top:4px;"> 대전</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <h4> 실시간 대전 결과</h4>
+
+            <!-- 요약 -->
+            <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
+              <div style="flex:1; background:var(--bg-battle-total); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-total);" id="analysis-battle-total">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 총 대전</div>
+              </div>
+              <div style="flex:1; background:var(--bg-battle-win); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-win);" id="analysis-battle-win-rate">0%</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;"> 우승률</div>
+              </div>
+              <div style="flex:1; background:var(--bg-battle-wpm); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-battle-wpm);" id="analysis-battle-avg-wpm">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">평균 WPM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="analysis-card">
+            <h4> 퀴즈 결과 요약</h4>
+            <div style="display:flex; gap:8px; margin-top:auto; padding-top:12px;">
+              <div style="flex:1; background:var(--bg-quiz-total); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-total);" id="analysis-quiz-total">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">총 퀴즈 플레이</div>
+              </div>
+              <div style="flex:1; background:var(--bg-quiz-correct); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-correct);" id="analysis-quiz-correct">0</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">누적 정답 수</div>
+              </div>
+              <div style="flex:1; background:var(--bg-quiz-rate); border-radius:10px; padding:10px; text-align:center;">
+                <div style="font-size:1.4rem; font-weight:900; color:var(--text-quiz-rate);" id="analysis-quiz-rate">0%</div>
+                <div style="font-size:.75rem; color:var(--theme-text-muted); margin-top:2px;">평균 정답률</div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- /analysis-grid (overall) -->
+      </div> <!-- /analysis-overall-panel -->
+
+      <!-- 상세 오타 분석 서브 탭 -->
+      <div id="analysis-detail-panel" style="display: none;">
+        <div style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: flex-end;">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="content-selector"
+              style="padding: 10px 15px; border-radius: 10px; border: 1px solid var(--theme-border); font-size: 1rem; background: var(--theme-bg-card); color: var(--theme-text-main); outline: none; cursor: pointer; min-width: 250px;">
+              <option value="">(전체 통계 모아보기)</option>
+            </select>
+            <button onclick="resetTypoStats()" class="btn btn-outline" style="padding: 10px 15px; border-radius: 10px; font-weight: bold;">
+              오타 기록 초기화
+            </button>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--theme-text-muted); margin-top: 8px;">
+            * 각 콘텐츠마다는 가장 최근에 플레이한 기록만 분석됩니다.
+          </div>
+        </div>
+
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 히라가나 오타 히트맵</h3>
+          <div class="heatmap-grid" id="heatmap">
+            <div style="text-align:center; grid-column:span 10; padding:20px; color:var(--theme-text-muted);">오타 기록이 없습니다.</div>
+          </div>
+        </div>
+
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h3>
+          <div id="profile-typo-list">
+            <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
+          </div>
+        </div>
+
+        <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 상세 오입력 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 입력 패턴)</span></h3>
+          <div id="profile-romaji-list">
+            <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
+          </div>
+        </div>
+
+
+
+      </div> <!-- analysis-detail-panel -->
+    </div>

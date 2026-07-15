@@ -6258,5 +6258,25 @@
     "실시간 & 랭킹": {
         "en": "Real-time & Ranking",
         "ja": "リアルタイム＆ランキング"
+    },
+    "페이지 준비중입니다": {
+        "en": "Coming Soon",
+        "ja": "準備中です"
+    },
+    "현재 연동 기능을 준비하고 있습니다. 빠른 시일 내에 멋진 서비스로 찾아뵙겠습니다!": {
+        "en": "We are currently preparing this feature. Stay tuned!",
+        "ja": "現在、この機能を準備しております。もうしばらくお待ちください！"
+    },
+    "창 닫기": {
+        "en": "Close",
+        "ja": "閉じる"
+    },
+    "현재 연동 기능을 준비하고 있습니다.": {
+        "en": "We are currently preparing this feature.",
+        "ja": "現在、この機能を準備しております。"
+    },
+    "빠른 시일 내에 멋진 서비스로 찾아뵙겠습니다!": {
+        "en": "Stay tuned for a great service soon!",
+        "ja": "もうしばらくお待ちください！"
     }
 }

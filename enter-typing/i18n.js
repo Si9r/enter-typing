@@ -18,7 +18,7 @@ function scanDOM(node) {
     if (node.nodeType === Node.TEXT_NODE) {
         const fullText = node.textContent;
         const trimmedText = fullText.trim();
-        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText);
+        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText) || /남은 퀴즈:\s*\d+개/.test(trimmedText);
         
         if (trimmedText && (translations[trimmedText] || hasDynamicPattern)) {
             const prefix = fullText.substring(0, fullText.indexOf(trimmedText));
@@ -115,6 +115,7 @@ async function applyTranslations() {
         observer.observe(document.body, { childList: true, subtree: true });
     }
     
+    updateLanguageSelectorUI();
     applyTranslationsCore();
 }
 
@@ -144,6 +145,7 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'Code: $1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, 'Joined battle room (#$1)!');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (Me)');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, 'Remaining Quizzes: $1');
             } else if (lang === 'ja') {
                 translatedText = translatedText.replace(/(\d+)\s*초/g, '$1秒');
                 translatedText = translatedText.replace(/(\d+)\s*분/g, '$1分');
@@ -158,6 +160,7 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'コード：$1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, '対戦部屋(#$1)に入場しました！');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (私)');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, '残りのクイズ: $1問');
             }
         }
         
@@ -211,6 +214,15 @@ function updateLanguageSelectorUI() {
         currentLangText.textContent = langMap[getCurrentLanguage()] || "한국어";
     }
 }
+
+// 전역 번역 유틸리티 함수 추가
+window.i18nTranslate = function(key) {
+    const lang = getCurrentLanguage();
+    if (lang !== 'ko' && localesLoaded && translations[key] && translations[key][lang]) {
+        return translations[key][lang];
+    }
+    return key;
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTranslations().then(() => {

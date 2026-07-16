@@ -1,4 +1,128 @@
 {
+    "복사되었습니다!": {
+        "en": "Copied!",
+        "ja": "コピーされました！"
+    },
+    "복사되었습니다": {
+        "en": "Copied",
+        "ja": "コピーされました"
+    },
+    "곧 가사가 시작됩니다. 대기하세요...": {
+        "en": "Lyrics starting soon. Please wait...",
+        "ja": "まもなく歌詞が始まります。お待ちください…"
+    },
+    "현재 입력 위치": {
+        "en": "Current Position",
+        "ja": "現在入力位置"
+    },
+    "퀴즈 통계": {
+        "en": "quiz statistics",
+        "ja": "クイズ統計"
+    },
+    "내 점수": {
+        "en": "my score",
+        "ja": "私のスコア"
+    },
+    "콤보": {
+        "en": "combo",
+        "ja": "コンボ"
+    },
+    "문제 정보": {
+        "en": "Problem Information",
+        "ja": "問題情報"
+    },
+    "정답을 입력하세요 (가수, 제목, 가사 등)...": {
+        "en": "Enter the correct answer (singer, title, lyrics, etc.)...",
+        "ja": "正しい答えを入力してください（歌手、タイトル、歌詞など）..."
+    },
+    "모든 문제가 끝났습니다.": {
+        "en": "All problems are over.",
+        "ja": "すべての問題が終了しました。"
+    },
+    "재생 시간:": {
+        "en": "Playing Time:",
+        "ja": "再生時間："
+    },
+    "플레이 수:": {
+        "en": "Number of plays:",
+        "ja": "プレイ数："
+    },
+    "장르": {
+        "en": "genre",
+        "ja": "ジャンル"
+    },
+    "음량 조절": {
+        "en": "volume control",
+        "ja": "音量調整"
+    },
+    "영상정보": {
+        "en": "video information",
+        "ja": "映像情報"
+    },
+    "작성자": {
+        "en": "Author",
+        "ja": "作者"
+    },
+    "입력 중...": {
+        "en": "Typing...",
+        "ja": "入力中..."
+    },
+    "영상 로딩 동기화 중...": {
+        "en": "Synchronizing video loading...",
+        "ja": "映像ロード同期中…"
+    },
+    "다른 플레이어를 기다리고 있습니다.": {
+        "en": "Waiting for other players.",
+        "ja": "他のプレイヤーを待っています。"
+    },
+    "전주 재생 중... 대기하세요 ⏳": {
+        "en": "Playing prelude... please wait ⏳",
+        "ja": "全州再生中...待ってください⏳"
+    },
+    "다음 가사 대기 중... ⏳": {
+        "en": "Waiting for next lyrics... ⏳",
+        "ja": "次の歌詞を待っています...⏳"
+    },
+    "가사를 모두 입력했습니다. 대기 중... ⏳": {
+        "en": "I entered all the lyrics. Waiting... ⏳",
+        "ja": "歌詞をすべて入力しました。待機中…⏳"
+    },
+    "문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...": {
+        "en": "Sentence completed. Waiting for the next sentence...",
+        "ja": "すべての文を入力しました。次の文までお待ちください…"
+    },
+    "마지막 소절입니다!": {
+        "en": "Last verse!",
+        "ja": "最後の小節です！"
+    },
+    "여기에 가사 로마자를 타이핑하세요...": {
+        "en": "Please type the lyrics in roman letters here...",
+        "ja": "ここで歌詞ローマ字を入力してください..."
+    },
+    "퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.": {
+        "en": "The quiz competition has begun! If you enter the correct answer, it will be graded automatically.",
+        "ja": "クイズ大戦が始まりました！正解を入力すると自動的に採点されます。"
+    },
+    "시간 초과! 잠시 후 다음 문제로 넘어갑니다.": {
+        "en": "Time out! We'll move on to the next question in a moment.",
+        "ja": "タイムアウト！しばらくすると、次の問題に進みます。"
+    },
+    "전주 재생 중... 곧 가사가 시작됩니다.": {
+        "en": "Intro playing... Lyrics will start soon.",
+        "ja": "前奏再生中… まもなく歌詞が始まります。"
+    },
+    "음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!": {
+        "en": "Audio loading complete. Click the '?' in the center to start!",
+        "ja": "音源の読み込みが完了しました。中央の 「？」 をクリックして開始してください！"
+    },
+    "남은 퀴즈:": {
+        "en": "Remaining Quizzes:",
+        "ja": "残りのクイズ:"
+    },
+    "개": {
+        "en": "",
+        "ja": "問"
+    },
     "\" 검색 결과": {
         "en": "",
         "ja": ""
@@ -387,10 +511,6 @@
         "en": "Remaining quizzes: -",
         "ja": "残りのクイズ: -"
     },
-    "내 점수": {
-        "en": "my score",
-        "ja": "私のスコア"
-    },
     "내 컨텐츠": {
         "en": "my content",
         "ja": "マイコンテンツ"
@@ -678,10 +798,6 @@
     "문제 · 주관식 단답형": {
         "en": "Problem · subjective short answer type",
         "ja": "問題・主観式単答型"
-    },
-    "문제 정보": {
-        "en": "Problem Information",
-        "ja": "問題情報"
     },
     "뮤직 퀴즈": {
         "en": "music quiz",
@@ -1011,9 +1127,9 @@
         "en": "Entering",
         "ja": "エンターピング"
     },
-    "엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러\n                        게임을 시작하세요.": {
-        "en": "Welcome to Enterping Music Quiz! '?' in the center press the button\n                        Start the game.",
-        "ja": "エンターピング音楽クイズへようこそ！中央の「？」ボタンを押す\n                        ゲームを始めましょう。"
+    "엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.": {
+        "en": "Welcome to Enterping Music Quiz! Click the '?' button in the center to start the game.",
+        "ja": "エンターピング音楽クイズへようこそ！中央の「？」ボタンを押してゲームを開始してください。"
     },
     "엔터핑 전체 종합 랭킹입니다. 부문별 최고를 확인하세요!": {
         "en": "Overall ranking for Enterping. Check out the best in each category!",
@@ -1087,10 +1203,6 @@
         "en": "While playing the video, at the timing when the desired verse begins",
         "ja": "映像を再生して欲しいフレーズが始まるタイミングで"
     },
-    "영상정보": {
-        "en": "video information",
-        "ja": "映像情報"
-    },
     "예: YOASOBI": {
         "en": "Example: YOASOBI",
         "ja": "例: YOASOBI"
@@ -1162,10 +1274,6 @@
     "을 즐겨라": {
         "en": " enjoy typing",
         "ja": "を楽しもう"
-    },
-    "음량 조절": {
-        "en": "volume control",
-        "ja": "音量調整"
     },
     "이곳은 방 참가하기 (방 리스트)입니다.": {
         "en": "This is room participation (room list).",
@@ -1299,10 +1407,6 @@
         "en": "TOP 5 frequently misspelled letters",
         "ja": "よく間違った文字 TOP 5"
     },
-    "작성자": {
-        "en": "Author",
-        "ja": "作者"
-    },
     "작업": {
         "en": "work",
         "ja": "仕事"
@@ -1311,17 +1415,9 @@
         "en": "Work information",
         "ja": "作品情報"
     },
-    "장르": {
-        "en": "genre",
-        "ja": "ジャンル"
-    },
     "장르 카테고리": {
         "en": "Genre Category",
         "ja": "ジャンルカテゴリ"
-    },
-    "재생 시간:": {
-        "en": "Playing Time:",
-        "ja": "再生時間："
     },
     "재전송": {
         "en": "retransmit",
@@ -1387,10 +1483,6 @@
         "en": "Correct rate",
         "ja": "正解率"
     },
-    "정답을 입력하세요 (가수, 제목, 가사 등)...": {
-        "en": "Enter the correct answer (singer, title, lyrics, etc.)...",
-        "ja": "正しい答えを入力してください（歌手、タイトル、歌詞など）..."
-    },
     "정확도": {
         "en": "accuracy",
         "ja": "精度"
@@ -1440,7 +1532,7 @@
         "ja": "直感的な難易度表記："
     },
     "초": {
-        "en": "candle",
+        "en": "seconds",
         "ja": "秒"
     },
     "촉음(っ) 분리 입력 허용": {
@@ -1448,8 +1540,8 @@
         "ja": "触音（っ） 分離入力許可"
     },
     "총": {
-        "en": "gun",
-        "ja": "銃"
+        "en": "Total",
+        "ja": "計"
     },
     "총 대전": {
         "en": "total war",
@@ -1543,10 +1635,6 @@
         "en": "Please select content",
         "ja": "コンテンツを選択してください"
     },
-    "콤보": {
-        "en": "combo",
-        "ja": "コンボ"
-    },
     "퀴즈": {
         "en": "Quiz",
         "ja": "クイズ"
@@ -1566,10 +1654,6 @@
     "퀴즈 결과 요약": {
         "en": "Summary of Quiz Results",
         "ja": "クイズ結果のまとめ"
-    },
-    "퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.": {
-        "en": "The quiz competition has begun! If you enter the correct answer, it will be graded automatically.",
-        "ja": "クイズ大戦が始まりました！正解を入力すると自動的に採点されます。"
     },
     "퀴즈 리스트": {
         "en": "Quiz List",
@@ -1618,10 +1702,6 @@
     "퀴즈 컨텐츠": {
         "en": "Quiz Content",
         "ja": "クイズコンテンツ"
-    },
-    "퀴즈 통계": {
-        "en": "quiz statistics",
-        "ja": "クイズ統計"
     },
     "퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.": {
         "en": "Set the section to be used as a quiz in the slider or time input box below, then enter the answer word and hint.",
@@ -1743,10 +1823,6 @@
         "en": "number of plays",
         "ja": "プレイ数"
     },
-    "플레이 수:": {
-        "en": "Number of plays:",
-        "ja": "プレイ数："
-    },
     "플레이리스트": {
         "en": "playlist",
         "ja": "プレイリスト"
@@ -1840,7 +1916,7 @@
         "ja": "アクティビティ別プレイ数"
     },
     "회": {
-        "en": "episode",
+        "en": "plays",
         "ja": "回"
     },
     "회원 탈퇴": {
@@ -1982,10 +2058,6 @@
     "출석체크가 정상적으로 완료되었습니다!": {
         "en": "Attendance check has been completed successfully!",
         "ja": "出席チェックが正常に完了しました！"
-    },
-    "모든 문제가 끝났습니다.": {
-        "en": "All problems are over.",
-        "ja": "すべての問題が終了しました。"
     },
     ", ok);\n        }\n\n        // ─── 비밀번호 일치 확인 ───────────────────────────────\n        function checkMatch() {\n            const pw = document.getElementById(": {
         "en": ", ok);\n        }\n\n        // ─── Check password matching ─────────────────────────────────\n        function checkMatch() {\n            const pw = document.getElementById(",
@@ -2475,10 +2547,6 @@
         "en": "fun battle room",
         "ja": "楽しい対戦室"
     },
-    "여기에 가사 로마자를 타이핑하세요...": {
-        "en": "Please type the lyrics in roman letters here...",
-        "ja": "ここで歌詞ローマ字を入力してください..."
-    },
     ">\n                    <p>\n                         임시 비밀번호로 로그인하면<br>\n                        <strong>보안을 위해 비밀번호를 즉시 변경</strong>해야 합니다.<br><br>\n                        메일이 보이지 않는다면 스팸함을 확인해주세요.\n                    </p>\n                </div>\n\n                <button class=": {
         "en": ">\n                    <p>\n                         When you log in with a temporary password<br>\n                        <strong>For security reasons, you must change your password immediately</strong>.<br><br>\n                        If you do not see the email, please check your spam folder.\n                    </p>\n                </div>\n\n                <button class=",
         "ja": ">\n                    <p>\n                         一時パスワードでログインすると<br>\n                        <strong>セキュリティのためにパスワードを即座に変更</strong>する必要があります。<br> <br>\n                        メールが表示されない場合は、スパムボックスを確認してください。\n                    </p>\n                </div>\n\n                <button class="
@@ -2838,10 +2906,6 @@
     "></i> <strong>타이핑 엔진 개선:</strong> 타이핑 시 하이픈(-) 문자를 정상 입력할 수 있게 패치되었으며, 쓰이지 않는 일본어 로마자 변환 기능이 삭제되어 타이핑 경험이 더욱 가벼워졌습니다.<br>\n            <i class=": {
         "en": "></i> <strong>Typing engine improvement:</strong> A patch has been made so that hyphen (-) characters can be entered properly when typing, and the obsolete Japanese romanization conversion function has been deleted, making the typing experience lighter.<br>\n            <i class=",
         "ja": "> </i> <strong>タイピングエンジンの改善：</strong>タイピング時にハイフン（ - ）文字を正常に入力できるようにパッチが適用され、使われていない日本語ローマ字変換機能が削除され、タイピング体験がより軽くなりました。<br>\n            <i class="
-    },
-    "가사를 모두 입력했습니다. 대기 중... ⏳": {
-        "en": "I entered all the lyrics. Waiting... ⏳",
-        "ja": "歌詞をすべて入力しました。待機中…⏳"
     },
     ">사용 가능한 이메일입니다.</span>\n                </div>\n\n                <!-- 비밀번호 -->\n                <div class=": {
         "en": ">This email is available.</span>\n                </div>\n\n                <!-- Password -->\n                <div class=",
@@ -3711,10 +3775,6 @@
         "en": ">Password does not match</span>\n        </div>\n        <button class=",
         "ja": ">パスワードが一致しません。</span>\n        </div>\n        <button class="
     },
-    "시간 초과! 잠시 후 다음 문제로 넘어갑니다.": {
-        "en": "Time out! We'll move on to the next question in a moment.",
-        "ja": "タイムアウト！しばらくすると、次の問題に進みます。"
-    },
     ">로딩중</span>\n                </div>\n            </div>\n\n            <!-- Bottom Right: Lyrics + Typing Area -->\n            <div class=": {
         "en": ">Loading</span>\n                </div>\n            </div>\n\n            <!-- Bottom Right: Lyrics + Typing Area -->\n            <div class=",
         "ja": ">読み込み中</span>\n                </div>\n            </div>\n\n            <!-- Bottom Right: Lyrics + Typing Area -->\n            <div class="
@@ -4018,10 +4078,6 @@
     "required\n                    >\n                    <!-- 비밀번호 강도 -->\n                    <div class=": {
         "en": "required\n                    >\n                    <!-- Password Strength -->\n                    <div class=",
         "ja": "required\n                    >\n                    <!-- パスワード強度 -->\n                    <div class="
-    },
-    "전주 재생 중... 대기하세요 ⏳": {
-        "en": "Playing prelude... please wait ⏳",
-        "ja": "全州再生中...待ってください⏳"
     },
     ">엔터핑</span>\n      </div>\n      <nav class=": {
         "en": ">Entering</span>\n      </div>\n      <nav class=",
@@ -5030,10 +5086,6 @@
     ").textContent = battleAvgWpm;\n      }\n    }\n\n    function updateBadges(data) {\n      const totalPlays = data.length;\n      let maxWpm = 0;\n      let jpopCount = 0;\n      let hasTop10Score = false;\n\n      // 정확도 통계는 타이핑(typing) 기록만으로 계산\n      const typingPlays = data.filter(item => item.type ===": {
         "en": ").textContent = battleAvgWpm;\n      }\n    }\n\n    function updateBadges(data) {\n      const totalPlays = data.length;\n      let maxWpm = 0;\n      let jpopCount = 0;\n      let hasTop10Score = false;\n\n      // Accuracy statistics are calculated solely from typing records\n      const typingPlays = data.filter(item => item.type ===",
         "ja": ").textContent = battleAvgWpm;\n      }\n    }\n\n    function updateBadges(data) {\n      const totalPlays = data.length;\n      let maxWpm = 0;\n      let jpopCount = 0;\n      let hasTop10Score = false;\n\n      //精度統計はタイピング記録のみで計算されます\n      const typingPlays = data.filter(item => item.type ==="
-    },
-    "다음 가사 대기 중... ⏳": {
-        "en": "Waiting for next lyrics... ⏳",
-        "ja": "次の歌詞を待っています...⏳"
     },
     ">\n          <h3>제1조 (목적)</h3>\n          <p>본 약관은 엔터핑(이하": {
         "en": ">\n          <h3>Article 1 (Purpose)</h3>\n          <p>These terms and conditions apply to Enterping (hereinafter referred to as",

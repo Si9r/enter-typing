@@ -290,8 +290,8 @@
 
         .content-type-badge.mode-quiz {
             display: inline-flex;
-            background: rgba(173, 216, 230, 0.3);
-            color: var(--color-battle-secondary);
+            background: #4f46e5;
+            color: #ffffff;
         }
 
         .content-preview-diff {
@@ -1068,8 +1068,8 @@
                 <!-- Video Info & Vol Panel -->
                 <div class="battle-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
                     <div
-                        style="font-weight: 900; border-bottom: 3px solid var(--color-battle-primary); padding-bottom: 8px; margin-bottom: 5px; color: var(--color-battle-text); font-size: 1.1rem; width: max-content;">
-                        영상정보</div>
+                        style="font-weight: 900; border-bottom: 3px solid var(--color-battle-primary); padding-bottom: 8px; margin-bottom: 5px; color: var(--color-battle-text); font-size: 1.1rem; width: max-content;"
+                        data-i18n="영상정보">영상정보</div>
 
                     <h3 id="info-title"
                         style="margin: 0 0 5px 0; font-size: 1.15rem; color: var(--color-battle-text); font-weight: 800; word-break: keep-all; line-height: 1.4;">
@@ -1087,20 +1087,20 @@
                         <div>
                             <div id="info-creator"
                                 style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text);">-</div>
-                            <div style="font-size: 0.75rem; color: var(--color-battle-text-muted); margin-top: 2px;">작성자
+                            <div style="font-size: 0.75rem; color: var(--color-battle-text-muted); margin-top: 2px;" data-i18n="작성자">작성자
                             </div>
                         </div>
                     </div>
 
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 2px; font-weight: 500;">
-                        재생 시간: <span id="time"
-                            style="font-weight: bold; color: var(--color-battle-secondary);">0</span>초</div>
+                        <span data-i18n="재생 시간:">재생 시간:</span> <span id="time"
+                            style="font-weight: bold; color: var(--color-battle-secondary);">0</span><span data-i18n="초">초</span></div>
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 10px; font-weight: 500;">
-                        플레이 수: <span id="info-views" style="font-weight: bold;">0</span>회</div>
+                        <span data-i18n="플레이 수:">플레이 수:</span> <span id="info-views" style="font-weight: bold;">0</span><span data-i18n="회">회</span></div>
                     <div
-                        style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 4px; font-weight: 500;">
+                        style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 4px; font-weight: 500;" data-i18n="장르">
                         장르</div>
                     <div id="info-tags" style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <span
@@ -1110,7 +1110,7 @@
                     <div style="margin-top: 15px; border-top: 1.5px dashed rgba(0,0,0,0.1); padding-top: 15px;">
                         <div
                             style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>음량 조절</span>
+                            <span data-i18n="음량 조절">음량 조절</span>
                             <span id="volume-display" style="color: var(--color-battle-primary);">50%</span>
                         </div>
                         <input type="range" id="volume-slider" min="0" max="100" value="50"
@@ -1232,7 +1232,8 @@
                 margin-top: 0;
             ">
                 <div class="panel-title"
-                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
+                    data-i18n="퀴즈 통계">
                     퀴즈 통계</div>
 
                 <h3 id="quiz-info-title"
@@ -1243,12 +1244,14 @@
                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; text-align: center;">
                     <div style="background: rgba(255, 123, 142, 0.1); border-radius: 12px; padding: 10px;">
                         <div
-                            style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;">
+                            style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;"
+                            data-i18n="내 점수">
                             내 점수</div>
                         <div id="quiz-my-score" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">콤보</div>
+                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;"
+                            data-i18n="콤보">콤보</div>
                         <div id="quiz-my-combo" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
@@ -1256,7 +1259,7 @@
                 <div style="margin-top: 5px; border-top: 2px dashed #ccc; padding-top: 15px; margin-bottom: 15px;">
                     <div
                         style="font-size: 0.95rem; font-weight: bold; color: #555; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>음량 조절</span>
+                        <span data-i18n="음량 조절">음량 조절</span>
                         <span id="quiz-volume-display" style="color: var(--color-pink)">50%</span>
                     </div>
                     <input type="range" id="quiz-volume-slider" min="0" max="100" value="50"
@@ -1313,7 +1316,8 @@
                 <div
                     style="display: flex; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding-right: 10px; align-items: flex-start; justify-content: center;">
                     <div class="panel-title"
-                        style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 20px; width: max-content; color: var(--theme-text-main); font-size: 1.1rem;">
+                        style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 20px; width: max-content; color: var(--theme-text-main); font-size: 1.1rem;"
+                        data-i18n="문제 정보">
                         문제 정보</div>
                     <div id="quiz-answer-board" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
                         <div id="quiz-board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
@@ -1334,7 +1338,8 @@
                 margin-top: 0;
             ">
                 <div class="panel-title"
-                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
+                    data-i18n="실시간 순위">
                     실시간 순위</div>
 
                 <div id="quiz-live-ranking-container"

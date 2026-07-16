@@ -106,11 +106,11 @@ function renderWaitingPhase() {
     const input = document.getElementById("game-typing-input");
     input.value = "";
     input.disabled = true;
-    input.placeholder = currentLineIndex === 0 ? "전주 재생 중... 대기하세요 ⏳" : "다음 가사 대기 중... ⏳";
+    input.placeholder = currentLineIndex === 0 ? window.i18nTranslate("전주 재생 중... 대기하세요 ⏳") : window.i18nTranslate("다음 가사 대기 중... ⏳");
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = '<span style="color: #666;">곧 가사가 시작됩니다. 대기하세요...</span>';
+        statusPanel.innerHTML = `<span style="color: #666;">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
     }
 
     battleTargetUnits = [];
@@ -305,12 +305,12 @@ function handleLineCompletion() {
     const input = document.getElementById("game-typing-input");
     if (input) {
         input.disabled = true;
-        input.placeholder = "가사를 모두 입력했습니다. 대기 중... ⏳";
+        input.placeholder = window.i18nTranslate("가사를 모두 입력했습니다. 대기 중... ⏳");
     }
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = '<span class="success-text"> 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
+        statusPanel.innerHTML = `<span class="success-text"> ${window.i18nTranslate("문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...")}</span>`;
     }
 
     calculateMyProgress();
@@ -344,7 +344,7 @@ export function startGamePlay() {
     const input = document.getElementById("game-typing-input");
     input.value = "";
     input.disabled = true; // 게임 시작 직후에는 무조건 잠금
-    input.placeholder = "전주 재생 중... 대기하세요 ⏳";
+    input.placeholder = window.i18nTranslate("전주 재생 중... 대기하세요 ⏳");
     input.oninput = handleTypingInput;
 
     if (state.syncTimer) clearInterval(state.syncTimer);
@@ -408,7 +408,7 @@ function loadGameplayLine() {
     if (nextIdx < totalLines) {
         document.getElementById("game-next-display").textContent = `Next - ${song.lines[nextIdx]}`;
     } else {
-        document.getElementById("game-next-display").textContent = "Next - 마지막 소절입니다!";
+        document.getElementById("game-next-display").textContent = `Next - ${window.i18nTranslate("마지막 소절입니다!")}`;
     }
 
     renderActiveLyrics();
@@ -418,7 +418,7 @@ function loadGameplayLine() {
     input.value = "";
 
     input.disabled = false;
-    input.placeholder = "여기에 가사 로마자를 타이핑하세요...";
+    input.placeholder = window.i18nTranslate("여기에 가사 로마자를 타이핑하세요...");
     input.focus();
     currentLineTypingStartTime = Date.now();
 }
@@ -643,7 +643,7 @@ function startQuizGameplay() {
 
     document.getElementById("quiz-my-score").innerText = "0";
     document.getElementById("quiz-my-combo").innerText = "0";
-    document.getElementById("quiz-chat-messages").innerHTML = '<div class="chat-bubble system" style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.</div>';
+    document.getElementById("quiz-chat-messages").innerHTML = `<div class="chat-bubble system" style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${window.i18nTranslate("퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.")}</div>`;
 
     const inputField = document.getElementById("quiz-chat-input");
     if (inputField) {
@@ -666,7 +666,7 @@ function startQuizGameplay() {
     }
 
     const countDisplay = document.getElementById("quiz-count-display-battle");
-    if (countDisplay) countDisplay.innerText = `남은 퀴즈: ${quizData.length}`;
+    if (countDisplay) countDisplay.innerText = `${window.i18nTranslate("남은 퀴즈:")} ${quizData.length}`;
 
     const infoTitle = document.getElementById("quiz-info-title");
     if (infoTitle) infoTitle.innerText = selectedSong.title || "로딩 중...";
@@ -697,7 +697,7 @@ function startQuizGameplay() {
 function startQuizBattle() {
     if (quizData.length === 0) return;
     if (currentQuizIndex >= quizData.length) {
-        addQuizSystemChat("모든 문제가 끝났습니다.");
+        addQuizSystemChat(window.i18nTranslate("모든 문제가 끝났습니다."));
         return;
     }
 
@@ -775,7 +775,7 @@ function playQuizSegment() {
             if (vinylRecord) vinylRecord.classList.add("paused");
             quizIsPlayingSegment = false;
 
-            addQuizSystemChat("시간 초과! 잠시 후 다음 문제로 넘어갑니다.");
+            addQuizSystemChat(window.i18nTranslate("시간 초과! 잠시 후 다음 문제로 넘어갑니다."));
 
             currentQuizCombo = 0;
             const comboEl = document.getElementById("quiz-my-combo");

@@ -18,7 +18,7 @@ function scanDOM(node) {
     if (node.nodeType === Node.TEXT_NODE) {
         const fullText = node.textContent;
         const trimmedText = fullText.trim();
-        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전|위)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText) || /\[구간\s*\d+\]/.test(trimmedText) || /오타\s*\d+\s*\/\s*시간초과\s*\d+/.test(trimmedText) || /「.+」\s*오타:/.test(trimmedText);
+        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText) || /남은 퀴즈:\s*\d+개/.test(trimmedText);
         
         if (trimmedText && (translations[trimmedText] || hasDynamicPattern)) {
             const prefix = fullText.substring(0, fullText.indexOf(trimmedText));
@@ -115,6 +115,7 @@ async function applyTranslations() {
         observer.observe(document.body, { childList: true, subtree: true });
     }
     
+    updateLanguageSelectorUI();
     applyTranslationsCore();
 }
 
@@ -138,16 +139,13 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/(\d+)\s*명/g, '$1 players');
                 translatedText = translatedText.replace(/(\d+)\s*개/g, '$1 items');
                 translatedText = translatedText.replace(/(\d+)\s*문제/g, '$1 Qs');
-                translatedText = translatedText.replace(/(\d+)\s*위/g, 'Rank $1');
                 translatedText = translatedText.replace(/([\d,]+)\s*점/g, '$1 pts');
                 translatedText = translatedText.replace(/([\d,]+)\s*승/g, '$1 wins');
                 translatedText = translatedText.replace(/\(총\s*([\d,]+)\s*전\)/g, '(Total $1 plays)');
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'Code: $1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, 'Joined battle room (#$1)!');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (Me)');
-                translatedText = translatedText.replace(/\[구간\s*(\d+)\]/g, '[Section $1]');
-                translatedText = translatedText.replace(/오타\s*(\d+)\s*\/\s*시간초과\s*(\d+)/g, 'Typos $1 / Timeouts $2');
-                translatedText = translatedText.replace(/「(.+)」\s*오타:/g, '「$1」 Typo:');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, 'Remaining Quizzes: $1');
             } else if (lang === 'ja') {
                 translatedText = translatedText.replace(/(\d+)\s*초/g, '$1秒');
                 translatedText = translatedText.replace(/(\d+)\s*분/g, '$1分');
@@ -156,16 +154,13 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/(\d+)\s*명/g, '$1人');
                 translatedText = translatedText.replace(/(\d+)\s*개/g, '$1個');
                 translatedText = translatedText.replace(/(\d+)\s*문제/g, '$1問');
-                translatedText = translatedText.replace(/(\d+)\s*위/g, '$1位');
                 translatedText = translatedText.replace(/([\d,]+)\s*점/g, '$1点');
                 translatedText = translatedText.replace(/([\d,]+)\s*승/g, '$1勝');
                 translatedText = translatedText.replace(/\(총\s*([\d,]+)\s*전\)/g, '(計$1戦)');
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'コード：$1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, '対戦部屋(#$1)に入場しました！');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (私)');
-                translatedText = translatedText.replace(/\[구간\s*(\d+)\]/g, '[区間 $1]');
-                translatedText = translatedText.replace(/오타\s*(\d+)\s*\/\s*시간초과\s*(\d+)/g, '誤打 $1 / タイムアウト $2');
-                translatedText = translatedText.replace(/「(.+)」\s*오타:/g, '「$1」 誤打：');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, '残りのクイズ: $1問');
             }
         }
         
@@ -219,6 +214,15 @@ function updateLanguageSelectorUI() {
         currentLangText.textContent = langMap[getCurrentLanguage()] || "한국어";
     }
 }
+
+// 전역 번역 유틸리티 함수 추가
+window.i18nTranslate = function(key) {
+    const lang = getCurrentLanguage();
+    if (lang !== 'ko' && localesLoaded && translations[key] && translations[key][lang]) {
+        return translations[key][lang];
+    }
+    return key;
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTranslations().then(() => {

@@ -6358,5 +6358,29 @@
     "문의하기": {
         "en": "Contact Us",
         "ja": "お問い合わせ"
+    },
+    "현재 입력 위치:": {
+        "en": "Current Input:",
+        "ja": "現在の入力位置:"
+    },
+    "입력 중...": {
+        "en": "Typing...",
+        "ja": "入力中..."
+    },
+    "입력된 조합:": {
+        "en": "Typed:",
+        "ja": "入力済み:"
+    },
+    "입력할 항목을 준비 중입니다.": {
+        "en": "Preparing input items...",
+        "ja": "入力項目を準備中です。"
+    },
+    "완벽하게 입력했습니다! 다음 문장을 기다려 주세요.": {
+        "en": "Perfectly typed! Please wait for the next sentence.",
+        "ja": "完璧に入力しました！次の文章をお待ちください。"
+    },
+    "마지막 소절입니다!": {
+        "en": "This is the last section!",
+        "ja": "最後のフレーズです！"
     }
 }

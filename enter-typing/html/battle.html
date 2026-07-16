@@ -1159,7 +1159,7 @@
                             style="display: flex; gap: 15px; font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text-muted);">
                             <span>WPM: <strong id="game-wpm"
                                     style="color: var(--color-battle-secondary);">0</strong></span>
-                            <span>정확도: <strong id="game-accuracy"
+                            <span><span data-i18n="정확도">정확도</span>: <strong id="game-accuracy"
                                     style="color: var(--color-battle-correct);">100%</strong></span>
                         </div>
                     </div>
@@ -1174,7 +1174,8 @@
                               padding: 10px 15px;
                               border-radius: 12px;
                               border: 1px dashed #ffd1d4;
-                            ">
+                              text-align: center;
+                            " data-i18n="한자 원문이 로딩됩니다.">
                             한자 원문이 로딩됩니다.
                         </div>
                     </div>
@@ -1183,8 +1184,9 @@
                           line-height: 1.8;
                           min-height: 120px;
                           color: #222;
+                          text-align: center;
                         "></div>
-                    <div id="game-next-display" class="next-preview-display" style="font-size: 0.95rem; color: #777">
+                    <div id="game-next-display" class="next-preview-display" style="font-size: 0.95rem; color: #777; text-align: center;">
                         Next -
                     </div>
                     <div class="timer-bar-container" style="
@@ -1201,7 +1203,7 @@
                             "></div>
                     </div>
                     <div id="game-status-panel" class="status-panel"
-                        style="font-size: 0.95rem; color: #444; min-height: 38px; font-weight: bold;">
+                        style="font-size: 0.95rem; color: #444; min-height: 38px; font-weight: bold;" data-i18n="대기 중...">
                         대기 중...
                     </div>
 

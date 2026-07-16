@@ -6330,5 +6330,33 @@
     "빠른 시일 내에 멋진 서비스로 찾아뵙겠습니다!": {
         "en": "Stay tuned for a great service soon!",
         "ja": "もうしばらくお待ちください！"
+    },
+    "서비스": {
+        "en": "Services",
+        "ja": "サービス"
+    },
+    "타이핑 연습": {
+        "en": "Typing Practice",
+        "ja": "タイピング練習"
+    },
+    "단어 퀴즈": {
+        "en": "Word Quiz",
+        "ja": "単語クイズ"
+    },
+    "멀티플레이": {
+        "en": "Multiplayer",
+        "ja": "マルチプレイ"
+    },
+    "커뮤니티": {
+        "en": "Community",
+        "ja": "コミュニティ"
+    },
+    "고객지원": {
+        "en": "Support",
+        "ja": "サポート"
+    },
+    "문의하기": {
+        "en": "Contact Us",
+        "ja": "お問い合わせ"
     }
 }

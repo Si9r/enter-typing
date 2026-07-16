@@ -75,7 +75,7 @@ function renderCards(items) {
 
         const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
 
-        const typeBadgeHTML = `<div style="position:absolute; bottom:8px; right:8px; background: rgba(0,0,0,0.65); color:white; padding:2px 8px; border-radius:10px; font-size:0.72rem; font-weight:700;">${isQuiz ? '퀴즈' : '타이핑'}</div>`;
+        const typeBadgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ${isQuiz ? 'ph-question' : 'ph-keyboard'}"></i> ${isQuiz ? '퀴즈' : '타이핑'}</div>`;
         const thumbSrc = isQuiz
             ? (item.thumbnail_url || (item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg` : null))
             : (item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg` : null);

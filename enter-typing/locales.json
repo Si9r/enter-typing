@@ -1703,6 +1703,78 @@
         "en": "tag",
         "ja": "タグ"
     },
+    "질문": {
+        "en": "question",
+        "ja": "質問"
+    },
+    "음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!": {
+        "en": "Audio loading is complete. Click '?' in the center to start!",
+        "ja": "音源の読み込みが完了しました。中央の「?」をクリックして開始してください！"
+    },
+    "남은 퀴즈": {
+        "en": "Remaining quizzes",
+        "ja": "残りのクイズ"
+    },
+    "제목": {
+        "en": "Title",
+        "ja": "タイトル"
+    },
+    "가수": {
+        "en": "singer",
+        "ja": "歌手"
+    },
+    "정답입니다! (가수)": {
+        "en": "Correct! (Artist)",
+        "ja": "正解です！ (歌手)"
+    },
+    "정답입니다! (제목)": {
+        "en": "Correct! (Title)",
+        "ja": "正解です！ (タイトル)"
+    },
+    "정답입니다! (질문)": {
+        "en": "Correct! (Question)",
+        "ja": "正解です！ (質問)"
+    },
+    "모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다": {
+        "en": "You got everything correct! The quiz is now over! congratulations",
+        "ja": "すべての正解を迎えました！クイズがすべて終わりました！おめでとうございます"
+    },
+    "모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다.": {
+        "en": "You got everything correct! After 3 seconds, move on to the next problem.",
+        "ja": "すべての正解を迎えました！ 3秒後、次の問題に進みます。"
+    },
+    "퀴즈가 이미 끝났습니다.": {
+        "en": "The quiz is already over.",
+        "ja": "クイズはもう終わりました。"
+    },
+    "퀴즈 ID가 유효하지 않습니다.": {
+        "en": "Quiz ID is invalid.",
+        "ja": "クイズIDが無効です。"
+    },
+    "퀴즈 데이터를 불러오지 못했습니다.": {
+        "en": "Quiz data failed to load.",
+        "ja": "クイズデータを読み込めませんでした。"
+    },
+    "서버 에러가 발생했습니다.": {
+        "en": "A server error occurred.",
+        "ja": "サーバーエラーが発生しました。"
+    },
+    "유튜브 영상 정보가 없습니다.": {
+        "en": "There is no YouTube video information.",
+        "ja": "YouTubeの動画情報はありません。"
+    },
+    "퀴즈 완료!": {
+        "en": "Quiz completed!",
+        "ja": "クイズ完了！"
+    },
+    "파일 선택": {
+        "en": "Choose File",
+        "ja": "ファイルを選択"
+    },
+    "선택된 파일 없음": {
+        "en": "No file chosen",
+        "ja": "選択されていません"
+    },
     "토": {
         "en": "saturday",
         "ja": "土"
@@ -1963,10 +2035,6 @@
         "en": "novalidate>\n                    <!-- New password -->\n                    <div class=",
         "ja": "novalidate>\n                    <!-- 新しいパスワード -->\n                    <div class="
     },
-    "서버 에러가 발생했습니다.": {
-        "en": "A server error has occurred.",
-        "ja": "サーバーエラーが発生しました。"
-    },
     ">필수 약관에 동의해주세요.</span>\n                </div>\n\n                <!-- 회원가입 버튼 -->\n                <button id=": {
         "en": ">Please agree to the required terms and conditions.</span>\n                </div>\n\n                <!-- Sign up button -->\n                <button id=",
         "ja": ">必須条件に同意してください。</span>\n                </div>\n\n                <!-- 会員登録ボタン -->\n                <button id="
@@ -2095,10 +2163,6 @@
         "en": "Ready",
         "ja": "準備完了"
     },
-    "모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다": {
-        "en": "You got everything correct! The quiz is now over! congratulations",
-        "ja": "すべての正解を迎えました！クイズがすべて終わりました！おめでとうございます"
-    },
     ">\n                                + 질문 추가\n                            </button>\n                        </div>\n\n                        <div style=": {
         "en": ">\n                                + Add question\n                            </button>\n                        </div>\n\n                        <div style=",
         "ja": ">\n                                +質問を追加\n                            </button>\n                        </div>\n\n                        <div style="
@@ -2175,10 +2239,6 @@
         "en": ">Average WPM</div>\n                        <div id=",
         "ja": ">平均WPM </div>\n                        <div id="
     },
-    "퀴즈 ID가 유효하지 않습니다.": {
-        "en": "Quiz ID is invalid.",
-        "ja": "クイズIDが無効です。"
-    },
     "이 시간에서 타이핑을 종료합니다.": {
         "en": "End typing at this time.",
         "ja": "この時点でタイピングを終了します。"
@@ -2206,10 +2266,6 @@
     ">다시 풀기</button>\n        <button onclick=": {
         "en": ">Unpack again</button>\n        <button onclick=",
         "ja": ">もう一度解く</button>\n        <button onclick="
-    },
-    "질문": {
-        "en": "question",
-        "ja": "質問"
     },
     ">촉음(っ) 분리 입력 허용\n          </div>\n          <div style=": {
         "en": ">Allow separate input of pronunciation (っ)\n          </div>\n          <div style=",
@@ -2558,10 +2614,6 @@
     ").textContent = maxWpm || 0;\n\n      // 3-3. 평균 정확도 업데이트\n      document.getElementById(": {
         "en": ").textContent = maxWpm || 0;\n\n      // 3-3. Average Accuracy Update\n      document.getElementById(",
         "ja": ").textContent = maxWpm || 0;\n\n      // 3-3.平均精度更新\n      document.getElementById("
-    },
-    "퀴즈 데이터를 불러오지 못했습니다.": {
-        "en": "Quiz data failed to load.",
-        "ja": "クイズデータを読み込めませんでした。"
     },
     ">\n    <title>실시간 타이핑 대전 - 엔터핑</title>\n    <link rel=": {
         "en": ">\n    <title>Real-time typing competition - Enterping</title>\n    <link rel=",
@@ -3128,8 +3180,8 @@
         "ja": "本当にこのクイズを削除してもよろしいですか？"
     },
     "오타 상세 분석:": {
-        "en": "Detailed analysis of typos:",
-        "ja": "太字詳細分析："
+        "en": "Typo Details:",
+        "ja": "誤打詳細分析："
     },
     ">곡 별 랭킹</a></li>\n        </ul>\n      </div>\n\n      <div class=": {
         "en": ">Ranking by song</a></li>\n        </ul>\n      </div>\n\n      <div class=",
@@ -3562,10 +3614,6 @@
     ">✏️ 수정</button>\n                    <button class=": {
         "en": ">✏️ Edit</button>\n                    <button class=",
         "ja": ">✏️編集</button>\n                    <button class="
-    },
-    "가수": {
-        "en": "singer",
-        "ja": "歌手"
     },
     ">\n                        대기 중...\n                    </div>\n\n                    <input id=": {
         "en": ">\n                        Waiting...\n                    </div>\n\n                    <input id=",
@@ -4275,10 +4323,6 @@
         "en": "game settings",
         "ja": "ゲーム設定"
     },
-    "퀴즈 완료!": {
-        "en": "Quiz completed!",
-        "ja": "クイズ完了！"
-    },
     ">난이도</span>\n                        <span id=": {
         "en": ">Difficulty level</span>\n                        <span id=",
         "ja": ">難易度</span>\n                        <span id="
@@ -4458,10 +4502,6 @@
     ">\n                            정답률\n                        </div>\n                        <div id=": {
         "en": ">\n                            Correct rate\n                        </div>\n                        <div id=",
         "ja": ">\n                            正解率\n                        </div>\n                        <div id="
-    },
-    "유튜브 영상 정보가 없습니다.": {
-        "en": "There is no YouTube video information.",
-        "ja": "YouTubeの動画情報はありません。"
     },
     ">\n                                드라이플라워 900타 방</h2>\n                        </div>\n                        <div class=": {
         "en": ">\n                                Dried flower 900 hits</h2>\n                        </div>\n                        <div class=",
@@ -4644,7 +4684,7 @@
         "ja": ">作成者</div>\n                    </div>\n                </div>\n\n                <div style="
     },
     "준비 중...": {
-        "en": "preparing...",
+        "en": "Preparing...",
         "ja": "準備中..."
     },
     ">\n        <!-- JS가 데이터를 채워줍니다 -->\n      </div>\n      <div class=": {
@@ -4682,10 +4722,6 @@
     ">영상 재생 설정</div>\n\n                    <div id=": {
         "en": ">Video playback settings</div>\n\n                    <div id=",
         "ja": ">ビデオ再生設定</div>\n\n                    <div id="
-    },
-    "퀴즈가 이미 끝났습니다.": {
-        "en": "The quiz is already over.",
-        "ja": "クイズはもう終わりました。"
     },
     ">전체 랭킹</a></li>\n          <li><a href=": {
         "en": ">Overall ranking</a></li>\n          <li><a href=",
@@ -4928,8 +4964,8 @@
         "ja": "> + </ span>タイピングを追加する\n                    </button>\n                </div>\n            </div>\n\n            <div\n                style="
     },
     "이 구간은 완벽하게 입력했습니다!": {
-        "en": "This section was entered perfectly!",
-        "ja": "この区間は完全に入力しました！"
+        "en": "You typed this section perfectly!",
+        "ja": "この区間は完璧に入力しました！"
     },
     "> (매우 쉬움)</option>\n                    <option value=": {
         "en": "> (Very easy)</option>\n                    <option value=",
@@ -5406,10 +5442,6 @@
     ">비밀번호를 입력해주세요.</span>\n        </div>\n        <button class=": {
         "en": ">Please enter your password.</span>\n        </div>\n        <button class=",
         "ja": ">パスワードを入力してください。</span>\n        </div>\n        <button class="
-    },
-    "모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다.": {
-        "en": "You got everything correct! After 3 seconds, move on to the next problem.",
-        "ja": "すべての正解を迎えました！ 3秒後、次の問題に進みます。"
     },
     "정답을 입력하세요. 쉼표로 동의어, 줄바꿈으로 다른 정답 옵션을 구분합니다.": {
         "en": "Please enter the correct answer. Separate synonyms with commas and different answer options with line breaks.",
@@ -6258,5 +6290,101 @@
     "실시간 & 랭킹": {
         "en": "Real-time & Ranking",
         "ja": "リアルタイム＆ランキング"
+    },
+    "(완벽함! )": {
+        "en": "(Perfect! )",
+        "ja": "(完璧！)"
+    },
+    " 오타: ": {
+        "en": " Typo: ",
+        "ja": " 誤打："
+    },
+    " (정답: ": {
+        "en": " (Expected: ",
+        "ja": " (正解："
+    },
+    "[시간 초과]": {
+        "en": "[Timeout]",
+        "ja": "[タイムアウト]"
+    },
+    " 미입력: ": {
+        "en": " Missed: ",
+        "ja": " 未入力："
+    },
+    "오타가 없습니다! 완벽해요 ": {
+        "en": "No typos! Perfect ",
+        "ja": "誤打がありません！完璧です "
+    },
+    "전주 재생 중... 곧 가사가 시작됩니다.": {
+        "en": "Playing intro... lyrics will start soon.",
+        "ja": "前奏再生中... 間もなく歌詞が始まります。"
+    },
+    "타이핑 영역을 클릭하면 게임이 시작됩니다!": {
+        "en": "Click the typing area to start the game!",
+        "ja": "タイピング領域をクリックするとゲームが開始します！"
+    },
+    " 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...": {
+        "en": " Finished typing the sentence. Waiting for the next sentence...",
+        "ja": " 文章をすべて入力しました。次の文章まで待機中..."
+    },
+    " 모든 타이핑이 종료되었습니다!": {
+        "en": " All typing has ended!",
+        "ja": " すべてのタイピングが終了しました！"
+    },
+    " 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.": {
+        "en": " Typed perfectly! Please wait for the next sentence.",
+        "ja": " 完璧に入力しました！次の文章をお待ちください。"
+    },
+    "문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...": {
+        "en": "Finished typing the sentence. Waiting for the next sentence...",
+        "ja": "文章をすべて入力しました。次の文章まで待機中..."
+    },
+    "모든 타이핑이 종료되었습니다!": {
+        "en": "All typing has ended!",
+        "ja": "すべてのタイピングが終了しました！"
+    },
+    "완벽하게 입력했습니다! 다음 문장을 기다려 주세요.": {
+        "en": "Typed perfectly! Please wait for the next sentence.",
+        "ja": "完璧に入力しました！次の文章をお待ちください。"
+    },
+    "(완벽함!)": {
+        "en": "(Perfect!)",
+        "ja": "(完璧！)"
+    },
+    "오타:": {
+        "en": "Typo:",
+        "ja": "誤打："
+    },
+    "(정답:": {
+        "en": "(Expected:",
+        "ja": "(正解："
+    },
+    "미입력:": {
+        "en": "Missed:",
+        "ja": "未入力："
+    },
+    "오타가 없습니다! 완벽해요": {
+        "en": "No typos! Perfect",
+        "ja": "誤打がありません！完璧です"
+    },
+    "현재 입력 위치:": {
+        "en": "Current position:",
+        "ja": "現在入力位置："
+    },
+    "입력 중... (입력된 조합:": {
+        "en": "typing... (Combination entered:",
+        "ja": "入力中... (入力された組み合わせ："
+    },
+    "정답": {
+        "en": "Expected",
+        "ja": "正解"
+    },
+    "미입력": {
+        "en": "Missed",
+        "ja": "未入力"
+    },
+    "정답:": {
+        "en": "Expected:",
+        "ja": "正解："
     }
 }

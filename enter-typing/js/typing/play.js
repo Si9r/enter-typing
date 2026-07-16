@@ -60,6 +60,8 @@ let lineCompleted = false;
 
 // Variables for countdown overlay
 let isCountingDown = false;
+let isResumeAuthorized = false;
+let isWaitingForResume = false;
 let countdownInterval = null;
 let playCountIncremented = false; // 세션 내 중복 카운트 방지
 
@@ -104,13 +106,25 @@ function initYoutubePlayer() {
           if (!isPlaying) {
             startGame(true);
           } else {
-            resumeTimer();
+            if (isWaitingForResume && !isResumeAuthorized) {
+              youtubePlayer.pauseVideo();
+              if (!isCountingDown) {
+                startCountdownAndPlay();
+              }
+            } else {
+              isWaitingForResume = false;
+              isResumeAuthorized = false;
+              resumeTimer();
+            }
           }
         } else if (
           event.data == YT.PlayerState.PAUSED ||
           event.data == YT.PlayerState.BUFFERING
         ) {
           pauseTimer();
+          if (event.data == YT.PlayerState.PAUSED) {
+            isWaitingForResume = true;
+          }
         } else if (event.data == YT.PlayerState.ENDED && isPlaying) {
           endGame(false);
         }
@@ -501,6 +515,7 @@ function startGame(startedByYoutube = false) {
   if (overlay) overlay.style.display = "none";
 
   if (!startedByYoutube && youtubePlayer && isPlayerReady) {
+    isResumeAuthorized = true;
     youtubePlayer.playVideo();
   }
 
@@ -556,7 +571,9 @@ function startGame(startedByYoutube = false) {
 function startTimer() {
   clearInterval(timer);
   timer = setInterval(() => {
-    gameTimeElapsed++;
+    if (!lineCompleted && !isWaitingPhase) {
+      gameTimeElapsed++;
+    }
     if (isYoutubeMode) {
       if (timeLeft > 0) {
         timeLeft--;
@@ -706,19 +723,19 @@ function endGame(completed = false) {
            
            const sectionDiv = document.createElement("div");
            sectionDiv.style.marginBottom = "10px";
-           sectionDiv.style.border = "1px solid #ddd";
+           sectionDiv.style.border = "1px solid var(--theme-border)";
            sectionDiv.style.borderRadius = "6px";
            sectionDiv.style.overflow = "hidden";
            
            const sectionHeader = document.createElement("div");
            sectionHeader.style.padding = "10px 15px";
-           sectionHeader.style.background = "#f1f1f1";
+           sectionHeader.style.background = "var(--theme-bg-hover)";
            sectionHeader.style.cursor = "pointer";
            sectionHeader.style.display = "flex";
            sectionHeader.style.justifyContent = "space-between";
            sectionHeader.style.alignItems = "center";
            sectionHeader.style.fontWeight = "bold";
-           sectionHeader.style.color = "#444";
+           sectionHeader.style.color = "var(--theme-text-main)";
            
            let coloredLineHtml = "";
            if (units.length > 0) {
@@ -731,14 +748,14 @@ function endGame(completed = false) {
                    } else if (hadTypo) {
                        coloredLineHtml += `<span style="color: #e67700; background: #fff4e6; padding: 2px; border-radius: 4px;">${escapeHTML(u.text)}</span>`;
                    } else {
-                       coloredLineHtml += `<span style="color: #555;">${escapeHTML(u.text)}</span>`;
+                       coloredLineHtml += `<span style="color: var(--theme-text-sub);">${escapeHTML(u.text)}</span>`;
                    }
                });
            } else {
                coloredLineHtml = `<span>${escapeHTML(lineText)}</span>`;
            }
 
-           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: #666; margin-left: 10px;">${coloredLineHtml}</span></span>`;
+           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: var(--theme-text-muted); margin-left: 10px;">${coloredLineHtml}</span></span>`;
            if (errors.length === 0) {
               titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! )</span>`;
            } else {
@@ -746,11 +763,11 @@ function endGame(completed = false) {
               let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
               titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">오타 ${typingErrors} / 시간초과 ${timeoutErrors}</span>`;
            }
-           sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: #888; margin-left: 10px; flex-shrink: 0;">▼</span>`;
+           sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: var(--theme-text-muted); margin-left: 10px; flex-shrink: 0;">▼</span>`;
 
            const detailsDiv = document.createElement("div");
            detailsDiv.style.padding = "15px";
-           detailsDiv.style.background = "#fff";
+           detailsDiv.style.background = "var(--theme-bg-card)";
            detailsDiv.style.display = "none";
 
            sectionHeader.addEventListener("click", () => {
@@ -788,7 +805,7 @@ function endGame(completed = false) {
                const analysisLabel = document.createElement("div");
                analysisLabel.style.fontSize = "0.85rem";
                analysisLabel.style.fontWeight = "bold";
-               analysisLabel.style.color = "#888";
+               analysisLabel.style.color = "var(--theme-text-muted)";
                analysisLabel.style.marginBottom = "4px";
                analysisLabel.innerText = "오타 상세 분석:";
                detailsDiv.appendChild(analysisLabel);
@@ -993,6 +1010,16 @@ typingInput.addEventListener("input", (e) => {
   const { isCompleteMatch, isPossiblePrefix } = TypingEngine.checkRomajiMatch(currentUnit, testBuffer);
 
   if (!isCompleteMatch && !isPossiblePrefix) {
+    // ── ん(n) 입력 후 'n'을 또 눌렀을 때 (nn 의도) 오타 처리 방지 ──
+    if (newChar === 'n' && currentBuffer === "" && currentUnitIndex > 0) {
+      const prevUnit = targetUnits[currentUnitIndex - 1];
+      if (prevUnit.text === 'ん' && prevUnit.typedAs === 'n') {
+        prevUnit.typedAs = 'nn'; // 더 이상 이 조건에 걸리지 않도록 방지
+        typingInput.value = currentBuffer; // 입력 무시
+        return;
+      }
+    }
+
     totalTypos++;
     sectionTypos++;
     typingInput.value = currentBuffer;
@@ -1017,6 +1044,7 @@ typingInput.addEventListener("input", (e) => {
 
   currentBuffer = testBuffer;
   if (isCompleteMatch) {
+    currentUnit.typedAs = testBuffer; // 기록해두기
     // 키 단위 오타 수집: 확정된 로마자 패턴(testBuffer) 기준으로 유닛 커밋
     if (keyTypoCollector) keyTypoCollector.commitUnit(testBuffer);
     currentUnitIndex++;
@@ -1230,7 +1258,7 @@ document.addEventListener("keydown", function(e) {
       e.preventDefault();
       const hira = contentHiraganaLines[currentLineIndex];
       const isLyricsEmpty = !hira || hira.trim() === "-" || hira.trim() === "";
-      if (lineCompleted || isLyricsEmpty) {
+      if (lineCompleted || isLyricsEmpty || isWaitingPhase) {
         skipTo80Percent();
       }
     } else if (e.code === "Space" || e.key === " ") {
@@ -1254,6 +1282,7 @@ function startCountdownAndPlay() {
   const text = document.getElementById("countdown-text");
   
   if (!overlay || !text) {
+    isResumeAuthorized = true;
     youtubePlayer.playVideo();
     return;
   }
@@ -1271,6 +1300,7 @@ function startCountdownAndPlay() {
       clearInterval(countdownInterval);
       overlay.style.display = "none";
       isCountingDown = false;
+      isResumeAuthorized = true;
       youtubePlayer.playVideo();
     }
   }, 1000);

@@ -466,7 +466,11 @@
         [data-theme="dark"] .time-inputs input,
         [data-theme="dark"] .question-label,
         [data-theme="dark"] .question-answer,
-        [data-theme="dark"] #quiz-hint {
+        [data-theme="dark"] #quiz-hint,
+        [data-theme="dark"] .modal-content input[type="text"],
+        [data-theme="dark"] .modal-content input[type="file"],
+        [data-theme="dark"] .modal-content select,
+        [data-theme="dark"] .modal-content textarea {
             background-color: rgba(255, 255, 255, 0.06) !important;
             color: var(--theme-text-main) !important;
             border-color: rgba(255, 255, 255, 0.15) !important;
@@ -477,7 +481,11 @@
         [data-theme="dark"] .time-inputs input:focus,
         [data-theme="dark"] .question-label:focus,
         [data-theme="dark"] .question-answer:focus,
-        [data-theme="dark"] #quiz-hint:focus {
+        [data-theme="dark"] #quiz-hint:focus,
+        [data-theme="dark"] .modal-content input[type="text"]:focus,
+        [data-theme="dark"] .modal-content input[type="file"]:focus,
+        [data-theme="dark"] .modal-content select:focus,
+        [data-theme="dark"] .modal-content textarea:focus {
             background-color: rgba(255, 255, 255, 0.1) !important;
             border-color: var(--color-pink) !important;
         }
@@ -826,16 +834,28 @@
 
             <div class="input-group">
                 <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">썸네일 이미지 (선택)</label>
-                <input type="file" id="thumbnail-file" accept="image/*" style="
-              width: 100%;
-              padding: 10px 12px;
-              border: 1px solid var(--theme-border);
-              border-radius: 6px;
-              outline: none;
-              margin-top: 5px;
-              margin-bottom: 5px;
-              box-sizing: border-box;
-            " />
+                <div class="custom-file-wrapper" style="display: flex; align-items: center; gap: 10px; margin-top: 5px; margin-bottom: 5px; width: 100%; padding: 6px; border: 1px solid var(--theme-border); border-radius: 6px; box-sizing: border-box;">
+                    <label for="thumbnail-file" style="cursor: pointer; padding: 6px 12px; background: var(--theme-bg-hover); color: var(--theme-text-main); border: 1px solid var(--theme-border); border-radius: 4px; font-weight: bold; font-size: 0.85rem;" data-i18n="파일 선택">파일 선택</label>
+                    <span id="thumbnail-file-name" style="font-size: 0.85rem; color: var(--theme-text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-i18n="선택된 파일 없음">선택된 파일 없음</span>
+                    <input type="file" id="thumbnail-file" accept="image/*" style="display: none;" />
+                </div>
+                <script>
+                    document.getElementById('thumbnail-file').addEventListener('change', function(e) {
+                        const nameDisplay = document.getElementById('thumbnail-file-name');
+                        if (this.files && this.files[0]) {
+                            nameDisplay.textContent = this.files[0].name;
+                            nameDisplay.removeAttribute('data-i18n');
+                        } else {
+                            nameDisplay.textContent = '선택된 파일 없음';
+                            nameDisplay.setAttribute('data-i18n', '선택된 파일 없음');
+                            if (window.updateTranslations) {
+                                window.updateTranslations();
+                            } else if (typeof applyTranslations === 'function') {
+                                applyTranslations();
+                            }
+                        }
+                    });
+                </script>
                 <div id="thumbnail-preview" style="
               width: 100%;
               height: 150px;

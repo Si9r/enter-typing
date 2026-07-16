@@ -35,7 +35,7 @@
   /* 닉네임 첫 글자(아바타) */
   function avatarChar(user) {
     if (user.nickname) return user.nickname.charAt(0).toUpperCase();
-    if (user.email)    return user.email.charAt(0).toUpperCase();
+    if (user.email) return user.email.charAt(0).toUpperCase();
     return '?';
   }
 
@@ -74,7 +74,7 @@
     `;
 
     /* 드롭다운 토글 */
-    const btn      = document.getElementById('nav-profile-btn');
+    const btn = document.getElementById('nav-profile-btn');
     const dropdown = document.getElementById('nav-profile-dropdown');
 
     btn.addEventListener('click', function (e) {
@@ -97,7 +97,11 @@
   }
 
   // ─── 하단 이용약관 및 개인정보 처리방침 모달 ──────────────────────────────
-  const footerTermsHTML = `
+
+
+
+  const termsData = {
+    ko: `
       <div class="terms-content">
           <h3>제1조 (목적)</h3>
           <p>본 약관은 엔터핑(이하 "회사")이 제공하는 웹사이트 및 관련 제반 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원과의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
@@ -136,9 +140,73 @@
           <h3>제8조 (준거법 및 재판관할)</h3>
           <p>회사와 회원 간에 제기된 소송은 대한민국법을 준거법으로 합니다. 회사와 회원 간 발생한 분쟁에 관한 소송은 민사소송법상의 관할법원에 제기합니다.</p>
       </div>
-  `;
+  `,
+    en: `
+      <div class="terms-content">
+          <h3>Article 1 (Purpose)</h3>
+          <p>The purpose of these Terms of Service is to set forth the rights, obligations, and responsibilities of Enterping (hereinafter referred to as the "Company") and the Members regarding the use of the website and related services.</p>
+          <h3>Article 2 (Definitions)</h3>
+          <p>The definitions of terms used in this agreement are as follows:</p>
+          <ul>
+              <li><strong>Member</strong>: A person who accesses the Company's service, agrees to these terms, and enters into a service usage contract by registering an ID (email) and password.</li>
+              <li><strong>Service</strong>: Typing practice games, entertainment quizzes, real-time ranking systems, and all other related services provided by the Company.</li>
+              <li><strong>Post</strong>: Articles, images, score records, etc. posted by the Member while using the Service.</li>
+          </ul>
+          <h3>Article 3 (Modification of Terms)</h3>
+          <p>The Company may amend these Terms to the extent that it does not violate relevant laws. Notice of any amendments will be posted on the Service.</p>
+          <h3>Article 4 (Registration and Account Management)</h3>
+          <p>Membership is established when the user agrees to these terms and the Privacy Policy, and applies for membership. Members are responsible for maintaining the confidentiality of their accounts and passwords.</p>
+          <h3>Article 5 (Obligations of Members and Prohibited Acts)</h3>
+          <p>Members shall not engage in the following acts:</p>
+          <ul>
+              <li>Stealing another person's personal information or account</li>
+              <li>Using macro programs, auto keyboards, hacking tools, or exploiting systemic vulnerabilities</li>
+              <li>Interfering with the normal operation of the service</li>
+              <li>Violating the intellectual property rights of the Company or third parties</li>
+          </ul>
+          <h3>Article 6 (Modification and Suspension of Service)</h3>
+          <p>The Company may temporarily suspend the provision of the Service in the event of maintenance, replacement, or breakdown of information and communication facilities.</p>
+          <h3>Article 7 (Disclaimer)</h3>
+          <p>The Company shall be exempted from liability for the provision of the Service if it cannot provide the Service due to force majeure. The Company is not responsible for any disputes between Members.</p>
+          <h3>Article 8 (Governing Law and Jurisdiction)</h3>
+          <p>Lawsuits filed between the Company and the Member shall be governed by the laws of the Republic of Korea.</p>
+      </div>
+`,
+    ja: `
+      <div class="terms-content">
+          <h3>第1条（目的）</h3>
+          <p>本規約は、エンターピング（以下「会社」といいます）が提供するウェブサイトおよび関連サービス（以下「サービス」といいます）の利用に関する、会社と会員との間の権利、義務、責任事項を定めることを目的とします。</p>
+          <h3>第2条（用語の定義）</h3>
+          <p>本規約で使用する用語の定義は以下の通りです。</p>
+          <ul>
+              <li><strong>会員</strong>：会社のサービスにアクセスし、本規約に同意した上でアカウント（メールアドレス）とパスワードを登録した者を指します。</li>
+              <li><strong>サービス</strong>：会社が提供するタイピング練習ゲーム、クイズ、リアルタイムランキングシステムおよびそれに関連するすべてのサービスを意味します。</li>
+              <li><strong>投稿物</strong>：会員がサービスを利用するにあたり、サービス上に掲示したテキスト、画像、スコア記録などを意味します。</li>
+          </ul>
+          <h3>第3条（規約の明示と改定）</h3>
+          <p>会社は、関連法令に違反しない範囲で本規約を改定することができます。改定された規約はサービス内で告知されます。</p>
+          <h3>第4条（会員登録とアカウント管理）</h3>
+          <p>会員登録は、利用者が本規約およびプライバシーポリシーに同意し、登録申請を行うことで成立します。会員は自身のアカウントとパスワードを秘密に保持する責任があります。</p>
+          <h3>第5条（利用者の義務と不正行為の禁止）</h3>
+          <p>会員は、以下の行為を行ってはなりません。</p>
+          <ul>
+              <li>他人の個人情報またはアカウントの盗用</li>
+              <li>マクロプログラム、自動キーボード、ハッキングツールの使用、またはシステムの脆弱性の悪用</li>
+              <li>サービスの正常な運営の妨害</li>
+              <li>会社または第三者の知的財産権の侵害</li>
+          </ul>
+          <h3>第6条（サービスの変更および中断）</h3>
+          <p>会社は、設備の保守点検、交換、故障などの事由が発生した場合、サービスの提供を一時的に中断することがあります。</p>
+          <h3>第7条（免責条項）</h3>
+          <p>会社は、不可抗力によりサービスを提供できない場合、サービス提供に関する責任を免除されます。また、会員間の紛争について会社は責任を負いません。</p>
+          <h3>第8条（準拠法と管轄裁判所）</h3>
+          <p>会社と会員との間に提起された訴訟は、大韓民国の法律を準拠法とします。</p>
+      </div>
+`
+  };
 
-  const footerPrivacyHTML = `
+  const privacyData = {
+    ko: `
       <div class="privacy-content">
           <h3>제1조 (개인정보의 처리 목적)</h3>
           <p>엔터핑(이하 "회사")은 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
@@ -178,15 +246,83 @@
           <p>개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
           <p style="padding-left: 10px; border-left: 3px solid var(--color-pink); margin-left: 5px;">
               <strong>개인정보 보호책임 부서</strong>: 엔터핑 보안운영팀<br>
-              <strong>이메일</strong>: privacy@enterping.com
+              <strong>이메일</strong>: privacy@enterping.com (임시)
           </p>
       </div>
-  `;
+  `,
+    en: `
+      <div class="privacy-content">
+          <h3>Article 1 (Purpose of Personal Information Processing)</h3>
+          <p>Enterping (the "Company") processes personal information for the following purposes. It will not be used for any other purposes:</p>
+          <ul>
+              <li><strong>Membership Registration and Management</strong>: Verification of intent to join, user identification, service restriction enforcement, and sending notifications.</li>
+              <li><strong>Service Provision</strong>: Recording typing rankings, managing quiz results, and providing personalized content.</li>
+          </ul>
+          <h3>Article 2 (Items of Personal Information Processed)</h3>
+          <p>The Company collects the following personal information:</p>
+          <ul>
+              <li><strong>Required Items</strong>: Email address, nickname, password (encrypted)</li>
+              <li><strong>Optional Items</strong>: Consent to receive marketing information</li>
+              <li><strong>Automatically Collected Items</strong>: IP address, cookies, access logs, etc.</li>
+          </ul>
+          <h3>Article 3 (Processing and Retention Period)</h3>
+          <p>The Company processes and retains personal information within the period agreed upon by the user. <strong>Personal information is destroyed without delay upon membership withdrawal.</strong></p>
+          <h3>Article 4 (Provision to Third Parties)</h3>
+          <p>The Company processes personal information only within the scope specified in Article 1, and provides it to third parties only with the user's consent or as required by law.</p>
+          <h3>Article 5 (Rights and Duties of the Subject)</h3>
+          <p>Users can exercise their rights to view, correct, delete, or suspend the processing of their personal information at any time through the profile page or customer support.</p>
+          <h3>Article 6 (Destruction of Personal Information)</h3>
+          <p>Personal information is destroyed without delay when it is no longer needed. Electronic files are destroyed using technical methods that prevent recovery.</p>
+          <h3>Article 7 (Safety Measures)</h3>
+          <p>The Company implements safety measures such as one-way encryption for passwords and security programs to prevent hacking and data leaks.</p>
+          <h3>Article 8 (Privacy Officer)</h3>
+          <p>The Company has designated a privacy officer to oversee personal information processing and handle related complaints.</p>
+          <p style="padding-left: 10px; border-left: 3px solid var(--color-pink); margin-left: 5px;">
+              <strong>Department</strong>: Enterping Security Operations Team<br>
+              <strong>Email</strong>: privacy@enterping.com (Temporary)
+          </p>
+      </div>
+`,
+    ja: `
+      <div class="privacy-content">
+          <h3>第1条（個人情報の処理目的）</h3>
+          <p>エンターピング（以下「会社」）は、以下の目的のために個人情報を処理します。これ以外の目的には使用されません。</p>
+          <ul>
+              <li><strong>会員登録および管理</strong>：本人確認、サービスの不正利用防止、各種通知などを目的とします。</li>
+              <li><strong>サービスの提供</strong>：タイピングランキングの登録、クイズの成績管理、カスタマイズコンテンツの提供を目的とします。</li>
+          </ul>
+          <h3>第2条（処理する個人情報の項目）</h3>
+          <p>会社は、以下の個人情報項目を収集および処理しています。</p>
+          <ul>
+              <li><strong>必須項目</strong>：メールアドレス、ニックネーム、パスワード（暗号化）</li>
+              <li><strong>選択項目</strong>：イベントおよびマーケティング情報の受信同意</li>
+              <li><strong>自動収集項目</strong>：IPアドレス、クッキー、アクセスログなど</li>
+          </ul>
+          <h3>第3条（処理および保有期間）</h3>
+          <p>会社は、利用者の同意を得た保有期間内で個人情報を処理および保有します。<strong>会員退会時には遅滞なく破棄することを原則とします。</strong></p>
+          <h3>第4条（第三者への提供）</h3>
+          <p>会社は、利用者の同意がある場合や法令に基づく場合を除き、個人情報を第三者に提供しません。</p>
+          <h3>第5条（情報主体の権利・義務および行使方法）</h3>
+          <p>利用者は、会社に対していつでも個人情報の閲覧、訂正、削除、処理停止を要求する権利を行使することができます。</p>
+          <h3>第6条（個人情報の破棄手続きおよび方法）</h3>
+          <p>個人情報が不要となった場合、会社は遅滞なく破棄します。電子ファイルは復元不可能な技術的方法を用いて破棄します。</p>
+          <h3>第7条（安全性の確保措置）</h3>
+          <p>会社は、パスワードの暗号化やハッキング対策のセキュリティプログラムなど、個人情報を保護するための技術的対策を講じています。</p>
+          <h3>第8条（個人情報保護責任者）</h3>
+          <p>会社は、個人情報の処理に関する業務を統括し、利用者の苦情処理などに対応するため、個人情報保護責任者を指定しています。</p>
+          <p style="padding-left: 10px; border-left: 3px solid var(--color-pink); margin-left: 5px;">
+              <strong>担当部署</strong>：エンターピング セキュリティ運用チーム<br>
+              <strong>メールアドレス</strong>：privacy@enterping.com (仮)
+          </p>
+      </div>
+`
+  };
+
 
   function initFooterModals() {
     const btnTerms = document.getElementById('footer-open-terms');
     const btnPrivacy = document.getElementById('footer-open-privacy');
-    
+
     // 만약 푸터가 없는 페이지라면 종료
     if (!btnTerms && !btnPrivacy) return;
 
@@ -221,13 +357,16 @@
     function openFooterModal(type) {
       const titleEl = document.getElementById('footer-modal-title');
       const contentEl = document.getElementById('footer-modal-content');
-      
+      const lang = (typeof getCurrentLanguage === 'function') ? getCurrentLanguage() : 'ko';
+
       if (type === 'terms') {
-        titleEl.textContent = '이용약관';
-        contentEl.innerHTML = footerTermsHTML;
+        const titles = { ko: '이용약관', en: 'Terms of Service', ja: '利用規約' };
+        titleEl.textContent = titles[lang] || titles['ko'];
+        contentEl.innerHTML = termsData[lang] || termsData['ko'];
       } else if (type === 'privacy') {
-        titleEl.textContent = '개인정보 처리방침';
-        contentEl.innerHTML = footerPrivacyHTML;
+        const titles = { ko: '개인정보 처리방침', en: 'Privacy Policy', ja: 'プライバシーポリシー' };
+        titleEl.textContent = titles[lang] || titles['ko'];
+        contentEl.innerHTML = privacyData[lang] || privacyData['ko'];
       }
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
@@ -259,30 +398,43 @@
       bar.removeAttribute('onclick'); // 기존 하드코딩된 onclick 제거
       const input = bar.querySelector('input');
       const icon = bar.querySelector('.search-icon');
-      
+
       if (input) {
         input.removeAttribute('readonly');
-        
+
         const executeSearch = () => {
-            const query = input.value.trim();
-            if (query) {
-                location.href = '/search?q=' + encodeURIComponent(query);
-            } else {
-                alert('검색어를 입력해주세요.');
-            }
+          const query = input.value.trim();
+          if (query) {
+            location.href = '/search?q=' + encodeURIComponent(query);
+          } else {
+            alert('검색어를 입력해주세요.');
+          }
         };
 
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keypress', function (e) {
           if (e.key === 'Enter') {
             executeSearch();
           }
         });
 
         if (icon) {
-            icon.style.cursor = 'pointer';
-            icon.addEventListener('click', executeSearch);
+          icon.style.cursor = 'pointer';
+          icon.addEventListener('click', executeSearch);
         }
       }
+    });
+  }
+
+  function initSocialLinks() {
+    const socialLinks = document.querySelectorAll('.social-links a');
+    socialLinks.forEach(link => {
+      // 이벤트 리스너(alert)를 제거하고 href와 target 설정
+      link.href = '/coming_soon.html';
+      link.target = '_blank';
+
+      // 혹시 이전에 등록된 리스너가 있다면 cloneNode로 제거 (안전장치)
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
     });
   }
 
@@ -291,6 +443,7 @@
     applyNavState();
     initFooterModals();
     initSearchBar();
+    initSocialLinks();
   }
 
   if (document.readyState === 'loading') {
@@ -308,12 +461,12 @@
 // Dark Mode Toggle Logic
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-    const navRight = document.querySelector('.nav-right');
-    if (navRight) {
-        const themeBtn = document.createElement('button');
-        themeBtn.id = 'theme-toggle';
-        themeBtn.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? '<i class="ph-fill ph-sun"></i>' : '<i class="ph-fill ph-moon"></i>';
-        themeBtn.style.cssText = `
+  const navRight = document.querySelector('.nav-right');
+  if (navRight) {
+    const themeBtn = document.createElement('button');
+    themeBtn.id = 'theme-toggle';
+    themeBtn.innerHTML = document.documentElement.getAttribute('data-theme') === 'dark' ? '<i class="ph-fill ph-sun"></i>' : '<i class="ph-fill ph-moon"></i>';
+    themeBtn.style.cssText = `
             background: var(--theme-bg-card);
             border: 1.5px solid var(--theme-border);
             color: var(--theme-text-main);
@@ -329,93 +482,93 @@ document.addEventListener('DOMContentLoaded', () => {
             width: 36px;
             height: 36px;
         `;
-        themeBtn.onmouseover = () => themeBtn.style.background = 'var(--theme-bg-hover)';
-        themeBtn.onmouseout = () => themeBtn.style.background = 'none';
+    themeBtn.onmouseover = () => themeBtn.style.background = 'var(--theme-bg-hover)';
+    themeBtn.onmouseout = () => themeBtn.style.background = 'none';
 
-        themeBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            if (isDark) {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('ep_theme', 'light');
-                themeBtn.innerHTML = '<i class="ph-fill ph-moon"></i>';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('ep_theme', 'dark');
-                themeBtn.innerHTML = '<i class="ph-fill ph-sun"></i>';
-            }
-        });
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('ep_theme', 'light');
+        themeBtn.innerHTML = '<i class="ph-fill ph-moon"></i>';
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('ep_theme', 'dark');
+        themeBtn.innerHTML = '<i class="ph-fill ph-sun"></i>';
+      }
+    });
 
-        const authGroup = navRight.querySelector('.auth-group') || navRight.querySelector('.profile-menu-container');
-        
-        // Language Switcher Logic
-        const langWrap = document.createElement('div');
-        langWrap.className = 'lang-switcher-wrap';
-        langWrap.style.cssText = 'position: relative; margin-right: 15px; display: flex; align-items: center;';
-        
-        const langBtn = document.createElement('button');
-        langBtn.className = 'lang-switcher-btn';
-        langBtn.id = 'lang-switcher-btn';
-        langBtn.style.cssText = 'background: transparent; border: none; color: var(--theme-text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 5px;';
-        
-        const langMap = { ko: "한국어", en: "English", ja: "日本語" };
-        const initialLangText = (typeof getCurrentLanguage === 'function') ? 
-            (langMap[getCurrentLanguage()] || '한국어') : '한국어';
-        langBtn.innerHTML = `<i class="ph-fill ph-globe"></i> <span id="current-lang-text" style="font-size: 0.9rem; font-weight: 500; margin-left: 4px;">${initialLangText}</span>`;
-        
-        const langDropdown = document.createElement('div');
-        langDropdown.className = 'lang-switcher-dropdown';
-        langDropdown.id = 'lang-switcher-dropdown';
-        langDropdown.style.cssText = 'position: absolute; top: 100%; right: 0; background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; min-width: 120px; z-index: 100; overflow: hidden; margin-top: 8px;';
-        
-        langDropdown.innerHTML = `
+    const authGroup = navRight.querySelector('.auth-group') || navRight.querySelector('.profile-menu-container');
+
+    // Language Switcher Logic
+    const langWrap = document.createElement('div');
+    langWrap.className = 'lang-switcher-wrap';
+    langWrap.style.cssText = 'position: relative; margin-right: 15px; display: flex; align-items: center; flex-shrink: 0; white-space: nowrap;';
+
+    const langBtn = document.createElement('button');
+    langBtn.className = 'lang-switcher-btn';
+    langBtn.id = 'lang-switcher-btn';
+    langBtn.style.cssText = 'background: transparent; border: none; color: var(--theme-text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 5px; flex-shrink: 0; white-space: nowrap;';
+
+    const langMap = { ko: "한국어", en: "English", ja: "日本語" };
+    const initialLangText = (typeof getCurrentLanguage === 'function') ?
+      (langMap[getCurrentLanguage()] || '한국어') : '한국어';
+    langBtn.innerHTML = `<i class="ph-fill ph-globe"></i> <span id="current-lang-text" style="font-size: 0.9rem; font-weight: 500; margin-left: 4px;">${initialLangText}</span>`;
+
+    const langDropdown = document.createElement('div');
+    langDropdown.className = 'lang-switcher-dropdown';
+    langDropdown.id = 'lang-switcher-dropdown';
+    langDropdown.style.cssText = 'position: absolute; top: 100%; right: 0; background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; min-width: 120px; z-index: 100; overflow: hidden; margin-top: 8px;';
+
+    langDropdown.innerHTML = `
             <button class="lang-item" data-lang="ko" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">한국어</button>
             <button class="lang-item" data-lang="en" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">English</button>
             <button class="lang-item" data-lang="ja" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem;">日本語</button>
         `;
-        
-        // Add hover effects for dropdown items
-        const langItems = langDropdown.querySelectorAll('.lang-item');
-        langItems.forEach(item => {
-            item.onmouseover = () => item.style.background = 'var(--theme-bg-hover)';
-            item.onmouseout = () => item.style.background = 'transparent';
-        });
 
-        langWrap.appendChild(langBtn);
-        langWrap.appendChild(langDropdown);
-        
-        langBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (langDropdown.style.display === 'none') {
-                langDropdown.style.display = 'flex';
-            } else {
-                langDropdown.style.display = 'none';
-            }
-        });
-        
-        langDropdown.querySelectorAll('.lang-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const selectedLang = e.target.getAttribute('data-lang');
-                if (typeof setLanguage === 'function') {
-                    setLanguage(selectedLang);
-                } else {
-                    localStorage.setItem('ep_lang', selectedLang);
-                    location.reload();
-                }
-                langDropdown.style.display = 'none';
-            });
-        });
-        
-        document.addEventListener('click', () => {
-            langDropdown.style.display = 'none';
-        });
+    // Add hover effects for dropdown items
+    const langItems = langDropdown.querySelectorAll('.lang-item');
+    langItems.forEach(item => {
+      item.onmouseover = () => item.style.background = 'var(--theme-bg-hover)';
+      item.onmouseout = () => item.style.background = 'transparent';
+    });
 
-        if (authGroup) {
-            navRight.insertBefore(langWrap, authGroup);
-            navRight.insertBefore(themeBtn, langWrap);
+    langWrap.appendChild(langBtn);
+    langWrap.appendChild(langDropdown);
+
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (langDropdown.style.display === 'none') {
+        langDropdown.style.display = 'flex';
+      } else {
+        langDropdown.style.display = 'none';
+      }
+    });
+
+    langDropdown.querySelectorAll('.lang-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const selectedLang = e.target.getAttribute('data-lang');
+        if (typeof setLanguage === 'function') {
+          setLanguage(selectedLang);
         } else {
-            navRight.appendChild(themeBtn);
-            navRight.appendChild(langWrap);
+          localStorage.setItem('ep_lang', selectedLang);
+          location.reload();
         }
+        langDropdown.style.display = 'none';
+      });
+    });
+
+    document.addEventListener('click', () => {
+      langDropdown.style.display = 'none';
+    });
+
+    if (authGroup) {
+      navRight.insertBefore(langWrap, authGroup);
+      navRight.insertBefore(themeBtn, langWrap);
+    } else {
+      navRight.appendChild(themeBtn);
+      navRight.appendChild(langWrap);
     }
+  }
 });

@@ -322,9 +322,9 @@ function updateQuizCountDisplay() {
     if (!display || quizData.length === 0) return;
     const remaining = quizData.length - currentIndex;
     if (remaining > 0) {
-        display.textContent = `남은 퀴즈: ${remaining}개`;
+        display.innerHTML = `<span>남은 퀴즈</span>: <span>${remaining}개</span>`;
     } else {
-        display.textContent = `퀴즈 완료!`;
+        display.innerHTML = `<span>퀴즈 완료!</span>`;
     }
 }
 

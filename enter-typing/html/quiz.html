@@ -302,24 +302,26 @@
                 <div style="
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 12px;
-              margin-bottom: 15px;
+              gap: 8px;
+              margin-bottom: 8px;
               text-align: center;
             ">
                     <div style="
                 background: var(--analysis-pair-bg);
                 border-radius: 12px;
-                padding: 10px;
+                padding: 8px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.75rem;
                   font-weight: bold;
+                  word-break: keep-all;
+                  line-height: 1.2;
                   color: var(--color-pink);
-                  margin-bottom: 5px;
+                  margin-bottom: 2px;
                 ">
                             현재 점수
                         </div>
-                        <div id="score" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
+                        <div id="score" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
                             0
                         </div>
                     </div>
@@ -327,41 +329,45 @@
                 background: var(--theme-bg-hover);
                 border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
-                padding: 10px;
+                padding: 8px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.75rem;
                   font-weight: bold;
+                  word-break: keep-all;
+                  line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 5px;
+                  margin-bottom: 2px;
                 ">
                             최고 점수
                         </div>
-                        <div id="best-score" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
+                        <div id="best-score" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
                 <div style="
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 12px;
+              gap: 8px;
               text-align: center;
             ">
                     <div style="
                 background: var(--theme-bg-hover);
                 border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
-                padding: 10px;
+                padding: 8px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.75rem;
                   font-weight: bold;
+                  word-break: keep-all;
+                  line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 5px;
+                  margin-bottom: 2px;
                 ">
                             정답률
                         </div>
-                        <div id="accuracy" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
+                        <div id="accuracy" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
                             100%
                         </div>
                     </div>
@@ -369,17 +375,19 @@
                 background: var(--theme-bg-hover);
                 border: 1.5px solid var(--theme-border);
                 border-radius: 12px;
-                padding: 10px;
+                padding: 8px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.75rem;
                   font-weight: bold;
+                  word-break: keep-all;
+                  line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 5px;
+                  margin-bottom: 2px;
                 ">
                             콤보
                         </div>
-                        <div id="combo" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">
+                        <div id="combo" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
                             0
                         </div>
                     </div>
@@ -440,7 +448,7 @@
               z-index: 20;
               box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             ">
-                    남은 퀴즈: -
+                    <span>남은 퀴즈</span>: -
                 </div>
 
                 <div class="vinyl-container" style="
@@ -511,7 +519,8 @@
                             left: 50%;
                             transform: translateX(-50%) rotate(-1.5deg);
                             cursor: pointer;
-                            background: #fff7d6;
+                            background: var(--theme-bg-card);
+                            border: 1px solid var(--theme-border);
                             color: var(--theme-text-main);
                             padding: 15px 20px;
                             font-size: 1rem;
@@ -550,57 +559,48 @@
         </div>
     </main>
 
+        <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-col brand-col">
                 <div class="footer-logo">
-                    <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height: 32px; width: auto" />
-                    <span class="logo-text">엔터핑</span>
+                    <img src="/assets/logo.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">
-                    일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑
-                    플랫폼
-                </p>
+                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
-                    <a href="#">X</a>
-                    <a href="#">IG</a>
-                    <a href="#">YT</a>
-                    <a href="#">DC</a>
+                    <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
+                    <a href="#"><i class="ph-bold ph-github-logo"></i></a>
                 </div>
             </div>
-
-            <div class="footer-col">
-                <h4>타이핑 & 퀴즈</h4>
-                <ul>
-                    <li><a href="/typing">타이핑 리스트</a></li>
-                    <li><a href="/typing/create">타이핑 작성</a></li>
-                    <li><a href="/quiz">퀴즈 리스트</a></li>
-                    <li><a href="/quiz/create">퀴즈 작성</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h4>실시간 & 랭킹</h4>
-                <ul>
-                    <li><a href="/battle">실시간 대전</a></li>
-                    <li><a href="/ranking">전체 랭킹</a></li>
-                    <li><a href="/ranking/songs">곡별 랭킹</a></li>
-                </ul>
-            </div>
-
+            
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
-                    <li><a href="/notice">공지사항</a></li>
-                    <li><a href="/profile">마이페이지</a></li>
+                    <li><a href="typing_list.html">타이핑 연습</a></li>
+                    <li><a href="quiz_list.html">단어 퀴즈</a></li>
+                    <li><a href="battle_list.html">멀티플레이</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>커뮤니티</h4>
+                <ul>
+                    <li><a href="ranking.html">랭킹</a></li>
+                    <li><a href="#">공지사항</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>고객지원</h4>
+                <ul>
+                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
                     <li><a href="#" id="footer-open-terms">이용약관</a></li>
                     <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>
-
         <div class="footer-bottom">
-            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>
+            <p>&copy; 2025 Enter Typing. All rights reserved.</p>
         </div>
     </footer>
 

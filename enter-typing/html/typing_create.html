@@ -292,6 +292,28 @@
             cursor: pointer;
             color: var(--theme-text-muted);
         }
+
+        /* 다크모드 대응 */
+        [data-theme="dark"] .editor-top-bar input,
+        [data-theme="dark"] .time-row input,
+        [data-theme="dark"] .modal-content input[type="text"],
+        [data-theme="dark"] .modal-content input[type="file"],
+        [data-theme="dark"] .modal-content select,
+        [data-theme="dark"] .modal-content textarea {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+            color: var(--theme-text-main) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+        }
+
+        [data-theme="dark"] .editor-top-bar input:focus,
+        [data-theme="dark"] .time-row input:focus,
+        [data-theme="dark"] .modal-content input[type="text"]:focus,
+        [data-theme="dark"] .modal-content input[type="file"]:focus,
+        [data-theme="dark"] .modal-content select:focus,
+        [data-theme="dark"] .modal-content textarea:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: var(--color-pink) !important;
+        }
     </style>
 
     <script>

@@ -461,6 +461,16 @@ function handleTypingInput(e) {
     totalKeysTyped++;
 
     if (!isCompleteMatch && !isPossiblePrefix) {
+        // ── ん(n) 입력 후 'n'을 또 눌렀을 때 (nn 의도) 오타 처리 방지 ──
+        if (newChar === 'n' && currentBuffer === "" && currentUnitIndex > 0) {
+            const prevUnit = battleTargetUnits[currentUnitIndex - 1];
+            if (prevUnit.text === 'ん' && prevUnit.typedAs === 'n') {
+                prevUnit.typedAs = 'nn'; // 더 이상 이 조건에 걸리지 않도록 방지
+                e.target.value = currentBuffer; // 입력 무시
+                return;
+            }
+        }
+
         typoCount++;
         e.target.value = currentBuffer;
 
@@ -478,6 +488,7 @@ function handleTypingInput(e) {
 
     currentBuffer = testBuffer;
     if (isCompleteMatch) {
+        currentUnit.typedAs = testBuffer; // 기록해두기
         currentUnitIndex++;
         currentBuffer = "";
         e.target.value = "";

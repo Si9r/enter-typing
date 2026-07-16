@@ -184,12 +184,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
 
                 let thumbnailHTML = '';
+                const typeBadge = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ph-keyboard"></i> 타이핑</div>`;
                 if (item.youtube_id) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                        ${typeBadge}
                         <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else {
-                    thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
+                    thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative;">
+                        ${typeBadge}
                     </div>`;
                 }
 
@@ -227,16 +230,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const bestScore = item.best_score || 0;
 
                 let thumbnailHTML = '';
+                const typeBadge = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ph-question"></i> 퀴즈</div>`;
                 if (item.thumbnail_url) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                        ${typeBadge}
                         <img src="${item.thumbnail_url}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else if (item.youtube_id) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
+                        ${typeBadge}
                         <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative; background: var(--theme-bg-hover); display:flex; align-items:center; justify-content:center;">
+                        ${typeBadge}
                         <img src="/assets/logo_icon.png" alt="기본 썸네일" style="height: 60%; opacity: 0.5;">
                     </div>`;
                 }

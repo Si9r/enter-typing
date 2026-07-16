@@ -976,6 +976,11 @@ body {
     margin-bottom: 15px;
 }
 
+.footer-logo img {
+    height: 36px;
+    width: auto;
+}
+
 .footer-desc {
     color: var(--theme-text-muted);
     font-size: 0.95rem;

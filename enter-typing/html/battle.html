@@ -290,8 +290,8 @@
 
         .content-type-badge.mode-quiz {
             display: inline-flex;
-            background: rgba(173, 216, 230, 0.3);
-            color: var(--color-battle-secondary);
+            background: #4f46e5;
+            color: #ffffff;
         }
 
         .content-preview-diff {
@@ -959,7 +959,8 @@
             <a href="/notice" class="nav-notice-link"
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
-                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
+                    class="ph-fill ph-bell"></i>
                 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='/login'">로그인</button>
@@ -974,13 +975,15 @@
 
         <!-- 0. ENTRANCE VIEW -->
         <!-- 비밀방 비밀번호 확인 모달 (직접 링크 접근용) -->
-        <div id="modal-room-password" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div id="modal-room-password"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
             <div class="battle-panel" style="max-width: 380px; width: 90%; padding: 32px; text-align: center;">
                 <h3 style="margin-top: 0; margin-bottom: 20px;">🔒 비밀방 입장</h3>
                 <input type="password" id="room-password-input" class="action-input" placeholder="비밀번호를 입력하세요"
                     style="padding: 12px 16px; font-size: 1rem; border-radius: 12px; box-sizing: border-box; width: 100%; margin-bottom: 16px;"
                     onkeydown="if(event.key==='Enter') submitRoomPassword()">
-                <button class="btn-battle btn-battle-primary" style="width: 100%; padding: 12px;" onclick="submitRoomPassword()">입장하기</button>
+                <button class="btn-battle btn-battle-primary" style="width: 100%; padding: 12px;"
+                    onclick="submitRoomPassword()">입장하기</button>
             </div>
         </div>
 
@@ -1013,8 +1016,8 @@
                                 <div id="wait-song-title" class="content-preview-title">방장이 콘텐츠를 선택하는 중입니다...</div>
                             </div>
                         </div>
-                        <button class="content-select-btn" id="btn-select-content"
-                            onclick="openContentSelectorModal()" title="콘텐츠 선택">
+                        <button class="content-select-btn" id="btn-select-content" onclick="openContentSelectorModal()"
+                            title="콘텐츠 선택">
                             <i class="ph-bold ph-pencil-simple"></i>
                         </button>
                     </div>
@@ -1067,9 +1070,8 @@
             <div style="display: flex; flex-direction: column; gap: 20px; width: 320px;">
                 <!-- Video Info & Vol Panel -->
                 <div class="battle-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-                    <div
-                        style="font-weight: 900; border-bottom: 3px solid var(--color-battle-primary); padding-bottom: 8px; margin-bottom: 5px; color: var(--color-battle-text); font-size: 1.1rem; width: max-content;">
-                        영상정보</div>
+                    <div style="font-weight: 900; border-bottom: 3px solid var(--color-battle-primary); padding-bottom: 8px; margin-bottom: 5px; color: var(--color-battle-text); font-size: 1.1rem; width: max-content;"
+                        data-i18n="영상정보">영상정보</div>
 
                     <h3 id="info-title"
                         style="margin: 0 0 5px 0; font-size: 1.15rem; color: var(--color-battle-text); font-weight: 800; word-break: keep-all; line-height: 1.4;">
@@ -1083,24 +1085,29 @@
                             style="width: 70px; height: 39px; border-radius: 4px; border: 1.5px solid rgba(0,0,0,0.08); object-fit: cover; display: none;">
                         <div id="info-avatar-placeholder"
                             style="width: 42px; height: 42px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 2px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
-                            </div>
+                        </div>
                         <div>
                             <div id="info-creator"
                                 style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text);">-</div>
-                            <div style="font-size: 0.75rem; color: var(--color-battle-text-muted); margin-top: 2px;">작성자
+                            <div style="font-size: 0.75rem; color: var(--color-battle-text-muted); margin-top: 2px;"
+                                data-i18n="작성자">작성자
                             </div>
                         </div>
                     </div>
 
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 2px; font-weight: 500;">
-                        재생 시간: <span id="time"
-                            style="font-weight: bold; color: var(--color-battle-secondary);">0</span>초</div>
+                        <span data-i18n="재생 시간:">재생 시간:</span> <span id="time"
+                            style="font-weight: bold; color: var(--color-battle-secondary);">0</span><span
+                            data-i18n="초">초</span>
+                    </div>
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 10px; font-weight: 500;">
-                        플레이 수: <span id="info-views" style="font-weight: bold;">0</span>회</div>
-                    <div
-                        style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 4px; font-weight: 500;">
+                        <span data-i18n="플레이 수:">플레이 수:</span> <span id="info-views"
+                            style="font-weight: bold;">0</span><span data-i18n="회">회</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 4px; font-weight: 500;"
+                        data-i18n="장르">
                         장르</div>
                     <div id="info-tags" style="display: flex; gap: 6px; flex-wrap: wrap;">
                         <span
@@ -1110,7 +1117,7 @@
                     <div style="margin-top: 15px; border-top: 1.5px dashed rgba(0,0,0,0.1); padding-top: 15px;">
                         <div
                             style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>음량 조절</span>
+                            <span data-i18n="음량 조절">음량 조절</span>
                             <span id="volume-display" style="color: var(--color-battle-primary);">50%</span>
                         </div>
                         <input type="range" id="volume-slider" min="0" max="100" value="50"
@@ -1232,7 +1239,8 @@
                 margin-top: 0;
             ">
                 <div class="panel-title"
-                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
+                    data-i18n="퀴즈 통계">
                     퀴즈 통계</div>
 
                 <h3 id="quiz-info-title"
@@ -1242,21 +1250,26 @@
                 <div
                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; text-align: center;">
                     <div style="background: rgba(255, 123, 142, 0.1); border-radius: 12px; padding: 8px;">
-                        <div
-                            style="font-size: 0.75rem; font-weight: bold; word-break: keep-all; line-height: 1.2; color: var(--color-pink); margin-bottom: 2px;">
+                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;"
+                            data-i18n="내 점수">
                             내 점수</div>
-                        <div id="quiz-my-score" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
+                        <div id="quiz-my-score"
+                            style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
-                    <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 8px;">
-                        <div style="font-size: 0.75rem; font-weight: bold; word-break: keep-all; line-height: 1.2; color: var(--theme-text-muted); margin-bottom: 2px;">콤보</div>
-                        <div id="quiz-my-combo" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
+                    <div
+                        style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
+                        <div
+                            style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">
+                            콤보</div>
+                        <div id="quiz-my-combo"
+                            style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
                 <div style="margin-top: 5px; border-top: 2px dashed #ccc; padding-top: 15px; margin-bottom: 15px;">
                     <div
                         style="font-size: 0.95rem; font-weight: bold; color: #555; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>음량 조절</span>
+                        <span data-i18n="음량 조절">음량 조절</span>
                         <span id="quiz-volume-display" style="color: var(--color-pink)">50%</span>
                     </div>
                     <input type="range" id="quiz-volume-slider" min="0" max="100" value="50"
@@ -1313,7 +1326,8 @@
                 <div
                     style="display: flex; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding-right: 10px; align-items: flex-start; justify-content: center;">
                     <div class="panel-title"
-                        style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 20px; width: max-content; color: var(--theme-text-main); font-size: 1.1rem;">
+                        style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 20px; width: max-content; color: var(--theme-text-main); font-size: 1.1rem;"
+                        data-i18n="문제 정보">
                         문제 정보</div>
                     <div id="quiz-answer-board" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
                         <div id="quiz-board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
@@ -1334,7 +1348,8 @@
                 margin-top: 0;
             ">
                 <div class="panel-title"
-                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
+                    data-i18n="실시간 순위">
                     실시간 순위</div>
 
                 <div id="quiz-live-ranking-container"
@@ -1384,7 +1399,7 @@
             <div class="battle-panel">
                 <h2
                     style="font-size: 2.2rem; font-weight: 900; color: var(--color-battle-accent); text-shadow: 0 4px 10px rgba(255,209,123,0.15);">
-                     BATTLE RESULTS </h2>
+                    BATTLE RESULTS </h2>
                 <p style="font-size: 1rem; color: var(--color-battle-text-muted); margin-top: 5px;">실시간 대전 최종 순위표</p>
 
                 <!-- Podium section -->
@@ -1444,17 +1459,25 @@
     </main>
 
     <!-- 콘텐츠 선택 모달 -->
-    <div id="modal-content-selector" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-        <div style="background: var(--theme-bg-card); width: 90%; max-width: 900px; height: 80vh; border-radius: 20px; border: 1px solid var(--theme-border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div style="padding: 20px 24px; border-bottom: 1px solid var(--theme-border); display: flex; justify-content: space-between; align-items: center;">
+    <div id="modal-content-selector"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div
+            style="background: var(--theme-bg-card); width: 90%; max-width: 900px; height: 80vh; border-radius: 20px; border: 1px solid var(--theme-border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div
+                style="padding: 20px 24px; border-bottom: 1px solid var(--theme-border); display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--theme-text-main);">콘텐츠 선택</h3>
-                <button onclick="closeContentSelectorModal()" style="background: none; border: none; font-size: 1.8rem; color: var(--theme-text-muted); cursor: pointer; padding: 0; line-height: 1;">&times;</button>
+                <button onclick="closeContentSelectorModal()"
+                    style="background: none; border: none; font-size: 1.8rem; color: var(--theme-text-muted); cursor: pointer; padding: 0; line-height: 1;">&times;</button>
             </div>
             <div style="padding: 16px 24px 0; display: flex; gap: 10px;">
-                <button id="content-tab-typing" class="btn-battle btn-battle-primary" style="padding: 8px 20px; font-size: 0.9rem;" onclick="setContentSelectorMode('typing')">타이핑</button>
-                <button id="content-tab-quiz" class="btn-battle btn-battle-secondary" style="padding: 8px 20px; font-size: 0.9rem;" onclick="setContentSelectorMode('quiz')">퀴즈</button>
+                <button id="content-tab-typing" class="btn-battle btn-battle-primary"
+                    style="padding: 8px 20px; font-size: 0.9rem;"
+                    onclick="setContentSelectorMode('typing')">타이핑</button>
+                <button id="content-tab-quiz" class="btn-battle btn-battle-secondary"
+                    style="padding: 8px 20px; font-size: 0.9rem;" onclick="setContentSelectorMode('quiz')">퀴즈</button>
             </div>
-            <div id="modal-content-grid" style="flex: 1; padding: 24px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; align-content: start; background: var(--theme-bg-main);">
+            <div id="modal-content-grid"
+                style="flex: 1; padding: 24px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; align-content: start; background: var(--theme-bg-main);">
                 <!-- 카드가 JS로 주입됨 -->
             </div>
         </div>

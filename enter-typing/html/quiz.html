@@ -109,7 +109,7 @@
             border: 2px solid var(--theme-border);
             border-radius: 16px;
             background: var(--theme-bg-card);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             display: flex;
             flex-direction: column;
             height: 400px;
@@ -219,7 +219,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
+                    class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href = '/login'">
                     로그인
@@ -234,7 +238,7 @@
     <script src="/navbar.js?v=2.0.0"></script>
 
     <main style="
-        margin-top: 120px;
+        margin-top: 90px;
         flex: 1;
         padding: 0 40px;
         display: flex;
@@ -264,7 +268,8 @@
             font-weight: 700;
             font-size: 1.05rem;
             transition: color 0.2s;
-          " onmouseover="this.style.color = 'var(--color-pink)'" onmouseout="this.style.color = 'var(--theme-text-muted)'">
+          " onmouseover="this.style.color = 'var(--color-pink)'"
+                onmouseout="this.style.color = 'var(--theme-text-muted)'">
                 ← 뒤로가기
             </a>
         </div>
@@ -275,7 +280,7 @@
           grid-template-rows: 1fr 1fr;
           gap: 12px;
           width: 100%;
-          height: calc(100vh - 175px);
+          height: calc(100vh - 145px);
         ">
             <!-- Top Left: Stats -->
             <div class="box-panel stats-panel" style="
@@ -317,7 +322,7 @@
                   word-break: keep-all;
                   line-height: 1.2;
                   color: var(--color-pink);
-                  margin-bottom: 2px;
+                  margin-bottom: 5px;
                 ">
                             현재 점수
                         </div>
@@ -332,16 +337,17 @@
                 padding: 8px;
               ">
                         <div style="
-                  font-size: 0.75rem;
+                  font-size: 0.85rem;
                   font-weight: bold;
                   word-break: keep-all;
                   line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 2px;
+                  margin-bottom: 5px;
                 ">
                             최고 점수
                         </div>
-                        <div id="best-score" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
+                        <div id="best-score"
+                            style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
@@ -358,12 +364,12 @@
                 padding: 8px;
               ">
                         <div style="
-                  font-size: 0.75rem;
+                  font-size: 0.85rem;
                   font-weight: bold;
                   word-break: keep-all;
                   line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 2px;
+                  margin-bottom: 5px;
                 ">
                             정답률
                         </div>
@@ -378,12 +384,12 @@
                 padding: 8px;
               ">
                         <div style="
-                  font-size: 0.75rem;
+                  font-size: 0.85rem;
                   font-weight: bold;
                   word-break: keep-all;
                   line-height: 1.2;
                   color: var(--theme-text-muted);
-                  margin-bottom: 2px;
+                  margin-bottom: 5px;
                 ">
                             콤보
                         </div>
@@ -483,8 +489,11 @@
 
 
             <!-- Bottom Left: 문제 정보 -->
-            <div class="box-panel" style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
-                <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">문제 정보</div>
+            <div class="box-panel"
+                style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
+                <div class="panel-title"
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">
+                    문제 정보</div>
 
                 <div id="answer-board" style="display: flex; flex-direction: column; gap: 16px;">
                     <div id="board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
@@ -511,7 +520,9 @@
                             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
                             width: 85%;
                             margin-bottom: 5px;
-                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)';"> 힌트 보기</button>
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.15)';"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 10px rgba(0,0,0,0.1)';">
+                            힌트 보기</button>
                         <div id="board-hint" onclick="toggleHintDisplay()" style="
                             display: none;
                             position: absolute;
@@ -531,8 +542,11 @@
                             width: 95%;
                             z-index: 10;
                         ">
-                            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 60px; height: 20px; background: var(--analysis-high-bg); box-shadow: 1px 1px 3px transparent; mix-blend-mode: multiply;"></div>
-                            <span id="board-hint-text" style="display: block; text-align: center; word-break: keep-all;">???</span>
+                            <div
+                                style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%) rotate(2deg); width: 60px; height: 20px; background: var(--analysis-high-bg); box-shadow: 1px 1px 3px transparent; mix-blend-mode: multiply;">
+                            </div>
+                            <span id="board-hint-text"
+                                style="display: block; text-align: center; word-break: keep-all;">???</span>
                         </div>
                     </div>
                 </div>
@@ -541,9 +555,8 @@
             <!-- Bottom Right: Chat Area -->
             <div class="box-panel chat-panel" style="min-height: 0; height: auto;">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="chat-bubble chat-system">
-                        엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러
-                        게임을 시작하세요.
+                    <div class="chat-bubble chat-system" data-i18n="엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.">
+                        엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.
                     </div>
                 </div>
                 <div class="chat-input-area">
@@ -559,7 +572,7 @@
         </div>
     </main>
 
-        <!-- Footer -->
+    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-col brand-col">
@@ -572,7 +585,7 @@
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
                 </div>
             </div>
-            
+
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
@@ -581,7 +594,7 @@
                     <li><a href="battle_list.html">멀티플레이</a></li>
                 </ul>
             </div>
-            
+
             <div class="footer-col">
                 <h4>커뮤니티</h4>
                 <ul>
@@ -589,7 +602,7 @@
                     <li><a href="#">공지사항</a></li>
                 </ul>
             </div>
-            
+
             <div class="footer-col">
                 <h4>고객지원</h4>
                 <ul>
@@ -626,10 +639,12 @@
             gap: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         ">
-            <div style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid var(--theme-border); padding-bottom: 20px;">
-                 퀴즈 결과 
+            <div
+                style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid var(--theme-border); padding-bottom: 20px;">
+                퀴즈 결과
             </div>
-            <div style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
+            <div
+                style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
                 총 <span id="modal-total-score">0</span>개의 정답을 맞췄습니다!
             </div>
             <div id="modal-log-container" style="

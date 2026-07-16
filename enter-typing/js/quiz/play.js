@@ -74,14 +74,14 @@ function onPlayerStateChange(event) {
 function onPlayerReady(event) {
     player.setVolume(document.getElementById("volume-slider").value);
     addSystemChat(
-        "음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!",
+        window.i18nTranslate("음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!"),
     );
 }
 
 function startQuiz() {
     if (!player || quizData.length === 0) return;
     if (currentIndex >= quizData.length) {
-        addSystemChat("퀴즈가 이미 끝났습니다.");
+        addSystemChat(window.i18nTranslate("퀴즈가 이미 끝났습니다."));
         return;
     }
 
@@ -251,7 +251,7 @@ function handleChat() {
         if (matchedIndex !== -1 && guessedArray[matchedIndex] === null) {
             guessedArray[matchedIndex] = matchedAnswer;
             updateBoardItem(key, matchedIndex, matchedAnswer);
-            addSystemChat(`정답입니다! (${question.question || "질문"})`);
+            addSystemChat(window.i18nTranslate("정답입니다!") + ` (${question.question || window.i18nTranslate("질문")})`);
 
             quizLogs.push({
                 quizIndex: currentIndex + 1,
@@ -299,14 +299,14 @@ function checkSegmentComplete() {
         chatSendBtn.disabled = true;
 
         if (currentIndex >= quizData.length - 1) {
-            addSystemChat("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다");
+            addSystemChat(window.i18nTranslate("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다"));
             currentIndex++;
             updateQuizCountDisplay();
             saveQuizHistory();
             showQuizResult();
         } else {
             addSystemChat(
-                "모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다.",
+                window.i18nTranslate("모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다."),
             );
             setTimeout(() => {
                 currentIndex++;
@@ -424,13 +424,13 @@ document.addEventListener("keydown", (e) => {
         chatSendBtn.disabled = true;
 
         if (currentIndex >= quizData.length - 1) {
-            addSystemChat("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다");
+            addSystemChat(window.i18nTranslate("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다"));
             currentIndex++;
             updateQuizCountDisplay();
             saveQuizHistory();
             showQuizResult();
         } else {
-            addSystemChat("노래를 스킵하셨습니다. 다음 문제로 넘어갑니다.");
+            addSystemChat(window.i18nTranslate("노래를 스킵하셨습니다. 다음 문제로 넘어갑니다."));
             setTimeout(() => {
                 currentIndex++;
                 updateQuizCountDisplay();
@@ -458,7 +458,7 @@ function showQuizResult() {
     logContainer.innerHTML = '';
 
     if (quizLogs.length === 0) {
-        logContainer.innerHTML = '<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">맞춘 정답이 없습니다 </div>';
+        logContainer.innerHTML = `<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">${window.i18nTranslate("맞춘 정답이 없습니다")}</div>`;
     } else {
         // Group by quizIndex
         const grouped = {};
@@ -473,7 +473,7 @@ function showQuizResult() {
 
             const header = document.createElement('div');
             header.style.cssText = "font-weight: 800; font-size: 1.05rem; color: var(--theme-text-main); margin-bottom: 12px; border-bottom: 1px dashed var(--theme-border); padding-bottom: 8px;";
-            header.innerText = `문제 ${qIdx}`;
+            header.innerText = `${window.i18nTranslate("문제")} ${qIdx}`;
             groupDiv.appendChild(header);
 
             grouped[qIdx].forEach(log => {

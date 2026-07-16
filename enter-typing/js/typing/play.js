@@ -404,7 +404,7 @@ function renderWaitingPhase() {
     typingInput.disabled = true;
   }
   if (statusPanel) {
-    statusPanel.innerHTML = '<span style="color: #666;">전주 재생 중... 곧 가사가 시작됩니다.</span>';
+    statusPanel.innerHTML = `<span style="color: #666;">${window.i18nTranslate("전주 재생 중... 곧 가사가 시작됩니다.")}</span>`;
   }
   targetUnits = [];
   currentBuffer = "";

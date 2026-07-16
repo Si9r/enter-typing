@@ -1,7 +1,5 @@
 :root {
   --color-green-hover: #7bdc7b;
-  --color-text-main: var(--theme-text-main);
-  --color-text-muted: var(--theme-text-muted);
   --color-correct: #5e8b5e;
   --color-incorrect: #ff7b8e;
 }

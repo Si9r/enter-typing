@@ -301,7 +301,7 @@ export function copyRoomCode() {
         function showSuccess() {
             const el = document.getElementById("wait-room-code");
             const originalHTML = el.innerHTML;
-            el.innerHTML = `복사되었습니다! <span style="font-size: 0.85rem;"></span>`;
+            el.innerHTML = `${window.i18nTranslate("복사되었습니다!")} <span style="font-size: 0.85rem;"></span>`;
             setTimeout(() => {
                 el.innerHTML = originalHTML;
             }, 1500);

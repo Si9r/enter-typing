@@ -234,7 +234,7 @@
     <script src="/navbar.js?v=2.0.0"></script>
 
     <main style="
-        margin-top: 120px;
+        margin-top: 90px;
         flex: 1;
         padding: 0 40px;
         display: flex;
@@ -275,7 +275,7 @@
           grid-template-rows: 1fr 1fr;
           gap: 12px;
           width: 100%;
-          height: calc(100vh - 175px);
+          height: calc(100vh - 145px);
         ">
             <!-- Top Left: Stats -->
             <div class="box-panel stats-panel" style="
@@ -312,10 +312,12 @@
                 padding: 10px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.78rem;
                   font-weight: bold;
                   color: var(--color-pink);
                   margin-bottom: 5px;
+                  white-space: nowrap;
+                  letter-spacing: -0.5px;
                 ">
                             현재 점수
                         </div>
@@ -330,10 +332,12 @@
                 padding: 10px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.78rem;
                   font-weight: bold;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
+                  white-space: nowrap;
+                  letter-spacing: -0.5px;
                 ">
                             최고 점수
                         </div>
@@ -354,10 +358,12 @@
                 padding: 10px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.78rem;
                   font-weight: bold;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
+                  white-space: nowrap;
+                  letter-spacing: -0.5px;
                 ">
                             정답률
                         </div>
@@ -372,10 +378,12 @@
                 padding: 10px;
               ">
                         <div style="
-                  font-size: 0.85rem;
+                  font-size: 0.78rem;
                   font-weight: bold;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
+                  white-space: nowrap;
+                  letter-spacing: -0.5px;
                 ">
                             콤보
                         </div>
@@ -532,9 +540,8 @@
             <!-- Bottom Right: Chat Area -->
             <div class="box-panel chat-panel" style="min-height: 0; height: auto;">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="chat-bubble chat-system">
-                        엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러
-                        게임을 시작하세요.
+                    <div class="chat-bubble chat-system" data-i18n="엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.">
+                        엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.
                     </div>
                 </div>
                 <div class="chat-input-area">

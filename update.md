@@ -116,3 +116,27 @@
 - **`routers/pages.py`**: `STATIC_FILE_MAP`에 `i18n.js`와 `locales.json` 라우팅을 추가하여 프론트엔드에서 번역 스크립트와 데이터를 불러올 수 있도록 복구.
 - **모든 HTML 파일**: 총 28개의 HTML 파일 및 partial 템플릿 하단에 `<script src="/i18n.js"></script>` 일괄 추가.
 - **`js/shared/navbar.js`**: 다크모드 토글 버튼 옆에 **언어 선택기(Language Switcher)** UI(한국어, English, 日本語)를 복구하여 실시간 언어 변경이 가능하도록 수정.
+
+## 7. 🚀 추가 업데이트 사항 (버그 수정 및 UX 개선)
+- **다국어(i18n) 동적 렌더링 정상화**: 자바스크립트가 화면을 다시 그릴 때 번역이 풀리는 현상 해결.
+- **내 콘텐츠 다국어 지원**: 타이핑/퀴즈 컨텐츠 탭 다국어 번역 완료.
+- **콘텐츠 삭제 시 500 에러 해결**: 외래키 제약조건 위반으로 삭제가 안되던 버그 패치 (하위 레코드 선 삭제 로직 적용).
+- **실시간 대전 스크롤 튐 현상 수정**: 타이핑 구간 진입 시 ocus()에 의한 강제 스크롤 방지.
+- **푸터(Footer) 레이아웃 픽스**: 비정상적으로 크기가 변형되던 배틀 페이지 푸터 정상화.
+
+### 📂 세부 파일 변경 내역 (추가 작업물)
+#### 🌐 프론트엔드 HTML / CSS
+- **html/battle_list.html** (수정됨): 푸터 레이아웃 inline 스타일 정리
+- **html/partials/profile_tab_mycontent.html** (수정됨): 다국어 속성(data-i18n) 적용
+- **html/partials/profile_tab_attend.html** (수정됨): 텍스트 포맷 정리
+
+#### ⚙️ 프론트엔드 자바스크립트
+- **js/profile/profile_attendance.js** (수정됨): 캘린더 생성 및 출석 버튼 로직이 i18n.js 번역 스캐너(MutationObserver)와 호환되도록 DOM 생성 방식 개편
+- **js/battle/battle_game.js** (수정됨): input.focus({ preventScroll: true }) 적용
+
+#### 🔌 백엔드 라우터
+- **routers/typing_content.py** (수정됨): TypingHistory, ContentTypoStat 등 연쇄 삭제(Cascade) 로직 추가
+- **routers/quiz_content.py** (수정됨): QuizHistory 연쇄 삭제 로직 추가
+
+#### 🌍 다국어 데이터
+- **locales.json** (수정됨): 출석 캘린더(월/년), 출석체크 버튼, 내 콘텐츠 탭 관련 한국어/영어/일본어 번역 세트 대거 추가

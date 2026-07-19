@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         // 검색어가 없을 경우
         document.getElementById('search-result-title').style.display = 'none';
         const emptyState = document.getElementById('empty-state');
-        emptyState.innerHTML = '<div style="font-size: 4rem; margin-bottom: 20px;"><i class="ph-bold ph-magnifying-glass"></i></div>검색어를 입력해 주세요.<br><span style="font-size: 0.95rem; color: #aaa; margin-top: 10px; display: inline-block;">상단 검색창에 곡명이나 아티스트를 입력하고 엔터를 누르세요!</span>';
+        emptyState.innerHTML = '<div style="font-size: 4rem; margin-bottom: 20px;"><i class="ph-bold ph-magnifying-glass"></i></div>검색어를 입력해 주세요.<br><span style="font-size: 0.95rem; color: var(--theme-text-muted); margin-top: 10px; display: inline-block;">상단 검색창에 곡명이나 아티스트를 입력하고 엔터를 누르세요!</span>';
         emptyState.style.display = 'block';
         return; // 통신하지 않고 종료
     }

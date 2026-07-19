@@ -45,7 +45,7 @@ async function loadQuizData() {
     if(overlay) {
         overlay.innerHTML = `
         <p style="color:#fff;font-size:1.1rem;"> ${err.message}</p>
-        <button onclick="location.href='/quiz'" style="margin-top:16px;background:#fff;color:#6C3FE8;border:none;border-radius:12px;padding:10px 24px;font-weight:800;cursor:pointer;">목록으로 돌아가기</button>
+        <button onclick="location.href='/quiz'" style="margin-top:16px;background: var(--theme-bg-card);color:#6C3FE8;border:none;border-radius:12px;padding:10px 24px;font-weight:800;cursor:pointer;">목록으로 돌아가기</button>
         `;
     }
   }
@@ -371,7 +371,7 @@ async function endQuiz() {
   banner.style.background = 'linear-gradient(135deg,#6C3FE8,#FF8FAB)';
   banner.innerHTML = ` 완료! ${quizData.questions.length}문제 중 ${correctCount}개 정답 · ${score}점
     <div style="margin-top:12px; display:flex; gap:10px; justify-content:center;">
-        <button onclick="location.reload()" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:#fff; color:#6C3FE8;">다시 풀기</button>
+        <button onclick="location.reload()" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background: var(--theme-bg-card); color:#6C3FE8;">다시 풀기</button>
         <button onclick="location.href='/quiz'" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:rgba(255,255,255,0.2); color:#fff;">목록으로</button>
     </div>`;
   document.getElementById('stat-cur').textContent = '완료!';

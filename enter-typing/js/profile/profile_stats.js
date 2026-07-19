@@ -272,7 +272,8 @@ function renderDetailAnalysis(result) {
             hm.appendChild(rowEl);
         });
     } else {
-        hm.innerHTML = '<div style="text-align:center; width:100%; padding:20px; color:var(--theme-text-muted);">오타 기록이 아직 없습니다.</div>';
+        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        hm.innerHTML = `<div style="text-align:center; width:100%; padding:20px; color:var(--theme-text-muted);">${msg}</div>`;
     }
 
     // 2. 오타 패턴 분석 (오타가 많은 키 TOP 5)
@@ -301,7 +302,8 @@ function renderDetailAnalysis(result) {
           `;
         }).join('');
     } else {
-        container.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
+        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">${msg}</div>`;
     }
 
     // 3. 상세 오입력 분석 (expected_key → typo_key TOP 5)
@@ -337,6 +339,7 @@ function renderDetailAnalysis(result) {
       `;
         }).join('');
     } else {
-        romajiContainer.innerHTML = '<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 아직 없습니다.</div>';
+        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        romajiContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">${msg}</div>`;
     }
 }

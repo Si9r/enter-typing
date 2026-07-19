@@ -11,7 +11,7 @@
         
         .sidebar { width: 320px; background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px); flex-shrink: 0;}
         .sidebar-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 20px; color: var(--color-text-main); padding-bottom: 10px; border-bottom: 2px solid var(--color-pink); }
-        .song-item { padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: white; border: 1px solid transparent; display: flex; align-items: center; gap: 15px;}
+        .song-item { padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: var(--theme-bg-card); border: 1px solid transparent; display: flex; align-items: center; gap: 15px;}
         .song-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .song-item.active { border-color: var(--color-pink); background: rgba(255, 182, 193, 0.1); }
         
@@ -24,7 +24,7 @@
         .content-header { background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); border-radius: 20px; padding: 40px; color: white; margin-bottom: 30px; box-shadow: 0 15px 35px rgba(255,182,193,0.3); display: flex; justify-content: space-between; align-items: flex-end;}
         .content-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
         .content-artist { font-size: 1.2rem; font-weight: 500; opacity: 0.9; }
-        .content-btn { background: white; color: var(--color-pink); padding: 10px 25px; border-radius: 30px; font-weight: 800; border: none; cursor: pointer; transition: transform 0.2s; }
+        .content-btn { background: var(--theme-bg-card); color: var(--color-pink); padding: 10px 25px; border-radius: 30px; font-weight: 800; border: none; cursor: pointer; transition: transform 0.2s; }
         .content-btn:hover { transform: scale(1.05); }
 
         .ranking-list { background: rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
@@ -39,7 +39,7 @@
         .rank-name { font-size: 1.2rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 5px; }
         .rank-stats { font-size: 0.9rem; color: var(--color-text-muted); display: flex; gap: 15px; }
         .rank-score { font-size: 1.4rem; font-weight: 900; color: var(--color-blue); text-align: right; width: 150px;}
-        .rank-date { font-size: 0.8rem; color: #aaa; text-align: right; width: 100px; }
+        .rank-date { font-size: 0.8rem; color: var(--theme-text-muted); text-align: right; width: 100px; }
         
         .empty-state { text-align: center; padding: 50px; color: var(--theme-text-muted); font-weight: 500; font-size: 1.1rem;}
     </style>
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 
-                <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #aaa;">
+                <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--theme-text-muted);">
                     <div style="font-size: 4rem; margin-bottom: 20px;">🎶</div>
                     <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
                 </div>

@@ -111,7 +111,7 @@ function renderWaitingPhase() {
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = `<span style="color: #666;">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
+        statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
     }
 
     battleTargetUnits = [];
@@ -422,7 +422,7 @@ function loadGameplayLine() {
 
     input.disabled = false;
     input.placeholder = window.i18nTranslate ? window.i18nTranslate("로마자를 입력하세요...") : "로마자를 입력하세요...";
-    input.focus();
+    input.focus({ preventScroll: true });
     currentLineTypingStartTime = Date.now();
 }
 

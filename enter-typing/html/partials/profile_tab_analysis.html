@@ -12,7 +12,7 @@
         <div class="analysis-grid">
           <!-- ⌨️ WPM + 정확도 카드 (단일 칸) -->
           <div class="analysis-card">
-            <h4><span style="margin-right:4px;">⌨️</span><strong>속도 &amp; 정확도</strong></h4>
+            <h4><span style="margin-right:4px;">⌨️</span><strong data-i18n="속도 & 정확도">속도 &amp; 정확도</strong></h4>
 
             <!-- Hidden elements to prevent JS errors -->
             <div style="display: none;">
@@ -30,7 +30,7 @@
             </div>
 
             <!-- WPM 추이 막대 -->
-            <div style="font-size:.78rem; font-weight:700; color:#aaa; margin-bottom:10px;">⏰ <strong>주간/월간 WPM</strong></div>
+            <div style="font-size:.78rem; font-weight:700; color: var(--theme-text-muted); margin-bottom:10px;">⏰ <strong data-i18n="주간/월간 WPM">주간/월간 WPM</strong></div>
             <div class="bar-row">
               <div class="bar-label">이번 주</div>
               <div class="bar-bg">
@@ -166,21 +166,21 @@
         </div>
 
         <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 키보드 오타 히트맵</h3>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"><span style="margin-right:4px;">⌨️</span><span data-i18n="키보드 오타 히트맵">키보드 오타 히트맵</span></h3>
           <div class="heatmap-grid" id="heatmap">
             <div style="text-align:center; width:100%; padding:20px; color:var(--theme-text-muted);">오타 기록이 없습니다.</div>
           </div>
         </div>
 
         <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 TOP 5)</span></h3>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 오타 패턴 분석 <span style="font-size:.8rem; font-weight:500; color: var(--theme-text-muted); margin-left:6px;">(자주 틀리는 TOP 5)</span></h3>
           <div id="profile-typo-list">
             <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
           </div>
         </div>
 
         <div class="card-block" style="background: var(--theme-bg-card); border-radius: 22px; padding: 34px; box-shadow: 0 4px 16px rgba(0, 0, 0, .06); margin-bottom: 24px;">
-          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 상세 오입력 분석 <span style="font-size:.8rem; font-weight:500; color:#aaa; margin-left:6px;">(자주 틀리는 입력 패턴)</span></h3>
+          <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;"> 상세 오입력 분석 <span style="font-size:.8rem; font-weight:500; color: var(--theme-text-muted); margin-left:6px;">(자주 틀리는 입력 패턴)</span></h3>
           <div id="profile-romaji-list">
             <div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">오타 기록이 없습니다.</div>
           </div>

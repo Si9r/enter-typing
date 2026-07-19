@@ -944,6 +944,8 @@ body {
     border-top: 1px solid var(--theme-border);
     padding: 60px 40px 20px;
     margin-top: 60px;
+    flex-shrink: 0;
+    width: 100%;
 }
 
 .footer-container {

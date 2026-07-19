@@ -203,7 +203,11 @@
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link"
+                style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
+                onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
+                onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
+                    class="ph-fill ph-bell"></i> 공지</a>
             <div class="auth-group">
                 <button class="auth-login" onclick="location.href='/login'">로그인</button>
                 <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
@@ -229,14 +233,18 @@
             </div>
 
             <!-- 필터/카테고리 영역 -->
-            <div style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div
+                style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div id="category-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
-                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('JPOP')">JPOP</button>
-                    <button class="btn btn-outline" style="padding: 8px 20px;" onclick="setCategory('ANIME')">애니메이션</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;"
+                        onclick="setCategory('JPOP')">JPOP</button>
+                    <button class="btn btn-outline" style="padding: 8px 20px;"
+                        onclick="setCategory('ANIME')">애니메이션</button>
                 </div>
                 <div>
-                    <select id="sort-select" onchange="setSort(this.value)" style="padding: 10px 15px; border: 1.5px solid var(--theme-border); border-radius: 8px; outline: none; font-weight: 700; color: var(--theme-text-sub); background: var(--theme-bg-card); cursor: pointer;">
+                    <select id="sort-select" onchange="setSort(this.value)"
+                        style="padding: 10px 15px; border: 1.5px solid var(--theme-border); border-radius: 8px; outline: none; font-weight: 700; color: var(--theme-text-sub); background: var(--theme-bg-card); cursor: pointer;">
                         <option value="recent">등록순</option>
                         <option value="popular">인기순</option>
                     </select>
@@ -248,17 +256,22 @@
             </div>
 
             <div style="text-align: center; margin-top: 60px;">
-                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;" onclick="loadMore()">더 많은 콘텐츠 보기</button>
+                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;"
+                    onclick="loadMore()">더 많은 콘텐츠 보기</button>
             </div>
         </section>
     </main>
 
-        <!-- Footer -->
+    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-col brand-col">
                 <div class="footer-logo">
+<<<<<<< HEAD
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
+=======
+                    <img src="/assets/logo_icon.png" alt="Enter Typing Logo" style="height: 36px; width: auto;">
+>>>>>>> Dowon
                 </div>
                 <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
@@ -266,7 +279,7 @@
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
                 </div>
             </div>
-            
+
             <div class="footer-col">
                 <h4>서비스</h4>
                 <ul>
@@ -275,7 +288,7 @@
                     <li><a href="battle_list.html">멀티플레이</a></li>
                 </ul>
             </div>
-            
+
             <div class="footer-col">
                 <h4>커뮤니티</h4>
                 <ul>
@@ -283,7 +296,7 @@
                     <li><a href="#">공지사항</a></li>
                 </ul>
             </div>
-            
+
             <div class="footer-col">
                 <h4>고객지원</h4>
                 <ul>
@@ -336,8 +349,8 @@
                     <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
                         ▶ 퀴즈 시작하기
                     </button>
-                    <button class="btn btn-outline btn-large" onclick="location.href='/ranking/songs'">
-                         랭킹 보기
+                    <button class="btn btn-outline btn-large" onclick="location.href='/ranking'">
+                        랭킹 보기
                     </button>
                 </div>
             </div>

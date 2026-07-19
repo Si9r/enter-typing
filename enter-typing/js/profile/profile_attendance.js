@@ -45,7 +45,7 @@ export function renderCalendar(y, m) {
         grid.appendChild(el);
     }
     const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-    document.getElementById('month-label').textContent = y + '년 ' + months[m - 1];
+    document.getElementById('month-label').innerHTML = `${y}<span>년 </span><span>${months[m - 1]}</span>`;
 }
 
 export function prevMonth() {
@@ -63,13 +63,13 @@ function initAttendBtn() {
     const btn = document.getElementById('attend-btn');
     if (attendanceData[todayStr()]) {
         // 이미 오늘 출석한 경우
-        btn.textContent = ' 오늘 출석 완료!';
+        btn.textContent = '오늘 출석 완료!';
         btn.disabled = true;
         btn.style.background = '#90EE90';
         btn.style.color = '#2F7A2F';
     } else {
         // 오늘 아직 출석 안 한 경우 버튼 초기화
-        btn.textContent = ' 오늘 출석체크 하기';
+        btn.textContent = '오늘 출석체크 하기';
         btn.disabled = false;
         btn.style.background = '';
         btn.style.color = '';
@@ -102,11 +102,9 @@ export async function doAttend() {
         const resData = await res.json();
 
         if (res.ok && resData.success) {
-            alert('출석체크가 정상적으로 완료되었습니다!');
+            alert(window.i18n ? window.i18n.getText('출석체크가 완료되었습니다! (+10점)') : '출석체크가 완료되었습니다! (+10점)');
             attendanceData[today] = true;
-
-            // 버튼 상태 변경
-            btn.textContent = ' 오늘 출석 완료!';
+            btn.textContent = '오늘 출석 완료!';
             btn.disabled = true;
             btn.style.background = '#90EE90';
             btn.style.color = '#2F7A2F';

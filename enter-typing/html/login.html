@@ -59,7 +59,7 @@
 
         /* 카드 */
         .auth-card {
-            background: #ffffff;
+            background: var(--theme-bg-card);
             border-radius: 28px;
             padding: 52px 48px;
             width: 100%;
@@ -135,19 +135,19 @@
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 0.97rem;
             color: var(--color-text-main);
-            background-color: #fafafa;
+            background-color: var(--theme-bg-card);
             transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
             outline: none;
         }
 
         .form-input:focus {
             border-color: var(--color-pink);
-            background-color: #fff;
+            background-color: var(--theme-bg-card);
             box-shadow: 0 0 0 3px rgba(255, 182, 193, 0.2);
         }
 
         .form-input::placeholder {
-            color: #bbb;
+            color: var(--theme-text-muted);
             font-weight: 400;
         }
 
@@ -216,7 +216,7 @@
 
         .divider span {
             font-size: 0.82rem;
-            color: #bbb;
+            color: var(--theme-text-muted);
             font-weight: 600;
             white-space: nowrap;
         }
@@ -232,7 +232,7 @@
             padding: 12px;
             border-radius: 12px;
             border: 1.5px solid var(--color-border);
-            background-color: #fff;
+            background-color: var(--theme-bg-card);
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 0.88rem;
             font-weight: 700;
@@ -246,8 +246,8 @@
         }
 
         .btn-social:hover {
-            background-color: #f8f9fa;
-            border-color: #ccc;
+            background-color: var(--theme-bg-card);
+            border-color: var(--theme-border);
             transform: translateY(-1px);
         }
 

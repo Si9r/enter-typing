@@ -99,8 +99,9 @@ function renderWaitingPhase() {
     const song = state.selectedSong;
     const totalLines = song.lines.length;
     document.getElementById("game-stage-indicator").textContent = `STAGE ${currentLineIndex + 1} / ${totalLines}`;
-    document.getElementById("game-kanji-display").textContent = "준비 중...";
-    document.getElementById("game-next-display").textContent = `Next - ${song.lines[currentLineIndex] || "-"}`;
+    document.getElementById("game-kanji-display").textContent = window.i18nTranslate ? window.i18nTranslate("준비 중...") : "준비 중...";
+    const nextPrefix = window.i18nTranslate ? window.i18nTranslate("Next") : "Next";
+    document.getElementById("game-next-display").textContent = `${nextPrefix} - ${song.lines[currentLineIndex] || "-"}`;
     document.getElementById("game-lyric-display").innerHTML = "<span class='lyric-unit pending'><span class='hira-text'>-</span><span class='roma-text'><span>-</span></span></span>";
 
     const input = document.getElementById("game-typing-input");
@@ -110,7 +111,7 @@ function renderWaitingPhase() {
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = `<span style="color: #666;">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
+        statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
     }
 
     battleTargetUnits = [];
@@ -405,10 +406,12 @@ function loadGameplayLine() {
     document.getElementById("game-kanji-display").textContent = currentKanjiTarget;
 
     const nextIdx = currentLineIndex + 1;
+    const nextPrefix = window.i18nTranslate ? window.i18nTranslate("Next") : "Next";
     if (nextIdx < totalLines) {
-        document.getElementById("game-next-display").textContent = `Next - ${song.lines[nextIdx]}`;
+        document.getElementById("game-next-display").textContent = `${nextPrefix} - ${song.lines[nextIdx]}`;
     } else {
-        document.getElementById("game-next-display").textContent = `Next - ${window.i18nTranslate("마지막 소절입니다!")}`;
+        const lastMsg = window.i18nTranslate ? window.i18nTranslate("마지막 소절입니다!") : "마지막 소절입니다!";
+        document.getElementById("game-next-display").textContent = `${nextPrefix} - ${lastMsg}`;
     }
 
     renderActiveLyrics();
@@ -418,8 +421,8 @@ function loadGameplayLine() {
     input.value = "";
 
     input.disabled = false;
-    input.placeholder = window.i18nTranslate("여기에 가사 로마자를 타이핑하세요...");
-    input.focus();
+    input.placeholder = window.i18nTranslate ? window.i18nTranslate("로마자를 입력하세요...") : "로마자를 입력하세요...";
+    input.focus({ preventScroll: true });
     currentLineTypingStartTime = Date.now();
 }
 
@@ -433,7 +436,8 @@ function highlightCurrentChar() {
     TypingEngine.highlightCurrentChar(lyricDisplay, battleTargetUnits, currentUnitIndex, currentBuffer);
 
     const statusPanel = document.getElementById("game-status-panel");
-    TypingEngine.getStatusHTML(statusPanel, battleTargetUnits, currentUnitIndex, currentBuffer, "입력 완료!");
+    const successMsg = window.i18nTranslate ? window.i18nTranslate("완벽하게 입력했습니다! 다음 문장을 기다려 주세요.") : "완벽하게 입력했습니다! 다음 문장을 기다려 주세요.";
+    TypingEngine.getStatusHTML(statusPanel, battleTargetUnits, currentUnitIndex, currentBuffer, `<span class="success-text">${successMsg}</span>`);
 }
 
 function handleTypingInput(e) {

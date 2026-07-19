@@ -325,12 +325,12 @@ async function fetchTypingContent(contentId) {
               const genres = data.genre.split(',').map(g => g.trim());
               genres.forEach(g => {
                   const tagSpan = document.createElement("span");
-                  tagSpan.style.cssText = "background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;";
+                  tagSpan.style.cssText = "background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: var(--theme-text-main); border: 1px solid var(--theme-border);";
                   tagSpan.innerText = g;
                   infoTags.appendChild(tagSpan);
               });
           } else {
-              infoTags.innerHTML = '<span style="background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: #555; border: 1px solid #ddd;">태그 없음</span>';
+              infoTags.innerHTML = '<span style="background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: var(--theme-text-main); border: 1px solid var(--theme-border);">태그 없음</span>';
           }
       }
 
@@ -404,7 +404,7 @@ function renderWaitingPhase() {
     typingInput.disabled = true;
   }
   if (statusPanel) {
-    statusPanel.innerHTML = `<span style="color: #666;">${window.i18nTranslate("전주 재생 중... 곧 가사가 시작됩니다.")}</span>`;
+    statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${window.i18nTranslate("전주 재생 중... 곧 가사가 시작됩니다.")}</span>`;
   }
   targetUnits = [];
   currentBuffer = "";
@@ -672,7 +672,7 @@ function endGame(completed = false) {
         if (topTypoList) {
             topTypoList.innerHTML = "";
             if (topTypos.length === 0) {
-                topTypoList.innerHTML = "<div style='text-align: center; color: #888; margin-top: 20px;'>오타가 없습니다! 완벽해요 </div>";
+                topTypoList.innerHTML = "<div style='text-align: center; color: var(--theme-text-muted); margin-top: 20px;'>오타가 없습니다! 완벽해요 </div>";
             } else {
                 topTypos.forEach((item, idx) => {
                     const row = document.createElement("div");

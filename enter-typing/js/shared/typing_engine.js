@@ -378,22 +378,26 @@ function highlightCurrentChar(container, units, currentUnitIndex, currentBuffer)
 function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, completeMessage = "입력 완료!") {
   if (!statusPanel) return "";
   if (!units || currentUnitIndex >= units.length) {
-    statusPanel.innerHTML = completeMessage;
-    return completeMessage;
+    statusPanel.innerHTML = window.i18nTranslate ? window.i18nTranslate(completeMessage) : completeMessage;
+    return statusPanel.innerHTML;
   }
 
   const currentUnit = units[currentUnitIndex];
   if (!currentUnit) {
-    const defaultMsg = "입력할 항목을 준비 중입니다.";
+    const defaultMsg = window.i18nTranslate ? window.i18nTranslate("입력할 항목을 준비 중입니다.") : "입력할 항목을 준비 중입니다.";
     statusPanel.innerText = defaultMsg;
     return defaultMsg;
   }
 
+  const locCurrentPos = window.i18nTranslate ? window.i18nTranslate("현재 입력 위치:") : "현재 입력 위치:";
+  const locTyping = window.i18nTranslate ? window.i18nTranslate("입력 중...") : "입력 중...";
+  const locCombo = window.i18nTranslate ? window.i18nTranslate("입력된 조합:") : "입력된 조합:";
+
   let htmlStr = "";
   if (currentBuffer === "") {
-    htmlStr = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span>`;
+    htmlStr = `${locCurrentPos} <span class="typing-now">${currentUnit.text}</span>`;
   } else {
-    htmlStr = `현재 입력 위치: <span class="typing-now">${currentUnit.text}</span> 입력 중... (입력된 조합: <span class="typing-now">${currentBuffer}</span>)`;
+    htmlStr = `${locCurrentPos} <span class="typing-now">${currentUnit.text}</span> ${locTyping} (${locCombo} <span class="typing-now">${currentBuffer}</span>)`;
   }
   statusPanel.innerHTML = htmlStr;
   return htmlStr;

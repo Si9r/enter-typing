@@ -154,6 +154,11 @@ def get_quiz_content(content_id: int, db: Session = Depends(get_db)):
 def delete_quiz_content(content_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     content = get_content_or_404(models.QuizContent, content_id, db)
     check_owner_or_403(content, current_user, "삭제 권한이 없습니다.")
+
+    # 관련 하위 레코드 먼저 삭제 (Foreign Key 무결성 제약 조건 에러 방지)
+    db.query(models.QuizHistory).filter(models.QuizHistory.quiz_id == content_id).delete()
+    db.query(models.BattleHistory).filter(models.BattleHistory.quiz_id == content_id).delete()
+
     db.delete(content)
     db.commit()
     return {"success": True, "message": "삭제되었습니다."}

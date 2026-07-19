@@ -469,7 +469,7 @@ function showQuizResult() {
 
         Object.keys(grouped).forEach(qIdx => {
             const groupDiv = document.createElement('div');
-            groupDiv.style.cssText = "background: var(--theme-bg-card); border: 1px solid #eaeaea; border-radius: 6px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);";
+            groupDiv.style.cssText = "background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 6px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);";
 
             const header = document.createElement('div');
             header.style.cssText = "font-weight: 800; font-size: 1.05rem; color: var(--theme-text-main); margin-bottom: 12px; border-bottom: 1px dashed var(--theme-border); padding-bottom: 8px;";

@@ -260,6 +260,14 @@ export async function loadMyHistory() {
                     url = `/quiz/${item.content_id}/play`;
                     typeLabel = '퀴즈 제작';
                 }
+                let scoreStr = item.score_str;
+                if (window.i18n) {
+                    if (scoreStr === '타이핑 콘텐츠 등록') scoreStr = window.i18n.getText('타이핑 콘텐츠 등록');
+                    else if (scoreStr === '퀴즈 콘텐츠 등록') scoreStr = window.i18n.getText('퀴즈 콘텐츠 등록');
+                    else if (scoreStr.includes('정답')) {
+                        scoreStr = scoreStr.replace('정답', window.i18n.getText('정답'));
+                    }
+                }
                 let dateStr = new Date(item.played_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
                 return `
           <div class="history-item" style="cursor:pointer;" onclick="location.href='${url}'">
@@ -269,10 +277,10 @@ export async function loadMyHistory() {
               <div class="sub">${typeLabel} · ${item.genre}</div>
             </div>
             <div class="history-result">
-              <div class="score">${item.score_str}</div>
+              <div class="score">${scoreStr}</div>
               <div class="date">${dateStr}</div>
             </div>
-            <div style="margin-left:12px;color:#ccc;font-size:1.1rem;align-self:center;">›</div>
+            <div style="margin-left:12px;color: var(--theme-text-muted);font-size:1.1rem;align-self:center;">›</div>
           </div>
         `;
             }).join('');

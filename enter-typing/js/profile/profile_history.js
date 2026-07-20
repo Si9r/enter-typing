@@ -41,15 +41,15 @@ export async function loadMyTypingContents() {
           <div class="history-icon typing">⌨️</div>
           <div class="history-info">
             <div class="title">${item.title} — ${item.artist}</div>
-            <div class="sub">난이도: ${` X ${item.difficulty || 3}`} · 장르: ${item.genre || 'JPOP'}</div>
+            <div class="sub"><span>난이도</span>: ${` X ${item.difficulty || 3}`} · <span>장르</span>: ${item.genre || 'JPOP'}</div>
           </div>
           <div class="history-result">
-            <div class="score">⏱️ ${item.best_time || 0}초</div>
-            <div class="date">플레이: ${item.play_count || 0}회</div>
+            <div class="score">⏱️ <span>${item.best_time || 0}초</span></div>
+            <div class="date"><span>플레이</span>: <span>${item.play_count || 0}회</span></div>
           </div>
           <div style="display:flex; gap:8px; flex-shrink:0;">
-            <button title="수정" onclick="event.stopPropagation(); location.href='/typing/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
-            <button title="삭제" onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
+            <button title="수정" onclick="event.stopPropagation(); location.href='/typing/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> <span>수정</span></button>
+            <button title="삭제" onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> <span>삭제</span></button>
           </div>
         </div>
       `).join('');
@@ -309,14 +309,14 @@ export async function loadMyQuizContents() {
           <div class="history-icon quiz"></div>
           <div class="history-info">
             <div class="title">${item.title}</div>
-            <div class="sub">난이도: ${` X ${item.difficulty || 3}`}</div>
+            <div class="sub"><span>난이도</span>: ${` X ${item.difficulty || 3}`}</div>
           </div>
           <div class="history-result">
-            <div class="score"> 최고 점수: ${item.best_score || 0}</div>
+            <div class="score"> <span>최고 점수</span>: <span>${item.best_score || 0}점</span></div>
           </div>
           <div style="display:flex; gap:8px; flex-shrink:0;">
-            <button title="수정" onclick="event.stopPropagation(); location.href='/quiz/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
-            <button title="삭제" onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
+            <button title="수정" onclick="event.stopPropagation(); location.href='/quiz/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> <span>수정</span></button>
+            <button title="삭제" onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> <span>삭제</span></button>
           </div>
         </div>
       `).join('');

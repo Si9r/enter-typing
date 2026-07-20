@@ -1,7 +1,7 @@
 let pendingRoomCode = null;
 
 function fmtMode(mode) {
-    return mode === 'quiz' ? '퀴즈' : (mode === 'typing' ? '타이핑' : null);
+    return mode === 'quiz' ? '<span>퀴즈</span>' : (mode === 'typing' ? '<span>타이핑</span>' : null);
 }
 
 async function loadRooms() {
@@ -15,18 +15,18 @@ async function loadRooms() {
         }
         grid.innerHTML = data.rooms.map(room => {
             const modeLabel = fmtMode(room.mode);
-            const songLabel = modeLabel ? `${modeLabel}: ${room.song_title || '곡 미정'}` : '콘텐츠 미정';
+            const songLabel = modeLabel ? `${modeLabel}: ${room.song_title || '<span>곡 미정</span>'}` : '<span>콘텐츠 미정</span>';
             const lockedClass = room.is_private ? ' locked' : '';
             const lockIcon = room.is_private ? '<i class="ph-fill ph-lock"></i>' : '';
             const statusClass = room.status === 'playing' ? ' playing' : '';
-            const statusLabel = room.status === 'playing' ? '게임중' : '대기중';
+            const statusLabel = room.status === 'playing' ? '<span>게임중</span>' : '<span>대기중</span>';
             return `
                 <div class="room-card${lockedClass}" onclick="onRoomClick('${room.code}', ${room.is_private})">
                     <div class="room-card-header">
                         <span class="room-card-title">${room.title}</span>
                         <span>${lockIcon}</span>
                     </div>
-                    <div class="room-card-meta">방장: ${room.host} · ${songLabel}</div>
+                    <div class="room-card-meta"><span>방장</span>: ${room.host} · ${songLabel}</div>
                     <div class="room-card-footer">
                         <span>${room.player_count} / ${room.max_players}명</span>
                         <span class="room-card-status${statusClass}">${statusLabel}</span>

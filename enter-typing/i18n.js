@@ -18,7 +18,7 @@ function scanDOM(node) {
     if (node.nodeType === Node.TEXT_NODE) {
         const fullText = node.textContent;
         const trimmedText = fullText.trim();
-        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText) || /남은 퀴즈:\s*\d+개/.test(trimmedText);
+        const hasDynamicPattern = /(?:\d+|\d+,\d+)(?:\s*)(초|분|점|회|명|개|문제|승|전)/.test(trimmedText) || /코드:\s*[\w\d]+/.test(trimmedText) || /대전방\(#[\w\d]+\)에 입장했습니다!/.test(trimmedText) || /\s\(나\)$/.test(trimmedText) || /남은 퀴즈:\s*\d+/.test(trimmedText) || /문제\s*\d+\s*\/\s*\d+/.test(trimmedText);
         
         if (trimmedText && (translations[trimmedText] || hasDynamicPattern)) {
             const prefix = fullText.substring(0, fullText.indexOf(trimmedText));
@@ -45,22 +45,24 @@ function scanPlaceholders() {
     const elementsWithPlaceholder = document.querySelectorAll('input[placeholder], textarea[placeholder]');
     elementsWithPlaceholder.forEach(el => {
         const text = el.getAttribute('placeholder').trim();
-        if (text && translations[text]) {
+        if (text && translations[text] && !el._i18n_tracked_ph) {
             placeholdersToTranslate.push({
                 element: el,
                 originalKey: text
             });
+            el._i18n_tracked_ph = true;
         }
     });
 
     const elementsWithTitle = document.querySelectorAll('[title]');
     elementsWithTitle.forEach(el => {
         const text = el.getAttribute('title').trim();
-        if (text && translations[text]) {
+        if (text && translations[text] && !el._i18n_tracked_title) {
             titlesToTranslate.push({
                 element: el,
                 originalKey: text
             });
+            el._i18n_tracked_title = true;
         }
     });
 }
@@ -77,7 +79,7 @@ function setLanguage(lang) {
 
 async function loadLocales() {
     try {
-        const res = await fetch('/locales.json');
+        const res = await fetch(`/locales.json?v=${new Date().getTime()}`);
         if (res.ok) {
             translations = await res.json();
             localesLoaded = true;
@@ -108,6 +110,7 @@ async function applyTranslations() {
             });
             if (shouldRescan) {
                 scanDOM(document.body);
+                scanPlaceholders();
                 // 재귀 호출을 막기 위해 domScanned는 true 상태 유지하며 번역만 실행
                 applyTranslationsCore();
             }
@@ -145,7 +148,8 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'Code: $1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, 'Joined battle room (#$1)!');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (Me)');
-                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, 'Remaining Quizzes: $1');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)/g, 'Remaining: $1');
+                translatedText = translatedText.replace(/문제\s*(\d+)\s*\/\s*(\d+)/g, 'Q $1 / $2');
             } else if (lang === 'ja') {
                 translatedText = translatedText.replace(/(\d+)\s*초/g, '$1秒');
                 translatedText = translatedText.replace(/(\d+)\s*분/g, '$1分');
@@ -160,7 +164,8 @@ function applyTranslationsCore() {
                 translatedText = translatedText.replace(/코드:\s*([\w\d]+)/g, 'コード：$1');
                 translatedText = translatedText.replace(/대전방\(#([\w\d]+)\)에 입장했습니다!/g, '対戦部屋(#$1)に入場しました！');
                 translatedText = translatedText.replace(/(.+)\s\(나\)$/g, '$1 (私)');
-                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)개/g, '残りのクイズ: $1問');
+                translatedText = translatedText.replace(/남은 퀴즈:\s*(\d+)/g, '残り: $1');
+                translatedText = translatedText.replace(/문제\s*(\d+)\s*\/\s*(\d+)/g, '問題 $1 / $2');
             }
         }
         
@@ -217,9 +222,11 @@ function updateLanguageSelectorUI() {
 
 // 전역 번역 유틸리티 함수 추가
 window.i18nTranslate = function(key) {
+    if (typeof key !== 'string') return key;
     const lang = getCurrentLanguage();
-    if (lang !== 'ko' && localesLoaded && translations[key] && translations[key][lang]) {
-        return translations[key][lang];
+    const trimmedKey = key.trim();
+    if (lang !== 'ko' && localesLoaded && translations[trimmedKey] && translations[trimmedKey][lang]) {
+        return key.replace(trimmedKey, translations[trimmedKey][lang]);
     }
     return key;
 };

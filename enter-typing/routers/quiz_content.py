@@ -66,7 +66,8 @@ def get_all_quiz_contents(db: Session = Depends(get_db)):
             "difficulty": c.difficulty,
             "best_score": c.best_score,
             "play_count": c.play_count,
-            "quiz_count": quiz_question_count(c)
+            "quiz_count": quiz_question_count(c),
+            "quiz_data": c.quiz_data
         })
     return {"success": True, "data": result}
 

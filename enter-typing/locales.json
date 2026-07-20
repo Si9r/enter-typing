@@ -313,7 +313,7 @@
   },
   "※ 음란물, 비하, 혐오 등의 퀴즈는 임의로 삭제될 수 있으며 관련\n                        법에 의거 처벌받을 수 있습니다.": {
     "en": "※ Quizzes containing pornographic material, derogatory remarks, hateful content, etc. may be deleted arbitrarily and\n                        You may be punished according to the law.",
-    "ja": "※ポルノ、ビハ、嫌悪などのクイズは任意に削除されることがあり、関連\n                        法律に基づいて罰せられることがあります。"
+    "ja": "※ポルノ、誹謗中傷、嫌悪などのクイズは任意に削除されることがあり、関連法律に基づいて罰せられることがあります。"
   },
   "← 뒤로가기": {
     "en": "← Go back",
@@ -1285,7 +1285,7 @@
   },
   "이메일": {
     "en": "email",
-    "ja": "Eメール"
+    "ja": "メール"
   },
   "이메일 입력": {
     "en": "Enter your email",
@@ -2153,7 +2153,7 @@
   },
   ");\n            }\n\n            currentStep = n;\n        }\n\n        // ─── Step 1: 이메일 폼 ────────────────────────────────\n        document.getElementById(": {
     "en": ");\n            }\n\n            currentStep = n;\n        }\n\n        // ─── Step 1: Email form ─────────────────────────────────\n        document.getElementById(",
-    "ja": "）;\n            }\n\n            currentStep = n;\n        }\n\n        // ─── Step 1: 電子メールフォーム ────────────────────────────────\n        document.getElementById("
+    "ja": "）;\n            }\n\n            currentStep = n;\n        }\n\n        // ─── Step 1: メールフォーム ────────────────────────────────\n        document.getElementById("
   },
   "></div>\n    </div>\n\n    <!-- 콘텐츠 목록 섹션 (타이핑) -->\n    <div class=": {
     "en": "></div>\n    </div>\n\n    <!-- Content list section (typing) -->\n    <div class=",
@@ -2377,7 +2377,7 @@
   },
   ");\n            }\n\n            // 이메일\n            const emailInput = document.getElementById(": {
     "en": ");\n            }\n\n            // email\n            const emailInput = document.getElementById(",
-    "ja": "）;\n            }\n\n            // Eメール\n            const emailInput = document.getElementById("
+    "ja": "）;\n            }\n\n            // メール\n            const emailInput = document.getElementById("
   },
   ">퀴즈</option>\n                        </select>\n                    </div>\n\n                    <div>\n                        <label\n                            style=": {
     "en": ">Quiz</option>\n                        </select>\n                    </div>\n\n                    <div>\n                        <label\n                            style=",
@@ -2697,7 +2697,7 @@
   },
   ">← 이메일 다시 입력</a>\n            </div>\n\n            <!-- ── Step 3: 임시 비밀번호 발송 완료 ── -->\n            <div class=": {
     "en": ">← Re-enter your email</a>\n            </div>\n\n            <!-- ── Step 3: Temporary password sent ── -->\n            <div class=",
-    "ja": ">←Eメールを再入力</a>\n            </div>\n\n            <!-- ── Step 3: 仮パスワード発送完了 ── -->\n            <div class="
+    "ja": ">←メールを再入力</a>\n            </div>\n\n            <!-- ── Step 3: 仮パスワード発送完了 ── -->\n            <div class="
   },
   ">인증번호 6자리</label>\n                        <div class=": {
     "en": ">6-digit authentication number</label>\n                        <div class=",
@@ -3989,7 +3989,7 @@
   },
   ");\n\n            // 이메일 유효성 검사\n            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n            if (!emailRegex.test(emailInput.value.trim())) {\n                emailInput.classList.add(": {
     "en": ");\n\n            // email validation\n            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n            if (!emailRegex.test(emailInput.value.trim())) {\n                emailInput.classList.add(",
-    "ja": "）;\n\n            // Eメール検証\n            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n            if(!emailRegex.test(emailInput.value.trim())) {\n                emailInput.classList.add("
+    "ja": "）;\n\n            // メール検証\n            const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n            if(!emailRegex.test(emailInput.value.trim())) {\n                emailInput.classList.add("
   },
   "이미지 업로드에 실패했습니다:": {
     "en": "Image upload failed:",
@@ -4341,7 +4341,7 @@
   },
   ";\n        if (!changeEmail) {\n            // 직접 접근 방지: 이메일 정보 없으면 로그인 페이지로\n            location.href =": {
     "en": ";\n        if (!changeEmail) {\n            // Prevent direct access: Go to login page without email information\n            location. href =",
-    "ja": ";\n        if(!changeEmail){\n            //直接アクセスを防ぐ：電子メール情報がない場合はログインページに\n            location.href ="
+    "ja": ";\n        if(!changeEmail){\n            //直接アクセスを防ぐ：メール情報がない場合はログインページに\n            location.href ="
   },
   "은 n 또는 nn, xn, ln으로 입력 가능\n      if (\n        romaji.startsWith(": {
     "en": "can be entered as n or nn, xn, ln\n      if (\n        romaji.startsWith(",
@@ -4925,7 +4925,7 @@
   },
   "이메일 또는 비밀번호가 올바르지 않습니다.": {
     "en": "Your email or password is incorrect.",
-    "ja": "電子メールまたはパスワードが正しくありません。"
+    "ja": "メールまたはパスワードが正しくありません。"
   },
   "로그인 정보가 없습니다.": {
     "en": "There is no login information.",
@@ -5249,7 +5249,7 @@
   },
   "이메일 중복 확인이 필요하거나 이미 가입된 이메일입니다.": {
     "en": "You need to double check your email or you have already registered.",
-    "ja": "電子メールの重複確認が必要か、すでに登録されている電子メールです。"
+    "ja": "メールの重複確認が必要か、すでに登録されているメールです。"
   },
   ">확인</button>\n                <button class=": {
     "en": ">OK</button>\n                <button class=",
@@ -5553,7 +5553,7 @@
   },
   ")은 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>\n          <ul>\n              <li><strong>회원 가입 및 관리</strong>: 회원 가입 의사 확인, 회원제 서비스 제공에 따른 본인 식별 및 인증, 회원자격 유지 및 관리, 제한적 본인확인제 시행에 따른 본인확인, 서비스 부정 이용 방지, 각종 고지·통지 등을 목적으로 개인정보를 처리합니다.</li>\n              <li><strong>서비스 제공 및 고도화</strong>: 타이핑 연습 랭킹 등록, 퀴즈 전적 관리, 개인 맞춤형 콘텐츠 제공을 목적으로 개인정보를 처리합니다.</li>\n          </ul>\n\n          <h3>제2조 (처리하는 개인정보의 항목)</h3>\n          <p>회사는 회원가입 및 서비스 이용 과정에서 다음과 같은 개인정보 항목을 수집 및 처리하고 있습니다.</p>\n          <ul>\n              <li><strong>필수 수집 항목</strong>: 이메일 주소, 닉네임, 비밀번호(암호화 저장)</li>\n              <li><strong>선택 수집 항목</strong>: 이벤트 및 마케팅 정보 수신 동의 여부</li>\n              <li><strong>자동 수집 항목</strong>: 서비스 이용 과정에서 IP 주소, 쿠키, 서비스 이용 기록, 접속 로그, 불량 이용 기록 등이 생성되어 수집될 수 있습니다.</li>\n          </ul>\n\n          <h3>제3조 (개인정보의 처리 및 보유 기간)</h3>\n          <p>회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를 수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다. <strong>회원의 개인정보는 회원 탈퇴 시 지체 없이 파기하는 것을 원칙으로 합니다.</strong></p>\n\n          <h3>제4조 (개인정보의 제3자 제공)</h3>\n          <p>회사는 정보주체의 개인정보를 제1조(개인정보의 처리 목적)에서 명시한 범위 내에서만 처리하며, 정보주체의 동의, 법률의 특별한 규정 등 개인정보 보호법 제17조 및 제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다. 이 외에 제3자에게 회원 개인정보를 양도하거나 대여하지 않습니다.</p>\n\n          <h3>제5조 (정보주체의 권리·의무 및 그 행사방법)</h3>\n          <p>정보주체는 회사에 대해 언제든지 개인정보 열람·정정·삭제·처리정지 요구 등의 권리를 행사할 수 있습니다. 권리 행사는 회원 정보 수정 페이지 또는 고객문의를 통해 직접 처리하거나 서면, 전자우편 등을 통하여 하실 수 있으며 회사는 이에 대해 지체 없이 조치하겠습니다.</p>\n\n          <h3>제6조 (개인정보의 파기절차 및 파기방법)</h3>\n          <p>회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다. 전자적 파일 형태의 정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 파기하며, 종이 문서에 출력된 개인정보는 분쇄기로 분쇄하거나 소각하여 파기합니다.</p>\n\n          <h3>제7조 (개인정보의 안전성 확보 조치)</h3>\n          <p>회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다.</p>\n          <ul>\n              <li>비밀번호 암호화: 회원의 비밀번호는 일방향 암호화(bcrypt 등)되어 저장 및 관리되므로 본인만이 알 수 있습니다.</li>\n              <li>해킹 등에 대비한 기술적 대책: 해킹이나 컴퓨터 바이러스 등에 의한 개인정보 유출 및 훼손을 막기 위하여 보안 프로그램을 설치하고 주기적으로 갱신·점검하고 있습니다.</li>\n          </ul>\n\n          <h3>제8조 (개인정보 보호책임자)</h3>\n          <p>개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>\n          <p style=": {
     "en": ") processes personal information for the following purposes. The personal information being processed will not be used for purposes other than the following, and if the purpose of use changes, necessary measures will be taken, such as obtaining separate consent in accordance with Article 18 of the Personal Information Protection Act.</p>\n          <ul>\n              <li><strong>Membership registration and management</strong>: Personal information is processed for the purposes of confirming intention to become a member, identifying and authenticating oneself through the provision of membership services, maintaining and managing membership qualifications, verifying one's identity through the implementation of a limited identity verification system, preventing fraudulent use of services, and providing various notices and notices.</li>\n              <li><strong>Service provision and advancement</strong>: Personal information is processed for the purpose of registering typing practice rankings, managing quiz results, and providing personalized content.</li>\n          </ul>\n\n          <h3>Article 2 (Items of personal information to be processed)</h3>\n          <p>The company collects and processes the following personal information items during membership registration and service use.</p>\n          <ul>\n              <li><strong>Required collection</strong>: email address, nickname, password (encrypted storage)</li>\n              <li><strong>Optional collection items</strong>: Whether you agree to receive event and marketing information</li>\n              <li><strong>Automatically collected items</strong>: IP addresses, cookies, service use records, access logs, and bad use records may be generated and collected during the service use process.</li>\n          </ul>\n\n          <h3>Article 3 (Processing and retention period of personal information)</h3>\n          <p>The company processes and retains personal information within the personal information retention and use period pursuant to the law or within the personal information retention and use period agreed upon when collecting personal information from the information subject. <strong>In principle, a member's personal information is destroyed without delay upon withdrawal of membership.</strong></p>\n\n          <h3>Article 4 (Provision of personal information to third parties)</h3>\n          <p>The company processes the personal information of the information subject only within the scope specified in Article 1 (Purpose of processing personal information), and provides personal information to third parties only in cases that fall under Articles 17 and 18 of the Personal Information Protection Act, including the consent of the information subject and special provisions of the law. In addition to this, we do not transfer or rent member personal information to third parties.</p>\n\n          <h3>Article 5 (Rights and obligations of information subjects and methods of exercising them)</h3>\n          <p>The information subject may exercise rights such as requesting the company to view, correct, delete, or suspend processing of personal information at any time. You can exercise your rights directly through the member information modification page or through customer inquiries, or in writing or by e-mail, and the company will take action without delay.</p>\n\n          <h3>Article 6 (Procedures and methods of destruction of personal information)</h3>\n          <p>The company destroys the personal information without delay when the personal information becomes unnecessary, such as when the personal information retention period has passed or the purpose of processing has been achieved. Information in the form of electronic files is destroyed using technical methods that render the records unrecoverable, and personal information printed on paper documents is destroyed by shredding or incineration.</p>\n\n          <h3>Article 7 (Measures to ensure the safety of personal information)</h3>\n          <p>The company is taking the following measures to ensure the safety of personal information.</p>\n          <ul>\n              <li>Password encryption: The member's password is stored and managed with one-way encryption (bcrypt, etc.), so only the member can know it.</li>\n              <li>Technical measures against hacking, etc.: To prevent personal information from being leaked or damaged by hacking or computer viruses, we install and periodically update and inspect security programs.</li>\n          </ul>\n\n          <h3>Article 8 (Personal Information Protection Manager)</h3>\n          <p>We are responsible for overall management of personal information processing, and we have designated a personal information protection officer as follows to handle complaints and provide relief for damages from information subjects related to personal information processing.</p>\n          <p style=",
-    "ja": "）は以下の目的のために個人情報を処理します。処理している個人情報は、次の目的以外の用途には利用されず、利用目的が変更される場合には、個人情報保護法第18条により別途の同意を受けるなど必要な措置を履行する予定です。 </p>\n          <ul>\n              <li> <strong>会員登録および管理</strong>：会員登録意思確認、会員制サービス提供による本人識別および認証、会員資格維持および管理、制限的本人確認制施行による本人確認、サービス不正利用防止、各種告知・通知などを目的に個人情報を処理します。</li>\n              <li> <strong>サービスの提供と高度化</strong>：タイピング練習ランキングの登録、クイズの完全な管理、パーソナライズされたコンテンツの提供を目的として個人情報を処理します。</li>\n          </ul>\n\n          <h3>第2条（処理する個人情報の項目）</h3>\n          <p>当社は、会員登録およびサービス利用の過程で以下の個人情報を収集および処理しています。</p>\n          <ul>\n              <li> <strong>必須収集項目</strong>：メールアドレス、ニックネーム、パスワード（パスワードを保存）</li>\n              <li> <strong>選択コレクション項目</strong>：イベントとマーケティング情報を受け入れるかどうか</li>\n              <li> <strong>自動収集項目</strong>：サービス利用プロセスでは、IPアドレス、Cookie、サービス利用履歴、アクセスログ、不正利用履歴などを生成して収集できます。</li>\n          </ul>\n\n          <h3>第3条（個人情報の処理および保有期間）</h3>\n          <p>会社は、法令による個人情報保有・利用期間または情報主体から個人情報を収集する際に同意された個人情報保有・利用期間内で個人情報を処理・保有します。 <strong>会員の個人情報は、会員の退会時に遅滞なく破棄することを原則としています。</strong> </p>\n\n          <h3>第4条（個人情報の第三者提供）</h3>\n          <p>会社は、情報主体の個人情報を第1条(個人情報の処理目的)で明示した範囲内でのみ処理し、情報主体の同意、法律の特別な規定など個人情報保護法第17条及び第18条に該当する場合に限り、個人情報を第3者に提供します。これ以外に、第三者に会員の個人情報を譲渡または貸与しません。</p>\n\n          <h3>第5条（情報主体の権利・義務およびその行使方法）</h3>\n          <p>情報主体は、会社に対していつでも個人情報閲覧・訂正・削除・処理停止要求等の権利を行使することができます。権利行使は会員情報修正ページまたは顧客問い合わせを通じて直接処理したり、書面、電子メールなどを通じて行うことができ、会社はこれに対して遅滞なく措置します。</p>\n\n          <h3>第6条（個人情報の破棄手続および破棄方法）</h3>\n          <p>会社は、個人情報保有期間の経過、処理目的達成など個人情報が不要になったときは、遅滞なく当該個人情報を破棄します。電子的ファイル形式の情報は、記録を再生できない技術的な方法を使用して破棄し、紙文書に出力された個人情報は粉砕機で粉砕または焼却して破棄します。 </p>\n\n          <h3>第7条（個人情報の安全性確保措置）</h3>\n          <p>会社は個人情報の安全性を確保するために次の措置を講じています。</p>\n          <ul>\n              <li>パスワード暗号化：会員のパスワードは一方向暗号化（bcryptなど）され、保存および管理されるため、自分だけが知ることができます。</li>\n              <li>ハッキングなどに備えた技術的対策：ハッキングやコンピュータウイルスなどによる個人情報の漏洩および毀損を防ぐためにセキュリティプログラムを設置し、定期的に更新・点検しています。</li>\n          </ul>\n\n          <h3>第8条（個人情報保護責任者）</h3>\n          <p>個人情報処理に関する業務を総括して責任を負い、個人情報処理に関する情報主体の不満処理および被害救済などのために、以下のように個人情報保護責任者を指定しています。</p>\n          <p style="
+    "ja": "）は以下の目的のために個人情報を処理します。処理している個人情報は、次の目的以外の用途には利用されず、利用目的が変更される場合には、個人情報保護法第18条により別途の同意を受けるなど必要な措置を履行する予定です。 </p>\n          <ul>\n              <li> <strong>会員登録および管理</strong>：会員登録意思確認、会員制サービス提供による本人識別および認証、会員資格維持および管理、制限的本人確認制施行による本人確認、サービス不正利用防止、各種告知・通知などを目的に個人情報を処理します。</li>\n              <li> <strong>サービスの提供と高度化</strong>：タイピング練習ランキングの登録、クイズの完全な管理、パーソナライズされたコンテンツの提供を目的として個人情報を処理します。</li>\n          </ul>\n\n          <h3>第2条（処理する個人情報の項目）</h3>\n          <p>当社は、会員登録およびサービス利用の過程で以下の個人情報を収集および処理しています。</p>\n          <ul>\n              <li> <strong>必須収集項目</strong>：メールアドレス、ニックネーム、パスワード（パスワードを保存）</li>\n              <li> <strong>選択コレクション項目</strong>：イベントとマーケティング情報を受け入れるかどうか</li>\n              <li> <strong>自動収集項目</strong>：サービス利用プロセスでは、IPアドレス、Cookie、サービス利用履歴、アクセスログ、不正利用履歴などを生成して収集できます。</li>\n          </ul>\n\n          <h3>第3条（個人情報の処理および保有期間）</h3>\n          <p>会社は、法令による個人情報保有・利用期間または情報主体から個人情報を収集する際に同意された個人情報保有・利用期間内で個人情報を処理・保有します。 <strong>会員の個人情報は、会員の退会時に遅滞なく破棄することを原則としています。</strong> </p>\n\n          <h3>第4条（個人情報の第三者提供）</h3>\n          <p>会社は、情報主体の個人情報を第1条(個人情報の処理目的)で明示した範囲内でのみ処理し、情報主体の同意、法律の特別な規定など個人情報保護法第17条及び第18条に該当する場合に限り、個人情報を第3者に提供します。これ以外に、第三者に会員の個人情報を譲渡または貸与しません。</p>\n\n          <h3>第5条（情報主体の権利・義務およびその行使方法）</h3>\n          <p>情報主体は、会社に対していつでも個人情報閲覧・訂正・削除・処理停止要求等の権利を行使することができます。権利行使は会員情報修正ページまたは顧客問い合わせを通じて直接処理したり、書面、メールなどを通じて行うことができ、会社はこれに対して遅滞なく措置します。</p>\n\n          <h3>第6条（個人情報の破棄手続および破棄方法）</h3>\n          <p>会社は、個人情報保有期間の経過、処理目的達成など個人情報が不要になったときは、遅滞なく当該個人情報を破棄します。電子的ファイル形式の情報は、記録を再生できない技術的な方法を使用して破棄し、紙文書に出力された個人情報は粉砕機で粉砕または焼却して破棄します。 </p>\n\n          <h3>第7条（個人情報の安全性確保措置）</h3>\n          <p>会社は個人情報の安全性を確保するために次の措置を講じています。</p>\n          <ul>\n              <li>パスワード暗号化：会員のパスワードは一方向暗号化（bcryptなど）され、保存および管理されるため、自分だけが知ることができます。</li>\n              <li>ハッキングなどに備えた技術的対策：ハッキングやコンピュータウイルスなどによる個人情報の漏洩および毀損を防ぐためにセキュリティプログラムを設置し、定期的に更新・点検しています。</li>\n          </ul>\n\n          <h3>第8条（個人情報保護責任者）</h3>\n          <p>個人情報処理に関する業務を総括して責任を負い、個人情報処理に関する情報主体の不満処理および被害救済などのために、以下のように個人情報保護責任者を指定しています。</p>\n          <p style="
   },
   ">\n                    모든 소절 등록을 마친 후 우측 상단의 <code> 저장</code>을 누르면 타이핑 등록이 완료됩니다!\n                </p>\n            </div>\n\n            <div\n                style=": {
     "en": ">\n                    After completing all measure registration, click <code> Save</code> in the upper right corner to complete typing registration!\n                </p>\n            </div>\n\n            <div\n                style=",
@@ -6414,5 +6414,57 @@
   "플레이": {
     "en": "play",
     "ja": "プレイ"
+  },
+  "콘텐츠 미정": {
+    "en": "Content TBD",
+    "ja": "コンテンツ未定"
+  },
+  "곡 미정": {
+    "en": "Song TBD",
+    "ja": "曲未定"
+  },
+  "게임중": {
+    "en": "Playing",
+    "ja": "プレイ中"
+  },
+  "대기중": {
+    "en": "Waiting",
+    "ja": "待機中"
+  },
+  "방장이 콘텐츠를 선택했습니다:": {
+    "en": "The host selected the content:",
+    "ja": "ホストがコンテンツを選択しました:"
+  },
+  "님이 게임을 완료했습니다!": {
+    "en": "has finished the game!",
+    "ja": "様がゲームを完了しました！"
+  },
+  "문제": {
+    "en": "Question",
+    "ja": "問題"
+  },
+  "제목": {
+    "en": "Title",
+    "ja": "タイトル"
+  },
+  "애니메이션 제목": {
+    "en": "Anime Title",
+    "ja": "アニメタイトル"
+  },
+  "등장인물": {
+    "en": "Character",
+    "ja": "登場人物"
+  },
+  "캐릭터": {
+    "en": "Character",
+    "ja": "キャラクター"
+  },
+  "가수명": {
+    "en": "Singer Name",
+    "ja": "歌手名"
+  },
+  "그룹명": {
+    "en": "Group Name",
+    "ja": "グループ名"
   }
 }

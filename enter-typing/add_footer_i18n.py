@@ -1,7 +1,10 @@
 import json
+import os
+
+LOCALES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "locales.json")
 
 def add_translations():
-    with open("c:/Users/dowon/enter-typing/enter-typing/locales.json", "r", encoding="utf-8") as f:
+    with open(LOCALES_PATH, "r", encoding="utf-8") as f:
         translations = json.load(f)
         
     missing_keys = {
@@ -27,7 +30,7 @@ def add_translations():
         else:
             translations[key].update(val)
             
-    with open("c:/Users/dowon/enter-typing/enter-typing/locales.json", "w", encoding="utf-8") as f:
+    with open(LOCALES_PATH, "w", encoding="utf-8") as f:
         json.dump(translations, f, ensure_ascii=False, indent=4)
         
 if __name__ == "__main__":

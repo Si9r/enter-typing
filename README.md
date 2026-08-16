@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo_icon.png" alt="Enterping Logo" width="140" />
+  <img src="enter-typing/assets/logo_icon.png" alt="Enterping Logo" width="140" />
   <h1>🎮 엔터핑 (Enterping)</h1>
   <p><b>좋아하는 유튜브 음악과 영상으로 즐기는 리듬감 있는 다국어 타이핑 & 퀴즈 플랫폼</b></p>
 

@@ -100,9 +100,17 @@ function initYoutubePlayer() {
         if (volSlider && typeof youtubePlayer.setVolume === "function") {
           youtubePlayer.setVolume(volSlider.value);
         }
+        const spdSlider = document.getElementById("speed-slider");
+        if (spdSlider && typeof youtubePlayer.setPlaybackRate === "function") {
+          youtubePlayer.setPlaybackRate(parseFloat(spdSlider.value));
+        }
       },
       onStateChange: function (event) {
         if (event.data == YT.PlayerState.PLAYING) {
+          const spdSlider = document.getElementById("speed-slider");
+          if (spdSlider && typeof youtubePlayer.setPlaybackRate === "function") {
+            youtubePlayer.setPlaybackRate(parseFloat(spdSlider.value));
+          }
           if (!isPlaying) {
             startGame(true);
           } else {
@@ -1359,6 +1367,35 @@ if (volumeSlider && volumeDisplay) {
     volumeDisplay.innerText = val + "%";
     if (youtubePlayer && typeof youtubePlayer.setVolume === "function") {
       youtubePlayer.setVolume(val);
+    }
+  });
+}
+
+// Playback Speed control logic
+const speedSlider = document.getElementById("speed-slider");
+const speedDisplay = document.getElementById("speed-display");
+
+if (speedSlider && speedDisplay) {
+  speedSlider.addEventListener("input", (e) => {
+    const val = parseFloat(e.target.value);
+    speedDisplay.innerText = val.toFixed(2) + "x";
+    if (youtubePlayer && typeof youtubePlayer.setPlaybackRate === "function") {
+      youtubePlayer.setPlaybackRate(val);
+    }
+  });
+}
+
+// Custom click handler for video wrapper to play/pause since pointer-events is none on iframe
+const ytContainer = document.getElementById("youtube-player-container");
+if (ytContainer) {
+  ytContainer.addEventListener("click", () => {
+    if (youtubePlayer && typeof youtubePlayer.getPlayerState === "function") {
+      const state = youtubePlayer.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        youtubePlayer.pauseVideo();
+      } else {
+        youtubePlayer.playVideo();
+      }
     }
   });
 }

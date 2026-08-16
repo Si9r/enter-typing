@@ -598,11 +598,23 @@
                             유효하지 않은 URL입니다.
                         </div>
                     </div>
+                    
+                    <!-- Volume Control -->
+                    <div style="margin-top: 15px; background: var(--theme-bg-hover); padding: 15px; border-radius: 12px; border: 1.5px solid var(--theme-border);">
+                        <div style="font-size: 0.85rem; font-weight: 800; color: var(--theme-text-muted); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                            <span>음량 조절</span>
+                            <span id="volume-display" style="font-weight: 900; color: var(--color-pink);">50%</span>
+                        </div>
+                        <input type="range" id="volume-slider" min="0" max="100" value="50" style="width: 100%; cursor: pointer; accent-color: var(--color-pink);">
+                    </div>
                 </div>
 
                 <!-- Right: Editing Area -->
                 <div class="crop-right">
-                    <div class="setting-title">영상 재생 설정</div>
+                    <div class="setting-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <span>영상 재생 설정</span>
+                        <span id="current-time-display" style="font-size: 0.9rem; font-weight: bold; color: var(--color-blue);">현재: 0.00초</span>
+                    </div>
 
                     <div id="custom-slider" style="
                 position: relative;
@@ -950,7 +962,7 @@
     </div>
 
     <script src="/js/shared/youtube_manager.js?v=1.0.0"></script>
-    <script src="/js/quiz/create.js"></script>
+    <script src="/js/quiz/create.js?v=2.0.0"></script>
     <script src="/i18n.js"></script>
 </body>
 

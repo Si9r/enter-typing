@@ -76,16 +76,16 @@
     "ja": "他のプレイヤーを待っています。"
   },
   "전주 재생 중... 대기하세요 ⏳": {
-    "en": "Playing prelude... please wait ⏳",
-    "ja": "全州再生中...待ってください⏳"
+    "en": "Playing intro... please wait ⏳",
+    "ja": "前奏再生中... お待ちください ⏳"
   },
   "다음 가사 대기 중... ⏳": {
     "en": "Waiting for next lyrics... ⏳",
     "ja": "次の歌詞を待っています...⏳"
   },
   "가사를 모두 입력했습니다. 대기 중... ⏳": {
-    "en": "I entered all the lyrics. Waiting... ⏳",
-    "ja": "歌詞をすべて入力しました。待機中…⏳"
+    "en": "All lyrics entered. Waiting... ⏳",
+    "ja": "歌詞をすべて入力しました。待機中... ⏳"
   },
   "문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...": {
     "en": "Sentence completed. Waiting for the next sentence...",
@@ -108,8 +108,8 @@
     "ja": "タイムアウト！しばらくすると、次の問題に進みます。"
   },
   "전주 재생 중... 곧 가사가 시작됩니다.": {
-    "en": "Intro playing... Lyrics will start soon.",
-    "ja": "前奏再生中… まもなく歌詞が始まります。"
+    "en": "Playing intro... Lyrics will start soon.",
+    "ja": "前奏再生中... まもなく歌詞が始まります。"
   },
   "음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!": {
     "en": "Audio loading complete. Click the '?' in the center to start!",
@@ -136,8 +136,8 @@
     "ja": "(非常に難しい)"
   },
   "(보통)": {
-    "en": "(commonly)",
-    "ja": "(通常)"
+    "en": "(Normal)",
+    "ja": "(普通)"
   },
   "(복수 정답은 쉼표(,)로 구분하여\n                                    입력하세요)": {
     "en": "(Multiple correct answers are separated by commas (,).\n                                    Please enter)",
@@ -148,12 +148,12 @@
     "ja": "（オプション）イベントとマーケティング情報の受信に同意します。"
   },
   "(쉬움)": {
-    "en": "(facility)",
+    "en": "(Easy)",
     "ja": "(簡単)"
   },
   "(어려움)": {
-    "en": "(difficulty)",
-    "ja": "(難易度)"
+    "en": "(Hard)",
+    "ja": "(難しい)"
   },
   "(자주 틀리는 TOP 5)": {
     "en": "(Top 5 common mistakes)",
@@ -413,7 +413,7 @@
   },
   "개의 정답을 맞췄습니다!": {
     "en": "You got 2 correct answers!",
-    "ja": "犬の正解を迎えました！"
+    "ja": "個の正解を迎えました！"
   },
   "개인정보 처리방침": {
     "en": "privacy policy",
@@ -696,7 +696,7 @@
     "ja": "ログイン"
   },
   "로그인 - 엔터핑": {
-    "en": "Login - Entering",
+    "en": "Login - Enterping",
     "ja": "ログイン - エンターピング"
   },
   "로그인하고 이어하기": {
@@ -736,7 +736,7 @@
     "ja": "マイページ"
   },
   "마이페이지 - 엔터핑": {
-    "en": "My Page - Entering",
+    "en": "My Page - Enterping",
     "ja": "マイページ - エンターピング"
   },
   "메시지를 입력하세요...": {
@@ -908,7 +908,7 @@
     "ja": "パスワード変更"
   },
   "비밀번호 변경 - 엔터핑": {
-    "en": "Change Password - Entering",
+    "en": "Change Password - Enterping",
     "ja": "パスワード変更 - エンターピング"
   },
   "비밀번호 변경하기": {
@@ -1108,7 +1108,7 @@
     "ja": "アーティスト/ソース"
   },
   "안녕하세요. 엔터핑입니다!": {
-    "en": "hello. It's Entering!",
+    "en": "Hello. this is Enterping!",
     "ja": "こんにちは。エンターピングです！"
   },
   "애니메이션": {
@@ -1124,7 +1124,7 @@
     "ja": "に同意します。"
   },
   "엔터핑": {
-    "en": "Entering",
+    "en": "Enterping",
     "ja": "エンターピング"
   },
   "엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.": {
@@ -1140,7 +1140,7 @@
     "ja": "エンターピングへようこそ！"
   },
   "엔터핑유저": {
-    "en": "Entering user",
+    "en": "Enterping user",
     "ja": "エンターピングユーザー"
   },
   "엔터핑의 최신 소식과 이벤트를 확인하세요": {
@@ -1720,11 +1720,11 @@
     "ja": "タイピング"
   },
   "타이핑 목록 - 엔터핑": {
-    "en": "Typing List - Entering",
+    "en": "Typing List - Enterping",
     "ja": "タイピングリスト - エンターピング"
   },
   "타이핑 상세 - 엔터핑": {
-    "en": "Typing Details - Entering",
+    "en": "Typing Details - Enterping",
     "ja": "タイピング詳細 - エンターピング"
   },
   "타이핑 시 하이픈(-) 문자를 정상 입력할 수 있게 패치되었으며, 쓰이지 않는 일본어 로마자 변환 기능이 삭제되어 타이핑 경험이 더욱 가벼워졌습니다.": {
@@ -1736,7 +1736,7 @@
     "ja": "タイピングエンジンの改善："
   },
   "타이핑 연습 - 엔터핑": {
-    "en": "Typing Practice - Entering",
+    "en": "Typing Practice - Enterping",
     "ja": "タイピング練習 - エンターピング"
   },
   "타이핑 열정왕": {
@@ -2216,7 +2216,7 @@
     "ja": ">\n                <h2>すべてのクイズコンテンツ</h2>\n                <div style="
   },
   ">\n    <title>비밀번호 변경 - 엔터핑</title>\n    <meta name=": {
-    "en": ">\n    <title>Change password - Entering</title>\n    <meta name=",
+    "en": ">\n    <title>Change password - Enterping</title>\n    <meta name=",
     "ja": ">\n    <title>パスワード変更 - エンターピング</title>\n    <meta name="
   },
   "></script>\n    <!-- 공통 navbar 상태 관리 -->\n    <script src=": {
@@ -2272,7 +2272,7 @@
     "ja": "不明な区間"
   },
   ">엔터핑유저</h2>\n        <p id=": {
-    "en": ">Entering User</h2>\n        <p id=",
+    "en": ">Enterping User</h2>\n        <p id=",
     "ja": ">エンターピングユーザー</h2>\n        <p id="
   },
   ">다시 풀기</button>\n        <button onclick=": {
@@ -2512,7 +2512,7 @@
     "ja": "コンテンツの読み込みに失敗しました。"
   },
   ">\n            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- INTERACTIVE GAME LOGIC MOCK -->\n    <script src=": {
-    "en": ">\n            <p>&copy; 2026 Entering. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- INTERACTIVE GAME LOGIC MOCK -->\n    <script src=",
+    "en": ">\n            <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- INTERACTIVE GAME LOGIC MOCK -->\n    <script src=",
     "ja": ">\n            <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- INTERACTIVE GAME LOGIC MOCK -->\n    <script src="
   },
   ";\n      } else {\n        // 오늘 아직 출석 안 한 경우 버튼 초기화\n        btn.textContent =": {
@@ -2692,7 +2692,7 @@
     "ja": ">クイズ</button>\n                <button class="
   },
   ">\n          <h3>제1조 (개인정보의 처리 목적)</h3>\n          <p>엔터핑(이하": {
-    "en": ">\n          <h3>Article 1 (Purpose of processing personal information)</h3>\n          <p>Entering (hereinafter referred to as",
+    "en": ">\n          <h3>Article 1 (Purpose of processing personal information)</h3>\n          <p>Enterping (hereinafter referred to as",
     "ja": ">\n          <h3>第1条（個人情報の処理目的）</h3>\n          <p>エンターピング（以下"
   },
   ">← 이메일 다시 입력</a>\n            </div>\n\n            <!-- ── Step 3: 임시 비밀번호 발송 완료 ── -->\n            <div class=": {
@@ -2864,7 +2864,7 @@
     "ja": ";\n            \n            currentContentId = id;\n\n            //データロード\n            try{\n                const res = await fetch("
   },
   ">\n<title>퀴즈 - 엔터핑</title>\n<link rel=": {
-    "en": ">\n<title>Quiz - Entering</title>\n<link rel=",
+    "en": ">\n<title>Quiz - Enterping</title>\n<link rel=",
     "ja": ">\n<title>クイズ - エンターピング</title>\n<link rel="
   },
   "이미지 업로드 중 오류가 발생했습니다.": {
@@ -2996,7 +2996,7 @@
     "ja": "ランキングロードに失敗しました"
   },
   ">\n            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay -->\n    <div class=": {
-    "en": ">\n            <p>&copy; 2026 Entering. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay -->\n    <div class=",
+    "en": ">\n            <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay -->\n    <div class=",
     "ja": ">\n            <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay -->\n    <div class="
   },
   ">개인정보처리방침</a></li>\n                </ul>\n            </div>\n        </div>\n        <div class=": {
@@ -3204,8 +3204,8 @@
     "ja": ">${results[2].score}ドット</div>\n            ${isQuizMode ?"
   },
   ">엔터핑</span>\n            </div>\n            <nav class=": {
-    "en": ">Entering</span>\n            </div>\n            <nav class=",
-    "ja": ">企業</span>\n            </div>\n            <nav class="
+    "en": ">Enterping</span>\n            </div>\n            <nav class=",
+    "ja": ">エンターピング</span>\n            </div>\n            <nav class="
   },
   ">타이핑 통계</div>\n                \n                <div style=": {
     "en": ">Typing Statistics</div>\n                \n                <div style=",
@@ -3228,7 +3228,7 @@
     "ja": ">\n                <label>詳細説明</label>\n                <textarea id="
   },
   ">\n            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay (from typing_list) -->\n    <div class=": {
-    "en": ">\n            <p>&copy; 2026 Entering. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay (from typing_list) -->\n    <div class=",
+    "en": ">\n            <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay (from typing_list) -->\n    <div class=",
     "ja": ">\n            <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Modal Overlay (from typing_list) -->\n    <div class="
   },
   ">퀴즈 작성하기</a></li>\n          <li><a href=": {
@@ -3328,7 +3328,7 @@
     "ja": ">\n                            <span>音量調整</span>\n                            <span id="
   },
   "></span>\n                <span>엔터핑</span>\n            </a>\n\n            <!-- ── 변경 폼 ── -->\n            <div id=": {
-    "en": "></span>\n                <span>Entering</span>\n            </a>\n\n            <!-- ── Change form ── -->\n            <div id=",
+    "en": "></span>\n                <span>Enterping</span>\n            </a>\n\n            <!-- ── Change form ── -->\n            <div id=",
     "ja": "> </span>\n                <span>エンターピング</span>\n            </a>\n\n            <!-- ──変更フォーム── -->\n            <div id="
   },
   ">4 명 (최대)</option>\n                            <option value=": {
@@ -3376,7 +3376,7 @@
     "ja": ">\n                        管理者モード：OFF\n                    </button>\n                    <button class="
   },
   ">\n                <span>엔터핑</span>\n            </a>\n\n            <h1 class=": {
-    "en": ">\n                <span>Entering</span>\n            </a>\n\n            <h1 class=",
+    "en": ">\n                <span>Enterping</span>\n            </a>\n\n            <h1 class=",
     "ja": ">\n                <span>エンターピング</span>\n            </a>\n\n            <h1 class="
   },
   ", checkPasswordMatch);\n\n        // ─── 전체 동의 체크박스 ────────────────────────────────\n        const agreeAll     = document.getElementById(": {
@@ -3660,7 +3660,7 @@
     "ja": ">ニックネームを入力してください。</span>\n          <span class="
   },
   ">\n                <span>엔터핑</span>\n            </a>\n\n            <!-- 스텝 인디케이터 -->\n            <div class=": {
-    "en": ">\n                <span>Entering</span>\n            </a>\n\n            <!-- Step indicator -->\n            <div class=",
+    "en": ">\n                <span>Enterping</span>\n            </a>\n\n            <!-- Step indicator -->\n            <div class=",
     "ja": ">\n                <span>エンターピング</span>\n            </a>\n\n            <!-- ステップインジケータ -->\n            <div class="
   },
   "[Battle] loadGameplayLine: song.lines가 비어있습니다. selectedSong:": {
@@ -3696,7 +3696,7 @@
     "ja": ">\n                <h2>すべての入力コンテンツ</h2>\n                <div style="
   },
   ">\n    <title>회원가입 - 엔터핑</title>\n    <meta name=": {
-    "en": ">\n    <title>Sign up - Entering</title>\n    <meta name=",
+    "en": ">\n    <title>Sign up - Enterping</title>\n    <meta name=",
     "ja": ">\n    <title>会員登録 - エンターピング</title>\n    <meta name="
   },
   "초보 환영! 같이 쳐요": {
@@ -3728,7 +3728,7 @@
     "ja": ">\n                    <thead>\n                        <tr>\n                            <th>ランキング</th>\n                            <th>プレイヤー</th>\n                            <th id="
   },
   ">\n            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <script src=": {
-    "en": ">\n            <p>&copy; 2026 Entering. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <script src=",
+    "en": ">\n            <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <script src=",
     "ja": ">\n            <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <script src="
   },
   "비밀번호가 변경되었습니다. 다시 로그인해주세요.": {
@@ -3792,8 +3792,8 @@
     "ja": "登録されているすべての歌詞シンクのリストを削除してもよろしいですか？"
   },
   ">엔터핑</span>\n        </div>\n        <p class=": {
-    "en": ">Entering</span>\n        </div>\n        <p class=",
-    "ja": ">企業</span>\n        </div>\n        <p class="
+    "en": ">Enterping</span>\n        </div>\n        <p class=",
+    "ja": ">エンターピング</span>\n        </div>\n        <p class="
   },
   "[Battle] 선택된 퀴즈: ${quizObj.title}": {
     "en": "[Battle] Selected quiz: ${quizObj.title}",
@@ -4080,8 +4080,8 @@
     "ja": "required\n                    >\n                    <!-- パスワード強度 -->\n                    <div class="
   },
   ">엔터핑</span>\n      </div>\n      <nav class=": {
-    "en": ">Entering</span>\n      </div>\n      <nav class=",
-    "ja": ">企業</span>\n      </div>\n      <nav class="
+    "en": ">Enterping</span>\n      </div>\n      <nav class=",
+    "ja": ">エンターピング</span>\n      </div>\n      <nav class="
   },
   "${data.nickname}님이 게임을 완료했습니다!": {
     "en": "${data.nickname} completed the game!",
@@ -4168,12 +4168,12 @@
     "ja": ";\n  }\n\n  /*ニックネームの最初の文字（アバター）*/\n  function avatarChar(user) {\n    if (user.nickname) return user.nickname.charAt(0).toUpperCase();\n    if（user.email）return user.email.charAt（0）.toUpperCase（）;\n    return"
   },
   "/>\n    <title>퀴즈 - 엔터핑</title>\n    <link rel=": {
-    "en": "/>\n    <title>Quiz - Entering</title>\n    <link rel=",
+    "en": "/>\n    <title>Quiz - Enterping</title>\n    <link rel=",
     "ja": "/>\n    <title>クイズ - エンターピング</title>\n    <link rel="
   },
   ">엔터핑에 오신 걸 환영해요!</h1>\n            <p class=": {
     "en": ">Welcome to Enterping!</h1>\n            <p class=",
-    "ja": ">企業へようこそ！</h1>\n            <p class="
+    "ja": ">エンターピングへようこそ！</h1>\n            <p class="
   },
   "};\n\n/**\n * 한글 문자열을 영타로 변환하는 함수입니다.\n * @param {string} str - 변환할 한글 문자열\n * @returns {string} 변환된 영문 레이아웃 문자열\n */\nfunction ko2en(str) {\n  let res =": {
     "en": "};\n\n/**\n * This is a function that converts Korean strings to English letters.\n * @param {string} str - Korean string to convert\n * @returns {string} converted English layout string\n */\nfunction ko2en(str) {\n  let res =",
@@ -4224,7 +4224,7 @@
     "ja": ">プレイヤー2 </div>\n                        <div class="
   },
   ">\n  <title>공지사항 - 엔터핑</title>\n  <link rel=": {
-    "en": ">\n  <title>Notice - Entering</title>\n  <link rel=",
+    "en": ">\n  <title>Notice - Enterping</title>\n  <link rel=",
     "ja": ">\n  <title>お知らせ - エンターピング</title>\n  <link rel="
   },
   ">\n                    콘텐츠 정보를 불러오는 중입니다...\n                </p>\n\n                <div class=": {
@@ -4452,7 +4452,7 @@
     "ja": ">タイプミスはありません。</div>\n          </div>\n        </div>\n\n\n\n      </div> <!-- analysis-detail-panel -->\n    </div>\n\n    <!-- タブ 3: 履歴 -->\n    <div class="
   },
   ">\n    <title>퀴즈 목록 - 엔터핑</title>\n    <link rel=": {
-    "en": ">\n    <title>Quiz List - Entering</title>\n    <link rel=",
+    "en": ">\n    <title>Quiz List - Enterping</title>\n    <link rel=",
     "ja": ">\n    <title>クイズリスト - エンターピング</title>\n    <link rel="
   },
   "></span>영문 포함\n                            </div>\n                            <div class=": {
@@ -4752,7 +4752,7 @@
     "ja": ">\n                <!-- 動的にカードが追加されるスペース -->\n            </div>\n\n            <div style="
   },
   ">\n    <title>타이핑 연습 - 엔터핑</title>\n    <link rel=": {
-    "en": ">\n    <title>Typing Practice - Entering</title>\n    <link rel=",
+    "en": ">\n    <title>Typing Practice - Enterping</title>\n    <link rel=",
     "ja": ">\n    <title>タイピング練習 - エンターピング</title>\n    <link rel="
   },
   "▶ [재생중]": {
@@ -4836,7 +4836,7 @@
     "ja": ";\n\n      // 3-6.リアルタイム対戦結果分析\n      let b1st = 0、b2nd = 0、b3rd = 0、b4th = 0;\n      let battleWpmTotal = 0;\n      battlePlaysAll.forEach(item => {\n        const r = item.rank;\n        if（r === 1）b1st ++;\n        else if (r === 2) b2nd++;\n        else if (r === 3) b3rd++;\n        else b4th++;\n        battleWpmTotal +=(item.wpm ||0);\n      }）;\n      const maxBattle = Math.max（b1st、b2nd、b3rd、b4th、1）;\n      const battleWinRate = battleCount> 0？ Math.round((b1st / battleCount) * 100) : 0;\n      const battleAvgWpm = battleCount> 0？ Math.round（battleWpmTotal / battleCount）：0;\n\n      if（document.getElementById（"
   },
   ">\n            <p>안녕하세요. 엔터핑입니다! </p>\n            <p>사이트 전체의 디자인 퀄리티를 한층 끌어올린 업데이트 내용을 안내해 드립니다.</p>\n            <p><strong>[주요 업데이트 사항]</strong><br>\n            <i class=": {
-    "en": ">\n            <p>Hello. It's Entering! </p>\n            <p>We will inform you of updates that have further improved the design quality of the entire site.</p>\n            <p><strong>[Major Updates]</strong><br>\n            <i class=",
+    "en": ">\n            <p>Hello. this is Enterping! </p>\n            <p>We will inform you of updates that have further improved the design quality of the entire site.</p>\n            <p><strong>[Major Updates]</strong><br>\n            <i class=",
     "ja": ">\n            <p>こんにちは。エンターピングです！ </p>\n            <p>サイト全体のデザインクオリティを一層引き上げたアップデート内容をご案内いたします。</p>\n            <p> <strong> [メインアップデート] </strong> <br>\n            <i class="
   },
   "매우 강함": {
@@ -4880,7 +4880,7 @@
     "ja": "重複確認に失敗しました。"
   },
   ">\n    <title>타이핑 목록 - 엔터핑</title>\n    <link rel=": {
-    "en": ">\n    <title>Typing list - Entering</title>\n    <link rel=",
+    "en": ">\n    <title>Typing list - Enterping</title>\n    <link rel=",
     "ja": ">\n    <title>入力リスト - 入力</title>\n    <link rel="
   },
   ">⌨️ 타이핑</button>\n                <button class=": {
@@ -5384,7 +5384,7 @@
     "ja": ">ログイン</button>\n        <button class="
   },
   ">\n      <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n    </div>\n  </footer>\n\n  <script src=": {
-    "en": ">\n      <p>&copy; 2026 Entering. All Rights Reserved.</p>\n    </div>\n  </footer>\n\n  <script src=",
+    "en": ">\n      <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n    </div>\n  </footer>\n\n  <script src=",
     "ja": ">\n      <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n    </div>\n  </footer>\n\n  <script src="
   },
   ">한국어</button>\n            <button class=": {
@@ -5484,8 +5484,8 @@
     "ja": ">（棄権）</span></span>\n                    </div>\n                </td>\n                <td colspan="
   },
   ">엔터핑</span>\n                </div>\n                <p class=": {
-    "en": ">Entering</span>\n                </div>\n                <p class=",
-    "ja": ">企業</span>\n                </div>\n                <p class="
+    "en": ">Enterping</span>\n                </div>\n                <p class=",
+    "ja": ">エンターピング</span>\n                </div>\n                <p class="
   },
   ">삭제</button>\n          </div>\n          <textarea class=": {
     "en": ">Delete</button>\n          </div>\n          <textarea class=",
@@ -5532,8 +5532,8 @@
     "ja": ">利用可能なニックネームです。</span>\n        </div>\n        <button class="
   },
   ">엔터핑</span>\n                    </div>\n                </div>\n\n                <div class=": {
-    "en": ">Entering</span>\n                    </div>\n                </div>\n\n                <div class=",
-    "ja": ">企業</span>\n                    </div>\n                </div>\n\n                <div class="
+    "en": ">Enterping</span>\n                    </div>\n                </div>\n\n                <div class=",
+    "ja": ">エンターピング</span>\n                    </div>\n                </div>\n\n                <div class="
   },
   ">\n    <title>검색 결과 - 엔터핑</title>\n    <link rel=": {
     "en": ">\n    <title>Search results - Enterping</title>\n    <link rel=",
@@ -5584,7 +5584,7 @@
     "ja": ">別のキーワードで検索してみてください！</span>\n            </div>\n        </section>\n    </main>\n\n    <!-- Footer -->\n    <footer class="
   },
   ">\n    <title>타이핑 상세 - 엔터핑</title>\n    <link rel=": {
-    "en": ">\n    <title>Typing Details - Entering</title>\n    <link rel=",
+    "en": ">\n    <title>Typing Details - Enterping</title>\n    <link rel=",
     "ja": ">\n    <title>タイピングの詳細 - エンターピング</title>\n    <link rel="
   },
   "Next - 마지막 소절입니다!": {
@@ -5652,7 +5652,7 @@
     "ja": "エラーが発生しました。"
   },
   ">\n    <title>비밀번호 찾기 - 엔터핑</title>\n    <meta name=": {
-    "en": ">\n    <title>Find password - Entering</title>\n    <meta name=",
+    "en": ">\n    <title>Find password - Enterping</title>\n    <meta name=",
     "ja": ">\n    <title>パスワードを検索 - エンターピング</title>\n    <meta name="
   },
   "타이핑 제작": {
@@ -5668,7 +5668,7 @@
     "ja": "動画所有者が他のウェブサイトでの再生（埋め込み）を許可していない映像です。別の映像を使用してください。"
   },
   ">\n  <title>마이페이지 - 엔터핑</title>\n  <link rel=": {
-    "en": ">\n  <title>My Page - Entering</title>\n  <link rel=",
+    "en": ">\n  <title>My Page - Enterping</title>\n  <link rel=",
     "ja": ">\n  <title>マイページ - エンターピング</title>\n  <link rel="
   },
   ">\n                    퀴즈 통계\n                </div>\n\n                <div style=": {
@@ -5676,7 +5676,7 @@
     "ja": ">\n                    クイズ統計\n                </div>\n\n                <div style="
   },
   ">\n            <p>&copy; 2026 엔터핑. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Result Modal -->\n    <div id=": {
-    "en": ">\n            <p>&copy; 2026 Entering. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Result Modal -->\n    <div id=",
+    "en": ">\n            <p>&copy; 2026 Enterping. All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Result Modal -->\n    <div id=",
     "ja": ">\n            <p>&copy; 2026 エンターピング。 All Rights Reserved.</p>\n        </div>\n    </footer>\n\n    <!-- Result Modal -->\n    <div id="
   },
   ");\n            const now = new Date().getTime();\n\n            // 기존 콘텐츠 수정(Edit) 모드일 경우 가이드를 띄우지 않습니다.\n            if (editId) return;\n\n            if (!hideUntil || now > parseInt(hideUntil)) {\n                guideModal.style.display =": {
@@ -5756,7 +5756,7 @@
     "ja": ">&times;</button>\n\n      <!-- タブ -->\n      <div class="
   },
   ">\n    <title>로그인 - 엔터핑</title>\n    <meta name=": {
-    "en": ">\n    <title>Login - Entering</title>\n    <meta name=",
+    "en": ">\n    <title>Login - Enterping</title>\n    <meta name=",
     "ja": ">\n    <title>ログイン - エンターピング</title>\n    <meta name="
   },
   ">종합 요약</button>\n        <button class=": {
@@ -6048,7 +6048,7 @@
     "ja": "ダークモード完璧な連動："
   },
   "안녕하세요. 엔터핑입니다! 🌐": {
-    "en": "hello. It's Entering! 🌐",
+    "en": "Hello. this is Enterping! 🌐",
     "ja": "こんにちは。エンターピングです！ 🌐"
   },
   "[업데이트] 글로벌 다국어(한국어, 영어, 일본어) 완벽 지원!": {

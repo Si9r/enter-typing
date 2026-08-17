@@ -396,13 +396,14 @@ async function fetchTypingContent(contentId) {
 
 function renderWaitingPhase() {
   if (stageIndicator) {
-    stageIndicator.innerText = `STAGE ${currentLineIndex + 1} / ${contentLines.length}`;
+    const totalStages = contentLines.filter(line => line !== "[END]").length;
+    stageIndicator.innerText = `${currentLineIndex + 1} / ${totalStages}`;
   }
   if (kanjiDisplay) {
     kanjiDisplay.innerText = "준비 중...";
   }
   if (nextPreviewDisplay) {
-    nextPreviewDisplay.innerHTML = `<span class='prefix'>Next</span> -`;
+    nextPreviewDisplay.innerHTML = `-`;
   }
   if (lyricDisplay) {
     lyricDisplay.innerHTML = "<span class='lyric-unit pending'><span class='hira-text'>-</span><span class='roma-text'><span>-</span></span></span>";
@@ -444,13 +445,14 @@ function renderLines() {
   const nextKanji = contentLines[currentLineIndex + 1] || "-";
 
   if (stageIndicator) {
-    stageIndicator.innerText = `STAGE ${currentLineIndex + 1} / ${contentLines.length}`;
+    const totalStages = contentLines.filter(line => line !== "[END]").length;
+    stageIndicator.innerText = `${currentLineIndex + 1} / ${totalStages}`;
   }
   if (kanjiDisplay) {
     kanjiDisplay.innerText = currentKanji;
   }
   if (nextPreviewDisplay) {
-    nextPreviewDisplay.innerHTML = `<span class='prefix'>Next</span> ${nextKanji}`;
+    nextPreviewDisplay.innerHTML = nextKanji;
   }
 
   targetUnits = parseKanaToTargetUnits(currentHiragana);
@@ -605,6 +607,12 @@ function pauseTimer() {
   clearInterval(timer);
   if (typingInput) {
     typingInput.disabled = true;
+    typingInput.style.opacity = "0.5";
+    typingInput.style.backgroundColor = "var(--theme-bg-hover)";
+  }
+  const pauseOverlay = document.getElementById("pause-overlay");
+  if (pauseOverlay && !isCountingDown) {
+    pauseOverlay.style.display = "flex";
   }
 }
 
@@ -616,8 +624,14 @@ function resumeTimer() {
     startTimer();
     if (typingInput && !lineCompleted) {
       typingInput.disabled = false;
+      typingInput.style.opacity = "1";
+      typingInput.style.backgroundColor = "var(--theme-bg-main)";
       typingInput.focus({ preventScroll: true });
     }
+  }
+  const pauseOverlay = document.getElementById("pause-overlay");
+  if (pauseOverlay) {
+    pauseOverlay.style.display = "none";
   }
 }
 
@@ -763,7 +777,14 @@ function endGame(completed = false) {
                coloredLineHtml = `<span>${escapeHTML(lineText)}</span>`;
            }
 
-           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">[구간 ${i + 1}] <span style="font-weight: normal; color: var(--theme-text-muted); margin-left: 10px;">${coloredLineHtml}</span></span>`;
+           let timeStr = "";
+           if (contentTimestamps && contentTimestamps[i] !== undefined) {
+               let s = Math.floor(contentTimestamps[i]);
+               let m = Math.floor(s / 60);
+               let ss = s % 60;
+               timeStr = `<span style="color: var(--color-pink); font-weight: bold; margin-right: 6px; font-size: 0.95rem;">[${m < 10 ? '0' : ''}${m}:${ss < 10 ? '0' : ''}${ss}]</span>`;
+           }
+           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${timeStr}[구간 ${i + 1}] <span style="font-weight: normal; color: var(--theme-text-muted); margin-left: 10px;">${coloredLineHtml}</span></span>`;
            if (errors.length === 0) {
               titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! )</span>`;
            } else {
@@ -1297,6 +1318,8 @@ function startCountdownAndPlay() {
 
   isCountingDown = true;
   overlay.style.display = "flex";
+  const pauseOverlay = document.getElementById("pause-overlay");
+  if (pauseOverlay) pauseOverlay.style.display = "none";
   let count = 3;
   text.innerText = count;
 
@@ -1385,16 +1408,31 @@ if (speedSlider && speedDisplay) {
   });
 }
 
-// Custom click handler for video wrapper to play/pause since pointer-events is none on iframe
+// Custom click handler for video wrapper to play ONLY. Do not pause on click.
 const ytContainer = document.getElementById("youtube-player-container");
 if (ytContainer) {
   ytContainer.addEventListener("click", () => {
     if (youtubePlayer && typeof youtubePlayer.getPlayerState === "function") {
+      if (isCountingDown) return; 
+      
       const state = youtubePlayer.getPlayerState();
-      if (state === YT.PlayerState.PLAYING) {
-        youtubePlayer.pauseVideo();
-      } else {
+      // 게임이 시작되지 않은 상태에서만 재생 허용 (클릭으로 인한 의도치 않은 일시정지 방지)
+      if (state !== YT.PlayerState.PLAYING && !isPlaying) {
         youtubePlayer.playVideo();
+      }
+    }
+  });
+}
+
+// 일시정지 오버레이를 클릭하면 다시 재생되도록 이벤트 추가
+const pauseOverlay = document.getElementById("pause-overlay");
+if (pauseOverlay) {
+  pauseOverlay.addEventListener("click", () => {
+    if (isCountingDown) return;
+    if (youtubePlayer && typeof youtubePlayer.getPlayerState === "function") {
+      const state = youtubePlayer.getPlayerState();
+      if (state === YT.PlayerState.PAUSED && isPlaying) {
+        startCountdownAndPlay();
       }
     }
   });

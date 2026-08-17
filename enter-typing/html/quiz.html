@@ -250,28 +250,11 @@
         margin-bottom: 0;
       ">
         <!-- 뒤로가기 버튼 -->
-        <div style="
-          width: 100%;
-          margin-bottom: 8px;
-          display: flex;
-          justify-content: flex-start;
-        ">
-            <a href="#" onclick="
-            history.back();
-            return false;
-          " style="
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--theme-text-muted);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.05rem;
-            transition: color 0.2s;
-          " onmouseover="this.style.color = 'var(--color-pink)'"
-                onmouseout="this.style.color = 'var(--theme-text-muted)'">
-                ← 뒤로가기
-            </a>
+        <div style="width: 100%; margin-bottom: 12px; display: flex; justify-content: flex-start;">
+            <button onclick="history.back()" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--theme-bg-card); border: 2px solid var(--theme-border); border-radius: 999px; padding: 6px 16px; color: var(--theme-text-muted); font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='var(--color-pink)'; this.style.color='var(--color-pink)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 182, 193, 0.15)';" onmouseout="this.style.borderColor='var(--theme-border)'; this.style.color='var(--theme-text-muted)'; this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';">
+                <i class="ph-bold ph-caret-left" style="font-size: 1.1rem;"></i>
+                뒤로가기
+            </button>
         </div>
 
         <div class="layout-grid" style="

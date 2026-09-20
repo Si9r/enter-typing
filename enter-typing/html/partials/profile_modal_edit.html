@@ -1,0 +1,65 @@
+  <!-- ══ 정보 수정 모달 ══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="editModal" onclick="closeEditModalOutside(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+
+      <!-- 탭 -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')"> 닉네임<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')"> 비밀번호<br>변경</button>
+        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">️ 회원 탈퇴</button>
+      </div>
+
+      <!-- 닉네임 변경 패널 -->
+      <div class="modal-panel active" id="mtab-nick">
+        <div class="modal-title">닉네임 변경</div>
+        <div class="m-form-group">
+          <label class="m-form-label" for="m-new-nick">새 닉네임</label>
+          <div class="nick-input-wrap">
+            <input id="m-new-nick" class="m-form-input" type="text" placeholder="2자~12자 입력" maxlength="12">
+            <button class="m-btn-outline" id="m-check-nick-btn" onclick="checkNewNicknameDuplicate()">중복 확인</button>
+          </div>
+          <span class="m-form-error" id="m-new-nick-err">닉네임을 입력해주세요.</span>
+          <span class="m-form-success" id="m-new-nick-success">사용 가능한 닉네임입니다.</span>
+        </div>
+        <button class="m-btn m-btn-pink" id="m-change-nick-btn" onclick="submitChangeNickname()">닉네임 변경</button>
+      </div>
+
+      <!-- 비밀번호 변경 패널 -->
+      <div class="modal-panel" id="mtab-pw">
+        <div class="modal-title">비밀번호 변경</div>
+        <div class="m-form-group">
+          <label class="m-form-label" for="m-cur-pw">현재 비밀번호</label>
+          <input id="m-cur-pw" class="m-form-input" type="password" placeholder="현재 비밀번호 입력">
+          <span class="m-form-error" id="m-cur-pw-err">현재 비밀번호를 입력해주세요.</span>
+        </div>
+        <div class="m-form-group">
+          <label class="m-form-label" for="m-new-pw">새 비밀번호</label>
+          <input id="m-new-pw" class="m-form-input" type="password" placeholder="영문+숫자 포함 8자 이상">
+          <span class="m-form-error" id="m-new-pw-err">영문, 숫자를 포함해 8자 이상 입력해주세요.</span>
+        </div>
+        <div class="m-form-group">
+          <label class="m-form-label" for="m-new-pw2">새 비밀번호 확인</label>
+          <input id="m-new-pw2" class="m-form-input" type="password" placeholder="새 비밀번호 재입력">
+          <span class="m-form-error" id="m-new-pw2-err">비밀번호가 일치하지 않습니다.</span>
+        </div>
+        <button class="m-btn m-btn-pink" id="m-change-pw-btn" onclick="submitChangePassword()">비밀번호 변경</button>
+      </div>
+
+      <!-- 회원 탈퇴 패널 -->
+      <div class="modal-panel" id="mtab-del">
+        <div class="modal-title">회원 탈퇴</div>
+        <div class="danger-zone">
+          <p>탈퇴 시 모든 기록(타이핑 기록, 퀴즈 기록, 출석 내역 등)이 <strong>영구 삭제</strong>되며 복구할 수 없습니다.</p>
+        </div>
+        <div class="m-form-group">
+          <label class="m-form-label" for="m-del-pw">현재 비밀번호 확인</label>
+          <input id="m-del-pw" class="m-form-input" type="password" placeholder="비밀번호를 입력하세요">
+          <span class="m-form-error" id="m-del-pw-err">비밀번호를 입력해주세요.</span>
+        </div>
+        <button class="m-btn m-btn-danger" id="m-del-btn" onclick="submitDeleteAccount()">회원 탈퇴하기</button>
+      </div>
+    </div>
+  </div>
+
+<script src="/i18n.js"></script>

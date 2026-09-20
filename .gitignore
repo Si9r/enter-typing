@@ -1,0 +1,12 @@
+.env
+
+__pycache__/
+*.pyc
+.venv/
+*.db
+*.log
+.env.*
+!.env.example
+enter-typing/assets/thumbnails/
+.idea/
+.vscode/

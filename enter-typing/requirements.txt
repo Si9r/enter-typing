@@ -26,7 +26,8 @@ pycparser==3.0
 pydantic==2.13.3
 pydantic-settings==2.14.1
 pydantic_core==2.46.3
-pykakasi==2.3.0
+SudachiDict-core==20260723
+SudachiPy==0.6.11
 PyMySQL==1.2.0
 python-dotenv==1.2.2
 python-jose==3.5.0

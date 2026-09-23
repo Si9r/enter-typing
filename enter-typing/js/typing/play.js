@@ -107,6 +107,7 @@ function initYoutubePlayer() {
       },
       onStateChange: function (event) {
         if (event.data == YT.PlayerState.PLAYING) {
+          setPauseOverlay(false);
           const spdSlider = document.getElementById("speed-slider");
           if (spdSlider && typeof youtubePlayer.setPlaybackRate === "function") {
             youtubePlayer.setPlaybackRate(parseFloat(spdSlider.value));
@@ -130,8 +131,9 @@ function initYoutubePlayer() {
           event.data == YT.PlayerState.BUFFERING
         ) {
           pauseTimer();
-          if (event.data == YT.PlayerState.PAUSED) {
+          if (event.data == YT.PlayerState.PAUSED && isPlaying) {
             isWaitingForResume = true;
+            if (!isCountingDown) setPauseOverlay(true);
           }
         } else if (event.data == YT.PlayerState.ENDED && isPlaying) {
           endGame(false);
@@ -610,10 +612,15 @@ function pauseTimer() {
     typingInput.style.opacity = "0.5";
     typingInput.style.backgroundColor = "var(--theme-bg-hover)";
   }
+}
+
+/**
+ * 일시정지 오버레이 표시/숨김. 게임 진행 중 영상이 실제로 일시정지(PAUSED)됐을 때만 표시한다.
+ * (버퍼링이나 게임 시작 전 재생 대기 중에 뜨면 영상 위를 덮어 클릭이 막힌다)
+ */
+function setPauseOverlay(visible) {
   const pauseOverlay = document.getElementById("pause-overlay");
-  if (pauseOverlay && !isCountingDown) {
-    pauseOverlay.style.display = "flex";
-  }
+  if (pauseOverlay) pauseOverlay.style.display = visible ? "flex" : "none";
 }
 
 /**
@@ -629,10 +636,7 @@ function resumeTimer() {
       typingInput.focus({ preventScroll: true });
     }
   }
-  const pauseOverlay = document.getElementById("pause-overlay");
-  if (pauseOverlay) {
-    pauseOverlay.style.display = "none";
-  }
+  setPauseOverlay(false);
 }
 
 /**
@@ -648,6 +652,7 @@ function endGame(completed = false) {
   const overlay = document.getElementById("countdown-overlay");
   if (overlay) overlay.style.display = "none";
   isPlaying = false;
+  setPauseOverlay(false);
   if (typingInput) typingInput.disabled = true;
 
   if (youtubePlayer && isPlayerReady) {
@@ -1315,8 +1320,7 @@ function startCountdownAndPlay() {
 
   isCountingDown = true;
   overlay.style.display = "flex";
-  const pauseOverlay = document.getElementById("pause-overlay");
-  if (pauseOverlay) pauseOverlay.style.display = "none";
+  setPauseOverlay(false);
   let count = 3;
   text.innerText = count;
 
@@ -1426,11 +1430,19 @@ const pauseOverlay = document.getElementById("pause-overlay");
 if (pauseOverlay) {
   pauseOverlay.addEventListener("click", () => {
     if (isCountingDown) return;
-    if (youtubePlayer && typeof youtubePlayer.getPlayerState === "function") {
-      const state = youtubePlayer.getPlayerState();
-      if (state === YT.PlayerState.PAUSED && isPlaying) {
-        startCountdownAndPlay();
-      }
+    if (!youtubePlayer || typeof youtubePlayer.getPlayerState !== "function") {
+      setPauseOverlay(false);
+      return;
+    }
+    const state = youtubePlayer.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) {
+      // 이미 재생 중인데 오버레이만 남은 경우
+      setPauseOverlay(false);
+    } else if (isPlaying) {
+      startCountdownAndPlay();
+    } else {
+      setPauseOverlay(false);
+      youtubePlayer.playVideo();
     }
   });
 }

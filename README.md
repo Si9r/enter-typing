@@ -30,7 +30,7 @@
 * **🌐 실시간 다국어 지원 (i18n)**: 한국어, 영어, 일본어 등 UI 실시간 다국어 번역 지원
 * **📝 유저 참여형 콘텐츠**: 타이핑 콘텐츠 및 퀴즈 목록 조회, 생성, 수정, 삭제 가능
 * **🎥 YouTube IFrame API 연동**: YouTube URL 또는 영상 ID를 자동 분석하여 백그라운드 영상 재생과 함께 즐기는 타이핑 화면
-* **🇯🇵 강력한 일본어 변환기**: `pykakasi`를 활용한 일본어 텍스트 → 히라가나/로마자 자동 변환 및 다이나믹 타이핑 엔진
+* **🇯🇵 강력한 일본어 변환기**: `SudachiPy`를 활용한 일본어 텍스트 → 히라가나/로마자 자동 변환 및 다이나믹 타이핑 엔진
 * **📅 게이미피케이션**: 매일매일 출석 체크 기록
 
 <br>
@@ -38,7 +38,7 @@
 ## 🛠️ 기술 스택 (Tech Stack)
 
 ### Backend
-`Python`, `FastAPI`, `SQLAlchemy`, `Pydantic`, `bcrypt`, `python-jose`, `python-dotenv`, `PyMySQL`, `pykakasi`, `Redis`
+`Python`, `FastAPI`, `SQLAlchemy`, `Pydantic`, `bcrypt`, `python-jose`, `python-dotenv`, `PyMySQL`, `SudachiPy`, `Redis`
 
 ### Frontend
 `HTML5`, `CSS3`, `Vanilla JavaScript`, `YouTube IFrame API`

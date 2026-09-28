@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -20,6 +21,8 @@ async def lifespan(app: FastAPI):
 
 # 운영 환경에서 API 명세를 공개하지 않는다.
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
+# HTML/JS/번역 번들 등 1KB 이상 응답을 gzip 압축한다 (번역 번들 약 160KB → 약 30KB)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.middleware("http")
@@ -48,7 +51,7 @@ async def security_headers(request: Request, call_next):
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 # 인라인 스크립트에서 뽑아낸 페이지별 JS는 /js/{feature}/{file}.js 로 직접 참조합니다.
 app.mount("/js", StaticFiles(directory="js"), name="js")
-# 다국어 번역 파일 (ko/en/ja.json). i18n.js 가 ?v=버전 을 붙여 요청하므로 브라우저 캐시를 쓴다.
+# 다국어 번역 파일 원본 (ko/en/ja.json). 페이지에서는 /i18n-bundle.js 로 묶어서 쓴다.
 app.mount("/locales", StaticFiles(directory="locales"), name="locales")
 
 # ── 기능별 라우터 등록 ────────────────────────────────────

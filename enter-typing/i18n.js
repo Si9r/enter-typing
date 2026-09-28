@@ -2,6 +2,9 @@
  * i18n.js — 엔터핑 다국어 엔진 (키 기반)
  *
  * 번역 파일: /locales/{ko,en,ja}.json  (네임스페이스별 중첩 객체, 예: { "typing": { "current_position": "현재 입력 위치" } })
+ * 페이지 <head> 에서 서버가 세 파일을 묶은 /i18n-bundle.js 를 먼저 불러오므로, 번역 사전은 처음부터 준비돼 있다.
+ *   <script src="/i18n-bundle.js"></script>
+ *   <script src="/i18n.js"></script>
  *
  * ── 사용법 ─────────────────────────────────────────────
  * HTML
@@ -10,8 +13,8 @@
  *   <button data-i18n-title="common.delete" title="삭제">
  *   <span data-i18n="quiz.remaining" data-i18n-args='{"count": 3}'></span>  ← 문구 안의 {count} 치환
  * JS
- *   await i18n.ready;                       // 번역 파일 로딩 완료 대기
- *   i18n.t('quiz.remaining', { count: 3 }); // 현재 언어 문구 (없으면 한국어 → 키 순으로 대체)
+ *   i18n.t('quiz.remaining', { count: 3 }); // 현재 언어 문구 (없으면 한국어 → 키 순으로 대체). 언제든 바로 사용 가능
+ *   document.addEventListener('i18n:change', rerender); // 언어를 바꿨을 때 JS 로 그린 화면을 다시 그리려면
  *   i18n.apply(element);                    // 동적으로 만든 요소 번역 (보통은 자동 감지되므로 불필요)
  *
  * ── 이전 방식 호환 (전환 기간 동안만 유지) ──────────────────
@@ -22,8 +25,6 @@
 (function () {
     if (window.i18n) return; // 여러 partial 에서 중복 포함돼도 한 번만 초기화
 
-    // 번역 파일을 바꾸면 이 값을 올린다 (브라우저 캐시 갱신용)
-    const LOCALE_VERSION = '2026-09-28';
     const SUPPORTED = ['ko', 'en', 'ja'];
     const DEFAULT_LANG = 'ko';
     const LANG_LABELS = { ko: '한국어', en: 'English', ja: '日本語' };
@@ -47,10 +48,15 @@
         return out;
     }
 
+    // <head> 의 /i18n-bundle.js 가 넣어 둔 사전을 바로 쓴다
+    const bundled = window.__EP_LOCALES || {};
+    Object.keys(bundled).forEach((lang) => { dicts[lang] = flatten(bundled[lang], '', {}); });
+
     async function loadDict(lang) {
         if (dicts[lang]) return dicts[lang];
+        // 번들이 없는 페이지를 위한 예비 경로
         try {
-            const res = await fetch(`/locales/${lang}.json?v=${LOCALE_VERSION}`);
+            const res = await fetch(`/locales/${lang}.json`, { cache: 'no-cache' });
             dicts[lang] = res.ok ? flatten(await res.json(), '', {}) : {};
         } catch (e) {
             console.error('[i18n] 번역 파일을 불러오지 못했습니다:', lang, e);
@@ -217,7 +223,7 @@
         // JS 가 문구를 바꿨으면(마지막으로 번역한 값과 다르면) 새 문구를 원문으로 다시 등록한다
         if (node._i18nOriginal !== undefined && node.nodeValue === node._i18nLast) return;
         const parent = node.parentElement;
-        if (!parent || parent.closest('script,style,noscript,textarea')) return;
+        if (!parent || parent.closest('script,style,noscript,textarea,[translate="no"]')) return;
         // 키로 관리 중인 요소는 건너뛴다. (JS 가 내용을 바꿔 키 관리에서 벗어났으면 이전 방식으로 번역)
         const owner = parent.closest('[data-i18n]');
         if (owner && ownsText(owner)) return;
@@ -345,4 +351,5 @@
     window.i18n = { t, apply, ready, setLanguage, getLang, SUPPORTED };
     window.setLanguage = setLanguage;           // navbar 언어 선택 메뉴에서 사용
     window.i18nTranslate = legacyTranslate;     // LEGACY: 기존 JS 호환
+    window.getCurrentLanguage = getLang;        // LEGACY: 예전 엔진의 전역 함수
 })();

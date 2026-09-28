@@ -1,12 +1,44 @@
 """정적 HTML/CSS/JS 페이지 라우팅 (클린 URL 포함)."""
+import hashlib
+import json
 import os
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="html")
+
+
+# ── 다국어 번역 번들 ───────────────────────────────────────
+# locales/{ko,en,ja}.json 을 하나의 JS 로 묶어 <head> 에서 동기로 불러온다.
+# 그래야 페이지의 어떤 스크립트든 i18n.t() 를 즉시 쓸 수 있다 (비동기 로딩 전 키가 보이는 문제 방지).
+# 파일이 바뀌면 ETag 가 바뀌므로 브라우저는 매번 304 로 확인만 하고, 바뀐 경우에만 새로 받는다.
+LOCALE_DIR = "locales"
+_bundle_cache = {"stamp": None, "body": b"", "etag": ""}
+
+
+def _locale_bundle():
+    files = sorted(f for f in os.listdir(LOCALE_DIR) if f.endswith(".json"))
+    stamp = tuple((f, os.path.getmtime(os.path.join(LOCALE_DIR, f))) for f in files)
+    if _bundle_cache["stamp"] != stamp:
+        data = {}
+        for f in files:
+            with open(os.path.join(LOCALE_DIR, f), encoding="utf-8") as fp:
+                data[f[:-5]] = json.load(fp)
+        body = ("window.__EP_LOCALES=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";").encode("utf-8")
+        _bundle_cache.update(stamp=stamp, body=body, etag='"' + hashlib.sha1(body).hexdigest()[:16] + '"')
+    return _bundle_cache
+
+
+@router.get("/i18n-bundle.js")
+def i18n_bundle(request: Request):
+    bundle = _locale_bundle()
+    headers = {"ETag": bundle["etag"], "Cache-Control": "no-cache"}
+    if request.headers.get("if-none-match") == bundle["etag"]:
+        return Response(status_code=304, headers=headers)
+    return Response(bundle["body"], media_type="application/javascript; charset=utf-8", headers=headers)
 
 
 @router.get("/")

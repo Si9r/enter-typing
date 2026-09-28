@@ -204,7 +204,6 @@ uvicorn main:app --reload
 
 **JS**
 ```js
-await i18n.ready;                          // 번역 파일 로딩 대기
 i18n.t('typing.remaining', { count: 3 });  // → "남은 문제: 3" / "Remaining: 3"
 ```
 동적으로 추가한 요소의 `data-i18n`은 자동으로 번역됩니다.
@@ -213,7 +212,8 @@ i18n.t('typing.remaining', { count: 3 });  // → "남은 문제: 3" / "Remainin
 - 키 이름: `네임스페이스.영어_snake_case`. 네임스페이스는 기능 이름(`typing`, `quiz`, `battle`, `profile`, `auth`, `ranking`, `notice`, `search`, `nav`)이고, 두 기능 이상에서 쓰면 `common`입니다.
 - 새 문구는 **세 언어 파일에 같은 키로** 추가합니다. 번역이 없으면 한국어가 표시됩니다.
 - 숫자 같은 값은 문장에 붙이지 말고 `{count}`처럼 인자로 넘깁니다. 언어마다 어순이 다르기 때문입니다.
-- 번역 파일을 수정하면 `i18n.js`의 `LOCALE_VERSION`을 올려야 사용자 브라우저 캐시가 갱신됩니다.
+- 번역 파일은 서버가 `/i18n-bundle.js`로 묶어 모든 페이지 `<head>`에서 먼저 불러옵니다. 그래서 JS 어디서든 `i18n.t()`를 바로 쓸 수 있습니다. 파일이 바뀌면 ETag가 바뀌어 브라우저가 자동으로 새로 받습니다.
+- 언어 이름처럼 번역하면 안 되는 문구는 `translate="no"`를 붙입니다.
 
 **전환 중 호환**: 아직 키로 옮기지 않은 화면은, 화면의 한국어가 `ko.json`의 문구와 같으면 이전 방식대로 자동 번역됩니다. `i18nTranslate()`, `alert`/`confirm` 번역도 이 호환 기능입니다. 모든 화면을 옮기면 `i18n.js`의 `LEGACY` 부분을 삭제합니다.
 

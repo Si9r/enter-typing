@@ -543,9 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
     langBtn.style.cssText = 'background: transparent; border: none; color: var(--theme-text-main); font-size: 1rem; cursor: pointer; display: flex; align-items: center; padding: 5px; flex-shrink: 0; white-space: nowrap;';
 
     const langMap = { ko: "한국어", en: "English", ja: "日本語" };
-    const initialLangText = (typeof getCurrentLanguage === 'function') ?
-      (langMap[getCurrentLanguage()] || '한국어') : '한국어';
-    langBtn.innerHTML = `<i class="ph-fill ph-globe"></i> <span id="current-lang-text" style="font-size: 0.9rem; font-weight: 500; margin-left: 4px;">${initialLangText}</span>`;
+    const initialLangText = langMap[window.i18n ? i18n.getLang() : 'ko'] || '한국어';
+    // 언어 이름은 어느 언어 화면에서든 원래 표기로 보여야 하므로 번역하지 않는다 (translate="no")
+    langBtn.innerHTML = `<i class="ph-fill ph-globe"></i> <span id="current-lang-text" translate="no" style="font-size: 0.9rem; font-weight: 500; margin-left: 4px;">${initialLangText}</span>`;
 
     const langDropdown = document.createElement('div');
     langDropdown.className = 'lang-switcher-dropdown';
@@ -553,9 +553,9 @@ document.addEventListener('DOMContentLoaded', () => {
     langDropdown.style.cssText = 'position: absolute; top: 100%; right: 0; background: var(--theme-bg-card); border: 1px solid var(--theme-border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; flex-direction: column; min-width: 120px; z-index: 100; overflow: hidden; margin-top: 8px;';
 
     langDropdown.innerHTML = `
-            <button class="lang-item" data-lang="ko" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">한국어</button>
-            <button class="lang-item" data-lang="en" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">English</button>
-            <button class="lang-item" data-lang="ja" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem;">日本語</button>
+            <button class="lang-item" translate="no" data-lang="ko" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">한국어</button>
+            <button class="lang-item" translate="no" data-lang="en" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--theme-border);">English</button>
+            <button class="lang-item" translate="no" data-lang="ja" style="padding: 10px 15px; border: none; background: transparent; color: var(--theme-text-main); cursor: pointer; text-align: left; font-size: 0.9rem;">日本語</button>
         `;
 
     // Add hover effects for dropdown items

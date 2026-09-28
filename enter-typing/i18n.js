@@ -83,22 +83,54 @@
         try { return JSON.parse(raw); } catch (e) { return undefined; }
     }
 
+    // HTML 들여쓰기로 생긴 줄바꿈·연속 공백은 한 칸으로 정리해서 비교한다
+    const normalize = (text) => text.replace(/\s+/g, ' ').trim();
+
+    function koDefault(key, params) {
+        const ko = dicts.ko || {};
+        return key in ko ? interpolate(ko[key], params) : key; // LEGACY: 키 자리에 한국어가 온 경우 그대로
+    }
+
+    /**
+     * 요소의 현재 값이 "번역 엔진이 관리하는 값"인지 판단한다.
+     * 한국어 기본값, 비어 있음, 또는 엔진이 마지막으로 넣은 번역일 때만 번역한다.
+     * JS 가 내용을 채운 요소(예: "로딩 중..." → 목록)는 언어를 바꿔도 덮어쓰지 않는다.
+     */
+    function owns(current, key, params, last) {
+        if (last !== undefined && current === last) return true;
+        const n = normalize(current || '');
+        return n === '' || n === normalize(koDefault(key, params));
+    }
+
+    function ownsText(el) {
+        const key = el.getAttribute('data-i18n');
+        return !!key && el.children.length === 0 && owns(el.textContent, key, parseArgs(el), el._i18nLast);
+    }
+
+    const ATTR_BINDINGS = [['data-i18n-placeholder', 'placeholder'], ['data-i18n-title', 'title'], ['data-i18n-aria-label', 'aria-label']];
+
+    function ownsAttr(el, attr, target) {
+        const key = el.getAttribute(attr);
+        el._i18nAttrKeyLast = el._i18nAttrKeyLast || {};
+        return !!key && owns(el.getAttribute(target), key, parseArgs(el), el._i18nAttrKeyLast[target]);
+    }
+
     function applyElement(el) {
         const args = parseArgs(el);
-        const textKey = el.getAttribute('data-i18n');
-        if (textKey) {
-            const v = t(textKey, args);
+        if (el.getAttribute('data-i18n') && ownsText(el)) {
+            const v = t(el.getAttribute('data-i18n'), args);
             // 값이 같으면 건드리지 않는다 (MutationObserver 무한 반복 방지)
             if (el.textContent !== v) el.textContent = v;
+            el._i18nLast = v;
         }
-        [['data-i18n-placeholder', 'placeholder'], ['data-i18n-title', 'title'], ['data-i18n-aria-label', 'aria-label']]
-            .forEach(([attr, target]) => {
-                const key = el.getAttribute(attr);
-                if (key) {
-                    const v = t(key, args);
-                    if (el.getAttribute(target) !== v) el.setAttribute(target, v);
-                }
-            });
+        ATTR_BINDINGS.forEach(([attr, target]) => {
+            const key = el.getAttribute(attr);
+            if (key && ownsAttr(el, attr, target)) {
+                const v = t(key, args);
+                if (el.getAttribute(target) !== v) el.setAttribute(target, v);
+                el._i18nAttrKeyLast[target] = v;
+            }
+        });
     }
 
     const I18N_SELECTOR = '[data-i18n],[data-i18n-placeholder],[data-i18n-title],[data-i18n-aria-label]';
@@ -135,9 +167,6 @@
         [/문제\s*(\d+)\s*\/\s*(\d+)/g, 'Q $1 / $2', '問題 $1 / $2'],
     ];
     const LEGACY_PATTERN_TEST = /(?:\d+|\d+,\d+)\s*(초|분|점|회|명|개|문제|승|전)|코드:\s*[\w\d]+|대전방\(#[\w\d]+\)에 입장했습니다!|\s\(나\)$|남은 퀴즈:\s*\d+|문제\s*\d+\s*\/\s*\d+/;
-
-    // HTML 들여쓰기로 생긴 줄바꿈·연속 공백은 한 칸으로 정리해서 비교한다
-    const normalize = (text) => text.replace(/\s+/g, ' ').trim();
 
     function getLegacyIndex() {
         if (!legacyIndex && dicts.ko) {
@@ -188,7 +217,10 @@
         // JS 가 문구를 바꿨으면(마지막으로 번역한 값과 다르면) 새 문구를 원문으로 다시 등록한다
         if (node._i18nOriginal !== undefined && node.nodeValue === node._i18nLast) return;
         const parent = node.parentElement;
-        if (!parent || parent.closest('[data-i18n],script,style,noscript,textarea')) return;
+        if (!parent || parent.closest('script,style,noscript,textarea')) return;
+        // 키로 관리 중인 요소는 건너뛴다. (JS 가 내용을 바꿔 키 관리에서 벗어났으면 이전 방식으로 번역)
+        const owner = parent.closest('[data-i18n]');
+        if (owner && ownsText(owner)) return;
         const trimmed = normalize(node.nodeValue);
         if (trimmed && (getLegacyIndex()[trimmed] || LEGACY_PATTERN_TEST.test(trimmed))) {
             node._i18nOriginal = node.nodeValue;
@@ -203,7 +235,7 @@
 
     function legacyTrackAttrs(el) {
         ['placeholder', 'title'].forEach((attr) => {
-            if (!el.hasAttribute(attr) || el.hasAttribute('data-i18n-' + attr)) return;
+            if (!el.hasAttribute(attr) || ownsAttr(el, 'data-i18n-' + attr, attr)) return;
             el._i18nAttrOriginal = el._i18nAttrOriginal || {};
             el._i18nAttrLast = el._i18nAttrLast || {};
             const current = el.getAttribute(attr);
@@ -300,7 +332,7 @@
                 if (m.type === 'childList') m.addedNodes.forEach((n) => apply(n));
                 else if (m.type === 'characterData') legacyScan(m.target);
                 else if (m.attributeName.startsWith('data-i18n')) applyElement(m.target);
-                else legacyScan(m.target); // JS 가 placeholder/title 을 바꾼 경우
+                else { applyElement(m.target); legacyScan(m.target); } // JS 가 placeholder/title 을 바꾼 경우
             });
         }).observe(document.body, {
             childList: true, subtree: true, characterData: true,

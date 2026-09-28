@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="battle.real_time_typing_competition_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -939,19 +939,19 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle" class="active">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle" class="active">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
@@ -961,10 +961,10 @@
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
                     class="ph-fill ph-bell"></i>
-                공지</a>
+                <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -978,8 +978,8 @@
         <div id="modal-room-password"
             style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
             <div class="battle-panel" style="max-width: 380px; width: 90%; padding: 32px; text-align: center;">
-                <h3 style="margin-top: 0; margin-bottom: 20px;">🔒 비밀방 입장</h3>
-                <input type="password" id="room-password-input" class="action-input" placeholder="비밀번호를 입력하세요"
+                <h3 data-i18n="battle.enter_private_room" style="margin-top: 0; margin-bottom: 20px;">🔒 비밀방 입장</h3>
+                <input data-i18n-placeholder="common.please_enter_your_password" type="password" id="room-password-input" class="action-input" placeholder="비밀번호를 입력하세요"
                     style="padding: 12px 16px; font-size: 1rem; border-radius: 12px; box-sizing: border-box; width: 100%; margin-bottom: 16px;"
                     onkeydown="if(event.key==='Enter') submitRoomPassword()">
                 <button class="btn-battle btn-battle-primary" style="width: 100%; padding: 12px;"
@@ -993,11 +993,11 @@
                 <div>
                     <div class="room-meta-header">
                         <div>
-                            <span class="room-status waiting" id="wait-room-status">대기 중</span>
-                            <h2 style="font-size: 1.6rem; font-weight: 900; margin-top: 8px;" id="wait-room-title">
+                            <span data-i18n="common.waiting" class="room-status waiting" id="wait-room-status">대기 중</span>
+                            <h2 data-i18n="common.loading" style="font-size: 1.6rem; font-weight: 900; margin-top: 8px;" id="wait-room-title">
                                 로딩 중...</h2>
                         </div>
-                        <div class="room-badge-code" id="wait-room-code" onclick="copyRoomCode()"
+                        <div data-i18n-title="battle.click_to_copy" class="room-badge-code" id="wait-room-code" onclick="copyRoomCode()"
                             style="cursor: pointer;" title="클릭해서 복사하기">
                             코드: 8892 <span style="font-size: 0.8rem;"></span>
                         </div>
@@ -1013,10 +1013,10 @@
                                         <i class="ph-fill ph-star"></i> 3
                                     </span>
                                 </div>
-                                <div id="wait-song-title" class="content-preview-title">방장이 콘텐츠를 선택하는 중입니다...</div>
+                                <div data-i18n="battle.the_host_is_selecting_content" id="wait-song-title" class="content-preview-title">방장이 콘텐츠를 선택하는 중입니다...</div>
                             </div>
                         </div>
-                        <button class="content-select-btn" id="btn-select-content" onclick="openContentSelectorModal()"
+                        <button data-i18n-title="battle.select_content" class="content-select-btn" id="btn-select-content" onclick="openContentSelectorModal()"
                             title="콘텐츠 선택">
                             <i class="ph-bold ph-pencil-simple"></i>
                         </button>
@@ -1029,27 +1029,27 @@
 
                 <div
                     style="display: flex; gap: 15px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
-                    <button class="btn-battle btn-battle-secondary" style="flex: 1;" onclick="leaveRoom()">방
+                    <button data-i18n="battle.room_exit" class="btn-battle btn-battle-secondary" style="flex: 1;" onclick="leaveRoom()">방
                         나가기</button>
-                    <button class="btn-battle btn-battle-primary" style="flex: 2;" id="btn-ready-start"
+                    <button data-i18n="common.getting_started" class="btn-battle btn-battle-primary" style="flex: 2;" id="btn-ready-start"
                         onclick="onReadyOrStartClick()">시작하기</button>
                 </div>
             </div>
 
             <div class="sidebar-panel">
                 <div class="battle-panel" style="padding: 15px; display: flex; flex-direction: column; gap: 12px;">
-                    <h3
+                    <h3 data-i18n="battle.waiting_room_chat"
                         style="font-size: 1.1rem; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
                         대기실 채팅</h3>
 
                     <div class="chat-container">
                         <div class="chat-messages" id="chat-messages">
-                            <div class="chat-bubble system">방이 개설되었습니다. 대기실 링크나 코드를 공유하여 친구들을 초대해 보세요!</div>
+                            <div data-i18n="battle.the_room_has_been_opened_share" class="chat-bubble system">방이 개설되었습니다. 대기실 링크나 코드를 공유하여 친구들을 초대해 보세요!</div>
                         </div>
                         <div class="chat-input-row">
-                            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..."
+                            <input data-i18n-placeholder="battle.please_enter_your_message" type="text" id="chat-input" placeholder="메시지를 입력하세요..."
                                 onkeydown="if(event.key==='Enter') sendChatMessage()">
-                            <button class="chat-send-btn" onclick="sendChatMessage()">전송</button>
+                            <button data-i18n="common.forwarding" class="chat-send-btn" onclick="sendChatMessage()">전송</button>
                         </div>
                     </div>
                 </div>
@@ -1058,7 +1058,7 @@
 
         <!-- 3. COUNTDOWN OVERLAY -->
         <div id="countdown-overlay" class="countdown-overlay" style="display: none;">
-            <div id="countdown-title"
+            <div data-i18n="battle.real_time_competition_is_about_to" id="countdown-title"
                 style="font-size: 1.5rem; font-weight: bold; color: var(--color-battle-text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;">
                 실시간 대전이 곧 시작됩니다!</div>
             <div class="countdown-number" id="countdown-num">3</div>
@@ -1071,9 +1071,9 @@
                 <!-- Video Info & Vol Panel -->
                 <div class="battle-panel" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
                     <div style="font-weight: 900; border-bottom: 3px solid var(--color-battle-primary); padding-bottom: 8px; margin-bottom: 5px; color: var(--color-battle-text); font-size: 1.1rem; width: max-content;"
-                        data-i18n="영상정보">영상정보</div>
+                        data-i18n="common.video_information">영상정보</div>
 
-                    <h3 id="info-title"
+                    <h3 data-i18n="common.loading" id="info-title"
                         style="margin: 0 0 5px 0; font-size: 1.15rem; color: var(--color-battle-text); font-weight: 800; word-break: keep-all; line-height: 1.4;">
                         로딩 중...</h3>
                     <div id="info-artist"
@@ -1090,34 +1090,34 @@
                             <div id="info-creator"
                                 style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text);">-</div>
                             <div style="font-size: 0.75rem; color: var(--color-battle-text-muted); margin-top: 2px;"
-                                data-i18n="작성자">작성자
+                                data-i18n="common.author">작성자
                             </div>
                         </div>
                     </div>
 
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 2px; font-weight: 500;">
-                        <span data-i18n="재생 시간:">재생 시간:</span> <span id="time"
+                        <span data-i18n="common.playing_time">재생 시간:</span> <span id="time"
                             style="font-weight: bold; color: var(--color-battle-secondary);">0</span><span
-                            data-i18n="초">초</span>
+                            data-i18n="common.seconds">초</span>
                     </div>
                     <div
                         style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 10px; font-weight: 500;">
-                        <span data-i18n="플레이 수:">플레이 수:</span> <span id="info-views"
-                            style="font-weight: bold;">0</span><span data-i18n="회">회</span>
+                        <span data-i18n="common.number_of_plays_2">플레이 수:</span> <span id="info-views"
+                            style="font-weight: bold;">0</span><span data-i18n="nav.plays">회</span>
                     </div>
                     <div style="font-size: 0.9rem; color: var(--color-battle-text); margin-bottom: 4px; font-weight: 500;"
-                        data-i18n="장르">
+                        data-i18n="common.genre">
                         장르</div>
                     <div id="info-tags" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <span
+                        <span data-i18n="common.loading_2"
                             style="background: rgba(0,0,0,0.03); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; color: var(--color-battle-text-muted); border: 1.5px solid rgba(0,0,0,0.05);">로딩중</span>
                     </div>
 
                     <div style="margin-top: 15px; border-top: 1.5px dashed rgba(0,0,0,0.1); padding-top: 15px;">
                         <div
                             style="font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
-                            <span data-i18n="음량 조절">음량 조절</span>
+                            <span data-i18n="common.volume_control">음량 조절</span>
                             <span id="volume-display" style="color: var(--color-battle-primary);">50%</span>
                         </div>
                         <input type="range" id="volume-slider" min="0" max="100" value="50"
@@ -1127,7 +1127,7 @@
 
                 <!-- Live Standings Card -->
                 <div class="battle-panel live-leaderboard" style="padding: 20px; min-height: 250px; flex: 1;">
-                    <h3
+                    <h3 data-i18n="battle.real_time_ranking"
                         style="font-size: 1.1rem; font-weight: bold; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px; margin-bottom: 15px; color: var(--color-battle-text);">
                         실시간 순위</h3>
 
@@ -1159,7 +1159,7 @@
                             style="display: flex; gap: 15px; font-size: 0.9rem; font-weight: bold; color: var(--color-battle-text-muted);">
                             <span>WPM: <strong id="game-wpm"
                                     style="color: var(--color-battle-secondary);">0</strong></span>
-                            <span><span data-i18n="정확도">정확도</span>: <strong id="game-accuracy"
+                            <span><span data-i18n="common.accuracy">정확도</span>: <strong id="game-accuracy"
                                     style="color: var(--color-battle-correct);">100%</strong></span>
                         </div>
                     </div>
@@ -1242,10 +1242,10 @@
             ">
                 <div class="panel-title"
                     style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
-                    data-i18n="퀴즈 통계">
+                    data-i18n="common.quiz_statistics">
                     퀴즈 통계</div>
 
-                <h3 id="quiz-info-title"
+                <h3 data-i18n="common.loading" id="quiz-info-title"
                     style="margin: 0 0 10px 0; font-size: 1.1rem; color: var(--color-battle-text); font-weight: 800; word-break: keep-all; line-height: 1.3;">
                     로딩 중...</h3>
 
@@ -1253,7 +1253,7 @@
                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; text-align: center;">
                     <div style="background: rgba(255, 123, 142, 0.1); border-radius: 12px; padding: 8px;">
                         <div style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;"
-                            data-i18n="내 점수">
+                            data-i18n="battle.my_score">
                             내 점수</div>
                         <div id="quiz-my-score"
                             style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
@@ -1262,7 +1262,7 @@
                         style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
                         <div
                             style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;"
-                            data-i18n="콤보">
+                            data-i18n="common.combo">
                             콤보</div>
                         <div id="quiz-my-combo"
                             style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
@@ -1272,7 +1272,7 @@
                 <div style="margin-top: 5px; border-top: 2px dashed #ccc; padding-top: 15px; margin-bottom: 15px;">
                     <div
                         style="font-size: 0.95rem; font-weight: bold; color: var(--theme-text-main); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span data-i18n="음량 조절">음량 조절</span>
+                        <span data-i18n="common.volume_control">음량 조절</span>
                         <span id="quiz-volume-display" style="color: var(--color-pink)">50%</span>
                     </div>
                     <input type="range" id="quiz-volume-slider" min="0" max="100" value="50"
@@ -1309,9 +1309,9 @@
                 <div class="vinyl-container"
                     style="position: relative; display: flex; justify-content: center; align-items: center; width: 280px; height: 280px; flex-shrink: 0;">
                     <div class="vinyl-record paused" id="quiz-vinyl-record" style="z-index: 2">
-                        <div class="vinyl-label" onclick="startQuizBattle()" style="cursor: pointer" title="클릭하여 시작">
+                        <div data-i18n-title="common.click_to_start" class="vinyl-label" onclick="startQuizBattle()" style="cursor: pointer" title="클릭하여 시작">
                         </div>
-                        <div class="vinyl-question" onclick="startQuizBattle()" style="cursor: pointer" title="클릭하여 시작">
+                        <div data-i18n-title="common.click_to_start" class="vinyl-question" onclick="startQuizBattle()" style="cursor: pointer" title="클릭하여 시작">
                             ?</div>
                     </div>
 
@@ -1330,7 +1330,7 @@
                     style="display: flex; flex-direction: column; height: 100%; flex: 1; overflow-y: auto; padding-right: 10px; align-items: flex-start; justify-content: center;">
                     <div class="panel-title"
                         style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 20px; width: max-content; color: var(--theme-text-main); font-size: 1.1rem;"
-                        data-i18n="문제 정보">
+                        data-i18n="common.problem_information">
                         문제 정보</div>
                     <div id="quiz-answer-board" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
                         <div id="quiz-board-items" style="display: flex; flex-direction: column; gap: 12px"></div>
@@ -1352,7 +1352,7 @@
             ">
                 <div class="panel-title"
                     style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;"
-                    data-i18n="실시간 순위">
+                    data-i18n="battle.real_time_ranking">
                     실시간 순위</div>
 
                 <div id="quiz-live-ranking-container"
@@ -1375,19 +1375,19 @@
             ">
                 <div class="chat-messages" id="quiz-chat-messages"
                     style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.01);">
-                    <div class="chat-bubble system"
+                    <div data-i18n="battle.the_quiz_competition_has_begun_if" class="chat-bubble system"
                         style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">
                         퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.
                     </div>
                 </div>
                 <div class="chat-input-area"
                     style="padding: 15px; border-top: 1px solid rgba(0,0,0,0.06); display: flex; gap: 10px;">
-                    <input type="text" id="quiz-chat-input" class="chat-input" placeholder="정답을 입력하세요 (가수, 제목, 가사 등)..."
+                    <input data-i18n-placeholder="battle.enter_the_correct_answer_singer_title" type="text" id="quiz-chat-input" class="chat-input" placeholder="정답을 입력하세요 (가수, 제목, 가사 등)..."
                         disabled onkeydown="if(event.key==='Enter') sendQuizChatMessage()"
                         style="flex: 1; padding: 12px 15px; border-radius: 12px; border: 2px solid var(--theme-border); font-size: 1rem; outline: none; transition: all 0.2s;"
                         onfocus="this.style.borderColor='var(--color-pink)'"
                         onblur="this.style.borderColor='var(--theme-border)'" />
-                    <button id="quiz-chat-send-btn" class="chat-send-btn" disabled onclick="sendQuizChatMessage()"
+                    <button data-i18n="common.forwarding" id="quiz-chat-send-btn" class="chat-send-btn" disabled onclick="sendQuizChatMessage()"
                         style="padding: 0 25px; border-radius: 12px; font-weight: bold; background: var(--color-pink); color: white; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s;"
                         onmouseover="this.style.background='var(--color-pink-hover)'"
                         onmouseout="this.style.background='var(--color-pink)'"
@@ -1403,7 +1403,7 @@
                 <h2
                     style="font-size: 2.2rem; font-weight: 900; color: var(--color-battle-accent); text-shadow: 0 4px 10px rgba(255,209,123,0.15);">
                     BATTLE RESULTS </h2>
-                <p style="font-size: 1rem; color: var(--color-battle-text-muted); margin-top: 5px;">실시간 대전 최종 순위표</p>
+                <p data-i18n="battle.real_time_match_final_leaderboard" style="font-size: 1rem; color: var(--color-battle-text-muted); margin-top: 5px;">실시간 대전 최종 순위표</p>
 
                 <!-- Podium section -->
                 <div class="podium-container">
@@ -1411,7 +1411,7 @@
                     <div class="podium-column second" id="podium-2nd">
                         <div class="podium-badge silver">2</div>
                         <div class="podium-avatar" id="podium-2nd-avatar">P</div>
-                        <div class="podium-name" id="podium-2nd-name">플레이어2</div>
+                        <div data-i18n="battle.player_2" class="podium-name" id="podium-2nd-name">플레이어2</div>
                         <div class="podium-wpm" id="podium-2nd-wpm">320 WPM</div>
                     </div>
 
@@ -1420,7 +1420,7 @@
                         <div class="podium-badge gold">1</div>
                         <div class="podium-avatar" id="podium-1st-avatar"
                             style="width: 55px; height: 55px; font-size: 1.4rem;">P</div>
-                        <div class="podium-name" id="podium-1st-name" style="font-size: 1.05rem;">플레이어1</div>
+                        <div data-i18n="battle.player_1" class="podium-name" id="podium-1st-name" style="font-size: 1.05rem;">플레이어1</div>
                         <div class="podium-wpm" id="podium-1st-wpm" style="font-size: 0.9rem;">410 WPM</div>
                     </div>
 
@@ -1428,7 +1428,7 @@
                     <div class="podium-column third" id="podium-3rd">
                         <div class="podium-badge bronze">3</div>
                         <div class="podium-avatar" id="podium-3rd-avatar">P</div>
-                        <div class="podium-name" id="podium-3rd-name">플레이어3</div>
+                        <div data-i18n="battle.player_3" class="podium-name" id="podium-3rd-name">플레이어3</div>
                         <div class="podium-wpm" id="podium-3rd-wpm">270 WPM</div>
                     </div>
                 </div>
@@ -1437,11 +1437,11 @@
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>순위</th>
-                            <th>플레이어</th>
-                            <th id="result-th-wpm">분당 타수(WPM)</th>
-                            <th id="result-th-accuracy">정확도</th>
-                            <th>점수</th>
+                            <th data-i18n="battle.ranking">순위</th>
+                            <th data-i18n="common.player">플레이어</th>
+                            <th data-i18n="battle.strokes_per_minute_wpm" id="result-th-wpm">분당 타수(WPM)</th>
+                            <th data-i18n="common.accuracy" id="result-th-accuracy">정확도</th>
+                            <th data-i18n="nav.score">점수</th>
                         </tr>
                     </thead>
                     <tbody id="results-table-body">
@@ -1451,9 +1451,9 @@
 
                 <div
                     style="display: flex; gap: 20px; justify-content: center; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 25px;">
-                    <button class="btn-battle btn-battle-secondary" style="max-width: 200px;"
+                    <button data-i18n="battle.return_to_waiting_room" class="btn-battle btn-battle-secondary" style="max-width: 200px;"
                         onclick="returnToLobby()">대기실로 돌아가기</button>
-                    <button class="btn-battle btn-battle-primary" style="max-width: 250px;"
+                    <button data-i18n="battle.one_more_round" class="btn-battle btn-battle-primary" style="max-width: 250px;"
                         onclick="returnToWaitingRoom()">한 판 더 하기</button>
                 </div>
             </div>
@@ -1468,15 +1468,15 @@
             style="background: var(--theme-bg-card); width: 90%; max-width: 900px; height: 80vh; border-radius: 20px; border: 1px solid var(--theme-border); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
             <div
                 style="padding: 20px 24px; border-bottom: 1px solid var(--theme-border); display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--theme-text-main);">콘텐츠 선택</h3>
+                <h3 data-i18n="battle.select_content" style="margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--theme-text-main);">콘텐츠 선택</h3>
                 <button onclick="closeContentSelectorModal()"
                     style="background: none; border: none; font-size: 1.8rem; color: var(--theme-text-muted); cursor: pointer; padding: 0; line-height: 1;">&times;</button>
             </div>
             <div style="padding: 16px 24px 0; display: flex; gap: 10px;">
-                <button id="content-tab-typing" class="btn-battle btn-battle-primary"
+                <button data-i18n="nav.typing" id="content-tab-typing" class="btn-battle btn-battle-primary"
                     style="padding: 8px 20px; font-size: 0.9rem;"
                     onclick="setContentSelectorMode('typing')">타이핑</button>
-                <button id="content-tab-quiz" class="btn-battle btn-battle-secondary"
+                <button data-i18n="nav.quiz" id="content-tab-quiz" class="btn-battle btn-battle-secondary"
                     style="padding: 8px 20px; font-size: 0.9rem;" onclick="setContentSelectorMode('quiz')">퀴즈</button>
             </div>
             <div id="modal-content-grid"
@@ -1493,7 +1493,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo" style="height: 36px; width: auto;">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -1501,28 +1501,28 @@
             </div>
 
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

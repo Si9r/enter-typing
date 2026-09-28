@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="notice.notice_enterping" lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -223,27 +223,27 @@
     <div class="nav-left">
       <div class="logo" onclick="location.href='/'">
         <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-        <span class="logo-text">엔터핑</span>
+        <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
       </div>
       <nav class="nav-links">
-        <a href="/typing">타이핑</a>
-        <a href="/quiz">퀴즈</a>
-        <a href="/ranking">랭킹</a>
-        <a href="/battle">실시간 대전</a>
+        <a data-i18n="nav.typing" href="/typing">타이핑</a>
+        <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+        <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+        <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
       </nav>
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='/search'">
         <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-        <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+        <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
     <div class="nav-right">
-      <a href="/notice" class="nav-notice-link active" style="margin-right: 20px; text-decoration: none; color: var(--color-pink); background-color: rgba(255, 182, 193, 0.15); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"><i class="ph-fill ph-bell"></i> 공지</a>
+      <a href="/notice" class="nav-notice-link active" style="margin-right: 20px; text-decoration: none; color: var(--color-pink); background-color: rgba(255, 182, 193, 0.15); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
       <div class="auth-group" id="nav-auth-group">
-        <button class="auth-login" onclick="location.href='/login'">로그인</button>
-        <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+        <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+        <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
       </div>
     </div>
   </header>
@@ -251,16 +251,16 @@
   <!-- MAIN SECTION -->
   <main class="notice-wrap">
     <div class="notice-header">
-      <h1>공지사항</h1>
-      <p>엔터핑의 최신 소식과 이벤트를 확인하세요</p>
+      <h1 data-i18n="common.notices">공지사항</h1>
+      <p data-i18n="notice.check_out_enterping_s_latest_news">엔터핑의 최신 소식과 이벤트를 확인하세요</p>
     </div>
 
     <!-- 필터 탭 -->
     <div class="filter-tabs">
-      <button class="filter-tab active" data-category="all">전체</button>
-      <button class="filter-tab" data-category="update">업데이트</button>
-      <button class="filter-tab" data-category="event">이벤트</button>
-      <button class="filter-tab" data-category="notice">공지</button>
+      <button data-i18n="common.all" class="filter-tab active" data-category="all">전체</button>
+      <button data-i18n="common.update" class="filter-tab" data-category="update">업데이트</button>
+      <button data-i18n="nav.event" class="filter-tab" data-category="event">이벤트</button>
+      <button data-i18n="common.notice" class="filter-tab" data-category="notice">공지</button>
     </div>
 
     <!-- 공지 카드 리스트 -->
@@ -269,24 +269,24 @@
       <div class="notice-card" data-category="update">
         <span class="arrow-icon">▼</span>
         <div class="badge-row">
-          <span class="n-badge badge-update">업데이트</span>
-          <span class="n-badge badge-important"> 오늘 업데이트</span>
+          <span data-i18n="common.update" class="n-badge badge-update">업데이트</span>
+          <span data-i18n="notice.update_today" class="n-badge badge-important"> 오늘 업데이트</span>
         </div>
-        <h3>[업데이트] 프리미엄 디자인 개편 및 아이콘 전면 교체!</h3>
-        <p class="notice-desc">전체적인 UI가 더욱 세련되고 깔끔하게 개선되었습니다.</p>
+        <h3 data-i18n="notice.update_premium_design_revamp_and_complet">[업데이트] 프리미엄 디자인 개편 및 아이콘 전면 교체!</h3>
+        <p data-i18n="notice.the_overall_ui_has_been_improved" class="notice-desc">전체적인 UI가 더욱 세련되고 깔끔하게 개선되었습니다.</p>
         <div class="notice-meta">
           <span>2026-07-06</span>
         </div>
         <div class="notice-detail">
           <div class="notice-detail-content">
-            <p>안녕하세요. 엔터핑입니다! </p>
-            <p>사이트 전체의 디자인 퀄리티를 한층 끌어올린 업데이트 내용을 안내해 드립니다.</p>
-            <p><strong>[주요 업데이트 사항]</strong><br>
-            <i class="ph-bold ph-star" style="color:var(--color-pink); margin-right:4px; vertical-align: middle;"></i> <strong>프리미엄 아이콘 전면 도입:</strong> 기존의 운영체제별로 다르게 보이던 기본 이모지들을 걷어내고, 통일감 있고 세련된 라인 아이콘(Phosphor Icons)으로 사이트 내 모든 아이콘을 교체했습니다.<br>
-            <i class="ph-bold ph-image" style="color:var(--color-blue); margin-right:4px; vertical-align: middle;"></i> <strong>메인 홈 UI/UX 개선:</strong> 메인 화면의 콘텐츠들을 거대한 글래스모피즘(Glassmorphism) 카드 래퍼로 감싸 시각적 깊이감을 더했으며, 카드 정보에 썸네일과 난이도 등을 추가하여 직관성을 높였습니다.<br>
-            <i class="ph-bold ph-keyboard" style="color:var(--color-pink); margin-right:4px; vertical-align: middle;"></i> <strong>타이핑 엔진 개선:</strong> 타이핑 시 하이픈(-) 문자를 정상 입력할 수 있게 패치되었으며, 쓰이지 않는 일본어 로마자 변환 기능이 삭제되어 타이핑 경험이 더욱 가벼워졌습니다.<br>
-            <i class="ph-bold ph-moon" style="color:var(--color-blue); margin-right:4px; vertical-align: middle;"></i> <strong>다크모드 디테일 향상:</strong> 다크모드 시 버튼 아이콘이 안 보이거나 특정 페이지의 배경색이 깨지는 자잘한 버그들을 모두 수정했습니다.</p>
-            <p>더욱 예쁘고 편안해진 엔터핑에서 즐거운 시간 보내세요!</p>
+            <p data-i18n="notice.hello_this_is_enterping">안녕하세요. 엔터핑입니다! </p>
+            <p data-i18n="notice.we_will_inform_you_of_updates">사이트 전체의 디자인 퀄리티를 한층 끌어올린 업데이트 내용을 안내해 드립니다.</p>
+            <p><strong data-i18n="notice.major_updates">[주요 업데이트 사항]</strong><br>
+            <i class="ph-bold ph-star" style="color:var(--color-pink); margin-right:4px; vertical-align: middle;"></i> <strong data-i18n="notice.full_introduction_of_premium_icons">프리미엄 아이콘 전면 도입:</strong> <span data-i18n="notice.we_removed_the_basic_emojis_that">기존의 운영체제별로 다르게 보이던 기본 이모지들을 걷어내고, 통일감 있고 세련된 라인 아이콘(Phosphor Icons)으로 사이트 내 모든 아이콘을 교체했습니다.</span><br>
+            <i class="ph-bold ph-image" style="color:var(--color-blue); margin-right:4px; vertical-align: middle;"></i> <strong data-i18n="notice.main_home_ui_ux_improvements">메인 홈 UI/UX 개선:</strong> <span data-i18n="notice.the_contents_of_the_main_screen">메인 화면의 콘텐츠들을 거대한 글래스모피즘(Glassmorphism) 카드 래퍼로 감싸 시각적 깊이감을 더했으며, 카드 정보에 썸네일과 난이도 등을 추가하여 직관성을 높였습니다.</span><br>
+            <i class="ph-bold ph-keyboard" style="color:var(--color-pink); margin-right:4px; vertical-align: middle;"></i> <strong data-i18n="notice.typing_engine_improvements">타이핑 엔진 개선:</strong> <span data-i18n="notice.a_patch_has_been_made_so">타이핑 시 하이픈(-) 문자를 정상 입력할 수 있게 패치되었으며, 쓰이지 않는 일본어 로마자 변환 기능이 삭제되어 타이핑 경험이 더욱 가벼워졌습니다.</span><br>
+            <i class="ph-bold ph-moon" style="color:var(--color-blue); margin-right:4px; vertical-align: middle;"></i> <strong data-i18n="notice.dark_mode_detail_enhancement">다크모드 디테일 향상:</strong> <span data-i18n="notice.we_have_fixed_all_minor_bugs">다크모드 시 버튼 아이콘이 안 보이거나 특정 페이지의 배경색이 깨지는 자잘한 버그들을 모두 수정했습니다.</span></p>
+            <p data-i18n="notice.have_a_great_time_at_enterping">더욱 예쁘고 편안해진 엔터핑에서 즐거운 시간 보내세요!</p>
           </div>
         </div>
       </div>
@@ -295,23 +295,23 @@
       <div class="notice-card" data-category="update">
         <span class="arrow-icon">▼</span>
         <div class="badge-row">
-          <span class="n-badge badge-update">업데이트</span>
+          <span data-i18n="common.update" class="n-badge badge-update">업데이트</span>
         </div>
-        <h3>[업데이트] 퀴즈 기능 강화 및 다크모드 정식 출시!</h3>
-        <p class="notice-desc">퀴즈 썸네일 추가 기능과 화면 전체에 적용되는 다크모드가 새롭게 추가되었습니다.</p>
+        <h3 data-i18n="notice.update_enhanced_quiz_function_and_offici">[업데이트] 퀴즈 기능 강화 및 다크모드 정식 출시!</h3>
+        <p data-i18n="notice.a_new_feature_to_add_quiz" class="notice-desc">퀴즈 썸네일 추가 기능과 화면 전체에 적용되는 다크모드가 새롭게 추가되었습니다.</p>
         <div class="notice-meta">
           <span> 2026-07-05</span>
         </div>
         <div class="notice-detail">
           <div class="notice-detail-content">
-            <p>안녕하세요. 엔터핑입니다! </p>
-            <p>오늘 새롭게 반영된 따끈따끈한 업데이트 내용을 안내해 드립니다.</p>
-            <p><strong>[주요 업데이트 사항]</strong><br>
-             <strong>전체 화면 다크모드 적용:</strong> 눈의 피로를 덜어주는 네이비 톤의 다크모드가 정식 추가되었습니다. 상단 네비게이션 바의  버튼을 눌러보세요!<br>
-            ️ <strong>퀴즈 썸네일 기능 강화:</strong> 퀴즈 제작 시 원하는 이미지를 썸네일로 업로드할 수 있으며, 퀴즈 목록의 UI가 타이핑 목록과 동일하게 깔끔한 디자인으로 개편되었습니다.<br>
-             <strong>직관적인 난이도 표기:</strong> 기존의 별 개수() 표기 방식이 ' X 3' 형태로 변경되어 모바일 등 작은 화면에서도 훨씬 읽기 편해졌습니다.<br>
-             <strong>메인 페이지 정돈:</strong> 조금 더 심플하고 몰입감 있는 첫인상을 위해 메인 화면의 애니메이션 캐릭터 이미지가 삭제되었습니다.</p>
-            <p>더욱 쾌적해진 환경에서 즐겁게 타이핑과 퀴즈를 즐겨주세요!</p>
+            <p data-i18n="notice.hello_this_is_enterping">안녕하세요. 엔터핑입니다! </p>
+            <p data-i18n="notice.we_will_inform_you_of_the">오늘 새롭게 반영된 따끈따끈한 업데이트 내용을 안내해 드립니다.</p>
+            <p><strong data-i18n="notice.major_updates">[주요 업데이트 사항]</strong><br>
+             <strong data-i18n="notice.apply_full_screen_dark_mode">전체 화면 다크모드 적용:</strong> <span data-i18n="notice.a_navy_toned_dark_mode_that">눈의 피로를 덜어주는 네이비 톤의 다크모드가 정식 추가되었습니다. 상단 네비게이션 바의  버튼을 눌러보세요!</span><br>
+            ️ <strong data-i18n="notice.enhanced_quiz_thumbnail_functionality">퀴즈 썸네일 기능 강화:</strong> <span data-i18n="notice.when_creating_a_quiz_you_can">퀴즈 제작 시 원하는 이미지를 썸네일로 업로드할 수 있으며, 퀴즈 목록의 UI가 타이핑 목록과 동일하게 깔끔한 디자인으로 개편되었습니다.</span><br>
+             <strong data-i18n="notice.intuitive_difficulty_notation">직관적인 난이도 표기:</strong> <span data-i18n="notice.the_existing_number_of_stars_notation">기존의 별 개수() 표기 방식이 ' X 3' 형태로 변경되어 모바일 등 작은 화면에서도 훨씬 읽기 편해졌습니다.</span><br>
+             <strong data-i18n="notice.organize_your_main_page">메인 페이지 정돈:</strong> <span data-i18n="notice.the_animated_character_image_on_the">조금 더 심플하고 몰입감 있는 첫인상을 위해 메인 화면의 애니메이션 캐릭터 이미지가 삭제되었습니다.</span></p>
+            <p data-i18n="notice.enjoy_typing_and_quizzes_in_a">더욱 쾌적해진 환경에서 즐겁게 타이핑과 퀴즈를 즐겨주세요!</p>
           </div>
         </div>
       </div>
@@ -325,7 +325,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -333,28 +333,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

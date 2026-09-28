@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="typing.typing_practice_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -23,27 +23,27 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing" class="active">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing" class="active">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -64,26 +64,26 @@
             
             <!-- Top Left: Stats -->
             <div class="box-panel stats-panel" style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
-                <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">타이핑 통계</div>
+                <div data-i18n="typing.typing_statistics" class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 14px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">타이핑 통계</div>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; text-align: center;">
                     <div style="background: var(--analysis-pair-bg); border-radius: 12px; padding: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;">현재 WPM</div>
+                        <div data-i18n="typing.current_wpm" style="font-size: 0.85rem; font-weight: bold; color: var(--color-pink); margin-bottom: 5px;">현재 WPM</div>
                         <div id="wpm" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">점수</div>
+                        <div data-i18n="nav.score" style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">점수</div>
                         <div id="score" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center;">
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">정확도</div>
+                        <div data-i18n="common.accuracy" style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">정확도</div>
                         <div id="accuracy" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">100%</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 12px; padding: 10px;">
-                        <div style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">오타수</div>
+                        <div data-i18n="typing.typos" style="font-size: 0.85rem; font-weight: bold; color: var(--theme-text-muted); margin-bottom: 5px;">오타수</div>
                         <div id="typos" style="font-size: 1.4rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
@@ -115,8 +115,8 @@
                     <svg id="video-placeholder" width="120" height="120" viewBox="0 0 24 24" fill="var(--theme-text-muted)" style="cursor: pointer;"><path d="M8 5v14l11-7z"/></svg>
                     
                     <div id="video-controls" style="text-align: center; margin-top: 10px; z-index: 20; position: absolute; bottom: 20px; background: var(--theme-bg-card); padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                        <button id="btn-start" class="btn btn-blue" style="border: none; font-weight: bold; padding: 8px 20px; border-radius: 8px;">시작</button>
-                        <button id="btn-restart" class="btn btn-pink" style="border: none; font-weight: bold; padding: 8px 20px; border-radius: 8px;">다시 시작</button>
+                        <button data-i18n="common.start" id="btn-start" class="btn btn-blue" style="border: none; font-weight: bold; padding: 8px 20px; border-radius: 8px;">시작</button>
+                        <button data-i18n="typing.restart" id="btn-restart" class="btn btn-pink" style="border: none; font-weight: bold; padding: 8px 20px; border-radius: 8px;">다시 시작</button>
                     </div>
                 </div>
 
@@ -125,7 +125,7 @@
                     
                     <div style="background: var(--theme-bg-hover); padding: 15px; border-radius: 12px; border: 1.5px solid var(--theme-border);">
                         <div style="font-size: 0.85rem; font-weight: 800; color: var(--theme-text-muted); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>음량 조절</span>
+                            <span data-i18n="common.volume_control">음량 조절</span>
                             <span id="volume-display" style="font-weight: 900; color: var(--color-pink);">50%</span>
                         </div>
                         <input type="range" id="volume-slider" min="0" max="100" value="50" style="width: 100%; cursor: pointer; accent-color: var(--color-pink);">
@@ -145,9 +145,9 @@
 
             <!-- Bottom Left: Video Info -->
             <div class="box-panel" style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
-                <div class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 10px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">영상정보</div>
+                <div data-i18n="common.video_information" class="panel-title" style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 10px; width: max-content; color: var(--theme-text-main); font-size: 1rem;">영상정보</div>
 
-                <h3 id="info-title" style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--theme-text-main); font-weight: 800; word-break: keep-all; line-height: 1.4;">로딩 중...</h3>
+                <h3 data-i18n="common.loading" id="info-title" style="margin: 0 0 4px 0; font-size: 1.1rem; color: var(--theme-text-main); font-weight: 800; word-break: keep-all; line-height: 1.4;">로딩 중...</h3>
                 <div id="info-artist" style="font-size: 0.9rem; color: var(--theme-text-muted); margin-bottom: 14px; font-weight: 700;">-</div>
 
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
@@ -155,15 +155,15 @@
                     <div id="info-avatar-placeholder" style="width: 44px; height: 44px; border-radius: 50%; background: var(--theme-border); border: 3px solid #999; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"></div>
                     <div>
                         <div id="info-creator" style="font-size: 0.9rem; font-weight: bold; color: var(--theme-text-main);">-</div>
-                        <div style="font-size: 0.75rem; color: var(--theme-text-muted); margin-top: 2px;">작성자</div>
+                        <div data-i18n="common.author" style="font-size: 0.75rem; color: var(--theme-text-muted); margin-top: 2px;">작성자</div>
                     </div>
                 </div>
 
-                <div style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 8px; font-weight: 500;">재생 시간: <span id="time" style="font-weight: bold; color: var(--color-blue);">0</span>초</div>
-                <div style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 10px; font-weight: 500;">플레이 수: <span id="info-views" style="font-weight: bold;">0</span>회</div>
-                <div style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 8px; font-weight: 500;">장르</div>
+                <div style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 8px; font-weight: 500;"><span data-i18n="common.playing_time">재생 시간:</span> <span id="time" style="font-weight: bold; color: var(--color-blue);">0</span><span data-i18n="common.seconds">초</span></div>
+                <div style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 10px; font-weight: 500;"><span data-i18n="common.number_of_plays_2">플레이 수:</span> <span id="info-views" style="font-weight: bold;">0</span><span data-i18n="nav.plays">회</span></div>
+                <div data-i18n="common.genre" style="font-size: 0.9rem; color: var(--theme-text-main); margin-bottom: 8px; font-weight: 500;">장르</div>
                 <div id="info-tags" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <span style="background: var(--theme-bg-hover); padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: bold; color: var(--theme-text-sub); border: 1px solid var(--theme-border);">로딩중</span>
+                    <span data-i18n="common.loading_2" style="background: var(--theme-bg-hover); padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: bold; color: var(--theme-text-sub); border: 1px solid var(--theme-border);">로딩중</span>
                 </div>
             </div>
 
@@ -184,7 +184,7 @@
                 <div id="stageIndicator" class="stage-indicator" style="font-size: 1.1rem; font-weight: 900; color: var(--color-pink); margin-bottom: 8px; text-align: center;">
                   0 / 0
                 </div>
-                <div id="kanjiDisplay" class="kanji-display" style="
+                <div data-i18n="common.the_original_chinese_text_is_loaded" id="kanjiDisplay" class="kanji-display" style="
                       font-size: 1.2rem;
                       color: var(--theme-text-muted);
                       font-weight: 500;
@@ -221,7 +221,7 @@
                       background: linear-gradient(90deg, var(--color-pink), var(--color-pink-hover));
                     "></div>
               </div>
-              <div id="statusPanel" class="status-panel" style="font-size: 0.95rem; color: var(--theme-text-main); min-height: 38px; font-weight: bold;">
+              <div data-i18n="typing.waiting_for_video_api_to_load" id="statusPanel" class="status-panel" style="font-size: 0.95rem; color: var(--theme-text-main); min-height: 38px; font-weight: bold;">
                 영상 API 로딩 기다리는 중...
               </div>
 
@@ -238,32 +238,32 @@
                 
                 <!-- 제목 -->
                 <div style="text-align: center; padding-bottom: 14px; border-bottom: 2px solid var(--theme-border);">
-                    <div style="font-size: 1.9rem; font-weight: 900; color: var(--theme-text-main);"> 타이핑 완료! </div>
+                    <div data-i18n="typing.typing_complete" style="font-size: 1.9rem; font-weight: 900; color: var(--theme-text-main);"> 타이핑 완료! </div>
                 </div>
 
                 <!-- Stats 4칸 그리드 -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; text-align: center;">
                     <div style="background: var(--analysis-pair-bg); border-radius: 14px; padding: 14px 10px;">
-                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--color-pink); margin-bottom: 6px;">최종 점수</div>
+                        <div data-i18n="typing.final_score" style="font-size: 0.82rem; font-weight: 700; color: var(--color-pink); margin-bottom: 6px;">최종 점수</div>
                         <div id="final-score" style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 14px; padding: 14px 10px;">
-                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">평균 WPM</div>
+                        <div data-i18n="common.average_wpm" style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">평균 WPM</div>
                         <div id="final-wpm" style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 14px; padding: 14px 10px;">
-                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">정확도</div>
+                        <div data-i18n="common.accuracy" style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">정확도</div>
                         <div id="final-accuracy" style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main);">100%</div>
                     </div>
                     <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 14px; padding: 14px 10px;">
-                        <div style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">총 오타수</div>
+                        <div data-i18n="typing.total_number_of_typos" style="font-size: 0.82rem; font-weight: 700; color: var(--theme-text-muted); margin-bottom: 6px;">총 오타수</div>
                         <div id="final-typos" style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
 
                 <!-- Top 5 Panel -->
                 <div style="background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 14px; padding: 16px;">
-                    <div style="font-weight: 800; font-size: 1rem; color: var(--theme-text-main); margin-bottom: 12px; text-align: center; border-bottom: 2px dashed var(--theme-border); padding-bottom: 10px;">자주 틀린 글자 TOP 5</div>
+                    <div data-i18n="typing.top_5_frequently_misspelled_letters" style="font-weight: 800; font-size: 1rem; color: var(--theme-text-main); margin-bottom: 12px; text-align: center; border-bottom: 2px dashed var(--theme-border); padding-bottom: 10px;">자주 틀린 글자 TOP 5</div>
                     <div id="top-typo-list" style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 10px; font-size: 0.9rem; color: var(--theme-text-sub);">
                         <!-- Top 5 will be populated here -->
                     </div>
@@ -271,14 +271,14 @@
 
                 <!-- Section Details Panel -->
                 <div id="typo-details-container" style="flex: 1; max-height: 30vh; overflow-y: auto; background: var(--theme-bg-hover); border: 1.5px solid var(--theme-border); border-radius: 14px; padding: 16px; display: none;">
-                    <div style="font-weight: 800; font-size: 1rem; color: var(--theme-text-main); margin-bottom: 12px; text-align: center; border-bottom: 2px dashed var(--theme-border); padding-bottom: 10px;">구간별 타이핑 결과</div>
+                    <div data-i18n="typing.typing_results_by_section" style="font-weight: 800; font-size: 1rem; color: var(--theme-text-main); margin-bottom: 12px; text-align: center; border-bottom: 2px dashed var(--theme-border); padding-bottom: 10px;">구간별 타이핑 결과</div>
                     <div id="typo-list" style="margin: 0; line-height: 1.6; display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div style="display: flex; gap: 12px; justify-content: center; padding-top: 4px;">
-                    <button onclick="location.reload()" style="background: linear-gradient(135deg, var(--color-pink), var(--color-pink-hover)); color: white; border: none; border-radius: 50px; font-weight: 800; padding: 12px 0; font-size: 1.05rem; width: 180px; cursor: pointer; box-shadow: 0 4px 15px var(--analysis-wrong-bg); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px var(--analysis-high-bg)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px var(--analysis-wrong-bg)';">다시 하기</button>
-                    <button onclick="location.href='/typing'" style="background: linear-gradient(135deg, #a8edea, #87ceeb); color: var(--theme-text-main); border: none; border-radius: 50px; font-weight: 800; padding: 12px 0; font-size: 1.05rem; width: 180px; cursor: pointer; box-shadow: 0 4px 15px rgba(135,206,235,0.35); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(135,206,235,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(135,206,235,0.35)';">목록으로</button>
+                    <button data-i18n="typing.do_it_again" onclick="location.reload()" style="background: linear-gradient(135deg, var(--color-pink), var(--color-pink-hover)); color: white; border: none; border-radius: 50px; font-weight: 800; padding: 12px 0; font-size: 1.05rem; width: 180px; cursor: pointer; box-shadow: 0 4px 15px var(--analysis-wrong-bg); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px var(--analysis-high-bg)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px var(--analysis-wrong-bg)';">다시 하기</button>
+                    <button data-i18n="common.to_list" onclick="location.href='/typing'" style="background: linear-gradient(135deg, #a8edea, #87ceeb); color: var(--theme-text-main); border: none; border-radius: 50px; font-weight: 800; padding: 12px 0; font-size: 1.05rem; width: 180px; cursor: pointer; box-shadow: 0 4px 15px rgba(135,206,235,0.35); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(135,206,235,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(135,206,235,0.35)';">목록으로</button>
                 </div>
                 
             </div>
@@ -292,7 +292,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -300,28 +300,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

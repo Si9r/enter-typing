@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html data-i18n-doc-title="quiz.quiz_creation_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8" />
@@ -515,29 +515,29 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href = '/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz" class="active">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz" class="active">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href = '/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly />
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly />
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href = '/login'">
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href = '/login'">
                     로그인
                 </button>
-                <button class="auth-signup" onclick="location.href = '/signup'">
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href = '/signup'">
                     회원가입
                 </button>
             </div>
@@ -549,13 +549,13 @@
     <div class="editor-container">
         <!-- Top Bar -->
         <div class="editor-top-bar">
-            <input type="text" id="title" placeholder="퀴즈 제목을 입력하세요" required />
+            <input data-i18n-placeholder="quiz.please_enter_a_title_for_your" type="text" id="title" placeholder="퀴즈 제목을 입력하세요" required />
             <div style="display: flex; gap: 10px; align-items: center">
-                <button class="toolbar-btn" id="btn-show-guide" title="퀴즈 제작 가이드 보기">❓ 가이드</button>
-                <button class="toolbar-btn" id="btn-settings" title="추가 정보 설정">
+                <button data-i18n="common.guide" data-i18n-title="quiz.view_our_quiz_creation_guide" class="toolbar-btn" id="btn-show-guide" title="퀴즈 제작 가이드 보기">❓ 가이드</button>
+                <button data-i18n="common.settings" data-i18n-title="common.additional_information_settings" class="toolbar-btn" id="btn-settings" title="추가 정보 설정">
                     ⚙️ 설정
                 </button>
-                <button class="toolbar-btn btn-primary" id="btn-save">
+                <button data-i18n="quiz.save_all" class="toolbar-btn btn-primary" id="btn-save">
                      전체 저장
                 </button>
             </div>
@@ -563,9 +563,9 @@
 
         <!-- Registered Quizzes Grid -->
         <div class="registered-section">
-            <div class="section-title" style="margin-bottom: 0">등록된 퀴즈</div>
+            <div data-i18n="quiz.registered_quiz" class="section-title" style="margin-bottom: 0">등록된 퀴즈</div>
             <div id="quiz-card-grid" class="quiz-card-grid">
-                <div style="
+                <div data-i18n="quiz.there_are_no_registered_quizzes_please" style="
               text-align: center;
               color: var(--theme-text-muted);
               padding: 30px;
@@ -579,7 +579,7 @@
 
         <!-- Main Editor (Cropping & Answer) -->
         <div class="editor-main">
-            <div class="section-title">영상 잘라내기</div>
+            <div data-i18n="quiz.cut_video" class="section-title">영상 잘라내기</div>
 
             <div class="crop-area">
                 <!-- Left: Video Area -->
@@ -594,7 +594,7 @@
                     </div>
                     <div class="url-input-container">
                         <input type="url" class="url-input" id="youtube_url" placeholder="Youtube URL" />
-                        <div class="url-error" id="url-error-msg" style="display: none">
+                        <div data-i18n="quiz.invalid_url" class="url-error" id="url-error-msg" style="display: none">
                             유효하지 않은 URL입니다.
                         </div>
                     </div>
@@ -602,7 +602,7 @@
                     <!-- Volume Control -->
                     <div style="margin-top: 15px; background: var(--theme-bg-hover); padding: 15px; border-radius: 12px; border: 1.5px solid var(--theme-border);">
                         <div style="font-size: 0.85rem; font-weight: 800; color: var(--theme-text-muted); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-                            <span>음량 조절</span>
+                            <span data-i18n="common.volume_control">음량 조절</span>
                             <span id="volume-display" style="font-weight: 900; color: var(--color-pink);">50%</span>
                         </div>
                         <input type="range" id="volume-slider" min="0" max="100" value="50" style="width: 100%; cursor: pointer; accent-color: var(--color-pink);">
@@ -612,7 +612,7 @@
                 <!-- Right: Editing Area -->
                 <div class="crop-right">
                     <div class="setting-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
-                        <span>영상 재생 설정</span>
+                        <span data-i18n="quiz.video_playback_settings">영상 재생 설정</span>
                         <span id="current-time-display" style="font-size: 0.9rem; font-weight: bold; color: var(--color-blue);">현재: 0.00초</span>
                     </div>
 
@@ -640,7 +640,7 @@
                   background: var(--color-pink);
                   border-radius: 3px;
                 "></div>
-                        <div id="slider-start" style="
+                        <div data-i18n-title="quiz.when_to_start" id="slider-start" style="
                   position: absolute;
                   top: 6px;
                   left: 0%;
@@ -654,7 +654,7 @@
                   border-radius: 3px 3px 0 0;
                   display: none;
                 " title="시작 시점"></div>
-                        <div id="slider-end" style="
+                        <div data-i18n-title="quiz.when_to_end" id="slider-end" style="
                   position: absolute;
                   top: 6px;
                   left: 0%;
@@ -692,28 +692,28 @@
                     </div>
 
                     <div class="btn-group">
-                        <button class="btn btn-blue" id="btn-start-here">
+                        <button data-i18n="quiz.start_from_current_location" class="btn btn-blue" id="btn-start-here">
                             현위치에서 시작
                         </button>
-                        <button class="btn btn-blue" id="btn-end-here">
+                        <button data-i18n="quiz.end_at_current_location" class="btn btn-blue" id="btn-end-here">
                             현위치에서 종료
                         </button>
                     </div>
 
                     <div class="btn-group">
-                        <button class="btn btn-offset" data-sec="1"
+                        <button data-i18n="quiz.n1_second" class="btn btn-offset" data-sec="1"
                             style="background: var(--color-blue); color: white; border: none">
                             1초
                         </button>
-                        <button class="btn btn-offset" data-sec="5"
+                        <button data-i18n="quiz.n5_seconds" class="btn btn-offset" data-sec="5"
                             style="background: var(--color-green); color: white; border: none">
                             5초
                         </button>
-                        <button class="btn btn-offset" data-sec="10"
+                        <button data-i18n="quiz.n10_seconds" class="btn btn-offset" data-sec="10"
                             style="background: var(--color-pink); color: white; border: none">
                             10초
                         </button>
-                        <button class="btn btn-offset" data-sec="30"
+                        <button data-i18n="quiz.n30_seconds" class="btn btn-offset" data-sec="30"
                             style="background: #ff8c9a; color: white; border: none">
                             30초
                         </button>
@@ -729,11 +729,11 @@
                   justify-content: space-between;
                 ">
                             <div style="display: flex; align-items: center; gap: 10px">
-                                정답 정보 설정
-                                <span style="font-size: 0.85rem; font-weight: normal; color: var(--theme-text-muted);">(복수 정답은 쉼표(,)로 구분하여
+                                <span data-i18n="quiz.set_correct_answer_information">정답 정보 설정</span>
+                                <span data-i18n="quiz.multiple_correct_answers_are_separated_b" style="font-size: 0.85rem; font-weight: normal; color: var(--theme-text-muted);">(복수 정답은 쉼표(,)로 구분하여
                                     입력하세요)</span>
                             </div>
-                            <button type="button" id="btn-add-question" style="
+                            <button data-i18n="quiz.add_question" type="button" id="btn-add-question" style="
                     background: var(--color-blue);
                     color: white;
                     border: none;
@@ -757,8 +757,8 @@
                             <div style="display: flex; flex-direction: column; gap: 10px; width: 280px; justify-content: flex-end;">
                                 <div class="answer-input-container"
                                     style="display: flex; gap: 10px; align-items: center">
-                                    <label style="width: 40px; font-weight: 700; color: var(--theme-text-sub)">힌트</label>
-                                    <input type="text" id="quiz-hint" placeholder="선택사항" style="
+                                    <label data-i18n="common.hint" style="width: 40px; font-weight: 700; color: var(--theme-text-sub)">힌트</label>
+                                    <input data-i18n-placeholder="quiz.optional" type="text" id="quiz-hint" placeholder="선택사항" style="
                         padding: 10px;
                         border: 1.5px solid var(--theme-border);
                         border-radius: 8px;
@@ -767,7 +767,7 @@
                         transition: all 0.2s;
                       " onfocus="this.style.borderColor='var(--color-pink)'; this.style.boxShadow='0 0 0 3px rgba(255,154,158,0.2)'" onblur="this.style.borderColor='var(--theme-border)'; this.style.boxShadow='none'" />
                                 </div>
-                                <button class="btn-submit" id="btn-add-quiz" style="
+                                <button data-i18n="nav.registration" class="btn-submit" id="btn-add-quiz" style="
                       width: 100%;
                       padding: 12px;
                       font-size: 1.1rem;
@@ -791,15 +791,15 @@
             <div class="warning-text">
                 <div style="display: flex; justify-content: space-between; width: 100%">
                     <span style="color: var(--theme-text-muted)">◀</span>
-                    <span>※ 음란물, 비하, 혐오 등의 퀴즈는 임의로 삭제될 수 있으며 관련
+                    <span data-i18n="quiz.quizzes_containing_pornographic_material">※ 음란물, 비하, 혐오 등의 퀴즈는 임의로 삭제될 수 있으며 관련
                         법에 의거 처벌받을 수 있습니다.</span>
                     <span style="color: var(--theme-text-muted)">▶</span>
                 </div>
             </div>
 
             <div class="bottom-actions">
-                <button class="btn btn-pink" id="btn-confirm-edit">확인</button>
-                <button class="btn btn-outline" id="btn-cancel-edit">취소</button>
+                <button data-i18n="nav.check" class="btn btn-pink" id="btn-confirm-edit">확인</button>
+                <button data-i18n="common.cancellation" class="btn btn-outline" id="btn-cancel-edit">취소</button>
             </div>
         </div>
     </div>
@@ -808,30 +808,30 @@
     <div class="modal-overlay" id="guide-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span> 퀴즈 제작 가이드</span>
+                <span data-i18n="quiz.quiz_creation_guide"> 퀴즈 제작 가이드</span>
                 <span class="close-modal" id="close-guide">✕</span>
             </div>
             
             <div style="font-size: 0.95rem; color: var(--theme-text-main); line-height: 1.6;">
-                <p><strong>1. 영상 불러오기</strong><br>
-                YouTube 영상의 URL을 입력하면 자동으로 영상이 불러와집니다.</p>
+                <p><strong data-i18n="common.n1_load_video">1. 영상 불러오기</strong><br>
+                <span data-i18n="quiz.when_you_enter_the_url_of">YouTube 영상의 URL을 입력하면 자동으로 영상이 불러와집니다.</span></p>
 
-                <p><strong>2. 구간 및 정답 설정</strong><br>
-                퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.</p>
+                <p><strong data-i18n="quiz.n2_setting_section_and_correct_answer">2. 구간 및 정답 설정</strong><br>
+                <span data-i18n="quiz.set_the_section_to_be_used">퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.</span></p>
 
-                <p><strong>3. 개별 퀴즈 추가 및 수정</strong><br>
-                우측 하단의 <code>등록</code> 버튼이나 하단 <code>확인</code> 버튼을 눌러 개별 퀴즈를 목록에 등록하세요.</p>
+                <p><strong data-i18n="quiz.n3_add_and_edit_individual_quizzes">3. 개별 퀴즈 추가 및 수정</strong><br>
+                <span data-i18n="quiz.bottom_right">우측 하단의</span> <code data-i18n="nav.registration">등록</code> <span data-i18n="quiz.button_or_bottom">버튼이나 하단</span> <code data-i18n="nav.check">확인</code> <span data-i18n="quiz.click_the_button_to_register_individual">버튼을 눌러 개별 퀴즈를 목록에 등록하세요.</span></p>
 
                 <p style="margin-top: 15px; color: var(--color-pink); font-weight: bold;">
-                원하는 만큼 퀴즈 등록을 마친 후 우측 상단의 <code> 전체 저장</code> 버튼을 누르면 퀴즈 세트 등록이 완료됩니다!
+                <span data-i18n="quiz.after_registering_for_as_many_quizzes">원하는 만큼 퀴즈 등록을 마친 후 우측 상단의</span> <code data-i18n="quiz.save_all"> 전체 저장</code> <span data-i18n="quiz.click_the_button_to_complete_your">버튼을 누르면 퀴즈 세트 등록이 완료됩니다!</span>
                 </p>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid var(--theme-border);">
                 <label style="font-size: 0.9rem; color: var(--theme-text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
-                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루 동안 보지 않기
+                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> <span data-i18n="quiz.don_t_look_for_a_day">하루 동안 보지 않기</span>
                 </label>
-                <button class="toolbar-btn btn-primary" id="btn-close-guide" style="padding: 8px 20px; font-weight: bold;">닫기</button>
+                <button data-i18n="nav.close" class="toolbar-btn btn-primary" id="btn-close-guide" style="padding: 8px 20px; font-weight: bold;">닫기</button>
             </div>
         </div>
     </div>
@@ -840,12 +840,12 @@
     <div class="modal-overlay" id="settings-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>콘텐츠 추가 정보 설정</span>
+                <span data-i18n="common.set_additional_content_information">콘텐츠 추가 정보 설정</span>
                 <span class="close-modal" id="close-settings">✕</span>
             </div>
 
             <div class="input-group">
-                <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">썸네일 이미지 (선택)</label>
+                <label data-i18n="quiz.thumbnail_image_optional" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">썸네일 이미지 (선택)</label>
                 <div class="custom-file-wrapper" style="display: flex; align-items: center; gap: 10px; margin-top: 5px; margin-bottom: 5px; width: 100%; padding: 6px; border: 1px solid var(--theme-border); border-radius: 6px; box-sizing: border-box;">
                     <label for="thumbnail-file" style="cursor: pointer; padding: 6px 12px; background: var(--theme-bg-hover); color: var(--theme-text-main); border: 1px solid var(--theme-border); border-radius: 4px; font-weight: bold; font-size: 0.85rem;" data-i18n="파일 선택">파일 선택</label>
                     <span id="thumbnail-file-name" style="font-size: 0.85rem; color: var(--theme-text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-i18n="선택된 파일 없음">선택된 파일 없음</span>
@@ -882,8 +882,8 @@
             </div>
 
             <div class="input-group">
-                <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">아티스트 / 출처</label>
-                <input type="text" id="artist" placeholder="예: YOASOBI" style="
+                <label data-i18n="common.artist_source" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">아티스트 / 출처</label>
+                <input data-i18n-placeholder="common.example_yoasobi" type="text" id="artist" placeholder="예: YOASOBI" style="
               width: 100%;
               padding: 10px 12px;
               border: 1px solid var(--theme-border);
@@ -896,7 +896,7 @@
             </div>
 
             <div class="input-group">
-                <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">장르 카테고리</label>
+                <label data-i18n="common.genre_category" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">장르 카테고리</label>
                 <select id="genre" style="
               width: 100%;
               padding: 10px;
@@ -908,14 +908,14 @@
               box-sizing: border-box;
             ">
                     <option value="JPOP">JPOP</option>
-                    <option value="애니메이션">애니메이션</option>
-                    <option value="기타">기타</option>
+                    <option data-i18n="common.anime" value="애니메이션">애니메이션</option>
+                    <option data-i18n="nav.etc" value="기타">기타</option>
                 </select>
             </div>
 
             <div class="input-group">
-                <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">상세 설명</label>
-                <textarea id="description" placeholder="퀴즈에 대한 간단한 설명을 적어주세요." style="
+                <label data-i18n="common.detailed_description" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">상세 설명</label>
+                <textarea data-i18n-placeholder="quiz.please_write_a_brief_description_of" id="description" placeholder="퀴즈에 대한 간단한 설명을 적어주세요." style="
               width: 100%;
               padding: 10px 12px;
               border: 1px solid var(--theme-border);
@@ -930,7 +930,7 @@
             </div>
 
             <div class="input-group">
-                <label style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">난이도</label>
+                <label data-i18n="common.difficulty" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">난이도</label>
                 <select id="difficulty" style="
               width: 100%;
               padding: 10px;
@@ -941,15 +941,15 @@
               margin-bottom: 15px;
               box-sizing: border-box;
             ">
-                    <option value="1"> (매우 쉬움)</option>
-                    <option value="2"> (쉬움)</option>
-                    <option value="3" selected> (보통)</option>
-                    <option value="4"> (어려움)</option>
-                    <option value="5"> (매우 어려움)</option>
+                    <option data-i18n="common.very_easy" value="1"> (매우 쉬움)</option>
+                    <option data-i18n="common.easy" value="2"> (쉬움)</option>
+                    <option data-i18n="common.normal" value="3" selected> (보통)</option>
+                    <option data-i18n="common.hard" value="4"> (어려움)</option>
+                    <option data-i18n="common.very_difficult" value="5"> (매우 어려움)</option>
                 </select>
             </div>
 
-            <button class="btn btn-blue" id="btn-save-settings" style="
+            <button data-i18n="common.save_settings" class="btn btn-blue" id="btn-save-settings" style="
             width: 100%;
             padding: 12px;
             border-radius: 6px;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="profile.my_page_enterping" lang="ko">
 
 <head>
   <meta charset="UTF-8">
@@ -1020,19 +1020,19 @@
     <div class="nav-left">
       <div class="logo" onclick="location.href='/'">
         <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-        <span class="logo-text">엔터핑</span>
+        <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
       </div>
       <nav class="nav-links">
-        <a href="/typing">타이핑</a>
-        <a href="/quiz">퀴즈</a>
-        <a href="/ranking">랭킹</a>
-        <a href="/battle">실시간 대전</a>
+        <a data-i18n="nav.typing" href="/typing">타이핑</a>
+        <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+        <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+        <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
       </nav>
     </div>
     <div class="nav-center">
       <div class="search-bar" onclick="location.href='/search'">
         <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-        <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+        <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
         <span class="shortcut">Enter</span>
       </div>
     </div>
@@ -1041,10 +1041,10 @@
         style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
         onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
         onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
-          class="ph-fill ph-bell"></i> 공지</a>
+          class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
       <div class="auth-group">
-        <button class="auth-login" onclick="location.href='/login'">로그인</button>
-        <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+        <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+        <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
       </div>
     </div>
   </header>
@@ -1057,11 +1057,11 @@
     <div class="profile-card">
       <div class="avatar" id="profile-avatar"></div>
       <div class="profile-info">
-        <h2 id="profile-nickname">엔터핑유저</h2>
+        <h2 data-i18n="profile.enterping_user" id="profile-nickname">엔터핑유저</h2>
         <p id="profile-email">enterping@example.com</p>
       </div>
       <div style="margin-left:auto;text-align:right; display:flex; gap:10px; align-items:center;">
-        <button class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
+        <button data-i18n="profile.information_edit" class="btn btn-pink" style="border-radius:12px;padding:10px 22px;" onclick="openEditModal()">✏️ 정보
           수정</button>
       </div>
     </div>
@@ -1069,10 +1069,10 @@
     <!-- 탭 네비게이션 -->
     <div class="tab-nav">
       <button class="tab-btn active" id="tab-profile-btn" onclick="switchTab('profile')"> 프로필 &amp; 뱃지</button>
-      <button class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')"> 분석</button>
-      <button class="tab-btn" id="tab-history-btn" onclick="switchTab('history')"> 히스토리</button>
-      <button class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')"> 출석체크</button>
-      <button class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')"> 내 컨텐츠</button>
+      <button data-i18n="common.analyze" class="tab-btn" id="tab-analysis-btn" onclick="switchTab('analysis')"> 분석</button>
+      <button data-i18n="common.history" class="tab-btn" id="tab-history-btn" onclick="switchTab('history')"> 히스토리</button>
+      <button data-i18n="profile.attendance_check" class="tab-btn" id="tab-attend-btn" onclick="switchTab('attend')"> 출석체크</button>
+      <button data-i18n="profile.my_content" class="tab-btn" id="tab-mytyping-btn" onclick="switchTab('mytyping')"> 내 컨텐츠</button>
     </div>
 
     {% include "partials/profile_tab_profile.html" %}
@@ -1091,7 +1091,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -1099,28 +1099,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

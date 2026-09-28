@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="ranking.ranking_by_song_enterping" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,27 +57,27 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking" style="color: var(--color-pink); font-weight: 700;">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" id="search-input-field" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -88,9 +88,9 @@
     <main style="margin-top: 80px;">
         <div class="song-ranking-layout">
             <aside class="sidebar">
-                <h3 class="sidebar-title"> 플레이리스트</h3>
+                <h3 data-i18n="ranking.playlist" class="sidebar-title"> 플레이리스트</h3>
                 <div id="song-list-container">
-                    <div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">곡을 불러오는 중...</div>
+                    <div data-i18n="ranking.loading_song" style="text-align:center; color: var(--theme-text-muted); padding: 20px;">곡을 불러오는 중...</div>
                 </div>
             </aside>
             
@@ -100,13 +100,13 @@
                         <div id="header-thumb" style="align-self: center; width: 90px; height: 90px; border-radius: 16px; background: rgba(255,255,255,0.2); background-size: cover; background-position: center; flex-shrink: 0; margin-right: 24px; display: flex; align-items: center; justify-content: center;"></div>
                         <div style="flex: 1;">
                             <div class="content-artist" id="header-artist">YOASOBI</div>
-                            <div class="content-title" id="header-title">夜に駆ける (밤을 달리다)</div>
+                            <div data-i18n="ranking.running_at_night" class="content-title" id="header-title">夜に駆ける (밤을 달리다)</div>
                             <div style="margin-top: 10px;">
                                 <span class="card-badge" style="background: rgba(255,255,255,0.2); border: none; color: white;" id="header-genre">JPOP</span>
                             </div>
                         </div>
                         <div>
-                            <button class="content-btn" id="play-now-btn">▶ 플레이하기</button>
+                            <button data-i18n="ranking.play" class="content-btn" id="play-now-btn">▶ 플레이하기</button>
                         </div>
                     </div>
                     
@@ -117,7 +117,7 @@
                 
                 <div id="select-prompt" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--theme-text-muted);">
                     <div style="font-size: 4rem; margin-bottom: 20px;">🎶</div>
-                    <h2 style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
+                    <h2 data-i18n="ranking.please_select_a_song_on_the" style="color: var(--color-text-muted);">좌측에서 곡을 선택해주세요</h2>
                 </div>
             </section>
         </div>
@@ -130,7 +130,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -138,28 +138,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

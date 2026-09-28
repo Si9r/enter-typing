@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="quiz.quiz_list_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -186,19 +186,19 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz" class="active">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz" class="active">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
@@ -207,10 +207,10 @@
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
-                    class="ph-fill ph-bell"></i> 공지</a>
+                    class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -222,12 +222,12 @@
         style="margin-top: 80px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; align-items: center;">
         <section class="content-section" style="padding-top: 40px; width: 100%; max-width: 1200px;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h2> 모든 퀴즈 콘텐츠</h2>
+                <h2 data-i18n="quiz.all_quiz_content"> 모든 퀴즈 콘텐츠</h2>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn btn-pink"
                         onclick="if(window.NavAuth && window.NavAuth.getUser()) { location.href='/quiz/create'; } else { alert('로그인이 필요한 서비스입니다.'); location.href='/login'; }"
                         style="display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 10px 22px;">
-                        <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> 퀴즈 추가하기
+                        <span style="font-size: 1.5rem; font-weight: bold; line-height: 1;">+</span> <span data-i18n="quiz.add_quiz">퀴즈 추가하기</span>
                     </button>
                 </div>
             </div>
@@ -236,17 +236,17 @@
             <div
                 style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
                 <div id="category-buttons" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
+                    <button data-i18n="common.all" class="btn btn-pink" style="padding: 8px 20px;" onclick="setCategory('전체')">전체</button>
                     <button class="btn btn-outline" style="padding: 8px 20px;"
                         onclick="setCategory('JPOP')">JPOP</button>
-                    <button class="btn btn-outline" style="padding: 8px 20px;"
+                    <button data-i18n="common.anime" class="btn btn-outline" style="padding: 8px 20px;"
                         onclick="setCategory('ANIME')">애니메이션</button>
                 </div>
                 <div>
                     <select id="sort-select" onchange="setSort(this.value)"
                         style="padding: 10px 15px; border: 1.5px solid var(--theme-border); border-radius: 8px; outline: none; font-weight: 700; color: var(--theme-text-sub); background: var(--theme-bg-card); cursor: pointer;">
-                        <option value="recent">등록순</option>
-                        <option value="popular">인기순</option>
+                        <option data-i18n="common.latest" value="recent">등록순</option>
+                        <option data-i18n="common.popular" value="popular">인기순</option>
                     </select>
                 </div>
             </div>
@@ -256,7 +256,7 @@
             </div>
 
             <div style="text-align: center; margin-top: 60px;">
-                <button id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;"
+                <button data-i18n="common.load_more" id="load-more-btn" class="btn btn-blue-outline btn-large" style="display: inline-flex;"
                     onclick="loadMore()">더 많은 콘텐츠 보기</button>
             </div>
         </section>
@@ -269,7 +269,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -277,28 +277,28 @@
             </div>
 
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>
@@ -314,38 +314,38 @@
             <div class="detail-cover"></div>
             <div class="detail-info">
                 <div class="card-badge pink" style="margin-bottom: 15px;" id="modal-genre">JPOP</div>
-                <h1 class="detail-title" id="modal-title">로딩 중...</h1>
+                <h1 data-i18n="common.loading" class="detail-title" id="modal-title">로딩 중...</h1>
                 <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
                     <div class="detail-artist" id="modal-artist" style="margin-bottom: 0;">-</div>
                     <div style="font-size: 0.95rem; color: var(--theme-text-muted); font-weight: 500;">
-                        제작자: <span id="modal-creator" style="color: var(--color-pink); font-weight: 700;">엔터핑</span>
+                        <span data-i18n="common.creator">제작자:</span> <span data-i18n="nav.enterping" id="modal-creator" style="color: var(--color-pink); font-weight: 700;">엔터핑</span>
                     </div>
                 </div>
 
                 <div class="detail-stats">
                     <div class="stat-item">
-                        <span class="label">난이도</span>
+                        <span data-i18n="common.difficulty" class="label">난이도</span>
                         <span id="modal-difficulty" class="value"></span>
                     </div>
                     <div class="stat-item">
-                        <span class="label">플레이 수</span>
-                        <span id="modal-play-count" class="value">0회</span>
+                        <span data-i18n="common.number_of_plays" class="label">플레이 수</span>
+                        <span data-i18n="common.n0_times" id="modal-play-count" class="value">0회</span>
                     </div>
                     <div class="stat-item">
-                        <span class="label">최고 점수</span>
-                        <span id="modal-best-score" class="value">0점</span>
+                        <span data-i18n="common.highest_score" class="label">최고 점수</span>
+                        <span data-i18n="common.n0_points" id="modal-best-score" class="value">0점</span>
                     </div>
                 </div>
 
-                <p class="detail-desc" id="modal-desc">
+                <p data-i18n="common.loading" class="detail-desc" id="modal-desc">
                     로딩 중...
                 </p>
 
                 <div class="detail-actions">
-                    <button id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
+                    <button data-i18n="common.start_quiz" id="modal-start-btn" class="btn btn-pink btn-large" style="flex: 1;">
                         ▶ 퀴즈 시작하기
                     </button>
-                    <button class="btn btn-outline btn-large" onclick="location.href='/ranking'">
+                    <button data-i18n="common.view_ranking" class="btn btn-outline btn-large" onclick="location.href='/ranking'">
                         랭킹 보기
                     </button>
                 </div>

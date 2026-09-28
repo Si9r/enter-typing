@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="auth.login_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -369,27 +369,27 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'" style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'" style="color: var(--color-pink); background-color: rgba(255,182,193,0.12);">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -402,16 +402,16 @@
             <!-- 로고 -->
             <a href="/" class="auth-logo">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:38px;width:auto;">
-                <span>엔터핑</span>
+                <span data-i18n="nav.enterping">엔터핑</span>
             </a>
 
-            <h1 class="auth-heading">다시 만나서 반가워요!</h1>
-            <p class="auth-subheading">로그인하고 타이핑 여정을 이어가세요 </p>
+            <h1 data-i18n="auth.nice_to_meet_you_again" class="auth-heading">다시 만나서 반가워요!</h1>
+            <p data-i18n="auth.log_in_and_continue_your_typing" class="auth-subheading">로그인하고 타이핑 여정을 이어가세요 </p>
 
             <form id="loginForm" novalidate>
                 <!-- 이메일 -->
                 <div class="form-group">
-                    <label class="form-label" for="login-email">이메일</label>
+                    <label data-i18n="nav.email" class="form-label" for="login-email">이메일</label>
                     <input
                         id="login-email"
                         class="form-input"
@@ -420,13 +420,13 @@
                         autocomplete="email"
                         required
                     >
-                    <span class="form-error" id="email-error">올바른 이메일 형식을 입력해주세요.</span>
+                    <span data-i18n="auth.please_enter_the_correct_email_format" class="form-error" id="email-error">올바른 이메일 형식을 입력해주세요.</span>
                 </div>
 
                 <!-- 비밀번호 -->
                 <div class="form-group">
-                    <label class="form-label" for="login-password">비밀번호</label>
-                    <input
+                    <label data-i18n="nav.password" class="form-label" for="login-password">비밀번호</label>
+                    <input data-i18n-placeholder="common.please_enter_your_password"
                         id="login-password"
                         class="form-input"
                         type="password"
@@ -434,22 +434,22 @@
                         autocomplete="current-password"
                         required
                     >
-                    <span class="form-error" id="password-error">비밀번호를 입력해주세요.</span>
+                    <span data-i18n="common.please_enter_your_password_2" class="form-error" id="password-error">비밀번호를 입력해주세요.</span>
                 </div>
 
                 <!-- 비밀번호 찾기 -->
                 <div class="form-extras">
-                    <a href="/forgot_password">비밀번호를 잊으셨나요?</a>
+                    <a data-i18n="auth.forgot_your_password" href="/forgot_password">비밀번호를 잊으셨나요?</a>
                 </div>
 
                 <!-- 로그인 버튼 -->
-                <button id="login-btn" type="submit" class="btn-auth btn-auth-primary">로그인</button>
+                <button data-i18n="nav.login" id="login-btn" type="submit" class="btn-auth btn-auth-primary">로그인</button>
             </form>
 
             <!-- 회원가입 유도 -->
             <p class="auth-footer-text">
-                아직 계정이 없으신가요?
-                <a href="/signup">회원가입하기</a>
+                <span data-i18n="auth.don_t_have_an_account_yet">아직 계정이 없으신가요?</span>
+                <a data-i18n="auth.sign_up" href="/signup">회원가입하기</a>
             </p>
         </div>
     </main>

@@ -73,19 +73,19 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle" class="active">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle" class="active">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
@@ -94,10 +94,10 @@
                 style="margin-right: 20px; text-decoration: none; color: var(--theme-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--theme-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
-                공지</a>
+                <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -109,22 +109,22 @@
         <section class="content-section" style="padding-top: 40px; width: 100%; max-width: 1200px;">
             <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
-                    <h2>⌨️ 실시간 타이핑 대전</h2>
-                    <p style="color: var(--theme-text-muted); margin-top: 8px; font-weight: 500;">참가할 방을 고르거나, 새 방을 직접 만들어보세요!</p>
+                    <h2 data-i18n="battle.real_time_typing_battle">⌨️ 실시간 타이핑 대전</h2>
+                    <p data-i18n="battle.choose_a_room_to_join_or" style="color: var(--theme-text-muted); margin-top: 8px; font-weight: 500;">참가할 방을 고르거나, 새 방을 직접 만들어보세요!</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="join-code-input" placeholder="코드 4자리" maxlength="4"
+                    <input data-i18n-placeholder="battle.code" type="text" id="join-code-input" placeholder="코드 4자리" maxlength="4"
                         style="padding: 10px 16px; border-radius: 30px; border: 1.5px solid var(--theme-border); width: 130px; text-align: center; font-weight: 800; letter-spacing: 3px; background: var(--theme-bg-card); color: var(--theme-text-main);"
                         onkeydown="if(event.key==='Enter') joinByCode()">
-                    <button class="btn btn-outline" style="border-radius: 30px; padding: 10px 22px;" onclick="joinByCode()">코드 참가</button>
+                    <button data-i18n="battle.join_by_code" class="btn btn-outline" style="border-radius: 30px; padding: 10px 22px;" onclick="joinByCode()">코드 참가</button>
                     <button class="btn btn-pink" style="border-radius: 30px; padding: 10px 22px;" onclick="openCreateModal()">
-                        <span style="font-size: 1.3rem; font-weight: bold; line-height: 1;">+</span> 방 만들기
+                        <span style="font-size: 1.3rem; font-weight: bold; line-height: 1;">+</span> <span data-i18n="battle.create_a_room">방 만들기</span>
                     </button>
                 </div>
             </div>
 
             <div class="room-grid" id="room-grid">
-                <div class="empty-rooms">방 목록을 불러오는 중...</div>
+                <div data-i18n="battle.loading_room_list" class="empty-rooms">방 목록을 불러오는 중...</div>
             </div>
         </section>
     </main>
@@ -136,7 +136,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -144,28 +144,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>
@@ -178,28 +178,28 @@
     <div class="modal-overlay" id="modal-create-room">
         <div class="modal-box">
             <button class="modal-close-btn" onclick="closeCreateModal()">&times;</button>
-            <h3>대전방 만들기</h3>
+            <h3 data-i18n="battle.create_battle_room">대전방 만들기</h3>
             <div class="form-row">
-                <label>방 제목</label>
-                <input type="text" id="create-title" placeholder="예: 초보 환영! 같이 쳐요" maxlength="40">
+                <label data-i18n="battle.room_title">방 제목</label>
+                <input data-i18n-placeholder="battle.ex_beginners_welcome_let_s_type" type="text" id="create-title" placeholder="예: 초보 환영! 같이 쳐요" maxlength="40">
             </div>
             <div class="form-row">
-                <label>최대 인원</label>
+                <label data-i18n="battle.max_players">최대 인원</label>
                 <select id="create-max-players">
-                    <option value="4">4명 (최대)</option>
-                    <option value="3">3명</option>
-                    <option value="2">2명</option>
+                    <option data-i18n="battle.n4_players_max" value="4">4명 (최대)</option>
+                    <option data-i18n="battle.n3_players" value="3">3명</option>
+                    <option data-i18n="battle.n2_players" value="2">2명</option>
                 </select>
             </div>
             <div class="form-row form-row-checkbox">
                 <input type="checkbox" id="create-is-private" onchange="onPrivateToggle()">
-                <label for="create-is-private">비밀방으로 만들기</label>
+                <label data-i18n="battle.make_it_a_private_room" for="create-is-private">비밀방으로 만들기</label>
             </div>
             <div class="form-row" id="create-password-row" style="display: none;">
-                <label>비밀번호</label>
-                <input type="password" id="create-password" placeholder="입장 비밀번호">
+                <label data-i18n="nav.password">비밀번호</label>
+                <input data-i18n-placeholder="battle.entry_password" type="password" id="create-password" placeholder="입장 비밀번호">
             </div>
-            <button class="btn btn-pink" style="width: 100%; padding: 14px; border-radius: 12px; margin-top: 8px;" onclick="submitCreateRoom()">방 생성 및 코드 발급</button>
+            <button data-i18n="battle.create_room_issue_code" class="btn btn-pink" style="width: 100%; padding: 14px; border-radius: 12px; margin-top: 8px;" onclick="submitCreateRoom()">방 생성 및 코드 발급</button>
         </div>
     </div>
 
@@ -207,10 +207,10 @@
     <div class="modal-overlay" id="modal-password">
         <div class="modal-box">
             <button class="modal-close-btn" onclick="closePasswordModal()">&times;</button>
-            <h3>🔒 비밀방 입장</h3>
+            <h3 data-i18n="battle.enter_private_room">🔒 비밀방 입장</h3>
             <div class="form-row">
-                <label>비밀번호</label>
-                <input type="password" id="join-password" placeholder="방 비밀번호를 입력하세요" onkeydown="if(event.key==='Enter') submitPassword()">
+                <label data-i18n="nav.password">비밀번호</label>
+                <input data-i18n-placeholder="battle.enter_the_room_password" type="password" id="join-password" placeholder="방 비밀번호를 입력하세요" onkeydown="if(event.key==='Enter') submitPassword()">
             </div>
             <button class="btn btn-pink" style="width: 100%; padding: 14px; border-radius: 12px; margin-top: 8px;" onclick="submitPassword()">입장하기</button>
         </div>

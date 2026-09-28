@@ -5,59 +5,59 @@
 
       <!-- 탭 -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')"> 닉네임<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')"> 비밀번호<br>변경</button>
-        <button class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">️ 회원 탈퇴</button>
+        <button class="modal-tab-btn active" id="mtab-nick-btn" onclick="switchModalTab('nick')"> <span data-i18n="nav.nickname">닉네임</span><br><span data-i18n="nav.change">변경</span></button>
+        <button class="modal-tab-btn" id="mtab-pw-btn" onclick="switchModalTab('pw')"> <span data-i18n="nav.password">비밀번호</span><br><span data-i18n="nav.change">변경</span></button>
+        <button data-i18n="profile.cancel_membership_2" class="modal-tab-btn" id="mtab-del-btn" onclick="switchModalTab('del')">️ 회원 탈퇴</button>
       </div>
 
       <!-- 닉네임 변경 패널 -->
       <div class="modal-panel active" id="mtab-nick">
-        <div class="modal-title">닉네임 변경</div>
+        <div data-i18n="profile.change_nickname" class="modal-title">닉네임 변경</div>
         <div class="m-form-group">
-          <label class="m-form-label" for="m-new-nick">새 닉네임</label>
+          <label data-i18n="profile.new_nickname" class="m-form-label" for="m-new-nick">새 닉네임</label>
           <div class="nick-input-wrap">
-            <input id="m-new-nick" class="m-form-input" type="text" placeholder="2자~12자 입력" maxlength="12">
-            <button class="m-btn-outline" id="m-check-nick-btn" onclick="checkNewNicknameDuplicate()">중복 확인</button>
+            <input data-i18n-placeholder="profile.nickname_length_hint" id="m-new-nick" class="m-form-input" type="text" placeholder="2자~12자 입력" maxlength="12">
+            <button data-i18n="common.check_for_duplicates" class="m-btn-outline" id="m-check-nick-btn" onclick="checkNewNicknameDuplicate()">중복 확인</button>
           </div>
-          <span class="m-form-error" id="m-new-nick-err">닉네임을 입력해주세요.</span>
-          <span class="m-form-success" id="m-new-nick-success">사용 가능한 닉네임입니다.</span>
+          <span data-i18n="profile.please_enter_your_nickname" class="m-form-error" id="m-new-nick-err">닉네임을 입력해주세요.</span>
+          <span data-i18n="common.available_nicknames" class="m-form-success" id="m-new-nick-success">사용 가능한 닉네임입니다.</span>
         </div>
-        <button class="m-btn m-btn-pink" id="m-change-nick-btn" onclick="submitChangeNickname()">닉네임 변경</button>
+        <button data-i18n="profile.change_nickname" class="m-btn m-btn-pink" id="m-change-nick-btn" onclick="submitChangeNickname()">닉네임 변경</button>
       </div>
 
       <!-- 비밀번호 변경 패널 -->
       <div class="modal-panel" id="mtab-pw">
-        <div class="modal-title">비밀번호 변경</div>
+        <div data-i18n="common.change_password" class="modal-title">비밀번호 변경</div>
         <div class="m-form-group">
-          <label class="m-form-label" for="m-cur-pw">현재 비밀번호</label>
-          <input id="m-cur-pw" class="m-form-input" type="password" placeholder="현재 비밀번호 입력">
-          <span class="m-form-error" id="m-cur-pw-err">현재 비밀번호를 입력해주세요.</span>
+          <label data-i18n="profile.current_password" class="m-form-label" for="m-cur-pw">현재 비밀번호</label>
+          <input data-i18n-placeholder="profile.enter_your_current_password" id="m-cur-pw" class="m-form-input" type="password" placeholder="현재 비밀번호 입력">
+          <span data-i18n="profile.please_enter_your_current_password" class="m-form-error" id="m-cur-pw-err">현재 비밀번호를 입력해주세요.</span>
         </div>
         <div class="m-form-group">
-          <label class="m-form-label" for="m-new-pw">새 비밀번호</label>
-          <input id="m-new-pw" class="m-form-input" type="password" placeholder="영문+숫자 포함 8자 이상">
-          <span class="m-form-error" id="m-new-pw-err">영문, 숫자를 포함해 8자 이상 입력해주세요.</span>
+          <label data-i18n="common.new_password" class="m-form-label" for="m-new-pw">새 비밀번호</label>
+          <input data-i18n-placeholder="profile.at_least_8_characters_including_letters" id="m-new-pw" class="m-form-input" type="password" placeholder="영문+숫자 포함 8자 이상">
+          <span data-i18n="profile.please_enter_at_least_8_characters" class="m-form-error" id="m-new-pw-err">영문, 숫자를 포함해 8자 이상 입력해주세요.</span>
         </div>
         <div class="m-form-group">
-          <label class="m-form-label" for="m-new-pw2">새 비밀번호 확인</label>
-          <input id="m-new-pw2" class="m-form-input" type="password" placeholder="새 비밀번호 재입력">
-          <span class="m-form-error" id="m-new-pw2-err">비밀번호가 일치하지 않습니다.</span>
+          <label data-i18n="common.confirm_new_password" class="m-form-label" for="m-new-pw2">새 비밀번호 확인</label>
+          <input data-i18n-placeholder="profile.re_enter_new_password" id="m-new-pw2" class="m-form-input" type="password" placeholder="새 비밀번호 재입력">
+          <span data-i18n="common.password_does_not_match" class="m-form-error" id="m-new-pw2-err">비밀번호가 일치하지 않습니다.</span>
         </div>
-        <button class="m-btn m-btn-pink" id="m-change-pw-btn" onclick="submitChangePassword()">비밀번호 변경</button>
+        <button data-i18n="common.change_password" class="m-btn m-btn-pink" id="m-change-pw-btn" onclick="submitChangePassword()">비밀번호 변경</button>
       </div>
 
       <!-- 회원 탈퇴 패널 -->
       <div class="modal-panel" id="mtab-del">
-        <div class="modal-title">회원 탈퇴</div>
+        <div data-i18n="nav.withdraw_membership" class="modal-title">회원 탈퇴</div>
         <div class="danger-zone">
-          <p>탈퇴 시 모든 기록(타이핑 기록, 퀴즈 기록, 출석 내역 등)이 <strong>영구 삭제</strong>되며 복구할 수 없습니다.</p>
+          <p><span data-i18n="profile.when_you_withdraw_all_records_typing">탈퇴 시 모든 기록(타이핑 기록, 퀴즈 기록, 출석 내역 등)이</span> <strong data-i18n="profile.permanent_deletion">영구 삭제</strong><span data-i18n="profile.and_cannot_be_recovered">되며 복구할 수 없습니다.</span></p>
         </div>
         <div class="m-form-group">
-          <label class="m-form-label" for="m-del-pw">현재 비밀번호 확인</label>
-          <input id="m-del-pw" class="m-form-input" type="password" placeholder="비밀번호를 입력하세요">
-          <span class="m-form-error" id="m-del-pw-err">비밀번호를 입력해주세요.</span>
+          <label data-i18n="profile.check_your_current_password" class="m-form-label" for="m-del-pw">현재 비밀번호 확인</label>
+          <input data-i18n-placeholder="common.please_enter_your_password" id="m-del-pw" class="m-form-input" type="password" placeholder="비밀번호를 입력하세요">
+          <span data-i18n="common.please_enter_your_password_2" class="m-form-error" id="m-del-pw-err">비밀번호를 입력해주세요.</span>
         </div>
-        <button class="m-btn m-btn-danger" id="m-del-btn" onclick="submitDeleteAccount()">회원 탈퇴하기</button>
+        <button data-i18n="profile.cancel_membership" class="m-btn m-btn-danger" id="m-del-btn" onclick="submitDeleteAccount()">회원 탈퇴하기</button>
       </div>
     </div>
   </div>

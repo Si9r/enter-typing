@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="typing.typing_platform_main" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -23,27 +23,27 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
         <div class="nav-right">
-            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> 공지</a>
+            <a href="/notice" class="nav-notice-link" style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;" onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';" onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -55,18 +55,18 @@
     <main class="hero">
         <div class="hero-left">
             <h1 class="hero-title">
-                좋아하는 콘텐츠로<br>
-                <span class="highlight">타이핑</span>을 즐겨라
+                <span data-i18n="typing.with_your_favorite_content">좋아하는 콘텐츠로</span><br>
+                <span data-i18n="nav.typing" class="highlight">타이핑</span><span data-i18n="typing.enjoy_typing">을 즐겨라</span>
             </h1>
             <p class="hero-desc">
-                다양한 노래 가사, 퀴즈 — 좋아하는 콘텐츠를 타이핑하며<br>
-                자연스럽게 타자 실력과 집중력을 키워보세요
+                <span data-i18n="typing.various_song_lyrics_quizzes_type_your">다양한 노래 가사, 퀴즈 — 좋아하는 콘텐츠를 타이핑하며</span><br>
+                <span data-i18n="typing.naturally_improve_your_typing_skills_and">자연스럽게 타자 실력과 집중력을 키워보세요</span>
             </p>
             <div class="hero-buttons">
-                <button id="hero-btn-primary" class="btn btn-large btn-pink" onclick="location.href='/signup'">
+                <button data-i18n="typing.sign_up_and_start" id="hero-btn-primary" class="btn btn-large btn-pink" onclick="location.href='/signup'">
                     회원가입하고 시작하기
                 </button>
-                <button id="hero-btn-secondary" class="btn btn-large btn-blue-outline" onclick="location.href='/login'">
+                <button data-i18n="typing.log_in_and_continue" id="hero-btn-secondary" class="btn btn-large btn-blue-outline" onclick="location.href='/login'">
                     로그인하고 이어하기
                 </button>
             </div>
@@ -141,8 +141,8 @@
     <div class="section-card-wrapper">
         <section class="content-section">
             <div class="section-header">
-                <h2><i class="ph-bold ph-fire" style="color:var(--color-pink); margin-right:8px; vertical-align: middle;"></i> 인기 타이핑 콘텐츠</h2>
-                <a href="/typing" class="view-all">전체보기 ></a>
+                <h2><i class="ph-bold ph-fire" style="color:var(--color-pink); margin-right:8px; vertical-align: middle;"></i> <span data-i18n="typing.popular_typing_content">인기 타이핑 콘텐츠</span></h2>
+                <a data-i18n="typing.view_all" href="/typing" class="view-all">전체보기 ></a>
             </div>
             <div class="slider-container" style="position: relative;">
                 <button class="slider-btn prev-btn" onclick="scrollSlider('popular-typing-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
@@ -158,8 +158,8 @@
     <div class="section-card-wrapper">
         <section class="content-section" style="margin-bottom: 0;">
             <div class="section-header">
-                <h2><i class="ph-bold ph-lightbulb" style="color:var(--color-blue); margin-right:8px; vertical-align: middle;"></i> 추천 퀴즈</h2>
-                <a href="/quiz" class="view-all">전체보기 ></a>
+                <h2><i class="ph-bold ph-lightbulb" style="color:var(--color-blue); margin-right:8px; vertical-align: middle;"></i> <span data-i18n="typing.recommended_quizzes">추천 퀴즈</span></h2>
+                <a data-i18n="typing.view_all" href="/quiz" class="view-all">전체보기 ></a>
             </div>
             <div class="slider-container" style="position: relative;">
                 <button class="slider-btn prev-btn" onclick="scrollSlider('popular-quiz-grid', -1)"><i class="ph-bold ph-caret-left"></i></button>
@@ -179,7 +179,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -187,28 +187,28 @@
             </div>
             
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
             
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>

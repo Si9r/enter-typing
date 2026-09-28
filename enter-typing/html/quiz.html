@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html data-i18n-doc-title="quiz.quiz_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8" />
@@ -202,19 +202,19 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href = '/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing">타이핑</a>
-                <a href="/quiz" class="active">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz" class="active">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href = '/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly />
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly />
                 <span class="shortcut">Enter</span>
             </div>
         </div>
@@ -223,12 +223,12 @@
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i
-                    class="ph-fill ph-bell"></i> 공지</a>
+                    class="ph-fill ph-bell"></i> <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href = '/login'">
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href = '/login'">
                     로그인
                 </button>
-                <button class="auth-signup" onclick="location.href = '/signup'">
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href = '/signup'">
                     회원가입
                 </button>
             </div>
@@ -275,7 +275,7 @@
             min-height: 0;
             overflow-y: auto;
           ">
-                <div class="panel-title" style="
+                <div data-i18n="common.quiz_statistics" class="panel-title" style="
               font-weight: 900;
               border-bottom: 3px solid var(--color-pink);
               padding-bottom: 6px;
@@ -306,7 +306,7 @@
                   line-height: 1.2;
                   color: var(--color-pink);
                   margin-bottom: 5px;
-                " data-i18n="현재 점수">
+                " data-i18n="quiz.current_score">
                             현재 점수
                         </div>
                         <div id="score" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
@@ -326,7 +326,7 @@
                   line-height: 1.2;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
-                " data-i18n="최고 점수">
+                " data-i18n="common.highest_score">
                             최고 점수
                         </div>
                         <div id="best-score"
@@ -353,7 +353,7 @@
                   line-height: 1.2;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
-                " data-i18n="정답률">
+                " data-i18n="common.correct_rate">
                             정답률
                         </div>
                         <div id="accuracy" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
@@ -373,7 +373,7 @@
                   line-height: 1.2;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
-                " data-i18n="콤보">
+                " data-i18n="common.combo">
                             콤보
                         </div>
                         <div id="combo" style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">
@@ -396,7 +396,7 @@
                 align-items: center;
                 justify-content: space-between;
               ">
-                        <span>음량 조절</span>
+                        <span data-i18n="common.volume_control">음량 조절</span>
                         <span id="volume-display" style="color: var(--color-pink)">50%</span>
                     </div>
                     <input type="range" id="volume-slider" min="0" max="100" value="50" style="
@@ -447,8 +447,8 @@
               align-items: center;
             ">
                     <div class="vinyl-record paused" id="vinyl-record" style="z-index: 2">
-                        <div class="vinyl-label" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작"></div>
-                        <div class="vinyl-question" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작">
+                        <div data-i18n-title="common.click_to_start" class="vinyl-label" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작"></div>
+                        <div data-i18n-title="common.click_to_start" class="vinyl-question" onclick="startQuiz()" style="cursor: pointer" title="클릭하여 시작">
                             ?
                         </div>
                     </div>
@@ -475,7 +475,7 @@
             <div class="box-panel"
                 style="border: 2px solid var(--theme-border); border-radius: 16px; padding: 15px; background: var(--theme-bg-card); box-shadow: 0 4px 20px rgba(0,0,0,0.03); min-height: 0; overflow-y: auto;">
                 <div class="panel-title"
-                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;" data-i18n="문제 정보">
+                    style="font-weight: 900; border-bottom: 3px solid var(--color-pink); padding-bottom: 6px; margin-bottom: 12px; width: max-content; color: var(--theme-text-main); font-size: 1rem;" data-i18n="common.problem_information">
                     문제 정보</div>
 
                 <div id="answer-board" style="display: flex; flex-direction: column; gap: 16px;">
@@ -490,7 +490,7 @@
                         border-top: 1px dashed var(--theme-border);
                         margin-top: 5px;
                     ">
-                        <button id="hint-toggle-btn" onclick="toggleHintDisplay()" style="
+                        <button data-i18n="common.see_hints" id="hint-toggle-btn" onclick="toggleHintDisplay()" style="
                             background: var(--color-blue);
                             color: white;
                             border: none;
@@ -543,9 +543,9 @@
                     </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-input" class="chat-input" placeholder="여기에 가수, 제목, 가사를 입력해보세요..."
+                    <input data-i18n-placeholder="quiz.enter_the_singer_title_and_lyrics" type="text" id="chat-input" class="chat-input" placeholder="여기에 가수, 제목, 가사를 입력해보세요..."
                         disabled />
-                    <button id="chat-send-btn" class="chat-send-btn" disabled>
+                    <button data-i18n="common.forwarding" id="chat-send-btn" class="chat-send-btn" disabled>
                         전송
                     </button>
                 </div>
@@ -562,7 +562,7 @@
                 <div class="footer-logo">
                     <img src="/assets/logo_icon.png" alt="Enter Typing Logo">
                 </div>
-                <p class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
+                <p data-i18n="common.a_fun_typing_platform_to_naturally" class="footer-desc">일본 문화 콘텐츠를 통해 자연스럽게 언어를 익히는 즐거운 타이핑 플랫폼</p>
                 <div class="social-links">
                     <a href="#"><i class="ph-bold ph-twitter-logo"></i></a>
                     <a href="#"><i class="ph-bold ph-github-logo"></i></a>
@@ -570,28 +570,28 @@
             </div>
 
             <div class="footer-col">
-                <h4>서비스</h4>
+                <h4 data-i18n="nav.services">서비스</h4>
                 <ul>
-                    <li><a href="/typing">타이핑 연습</a></li>
-                    <li><a href="/quiz">단어 퀴즈</a></li>
-                    <li><a href="/battle">멀티플레이</a></li>
+                    <li><a data-i18n="nav.typing_practice" href="/typing">타이핑 연습</a></li>
+                    <li><a data-i18n="common.word_quiz" href="/quiz">단어 퀴즈</a></li>
+                    <li><a data-i18n="common.multiplayer" href="/battle">멀티플레이</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>커뮤니티</h4>
+                <h4 data-i18n="common.community">커뮤니티</h4>
                 <ul>
-                    <li><a href="/ranking">랭킹</a></li>
-                    <li><a href="/notice">공지사항</a></li>
+                    <li><a data-i18n="nav.ranking" href="/ranking">랭킹</a></li>
+                    <li><a data-i18n="common.notices" href="/notice">공지사항</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h4>고객지원</h4>
+                <h4 data-i18n="common.support">고객지원</h4>
                 <ul>
-                    <li><a href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
-                    <li><a href="#" id="footer-open-terms">이용약관</a></li>
-                    <li><a href="#" id="footer-open-privacy">개인정보처리방침</a></li>
+                    <li><a data-i18n="common.contact_us" href="https://forms.gle/XktdxJWezSjU8pSUA" target="_blank">문의하기</a></li>
+                    <li><a data-i18n="nav.terms_of_service" href="#" id="footer-open-terms">이용약관</a></li>
+                    <li><a data-i18n="common.privacy_policy" href="#" id="footer-open-privacy">개인정보처리방침</a></li>
                 </ul>
             </div>
         </div>
@@ -623,12 +623,12 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         ">
             <div
-                style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid var(--theme-border); padding-bottom: 20px;" data-i18n="퀴즈 결과">
+                style="font-size: 1.6rem; font-weight: 900; color: var(--theme-text-main); text-align: center; border-bottom: 2px solid var(--theme-border); padding-bottom: 20px;" data-i18n="common.quiz_results">
                 퀴즈 결과
             </div>
             <div
                 style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
-                총 <span id="modal-total-score">0</span>개의 정답을 맞췄습니다!
+                <span data-i18n="nav.total">총</span> <span id="modal-total-score">0</span><span data-i18n="quiz.you_got_2_correct_answers">개의 정답을 맞췄습니다!</span>
             </div>
             <div id="modal-log-container" style="
                 flex: 1;
@@ -643,7 +643,7 @@
             ">
             </div>
             <div style="display: flex; justify-content: center; gap: 15px; margin-top: 15px;">
-                <button onclick="location.href='/quiz'" style="
+                <button data-i18n="common.to_list" onclick="location.href='/quiz'" style="
                     background: #a9d6e5;
                     color: white;
                     border: none;
@@ -653,7 +653,7 @@
                     font-weight: bold;
                     cursor: pointer;
                 ">목록으로</button>
-                <button onclick="document.getElementById('quiz-result-modal').style.display='none'" style="
+                <button data-i18n="nav.close" onclick="document.getElementById('quiz-result-modal').style.display='none'" style="
                     background: #e0e0e0;
                     color: var(--theme-text-main);
                     border: none;

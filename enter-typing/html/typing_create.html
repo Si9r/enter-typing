@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html data-i18n-doc-title="typing.typing_content_creation_enterping" lang="ko">
 
 <head>
     <meta charset="UTF-8">
@@ -329,19 +329,19 @@
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
                 <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
-                <span class="logo-text">엔터핑</span>
+                <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
-                <a href="/typing" class="active">타이핑</a>
-                <a href="/quiz">퀴즈</a>
-                <a href="/ranking">랭킹</a>
-                <a href="/battle">실시간 대전</a>
+                <a data-i18n="nav.typing" href="/typing" class="active">타이핑</a>
+                <a data-i18n="nav.quiz" href="/quiz">퀴즈</a>
+                <a data-i18n="nav.ranking" href="/ranking">랭킹</a>
+                <a data-i18n="common.live_battle" href="/battle">실시간 대전</a>
             </nav>
         </div>
         <div class="nav-center">
             <div class="search-bar" onclick="location.href='/search'">
                 <span class="search-icon"><i class="ph-bold ph-magnifying-glass"></i></span>
-                <input type="text" placeholder="곡명, 아티스트 검색" readonly>
+                <input data-i18n-placeholder="common.search_for_song_artist" type="text" placeholder="곡명, 아티스트 검색" readonly>
                 <span class="shortcut">Enter</span>
             </div>
         </div>
@@ -350,10 +350,10 @@
                 style="margin-right: 20px; text-decoration: none; color: var(--color-text-muted); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; transition: all 0.2s;"
                 onmouseover="this.style.color='var(--color-pink)'; this.style.backgroundColor='rgba(255, 182, 193, 0.15)';"
                 onmouseout="this.style.color='var(--color-text-muted)'; this.style.backgroundColor='transparent';"><i class="ph-fill ph-bell"></i>
-                공지</a>
+                <span data-i18n="common.notice">공지</span></a>
             <div class="auth-group">
-                <button class="auth-login" onclick="location.href='/login'">로그인</button>
-                <button class="auth-signup" onclick="location.href='/signup'">회원가입</button>
+                <button data-i18n="nav.login" class="auth-login" onclick="location.href='/login'">로그인</button>
+                <button data-i18n="nav.sign_up" class="auth-signup" onclick="location.href='/signup'">회원가입</button>
             </div>
         </div>
     </header>
@@ -364,11 +364,11 @@
 
         <!-- Top Bar -->
         <div class="editor-top-bar">
-            <input type="text" id="title" placeholder="동영상 제목을 입력하세요" required>
+            <input data-i18n-placeholder="typing.enter_a_video_title" type="text" id="title" placeholder="동영상 제목을 입력하세요" required>
             <div style="display: flex; gap: 10px; align-items: center;">
-                <button class="toolbar-btn" id="btn-show-guide" title="타이핑 작성 가이드 보기">❓ 가이드</button>
-                <button class="toolbar-btn" id="btn-settings" title="추가 정보 설정">⚙️ 설정</button>
-                <button class="toolbar-btn btn-primary" id="btn-save"> 저장</button>
+                <button data-i18n="common.guide" data-i18n-title="typing.view_our_typing_guide" class="toolbar-btn" id="btn-show-guide" title="타이핑 작성 가이드 보기">❓ 가이드</button>
+                <button data-i18n="common.settings" data-i18n-title="common.additional_information_settings" class="toolbar-btn" id="btn-settings" title="추가 정보 설정">⚙️ 설정</button>
+                <button data-i18n="nav.save" class="toolbar-btn btn-primary" id="btn-save"> 저장</button>
             </div>
         </div>
 
@@ -379,44 +379,44 @@
                     <div id="youtube-player"></div>
                 </div>
                 <div class="url-input-group">
-                    <input type="url" id="youtube_url" placeholder="YouTube URL을 입력하세요">
-                    <button class="toolbar-btn" id="btn-load-yt">불러오기</button>
+                    <input data-i18n-placeholder="typing.enter_your_youtube_url" type="url" id="youtube_url" placeholder="YouTube URL을 입력하세요">
+                    <button data-i18n="common.load" class="toolbar-btn" id="btn-load-yt">불러오기</button>
                 </div>
             </div>
 
             <!-- Right: Editing Area -->
             <div class="editor-right">
                 <div class="time-row">
-                    <label style="font-weight:700; color: var(--theme-text-sub); width:40px;">시간</label>
+                    <label data-i18n="nav.hour" style="font-weight:700; color: var(--theme-text-sub); width:40px;">시간</label>
                     <input type="number" id="line-time" step="0.01" min="0" placeholder="0.00">
-                    <button class="toolbar-btn" id="btn-sync-time" title="현재 영상 시간 가져오기">⏱️ 싱크</button>
-                    <button class="toolbar-btn" id="btn-end-here" title="이 시간에서 타이핑을 종료합니다."
+                    <button data-i18n="typing.sync" data-i18n-title="typing.get_current_video_time" class="toolbar-btn" id="btn-sync-time" title="현재 영상 시간 가져오기">⏱️ 싱크</button>
+                    <button data-i18n="typing.end_here" data-i18n-title="typing.end_typing_at_this_time" class="toolbar-btn" id="btn-end-here" title="이 시간에서 타이핑을 종료합니다."
                         style="color: var(--color-pink); border-color: var(--color-pink);"> 여기서 종료하기</button>
                 </div>
 
                 <div class="input-group">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label>가사 텍스트</label>
-                        <button class="toolbar-btn" id="btn-auto-convert"
+                        <label data-i18n="typing.lyrics_text">가사 텍스트</label>
+                        <button data-i18n="typing.automatic_conversion" class="toolbar-btn" id="btn-auto-convert"
                             style="font-size: 0.8rem; padding: 4px 8px; border-color: var(--color-pink); color: var(--color-pink);">
                             자동 변환</button>
                     </div>
-                    <textarea id="line-lyrics" placeholder="가사 원문을 입력하세요"></textarea>
+                    <textarea data-i18n-placeholder="typing.please_enter_the_original_lyrics" id="line-lyrics" placeholder="가사 원문을 입력하세요"></textarea>
                 </div>
 
                 <div class="input-group">
-                    <label>읽기 (히라가나)</label>
-                    <textarea id="line-hiragana" placeholder="히라가나를 입력하세요"></textarea>
+                    <label data-i18n="typing.reading_hiragana">읽기 (히라가나)</label>
+                    <textarea data-i18n-placeholder="typing.please_enter_hiragana" id="line-hiragana" placeholder="히라가나를 입력하세요"></textarea>
                 </div>
 
                 
 
                 <div class="action-row">
-                    <button class="toolbar-btn btn-primary" id="btn-add-line" style="flex:1;">+ 추가</button>
-                    <button class="toolbar-btn" id="btn-update-line" style="flex:1; display:none;">✏️ 수정</button>
-                    <button class="toolbar-btn" id="btn-cancel-edit" style="display:none;">취소</button>
+                    <button data-i18n="typing.add" class="toolbar-btn btn-primary" id="btn-add-line" style="flex:1;">+ 추가</button>
+                    <button data-i18n="typing.edit" class="toolbar-btn" id="btn-update-line" style="flex:1; display:none;">✏️ 수정</button>
+                    <button data-i18n="common.cancellation" class="toolbar-btn" id="btn-cancel-edit" style="display:none;">취소</button>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--theme-text-muted); text-align: center; margin-top: 5px;">
+                <div data-i18n="typing.both_lyrics_and_reading_must_be" style="font-size: 0.8rem; color: var(--theme-text-muted); text-align: center; margin-top: 5px;">
                     ※ 가사, 읽기를 모두 입력해야 추가됩니다.
                 </div>
             </div>
@@ -424,25 +424,25 @@
 
         <!-- Bottom: Lines Table -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
-            <button class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
+            <h3 data-i18n="typing.list_of_registered_lyrics" style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
+            <button data-i18n="typing.delete_all" class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
         </div>
         <div class="editor-bottom">
             <table class="lines-table" id="lines-table">
                 <thead>
                     <tr>
                         <th style="width: 50px; text-align: center;">#</th>
-                        <th style="width: 100px;">시간(초)</th>
-                        <th>가사</th>
-                        <th>읽기 (히라가나)</th>
+                        <th data-i18n="typing.time_seconds" style="width: 100px;">시간(초)</th>
+                        <th data-i18n="common.lyrics">가사</th>
+                        <th data-i18n="typing.reading_hiragana">읽기 (히라가나)</th>
                         
-                        <th style="width: 100px; text-align: center;">작업</th>
+                        <th data-i18n="common.work" style="width: 100px; text-align: center;">작업</th>
                     </tr>
                 </thead>
                 <tbody id="lines-tbody">
                     <!-- Lines will be dynamically added here -->
                     <tr>
-                        <td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px;">
+                        <td data-i18n="typing.no_lyrics_registered_please_add_lyrics" colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px;">
                             등록된 가사가 없습니다. 오른쪽 입력창에서 가사를 추가해주세요.
                         </td>
                     </tr>
@@ -455,29 +455,29 @@
     <div class="modal-overlay" id="guide-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span> 타이핑 추가 가이드</span>
+                <span data-i18n="typing.additional_typing_guide"> 타이핑 추가 가이드</span>
                 <span class="close-modal" id="close-guide">✕</span>
             </div>
 
             <div style="font-size: 0.95rem; color: var(--theme-text-main); line-height: 1.6;">
-                <p><strong>1. 영상 불러오기</strong><br>
-                    YouTube 영상의 URL을 입력하고 <code>불러오기</code> 버튼을 눌러 영상을 가져옵니다.</p>
+                <p><strong data-i18n="common.n1_load_video">1. 영상 불러오기</strong><br>
+                    <span data-i18n="typing.enter_the_url_of_the_youtube">YouTube 영상의 URL을 입력하고</span> <code data-i18n="common.load">불러오기</code> <span data-i18n="typing.press_the_button_to_import_the">버튼을 눌러 영상을 가져옵니다.</span></p>
 
-                <p><strong>2. 시간 맞추기 (싱크)</strong><br>
-                    영상을 재생하다가 원하는 구절이 시작되는 타이밍에 <code>⏱️ 싱크</code> 버튼을 누르면 현재 시간이 자동으로 채워집니다.</p>
+                <p><strong data-i18n="typing.n2_set_time_sync">2. 시간 맞추기 (싱크)</strong><br>
+                    <span data-i18n="typing.while_playing_the_video_at_the">영상을 재생하다가 원하는 구절이 시작되는 타이밍에</span> <code data-i18n="typing.sync">⏱️ 싱크</code> <span data-i18n="typing.when_you_press_the_button_the">버튼을 누르면 현재 시간이 자동으로 채워집니다.</span></p>
 
-                <p><strong>3. 가사 자동 변환</strong><br>
-                    가사 텍스트를 입력하고 <code> 자동 변환</code> 버튼을 누르면 읽기(히라가나)가 알아서 변환됩니다! (직접 수정도 가능합니다)</p>
+                <p><strong data-i18n="typing.n3_automatic_conversion_of_lyrics">3. 가사 자동 변환</strong><br>
+                    <span data-i18n="typing.enter_the_lyrics_text_and">가사 텍스트를 입력하고</span> <code data-i18n="typing.automatic_conversion"> 자동 변환</code> <span data-i18n="typing.just_press_the_button_and_the">버튼을 누르면 읽기(히라가나)가 알아서 변환됩니다! (직접 수정도 가능합니다)</span></p>
 
-                <p><strong>4. 목록에 추가</strong><br>
-                    내용이 올바른지 확인한 후 <code>+ 추가</code> 버튼을 눌러 소절을 등록하세요.</p>
+                <p><strong data-i18n="typing.n4_add_to_list">4. 목록에 추가</strong><br>
+                    <span data-i18n="typing.after_confirming_that_the_contents_are">내용이 올바른지 확인한 후</span> <code data-i18n="typing.add">+ 추가</code> <span data-i18n="typing.press_the_button_to_register_the">버튼을 눌러 소절을 등록하세요.</span></p>
 
-                <p><strong>5. 여기서 종료하기 (선택)</strong><br>
-                    노래가 끝난 후 반주가 너무 길다면, 원하는 시간에서 <code> 여기서 종료하기</code> 버튼을 눌러주세요. 게임 플레이 시 해당 지점에서 바로 종료되고 점수판으로
-                    이동합니다.</p>
+                <p><strong data-i18n="typing.n5_end_here_optional">5. 여기서 종료하기 (선택)</strong><br>
+                    <span data-i18n="typing.if_the_accompaniment_is_too_long">노래가 끝난 후 반주가 너무 길다면, 원하는 시간에서</span> <code data-i18n="typing.end_here"> 여기서 종료하기</code> <span data-i18n="typing.please_press_the_button_when_playing">버튼을 눌러주세요. 게임 플레이 시 해당 지점에서 바로 종료되고 점수판으로
+                    이동합니다.</span></p>
 
                 <p style="margin-top: 15px; color: var(--color-pink); font-weight: bold;">
-                    모든 소절 등록을 마친 후 우측 상단의 <code> 저장</code>을 누르면 타이핑 등록이 완료됩니다!
+                    <span data-i18n="typing.after_registering_all_measures_click">모든 소절 등록을 마친 후 우측 상단의</span> <code data-i18n="nav.save"> 저장</code><span data-i18n="typing.click_to_complete_typing_registration">을 누르면 타이핑 등록이 완료됩니다!</span>
                 </p>
             </div>
 
@@ -485,10 +485,10 @@
                 style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 15px; border-top: 1px solid var(--theme-border);">
                 <label
                     style="font-size: 0.9rem; color: var(--theme-text-muted); display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: bold;">
-                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> 하루
-                    동안 보지 않기
+                    <input type="checkbox" id="hide-guide-today" style="width: 16px; height: 16px; cursor: pointer;"> <span data-i18n="quiz.don_t_look_for_a_day">하루
+                    동안 보지 않기</span>
                 </label>
-                <button class="toolbar-btn btn-primary" id="btn-close-guide"
+                <button data-i18n="nav.close" class="toolbar-btn btn-primary" id="btn-close-guide"
                     style="padding: 8px 20px; font-weight: bold;">닫기</button>
             </div>
         </div>
@@ -498,41 +498,41 @@
     <div class="modal-overlay" id="settings-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>콘텐츠 추가 정보 설정</span>
+                <span data-i18n="common.set_additional_content_information">콘텐츠 추가 정보 설정</span>
                 <span class="close-modal" id="close-settings">✕</span>
             </div>
 
             <div class="input-group">
-                <label>아티스트 / 출처</label>
-                <input type="text" id="artist" placeholder="예: YOASOBI">
+                <label data-i18n="common.artist_source">아티스트 / 출처</label>
+                <input data-i18n-placeholder="common.example_yoasobi" type="text" id="artist" placeholder="예: YOASOBI">
             </div>
 
             <div class="input-group">
-                <label>장르 카테고리</label>
+                <label data-i18n="common.genre_category">장르 카테고리</label>
                 <select id="genre" style="padding:10px; border:1px solid var(--theme-border); border-radius:6px; outline:none;">
                     <option value="JPOP">JPOP</option>
-                    <option value="애니메이션">애니메이션</option>
-                    <option value="기타">기타</option>
+                    <option data-i18n="common.anime" value="애니메이션">애니메이션</option>
+                    <option data-i18n="nav.etc" value="기타">기타</option>
                 </select>
             </div>
 
             <div class="input-group">
-                <label>상세 설명</label>
-                <textarea id="description" placeholder="팝업창에 표시될 노래나 대사에 대한 간단한 설명을 적어주세요."></textarea>
+                <label data-i18n="common.detailed_description">상세 설명</label>
+                <textarea data-i18n-placeholder="typing.please_write_a_brief_description_of" id="description" placeholder="팝업창에 표시될 노래나 대사에 대한 간단한 설명을 적어주세요."></textarea>
             </div>
 
             <div class="input-group">
-                <label>난이도</label>
+                <label data-i18n="common.difficulty">난이도</label>
                 <select id="difficulty" style="padding:10px; border:1px solid var(--theme-border); border-radius:6px; outline:none;">
-                    <option value="1"> (매우 쉬움)</option>
-                    <option value="2"> (쉬움)</option>
-                    <option value="3" selected> (보통)</option>
-                    <option value="4"> (어려움)</option>
-                    <option value="5"> (매우 어려움)</option>
+                    <option data-i18n="common.very_easy" value="1"> (매우 쉬움)</option>
+                    <option data-i18n="common.easy" value="2"> (쉬움)</option>
+                    <option data-i18n="common.normal" value="3" selected> (보통)</option>
+                    <option data-i18n="common.hard" value="4"> (어려움)</option>
+                    <option data-i18n="common.very_difficult" value="5"> (매우 어려움)</option>
                 </select>
             </div>
 
-            <button class="toolbar-btn btn-primary" id="btn-save-settings"
+            <button data-i18n="common.save_settings" class="toolbar-btn btn-primary" id="btn-save-settings"
                 style="margin-top: 10px; justify-content: center;">설정 저장</button>
         </div>
     </div>

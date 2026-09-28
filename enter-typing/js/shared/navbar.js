@@ -402,6 +402,15 @@
   }
 
   function initSearchBar() {
+    // type=search 로 바꾸면 크롬/엣지에 생기는 기본 X(지우기) 버튼을 숨겨 기존 모양을 유지한다.
+    if (!document.getElementById('ep-search-style')) {
+      const style = document.createElement('style');
+      style.id = 'ep-search-style';
+      style.textContent = '.search-bar input[type=search]::-webkit-search-cancel-button,' +
+        '.search-bar input[type=search]::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none;}' +
+        '.search-bar input[type=search]{-webkit-appearance:none;appearance:none;}';
+      document.head.appendChild(style);
+    }
     const searchBars = document.querySelectorAll('.search-bar');
     searchBars.forEach(bar => {
       bar.removeAttribute('onclick'); // 기존 하드코딩된 onclick 제거
@@ -409,7 +418,20 @@
       const icon = bar.querySelector('.search-icon');
 
       if (input) {
-        input.removeAttribute('readonly');
+        // 브라우저에 저장된 아이디/검색 기록이 자동으로 채워지거나 제안되지 않도록 한다.
+        // - type=search: 브라우저가 로그인(아이디) 입력칸으로 오인하지 않게 함
+        // - autocomplete=off: 입력 기록 제안 끄기
+        // - readonly 는 포커스될 때 해제: 페이지 로드 시점의 자동 채우기 방지
+        input.type = 'search';
+        input.name = 'q';
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('autocorrect', 'off');
+        input.setAttribute('autocapitalize', 'off');
+        input.setAttribute('spellcheck', 'false');
+        input.setAttribute('data-lpignore', 'true'); // LastPass 등 비밀번호 관리자 확장 무시
+        input.setAttribute('data-1p-ignore', '');    // 1Password 무시
+        input.addEventListener('focus', () => input.removeAttribute('readonly'), { once: true });
+        input.addEventListener('pointerdown', () => input.removeAttribute('readonly'), { once: true });
 
         const executeSearch = () => {
           const query = input.value.trim();

@@ -44,8 +44,8 @@ export function renderCalendar(y, m) {
         }
         grid.appendChild(el);
     }
-    const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-    document.getElementById('month-label').innerHTML = `${y}<span>년 </span><span>${months[m - 1]}</span>`;
+    const months = [i18n.t('profile.jan'), i18n.t('profile.feb'), i18n.t('profile.mar'), i18n.t('profile.apr'), i18n.t('profile.may'), i18n.t('profile.jun'), i18n.t('profile.jul'), i18n.t('profile.aug'), i18n.t('profile.sep'), i18n.t('profile.oct'), i18n.t('profile.nov'), i18n.t('profile.dec')];
+    document.getElementById('month-label').textContent = i18n.t('profile.year_month', { year: y, month: months[m - 1] });
 }
 
 export function prevMonth() {
@@ -63,13 +63,13 @@ function initAttendBtn() {
     const btn = document.getElementById('attend-btn');
     if (attendanceData[todayStr()]) {
         // 이미 오늘 출석한 경우
-        btn.textContent = '오늘 출석 완료!';
+        btn.textContent = i18n.t('profile.check_in_complete');
         btn.disabled = true;
         btn.style.background = '#90EE90';
         btn.style.color = '#2F7A2F';
     } else {
         // 오늘 아직 출석 안 한 경우 버튼 초기화
-        btn.textContent = '오늘 출석체크 하기';
+        btn.textContent = i18n.t('profile.check_in_today');
         btn.disabled = false;
         btn.style.background = '';
         btn.style.color = '';
@@ -81,7 +81,7 @@ export async function doAttend() {
     if (btn.disabled) return;
 
     if (!localStorage.getItem('ep_user')) {
-        alert('로그인이 필요한 기능입니다.');
+        alert(i18n.t('profile.this_function_requires_login'));
         location.href = '/login';
         return;
     }
@@ -100,9 +100,9 @@ export async function doAttend() {
         const resData = await res.json();
 
         if (res.ok && resData.success) {
-            alert(window.i18n ? window.i18n.getText('출석체크가 완료되었습니다! (+10점)') : '출석체크가 완료되었습니다! (+10점)');
+            alert(i18n.t('profile.attendance_complete'));
             attendanceData[today] = true;
-            btn.textContent = '오늘 출석 완료!';
+            btn.textContent = i18n.t('profile.check_in_complete');
             btn.disabled = true;
             btn.style.background = '#90EE90';
             btn.style.color = '#2F7A2F';
@@ -111,11 +111,11 @@ export async function doAttend() {
             renderCalendar(curYear, curMonth);
             calculateStats();
         } else {
-            alert(resData.detail || '출석체크 등록 실패');
+            alert(resData.detail || i18n.t('profile.attendance_failed'));
         }
     } catch (e) {
         console.error("출석체크 등록 도중 에러가 발생했습니다:", e);
-        alert('출석체크 처리 도중 예기치 못한 에러가 발생했습니다.');
+        alert(i18n.t('profile.an_unexpected_error_occurred_during_atte'));
     }
 }
 

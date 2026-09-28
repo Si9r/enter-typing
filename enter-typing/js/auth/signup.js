@@ -17,7 +17,7 @@ document.getElementById('signup-password').addEventListener('input', function ()
         document.getElementById('bar3'),
         document.getElementById('bar4')
     ];
-    const labels = ['', '약함', '보통', '강함', '매우 강함'];
+    const labels = ['', i18n.t('auth.strength_weak'), i18n.t('auth.strength_medium'), i18n.t('auth.strength_strong'), i18n.t('auth.very_strong')];
     const colors = ['', 'weak', 'medium', 'strong', 'strong'];
 
     bars.forEach((bar, i) => {
@@ -97,7 +97,7 @@ async function checkEmailDuplicate() {
     if (!emailRegex.test(emailVal)) {
         emailInput.classList.add('error');
         emailInput.classList.remove('valid');
-        errEl.textContent = '올바른 이메일 형식을 입력해주세요.';
+        errEl.textContent = i18n.t('auth.please_enter_the_correct_email_format');
         errEl.classList.add('visible');
         okEl.classList.remove('visible');
         isEmailChecked = false;
@@ -146,7 +146,7 @@ async function checkNicknameDuplicate() {
     if (nameVal.length < 2 || nameVal.length > 12) {
         nameInput.classList.add('error');
         nameInput.classList.remove('valid');
-        errEl.textContent = '닉네임은 2자 이상 12자 이하로 입력해주세요.';
+        errEl.textContent = i18n.t('common.please_enter_a_nickname_of_at');
         errEl.classList.add('visible');
         okEl.classList.remove('visible');
         isNicknameChecked = false;
@@ -200,7 +200,7 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
         valid = false;
     } else if (!isNicknameChecked) {
         nameInput.classList.add('error');
-        nameError.textContent = '닉네임 중복 확인이 필요하거나 이미 사용 중인 닉네임입니다.';
+        nameError.textContent = i18n.t('auth.the_nickname_needs_to_be_checked');
         nameError.classList.add('visible');
         valid = false;
     } else {
@@ -218,7 +218,7 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
         valid = false;
     } else if (!isEmailChecked) {
         emailInput.classList.add('error');
-        emailError.textContent = '이메일 중복 확인이 필요하거나 이미 가입된 이메일입니다.';
+        emailError.textContent = i18n.t('auth.you_need_to_double_check_your');
         emailError.classList.add('visible');
         valid = false;
     } else {
@@ -257,7 +257,7 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
     if (valid) {
         const signupBtn = document.getElementById('signup-btn');
         signupBtn.disabled = true;
-        signupBtn.textContent = '가입 중...';
+        signupBtn.textContent = i18n.t('auth.signing_up');
 
         fetch('/api/signup', {
             method: 'POST',
@@ -271,22 +271,22 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
             .then(async res => {
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alert('회원가입이 완료되었습니다. 로그인 해주세요.');
+                    alert(i18n.t('auth.membership_registration_has_been_complet'));
                     location.href = '/login';
                 } else {
                     const emailInput = document.getElementById('signup-email');
                     const emailError = document.getElementById('email-error');
                     emailInput.classList.add('error');
-                    emailError.textContent = data.detail || '회원가입에 실패했습니다. 다시 시도해주세요.';
+                    emailError.textContent = data.detail || i18n.t('auth.membership_registration_failed_please_tr');
                     emailError.classList.add('visible');
                 }
             })
             .catch(err => {
-                alert('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.');
+                alert(i18n.t('auth.unable_to_connect_to_server_please'));
             })
             .finally(() => {
                 signupBtn.disabled = false;
-                signupBtn.textContent = '회원가입';
+                signupBtn.textContent = i18n.t('nav.sign_up');
             });
     }
 });

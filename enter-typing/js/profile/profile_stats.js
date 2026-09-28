@@ -17,9 +17,9 @@ export async function loadProfileAnalysis() {
             document.getElementById('analysis-wpm-lastweek-bar').style.width = (resData.wpm_lastweek / maxWpm * 100) + '%';
             document.getElementById('analysis-wpm-month-bar').style.width = (resData.wpm_month / maxWpm * 100) + '%';
 
-            document.getElementById('analysis-play-typing-val').textContent = resData.play_typing + '회';
-            document.getElementById('analysis-play-quiz-val').textContent = resData.play_quiz + '회';
-            document.getElementById('analysis-play-battle-val').textContent = resData.play_battle + '회';
+            document.getElementById('analysis-play-typing-val').textContent = i18n.t('common.n_times', { count: resData.play_typing });
+            document.getElementById('analysis-play-quiz-val').textContent = i18n.t('common.n_times', { count: resData.play_quiz });
+            document.getElementById('analysis-play-battle-val').textContent = i18n.t('common.n_times', { count: resData.play_battle });
 
             const totalPlays = resData.play_typing + resData.play_quiz + resData.play_battle;
             const pctTyping = totalPlays > 0 ? Math.round((resData.play_typing / totalPlays) * 100) : 0;
@@ -177,7 +177,7 @@ export function loadDetailStats(contentId = "") {
 }
 
 export async function resetTypoStats() {
-    if (!confirm('정말로 오타 기록을 모두 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (!confirm(i18n.t('profile.are_you_sure_you_want_to_3'))) return;
 
     try {
         const res = await fetch('/api/typo-stats', { method: 'DELETE' });
@@ -189,11 +189,11 @@ export async function resetTypoStats() {
             const sel = document.getElementById('content-selector');
             if (sel) loadDetailStats(sel.value);
         } else {
-            alert('초기화에 실패했습니다.');
+            alert(i18n.t('profile.initialization_failed'));
         }
     } catch (e) {
         console.error(e);
-        alert('서버 오류가 발생했습니다.');
+        alert(i18n.t('common.a_server_error_occurred'));
     }
 }
 
@@ -252,18 +252,18 @@ function renderDetailAnalysis(result) {
 
                 const cell = document.createElement('div');
                 cell.className = 'hm-cell ' + levelClass;
-                let tip = `${keyLabel(ch)} — 오타 ${errorCount}회`;
+                let tip = i18n.t('profile.typo_tooltip', { key: keyLabel(ch), count: errorCount });
                 if (totalCount > 0) {
-                    tip += ` (오타율 ${Math.round((errorCount / totalCount) * 100)}%)`;
+                    tip += i18n.t('profile.typo_rate', { rate: Math.round((errorCount / totalCount) * 100) });
                 }
                 cell.title = tip;
-                cell.innerHTML = `<span class="hm-char">${keyLabel(ch)}</span><span class="hm-rate">${errorCount > 0 ? errorCount + '회' : '-'}</span>`;
+                cell.innerHTML = `<span class="hm-char">${keyLabel(ch)}</span><span class="hm-rate">${errorCount > 0 ? i18n.t('common.n_times', { count: errorCount }) : '-'}</span>`;
                 rowEl.appendChild(cell);
             }
             hm.appendChild(rowEl);
         });
     } else {
-        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        const msg = i18n.t('profile.no_typo_history_yet');
         hm.innerHTML = `<div style="text-align:center; width:100%; padding:20px; color:var(--theme-text-muted);">${msg}</div>`;
     }
 
@@ -278,7 +278,7 @@ function renderDetailAnalysis(result) {
         container.innerHTML = topTypos.map((item) => {
             const pct = Math.round((item.error_count / maxErrors) * 100);
             const level = pct >= 60 ? '' : pct >= 30 ? ' med' : ' low';
-            const totalInfo = item.total_count > 0 ? `${item.total_count}회 중` : '';
+            const totalInfo = item.total_count > 0 ? i18n.t('profile.out_of_n', { count: item.total_count }) : '';
             return `
             <div class="typo-row">
               <div class="typo-char">
@@ -288,12 +288,12 @@ function renderDetailAnalysis(result) {
               <div class="typo-bar-bg">
                 <div class="typo-bar-fill${level}" style="width:${pct}%;"></div>
               </div>
-              <div class="typo-pct${level}">${item.error_count}회</div>
+              <div class="typo-pct${level}">${i18n.t('common.n_times', { count: item.error_count })}</div>
             </div>
           `;
         }).join('');
     } else {
-        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        const msg = i18n.t('profile.no_typo_history_yet');
         container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">${msg}</div>`;
     }
 
@@ -317,12 +317,12 @@ function renderDetailAnalysis(result) {
             <div style="display: flex; align-items: center; gap: 10px; font-family: monospace; font-size: 1.1rem;">
               <span style="color: #27ae60; font-weight: 700; background: rgba(39, 174, 96, 0.12); padding: 4px 10px; border-radius: 6px;">${keyLabel(rm.expected_key)}</span>
               <i class="ph-bold ph-arrow-right" style="color: var(--theme-text-muted);"></i>
-              <span style="color: #e74c3c; font-weight: 700; background: rgba(231, 76, 60, 0.12); padding: 4px 10px; border-radius: 6px;">${rm.typo_key ? keyLabel(rm.typo_key) : '(없음)'}</span>
+              <span style="color: #e74c3c; font-weight: 700; background: rgba(231, 76, 60, 0.12); padding: 4px 10px; border-radius: 6px;">${rm.typo_key ? keyLabel(rm.typo_key) : i18n.t('profile.doesn_t_exist')}</span>
             </div>
           </div>
           <div style="text-align: right;">
             <div style="font-weight: 800; color: var(--theme-text-main); font-size: 1.15rem;">
-              ${rm.error_count}<span style="font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600; margin-left: 2px;">회</span>
+              ${rm.error_count}<span style="font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600; margin-left: 2px;">${i18n.t('profile.unit_times')}</span>
             </div>
             ${pctInfo}
           </div>
@@ -330,7 +330,7 @@ function renderDetailAnalysis(result) {
       `;
         }).join('');
     } else {
-        const msg = window.i18n ? window.i18n.getText("오타 기록이 아직 없습니다.") : "오타 기록이 아직 없습니다.";
+        const msg = i18n.t('profile.no_typo_history_yet');
         romajiContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--theme-text-muted); font-weight: bold;">${msg}</div>`;
     }
 }

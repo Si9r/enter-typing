@@ -20,7 +20,7 @@ document.getElementById('new-password').addEventListener('input', function () {
     const score = getStrength(pw);
     const bars = ['bar1', 'bar2', 'bar3', 'bar4'].map(id => document.getElementById(id));
     const colors = ['', 'weak', 'medium', 'strong', 'strong'];
-    const lbls = ['', '약함', '보통', '강함', '매우 강함'];
+    const lbls = ['', i18n.t('auth.strength_weak'), i18n.t('auth.strength_medium'), i18n.t('auth.strength_strong'), i18n.t('auth.very_strong')];
 
     bars.forEach((b, i) => {
         b.className = 'strength-bar';
@@ -99,7 +99,7 @@ document.getElementById('changeForm').addEventListener('submit', async function 
     if (!valid) return;
 
     changeBtn.disabled = true;
-    changeBtn.textContent = '변경 중...';
+    changeBtn.textContent = i18n.t('common.changing');
 
     try {
         const res = await fetch('/api/change-password', {
@@ -115,15 +115,15 @@ document.getElementById('changeForm').addEventListener('submit', async function 
             sessionStorage.removeItem('change_pw_email'); // 세션 정리
             showSuccess();
         } else {
-            pwError.textContent = data.detail || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.';
+            pwError.textContent = data.detail || i18n.t('auth.password_change_failed');
             pwError.classList.add('visible');
         }
     } catch (err) {
-        pwError.textContent = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        pwError.textContent = i18n.t('auth.unable_to_connect_to_server_please');
         pwError.classList.add('visible');
     } finally {
         changeBtn.disabled = false;
-        changeBtn.textContent = '비밀번호 변경하기';
+        changeBtn.textContent = i18n.t('auth.change_your_password');
     }
 });
 

@@ -32,7 +32,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     if (!valid) return;
 
     loginBtn.disabled = true;
-    loginBtn.textContent = '로그인 중...';
+    loginBtn.textContent = i18n.t('auth.logging_in');
 
     try {
         const res = await fetch('/api/login', {
@@ -64,15 +64,15 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             }
         } else {
             passwordInput.classList.add('error');
-            passwordError.textContent = data.detail || '이메일 또는 비밀번호가 올바르지 않습니다.';
+            passwordError.textContent = data.detail || i18n.t('auth.your_email_or_password_is_incorrect');
             passwordError.classList.add('visible');
         }
     } catch (err) {
-        passwordError.textContent = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        passwordError.textContent = i18n.t('auth.unable_to_connect_to_server_please');
         passwordError.classList.add('visible');
     } finally {
         loginBtn.disabled = false;
-        loginBtn.textContent = '로그인';
+        loginBtn.textContent = i18n.t('nav.login');
     }
 });
 

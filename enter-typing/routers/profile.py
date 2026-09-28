@@ -51,6 +51,7 @@ def get_my_history(db: Session = Depends(get_db), current_user: models.User = De
                 "genre": th.genre,
                 "wpm": th.wpm,
                 "accuracy": th.accuracy,
+                "score": th.score,
                 "score_str": f"{th.score}점 · {th.wpm} WPM · {int(th.accuracy)}%",
                 "played_at": p_time.isoformat(),
                 "_raw_date": p_time

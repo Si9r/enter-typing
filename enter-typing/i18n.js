@@ -348,7 +348,8 @@
         });
     }).finally(show);
 
-    window.i18n = { t, apply, ready, setLanguage, getLang, SUPPORTED };
+    // getText: 예전 코드가 부르던 이름 (LEGACY). 키와 한국어 문장 모두 받는다.
+    window.i18n = { t, apply, ready, setLanguage, getLang, SUPPORTED, getText: t };
     window.setLanguage = setLanguage;           // navbar 언어 선택 메뉴에서 사용
     window.i18nTranslate = legacyTranslate;     // LEGACY: 기존 JS 호환
     window.getCurrentLanguage = getLang;        // LEGACY: 예전 엔진의 전역 함수

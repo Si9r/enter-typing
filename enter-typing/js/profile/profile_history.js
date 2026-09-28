@@ -1,6 +1,30 @@
 // ── 히스토리 / 내 컨텐츠 탭: 플레이 기록, 제작한 콘텐츠 목록 ──────────
 import { updateBadges } from './profile_stats.js';
 
+// 서버 데이터(제목 등 사용자가 입력한 값)는 HTML 로 넣기 전에 반드시 이스케이프한다
+function esc(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function emptyMessage(key) {
+    return `<div style="text-align:center; padding: 40px; color: var(--theme-text-muted); font-weight: bold;">${i18n.t(key)}</div>`;
+}
+
+const EDIT_BTN_STYLE = 'display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;';
+const DELETE_BTN_STYLE = 'display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;';
+
+function actionButtons(editUrl, deleteFn, id) {
+    return `
+          <div style="display:flex; gap:8px; flex-shrink:0;">
+            <button title="${i18n.t('common.edit')}" onclick="event.stopPropagation(); location.href='${editUrl}'" style="${EDIT_BTN_STYLE}"><i class="ph-bold ph-pencil-simple"></i> ${i18n.t('common.edit')}</button>
+            <button title="${i18n.t('nav.delete')}" onclick="event.stopPropagation(); ${deleteFn}(${Number(id)})" style="${DELETE_BTN_STYLE}"><i class="ph-bold ph-trash"></i> ${i18n.t('nav.delete')}</button>
+          </div>`;
+}
+
+const DATE_LOCALES = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP' };
+
 export function switchSubTab(type) {
     document.getElementById('mytyping-list').style.display = type === 'typing' ? 'block' : 'none';
     document.getElementById('myquiz-list').style.display = type === 'quiz' ? 'block' : 'none';
@@ -35,24 +59,21 @@ export async function loadMyTypingContents() {
         const container = document.getElementById('mytyping-list');
         if (resData.success && resData.data.length > 0) {
             container.innerHTML = resData.data.map(item => `
-        <div class="history-item" style="cursor:pointer;" onclick="location.href='/typing/${item.id}'">
+        <div class="history-item" style="cursor:pointer;" onclick="location.href='/typing/${Number(item.id)}'">
           <div class="history-icon typing">⌨️</div>
           <div class="history-info">
-            <div class="title">${item.title} — ${item.artist}</div>
-            <div class="sub">난이도: ${` X ${item.difficulty || 3}`} · 장르: ${item.genre || 'JPOP'}</div>
+            <div class="title">${esc(item.title)} — ${esc(item.artist)}</div>
+            <div class="sub">${i18n.t('profile.difficulty_label', { level: ` X ${Number(item.difficulty) || 3}` })} · ${i18n.t('profile.genre_label', { genre: esc(item.genre || 'JPOP') })}</div>
           </div>
           <div class="history-result">
-            <div class="score">⏱️ ${item.best_time || 0}초</div>
-            <div class="date">플레이: ${item.play_count || 0}회</div>
+            <div class="score">⏱️ ${i18n.t('common.n_seconds', { count: item.best_time || 0 })}</div>
+            <div class="date">${i18n.t('profile.play_count_label', { count: item.play_count || 0 })}</div>
           </div>
-          <div style="display:flex; gap:8px; flex-shrink:0;">
-            <button title="수정" onclick="event.stopPropagation(); location.href='/typing/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
-            <button title="삭제" onclick="event.stopPropagation(); deleteMyTyping(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
-          </div>
+          ${actionButtons(`/typing/${Number(item.id)}/edit`, 'deleteMyTyping', item.id)}
         </div>
       `).join('');
         } else {
-            container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--theme-text-muted); font-weight: bold;">아직 제작한 타이핑 콘텐츠가 없습니다.</div>';
+            container.innerHTML = emptyMessage('profile.no_typing_content_yet');
         }
     } catch (e) {
         console.error("내 타이핑 콘텐츠를 불러오는 도중 오류가 발생했습니다:", e);
@@ -60,11 +81,11 @@ export async function loadMyTypingContents() {
 }
 
 export async function deleteMyTyping(id) {
-    if (!confirm("정말 이 타이핑 콘텐츠를 삭제하시겠습니까?")) return;
+    if (!confirm(i18n.t('profile.are_you_sure_you_want_to_2'))) return;
 
     const token = localStorage.getItem('ep_user');
     if (!token) {
-        alert("로그인이 필요합니다.");
+        alert(i18n.t('common.login_is_required'));
         return;
     }
 
@@ -75,23 +96,23 @@ export async function deleteMyTyping(id) {
         const resData = await res.json();
 
         if (resData.success) {
-            alert("삭제되었습니다.");
+            alert(i18n.t('common.it_has_been_deleted'));
             loadMyTypingContents(); // 목록 새로고침
         } else {
-            alert(resData.detail || "삭제에 실패했습니다.");
+            alert(resData.detail || i18n.t('common.deletion_failed'));
         }
     } catch (e) {
         console.error("삭제 중 오류가 발생했습니다:", e);
-        alert("오류가 발생했습니다.");
+        alert(i18n.t('common.an_error_occurred'));
     }
 }
 
 export async function deleteMyQuiz(id) {
-    if (!confirm("정말 이 퀴즈 콘텐츠를 삭제하시겠습니까?")) return;
+    if (!confirm(i18n.t('profile.are_you_sure_you_want_to'))) return;
 
     const token = localStorage.getItem('ep_user');
     if (!token) {
-        alert("로그인이 필요합니다.");
+        alert(i18n.t('common.login_is_required'));
         return;
     }
 
@@ -102,14 +123,14 @@ export async function deleteMyQuiz(id) {
         const resData = await res.json();
 
         if (resData.success) {
-            alert("삭제되었습니다.");
+            alert(i18n.t('common.it_has_been_deleted'));
             loadMyQuizContents(); // 목록 새로고침
         } else {
-            alert(resData.detail || "삭제에 실패했습니다.");
+            alert(resData.detail || i18n.t('common.deletion_failed'));
         }
     } catch (e) {
         console.error("삭제 중 오류가 발생했습니다:", e);
-        alert("오류가 발생했습니다.");
+        alert(i18n.t('common.an_error_occurred'));
     }
 }
 
@@ -191,11 +212,11 @@ function updateProfileDashboard(data) {
     const quizPct = totalPlays > 0 ? Math.round((quizCount / totalPlays) * 100) : 0;
     const battlePct = totalPlays > 0 ? Math.round((battleCount / totalPlays) * 100) : 0;
 
-    document.getElementById('analysis-play-typing-val').textContent = typingCount + '회';
+    document.getElementById('analysis-play-typing-val').textContent = i18n.t('common.n_times', { count: typingCount });
     document.getElementById('analysis-play-typing-bar').style.width = typingPct + '%';
-    document.getElementById('analysis-play-quiz-val').textContent = quizCount + '회';
+    document.getElementById('analysis-play-quiz-val').textContent = i18n.t('common.n_times', { count: quizCount });
     document.getElementById('analysis-play-quiz-bar').style.width = quizPct + '%';
-    document.getElementById('analysis-play-battle-val').textContent = battleCount + '회';
+    document.getElementById('analysis-play-battle-val').textContent = i18n.t('common.n_times', { count: battleCount });
     document.getElementById('analysis-play-battle-bar').style.width = battlePct + '%';
     document.getElementById('analysis-pct-typing').textContent = typingPct + '%';
     document.getElementById('analysis-pct-quiz').textContent = quizPct + '%';
@@ -222,6 +243,36 @@ function updateProfileDashboard(data) {
     }
 }
 
+// 히스토리 점수 문구는 서버가 보낸 숫자로 현재 언어에 맞게 만든다 (서버의 score_str 은 한국어 고정)
+const RANK_MEDALS = { 1: '🥇 ', 2: '🥈 ', 3: '🥉 ' };
+
+function formatHistoryScore(item) {
+    const acc = Math.floor(item.accuracy || 0);
+    switch (item.type) {
+        case 'typing':
+            return i18n.t('profile.score_typing', { score: item.score ?? 0, wpm: item.wpm ?? 0, acc });
+        case 'quiz':
+            return i18n.t('profile.score_quiz', { score: item.score ?? 0, total: item.total_questions ?? 0 });
+        case 'battle':
+            return i18n.t('profile.score_battle', {
+                rank: (RANK_MEDALS[item.rank] || '') + i18n.t('common.rank_n', { rank: item.rank }),
+                score: item.score ?? 0, wpm: item.wpm ?? 0, acc,
+            });
+        case 'create_typing':
+            return i18n.t('profile.registered_typing_content');
+        case 'create_quiz':
+            return i18n.t('profile.registered_quiz_content');
+        default:
+            return item.score_str || '';
+    }
+}
+
+// 서버가 넣어 보내는 고정 장르 문구만 번역한다 (콘텐츠의 실제 장르는 사용자가 입력한 값이라 그대로 둔다)
+function historyGenreLabel(genre) {
+    const fixed = { '퀴즈': 'nav.quiz', '실시간 대전': 'common.live_battle', '알 수 없음': 'common.unknown' };
+    return fixed[genre] ? i18n.t(fixed[genre]) : (genre || '');
+}
+
 export async function loadMyHistory() {
     const token = localStorage.getItem('ep_user');
     if (!token) return;
@@ -236,39 +287,32 @@ export async function loadMyHistory() {
                 if (item.type === 'typing') {
                     icon = '<div class="history-icon typing">⌨️</div>';
                     url = `/typing/${item.content_id}/play`;
-                    typeLabel = '타이핑';
+                    typeLabel = i18n.t('nav.typing');
                 } else if (item.type === 'battle') {
                     icon = '<div class="history-icon battle"></div>';
                     url = '/battle';
-                    typeLabel = '실시간 대전';
+                    typeLabel = i18n.t('common.live_battle');
                 } else if (item.type === 'quiz') {
                     icon = '<div class="history-icon quiz"></div>';
                     url = item.content_id ? `/quiz/${item.content_id}/play` : '/quiz';
-                    typeLabel = '퀴즈';
+                    typeLabel = i18n.t('nav.quiz');
                 } else if (item.type === 'create_typing') {
                     icon = '<div class="history-icon create-typing" style="background:var(--color-blue);color:white;">📁</div>';
                     url = `/typing/${item.content_id}`;
-                    typeLabel = '타이핑 제작';
+                    typeLabel = i18n.t('profile.typing_production');
                 } else if (item.type === 'create_quiz') {
                     icon = '<div class="history-icon create-quiz" style="background:var(--color-purple);color:white;">➕</div>';
                     url = `/quiz/${item.content_id}/play`;
-                    typeLabel = '퀴즈 제작';
+                    typeLabel = i18n.t('common.quiz_creation');
                 }
-                let scoreStr = item.score_str;
-                if (window.i18n) {
-                    if (scoreStr === '타이핑 콘텐츠 등록') scoreStr = window.i18n.getText('타이핑 콘텐츠 등록');
-                    else if (scoreStr === '퀴즈 콘텐츠 등록') scoreStr = window.i18n.getText('퀴즈 콘텐츠 등록');
-                    else if (scoreStr.includes('정답')) {
-                        scoreStr = scoreStr.replace('정답', window.i18n.getText('정답'));
-                    }
-                }
-                let dateStr = new Date(item.played_at).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const scoreStr = formatHistoryScore(item);
+                const dateStr = new Date(item.played_at).toLocaleDateString(DATE_LOCALES[i18n.getLang()], { year: 'numeric', month: '2-digit', day: '2-digit' });
                 return `
           <div class="history-item" style="cursor:pointer;" onclick="location.href='${url}'">
             ${icon}
             <div class="history-info">
-              <div class="title">${item.title}</div>
-              <div class="sub">${typeLabel} · ${item.genre}</div>
+              <div class="title">${esc(item.title)}</div>
+              <div class="sub">${typeLabel} · ${esc(historyGenreLabel(item.genre))}</div>
             </div>
             <div class="history-result">
               <div class="score">${scoreStr}</div>
@@ -280,11 +324,11 @@ export async function loadMyHistory() {
             }).join('');
         } else {
             updateProfileDashboard([]);
-            container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--theme-text-muted); font-weight: bold;">아직 플레이한 기록이 없습니다.</div>';
+            container.innerHTML = emptyMessage('profile.no_history_yet');
         }
     } catch (e) {
         console.error("히스토리를 불러오는 도중 오류가 발생했습니다:", e);
-        document.getElementById('my-history-list').innerHTML = `<div style="text-align:center; padding: 40px; color: red; font-weight: bold;">오류가 발생했습니다:<br>${e.message}</div>`;
+        document.getElementById('my-history-list').innerHTML = `<div style="text-align:center; padding: 40px; color: red; font-weight: bold;">${esc(i18n.t('common.error_occurred_detail', { message: e.message }))}</div>`;
     }
 }
 
@@ -297,23 +341,20 @@ export async function loadMyQuizContents() {
         const container = document.getElementById('myquiz-list');
         if (resData.success && resData.data.length > 0) {
             container.innerHTML = resData.data.map(item => `
-        <div class="history-item" style="cursor:pointer;" onclick="location.href='/quiz/${item.id}/play'">
+        <div class="history-item" style="cursor:pointer;" onclick="location.href='/quiz/${Number(item.id)}/play'">
           <div class="history-icon quiz"></div>
           <div class="history-info">
-            <div class="title">${item.title}</div>
-            <div class="sub">난이도: ${` X ${item.difficulty || 3}`}</div>
+            <div class="title">${esc(item.title)}</div>
+            <div class="sub">${i18n.t('profile.difficulty_label', { level: ` X ${Number(item.difficulty) || 3}` })}</div>
           </div>
           <div class="history-result">
-            <div class="score"> 최고 점수: ${item.best_score || 0}</div>
+            <div class="score"> ${i18n.t('profile.best_score_label', { score: item.best_score || 0 })}</div>
           </div>
-          <div style="display:flex; gap:8px; flex-shrink:0;">
-            <button title="수정" onclick="event.stopPropagation(); location.href='/quiz/${item.id}/edit'" style="display:flex; align-items:center; gap:5px; background: #3498db; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-pencil-simple"></i> 수정</button>
-            <button title="삭제" onclick="event.stopPropagation(); deleteMyQuiz(${item.id})" style="display:flex; align-items:center; gap:5px; background: #ff4757; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="ph-bold ph-trash"></i> 삭제</button>
-          </div>
+          ${actionButtons(`/quiz/${Number(item.id)}/edit`, 'deleteMyQuiz', item.id)}
         </div>
       `).join('');
         } else {
-            container.innerHTML = '<div style="text-align:center; padding: 40px; color: var(--theme-text-muted); font-weight: bold;">아직 제작한 퀴즈 콘텐츠가 없습니다.</div>';
+            container.innerHTML = emptyMessage('profile.no_quiz_content_yet');
         }
     } catch (e) {
         console.error("내 퀴즈 콘텐츠를 불러오는 도중 오류가 발생했습니다:", e);

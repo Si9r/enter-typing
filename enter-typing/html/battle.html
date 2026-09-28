@@ -1052,7 +1052,7 @@
                         <div class="chat-input-row">
                             <input data-i18n-placeholder="battle.please_enter_your_message" type="text" id="chat-input" placeholder="메시지를 입력하세요..."
                                 onkeydown="if(event.key==='Enter') sendChatMessage()">
-                            <button data-i18n="common.forwarding" class="chat-send-btn" onclick="sendChatMessage()">전송</button>
+                            <button data-i18n="common.send" class="chat-send-btn" onclick="sendChatMessage()">전송</button>
                         </div>
                     </div>
                 </div>
@@ -1390,7 +1390,7 @@
                         style="flex: 1; padding: 12px 15px; border-radius: 12px; border: 2px solid var(--theme-border); font-size: 1rem; outline: none; transition: all 0.2s;"
                         onfocus="this.style.borderColor='var(--color-pink)'"
                         onblur="this.style.borderColor='var(--theme-border)'" />
-                    <button data-i18n="common.forwarding" id="quiz-chat-send-btn" class="chat-send-btn" disabled onclick="sendQuizChatMessage()"
+                    <button data-i18n="common.send" id="quiz-chat-send-btn" class="chat-send-btn" disabled onclick="sendQuizChatMessage()"
                         style="padding: 0 25px; border-radius: 12px; font-weight: bold; background: var(--color-pink); color: white; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s;"
                         onmouseover="this.style.background='var(--color-pink-hover)'"
                         onmouseout="this.style.background='var(--color-pink)'"

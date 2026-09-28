@@ -46,7 +46,7 @@ document.getElementById('emailForm').addEventListener('submit', async function (
 
     // 버튼 로딩 상태
     sendBtn.disabled = true;
-    sendBtn.textContent = '발송 중...';
+    sendBtn.textContent = i18n.t('auth.sending');
 
     try {
         const res = await fetch('/api/send-verification-code', {
@@ -58,7 +58,7 @@ document.getElementById('emailForm').addEventListener('submit', async function (
 
         if (!res.ok) {
             emailInput.classList.add('error');
-            emailError.textContent = data.detail || '발송에 실패했습니다. 다시 시도해주세요.';
+            emailError.textContent = data.detail || i18n.t('auth.sending_failed_please_try_again');
             emailError.classList.add('visible');
             return;
         }
@@ -69,11 +69,11 @@ document.getElementById('emailForm').addEventListener('submit', async function (
         goStep(2);
         startTimer();
     } catch (err) {
-        emailError.textContent = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        emailError.textContent = i18n.t('auth.unable_to_connect_to_server_please');
         emailError.classList.add('visible');
     } finally {
         sendBtn.disabled = false;
-        sendBtn.textContent = '인증번호 발송';
+        sendBtn.textContent = i18n.t('auth.send_authentication_number');
     }
 });
 
@@ -97,7 +97,7 @@ function startTimer() {
         updateTimerDisplay();
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            document.getElementById('timer').textContent = '만료됨';
+            document.getElementById('timer').textContent = i18n.t('auth.expired');
             document.getElementById('resend-btn').disabled = false;
         }
     }, 1000);
@@ -113,7 +113,7 @@ function updateTimerDisplay() {
 document.getElementById('resend-btn').addEventListener('click', async function () {
     const resendBtn = this;
     resendBtn.disabled = true;
-    resendBtn.textContent = '발송 중';
+    resendBtn.textContent = i18n.t('auth.shipping');
 
     try {
         const res = await fetch('/api/send-verification-code', {
@@ -131,7 +131,7 @@ document.getElementById('resend-btn').addEventListener('click', async function (
         // 네트워크 오류 시 재시도 허용
         resendBtn.disabled = false;
     } finally {
-        resendBtn.textContent = '재전송';
+        resendBtn.textContent = i18n.t('auth.retransmit');
     }
 });
 
@@ -145,13 +145,13 @@ document.getElementById('codeForm').addEventListener('submit', async function (e
 
     if (code.length !== 6 || !/^\d{6}$/.test(code)) {
         codeInput.classList.add('error');
-        codeError.textContent = '6자리 숫자를 입력해주세요.';
+        codeError.textContent = i18n.t('auth.please_enter_a_6_digit_number');
         codeError.classList.add('visible');
         return;
     }
 
     verifyBtn.disabled = true;
-    verifyBtn.textContent = '확인 중...';
+    verifyBtn.textContent = i18n.t('common.checking');
 
     try {
         const res = await fetch('/api/verify-code', {
@@ -168,15 +168,15 @@ document.getElementById('codeForm').addEventListener('submit', async function (e
             goStep(3);
         } else {
             codeInput.classList.add('error');
-            codeError.textContent = data.detail || '인증번호가 올바르지 않습니다.';
+            codeError.textContent = data.detail || i18n.t('auth.the_authentication_number_is_incorrect');
             codeError.classList.add('visible');
         }
     } catch (err) {
-        codeError.textContent = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+        codeError.textContent = i18n.t('auth.unable_to_connect_to_server_please');
         codeError.classList.add('visible');
     } finally {
         verifyBtn.disabled = false;
-        verifyBtn.textContent = '인증번호 확인';
+        verifyBtn.textContent = i18n.t('auth.check_authentication_number');
     }
 });
 

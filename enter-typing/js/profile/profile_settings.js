@@ -8,7 +8,7 @@ export function openEditModal() {
     // 로그인 상태 확인
     const user = (typeof NavAuth !== 'undefined') ? NavAuth.getUser() : null;
     if (!user || !user.email) {
-        alert('로그인이 필요합니다.');
+        alert(i18n.t('common.login_is_required'));
         location.href = '/login';
         return;
     }
@@ -81,14 +81,14 @@ export async function checkNewNicknameDuplicate() {
     input.classList.remove('error', 'valid');
 
     if (newNick === '') {
-        showMErr('m-new-nick-err', '닉네임을 입력해주세요.');
+        showMErr('m-new-nick-err', i18n.t('profile.please_enter_your_nickname'));
         input.classList.add('error');
         isModalNicknameChecked = false;
         return;
     }
 
     if (newNick.length < 2 || newNick.length > 12) {
-        showMErr('m-new-nick-err', '닉네임은 2자 이상 12자 이하로 입력해주세요.');
+        showMErr('m-new-nick-err', i18n.t('common.please_enter_a_nickname_of_at'));
         input.classList.add('error');
         isModalNicknameChecked = false;
         return;
@@ -96,7 +96,7 @@ export async function checkNewNicknameDuplicate() {
 
     // 현재 본인의 닉네임과 같은 경우
     if (newNick === user.nickname) {
-        okEl.textContent = '현재 사용 중인 본인의 닉네임입니다.';
+        okEl.textContent = i18n.t('profile.this_is_your_nickname');
         okEl.classList.add('visible');
         input.classList.add('valid');
         isModalNicknameChecked = true;
@@ -105,7 +105,7 @@ export async function checkNewNicknameDuplicate() {
 
     const btn = document.getElementById('m-check-nick-btn');
     btn.disabled = true;
-    btn.textContent = '확인 중...';
+    btn.textContent = i18n.t('common.checking');
 
     try {
         const res = await fetch('/api/check-nickname?nickname=' + encodeURIComponent(newNick));
@@ -122,43 +122,43 @@ export async function checkNewNicknameDuplicate() {
                 isModalNicknameChecked = true;
             }
         } else {
-            showMErr('m-new-nick-err', data.detail || '중복 확인에 실패했습니다.');
+            showMErr('m-new-nick-err', data.detail || i18n.t('profile.duplicate_check_failed'));
             input.classList.add('error');
             isModalNicknameChecked = false;
         }
     } catch (e) {
-        showMErr('m-new-nick-err', '서버에 연결할 수 없습니다.');
+        showMErr('m-new-nick-err', i18n.t('common.unable_to_connect_to_server'));
         input.classList.add('error');
         isModalNicknameChecked = false;
     } finally {
         btn.disabled = false;
-        btn.textContent = '중복 확인';
+        btn.textContent = i18n.t('common.check_for_duplicates');
     }
 }
 
 // ── 닉네임 변경 ────────────────────────────────────────────
 export async function submitChangeNickname() {
     const user = NavAuth.getUser();
-    if (!user || !user.email) { alert('로그인 정보가 없습니다.'); return; }
+    if (!user || !user.email) { alert(i18n.t('profile.there_is_no_login_information')); return; }
 
     const newNick = document.getElementById('m-new-nick').value.trim();
     const input = document.getElementById('m-new-nick');
     hideMErr('m-new-nick-err');
 
     if (newNick.length < 2 || newNick.length > 12) {
-        showMErr('m-new-nick-err', '닉네임은 2자 이상 12자 이하로 입력해주세요.');
+        showMErr('m-new-nick-err', i18n.t('common.please_enter_a_nickname_of_at'));
         input.classList.add('error');
         return;
     }
 
     if (!isModalNicknameChecked) {
-        showMErr('m-new-nick-err', '닉네임 중복 확인이 필요합니다.');
+        showMErr('m-new-nick-err', i18n.t('profile.nickname_duplication_check_is_required'));
         input.classList.add('error');
         return;
     }
 
     const btn = document.getElementById('m-change-nick-btn');
-    btn.disabled = true; btn.textContent = '변경 중...';
+    btn.disabled = true; btn.textContent = i18n.t('common.changing');
 
     try {
         const res = await fetch('/api/change-nickname', {
@@ -171,7 +171,7 @@ export async function submitChangeNickname() {
         const data = await res.json();
 
         if (res.ok && data.success) {
-            alert('닉네임이 변경되었습니다.');
+            alert(i18n.t('profile.your_nickname_has_changed'));
 
             // 업데이트된 사용자 정보 저장
             const updatedUser = { ...user, nickname: data.nickname || newNick };
@@ -184,19 +184,19 @@ export async function submitChangeNickname() {
             // 네비게이션 바 등 동기화를 위해 페이지 새로고침
             location.reload();
         } else {
-            showMErr('m-new-nick-err', data.detail || '변경에 실패했습니다.');
+            showMErr('m-new-nick-err', data.detail || i18n.t('common.change_failed'));
         }
     } catch (e) {
-        alert('서버에 연결할 수 없습니다.');
+        alert(i18n.t('common.unable_to_connect_to_server'));
     } finally {
-        btn.disabled = false; btn.textContent = '닉네임 변경';
+        btn.disabled = false; btn.textContent = i18n.t('profile.change_nickname');
     }
 }
 
 // ── 비밀번호 변경 ──────────────────────────────────────────
 export async function submitChangePassword() {
     const user = NavAuth.getUser();
-    if (!user || !user.email) { alert('로그인 정보가 없습니다.'); return; }
+    if (!user || !user.email) { alert(i18n.t('profile.there_is_no_login_information')); return; }
 
     const curPw = document.getElementById('m-cur-pw').value;
     const newPw = document.getElementById('m-new-pw').value;
@@ -205,15 +205,15 @@ export async function submitChangePassword() {
 
     hideMErr('m-cur-pw-err'); hideMErr('m-new-pw-err'); hideMErr('m-new-pw2-err');
 
-    if (!curPw) { showMErr('m-cur-pw-err', '현재 비밀번호를 입력해주세요.'); valid = false; }
+    if (!curPw) { showMErr('m-cur-pw-err', i18n.t('profile.please_enter_your_current_password')); valid = false; }
     const pwOk = /[a-zA-Z]/.test(newPw) && /[0-9]/.test(newPw) && newPw.length >= 8;
-    if (!pwOk) { showMErr('m-new-pw-err', '영문, 숫자를 포함해 8자 이상 입력해주세요.'); valid = false; }
-    if (newPw !== newPw2) { showMErr('m-new-pw2-err', '비밀번호가 일치하지 않습니다.'); valid = false; }
+    if (!pwOk) { showMErr('m-new-pw-err', i18n.t('profile.please_enter_at_least_8_characters')); valid = false; }
+    if (newPw !== newPw2) { showMErr('m-new-pw2-err', i18n.t('common.password_does_not_match')); valid = false; }
     if (!valid) return;
 
     // Step 1: 현재 비밀번호로 로그인 검증
     const btn = document.getElementById('m-change-pw-btn');
-    btn.disabled = true; btn.textContent = '변경 중...';
+    btn.disabled = true; btn.textContent = i18n.t('common.changing');
 
     try {
         // 현재 비밀번호 검증 (login API 재활용)
@@ -224,7 +224,7 @@ export async function submitChangePassword() {
         });
         const verifyData = await verifyRes.json();
         if (!verifyRes.ok) {
-            showMErr('m-cur-pw-err', '현재 비밀번호가 올바르지 않습니다.');
+            showMErr('m-cur-pw-err', i18n.t('profile.your_current_password_is_incorrect'));
             return;
         }
 
@@ -239,33 +239,33 @@ export async function submitChangePassword() {
         const data = await res.json();
 
         if (res.ok && data.success) {
-            alert('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
+            alert(i18n.t('profile.your_password_has_been_changed_please'));
             NavAuth.logout();
             closeEditModal();
             location.href = '/login';
         } else {
-            showMErr('m-new-pw-err', data.detail || '변경에 실패했습니다.');
+            showMErr('m-new-pw-err', data.detail || i18n.t('common.change_failed'));
         }
     } catch (e) {
-        alert('서버에 연결할 수 없습니다.');
+        alert(i18n.t('common.unable_to_connect_to_server'));
     } finally {
-        btn.disabled = false; btn.textContent = '비밀번호 변경';
+        btn.disabled = false; btn.textContent = i18n.t('common.change_password');
     }
 }
 
 // ── 회원 탈퇴 ──────────────────────────────────────────────
 export async function submitDeleteAccount() {
     const user = NavAuth.getUser();
-    if (!user || !user.email) { alert('로그인 정보가 없습니다.'); return; }
+    if (!user || !user.email) { alert(i18n.t('profile.there_is_no_login_information')); return; }
 
     const pw = document.getElementById('m-del-pw').value;
     hideMErr('m-del-pw-err');
-    if (!pw) { showMErr('m-del-pw-err', '비밀번호를 입력해주세요.'); return; }
+    if (!pw) { showMErr('m-del-pw-err', i18n.t('common.please_enter_your_password_2')); return; }
 
-    if (!confirm('정말로 탈퇴하시겠습니까? 모든 데이터가 영구 삭제됩니다.')) return;
+    if (!confirm(i18n.t('profile.are_you_sure_you_want_to_4'))) return;
 
     const btn = document.getElementById('m-del-btn');
-    btn.disabled = true; btn.textContent = '처리 중...';
+    btn.disabled = true; btn.textContent = i18n.t('profile.processing');
 
     try {
         const res = await fetch('/api/delete-account', {
@@ -279,15 +279,15 @@ export async function submitDeleteAccount() {
 
         if (res.ok && data.success) {
             NavAuth.logout();
-            alert('회원 탈퇴가 완료되었습니다. 이용해 주셔서 감사합니다.');
+            alert(i18n.t('profile.membership_withdrawal_has_been_completed'));
             location.href = '/';
         } else {
-            showMErr('m-del-pw-err', data.detail || '탈퇴에 실패했습니다.');
+            showMErr('m-del-pw-err', data.detail || i18n.t('profile.withdrawal_failed'));
         }
     } catch (e) {
-        alert('서버에 연결할 수 없습니다.');
+        alert(i18n.t('common.unable_to_connect_to_server'));
     } finally {
-        btn.disabled = false; btn.textContent = '회원 탈퇴하기';
+        btn.disabled = false; btn.textContent = i18n.t('profile.cancel_membership');
     }
 }
 

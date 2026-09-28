@@ -390,7 +390,7 @@
             <!-- Right: Editing Area -->
             <div class="editor-right">
                 <div class="time-row">
-                    <label data-i18n="nav.hour" style="font-weight:700; color: var(--theme-text-sub); width:40px;">시간</label>
+                    <label data-i18n="common.time" style="font-weight:700; color: var(--theme-text-sub); width:40px;">시간</label>
                     <input type="number" id="line-time" step="0.01" min="0" placeholder="0.00">
                     <button data-i18n="typing.sync" data-i18n-title="typing.get_current_video_time" class="toolbar-btn" id="btn-sync-time" title="현재 영상 시간 가져오기">⏱️ 싱크</button>
                     <button data-i18n="typing.end_here" data-i18n-title="typing.end_typing_at_this_time" class="toolbar-btn" id="btn-end-here" title="이 시간에서 타이핑을 종료합니다."
@@ -417,7 +417,7 @@
                 <div class="action-row">
                     <button data-i18n="typing.add" class="toolbar-btn btn-primary" id="btn-add-line" style="flex:1;">+ 추가</button>
                     <button data-i18n="typing.edit" class="toolbar-btn" id="btn-update-line" style="flex:1; display:none;">✏️ 수정</button>
-                    <button data-i18n="common.cancellation" class="toolbar-btn" id="btn-cancel-edit" style="display:none;">취소</button>
+                    <button data-i18n="common.cancel" class="toolbar-btn" id="btn-cancel-edit" style="display:none;">취소</button>
                 </div>
                 <div data-i18n="typing.both_lyrics_and_reading_must_be" style="font-size: 0.8rem; color: var(--theme-text-muted); text-align: center; margin-top: 5px;">
                     ※ 가사, 읽기를 모두 입력해야 추가됩니다.
@@ -439,7 +439,7 @@
                         <th data-i18n="common.lyrics">가사</th>
                         <th data-i18n="typing.reading_hiragana">읽기 (히라가나)</th>
                         
-                        <th data-i18n="common.work" style="width: 100px; text-align: center;">작업</th>
+                        <th data-i18n="common.actions" style="width: 100px; text-align: center;">작업</th>
                     </tr>
                 </thead>
                 <tbody id="lines-tbody">

@@ -35,11 +35,11 @@ Object.assign(window, {
 document.addEventListener("DOMContentLoaded", () => {
     const user = (typeof NavAuth !== 'undefined') ? NavAuth.getUser() : null;
     if (!user) {
-        alert('로그인이 필요한 서비스입니다.');
+        alert(i18n.t('common.this_service_requires_login'));
         location.href = '/login';
         return;
     }
-    document.getElementById('profile-nickname').textContent = user.nickname || '엔터핑유저';
+    document.getElementById('profile-nickname').textContent = user.nickname || i18n.t('profile.enterping_user');
     document.getElementById('profile-email').textContent = user.email || '';
     document.getElementById('profile-avatar').textContent = (user.nickname || user.email || '?').charAt(0).toUpperCase();
 

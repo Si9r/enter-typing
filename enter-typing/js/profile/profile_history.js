@@ -63,7 +63,7 @@ export async function loadMyTypingContents() {
           <div class="history-icon typing">⌨️</div>
           <div class="history-info">
             <div class="title">${esc(item.title)} — ${esc(item.artist)}</div>
-            <div class="sub">${i18n.t('profile.difficulty_label', { level: ` X ${Number(item.difficulty) || 3}` })} · ${i18n.t('profile.genre_label', { genre: esc(item.genre || 'JPOP') })}</div>
+            <div class="sub">${i18n.t('profile.difficulty_label', { level: ` X ${Number(item.difficulty) || 3}` })} · ${i18n.t('profile.genre_label', { genre: esc(i18n.genre(item.genre || 'JPOP')) })}</div>
           </div>
           <div class="history-result">
             <div class="score">⏱️ ${i18n.t('common.n_seconds', { count: item.best_time || 0 })}</div>
@@ -267,12 +267,6 @@ function formatHistoryScore(item) {
     }
 }
 
-// 서버가 넣어 보내는 고정 장르 문구만 번역한다 (콘텐츠의 실제 장르는 사용자가 입력한 값이라 그대로 둔다)
-function historyGenreLabel(genre) {
-    const fixed = { '퀴즈': 'nav.quiz', '실시간 대전': 'common.live_battle', '알 수 없음': 'common.unknown' };
-    return fixed[genre] ? i18n.t(fixed[genre]) : (genre || '');
-}
-
 export async function loadMyHistory() {
     const token = localStorage.getItem('ep_user');
     if (!token) return;
@@ -312,7 +306,7 @@ export async function loadMyHistory() {
             ${icon}
             <div class="history-info">
               <div class="title">${esc(item.title)}</div>
-              <div class="sub">${typeLabel} · ${esc(historyGenreLabel(item.genre))}</div>
+              <div class="sub">${typeLabel} · ${esc(i18n.genre(item.genre))}</div>
             </div>
             <div class="history-result">
               <div class="score">${scoreStr}</div>

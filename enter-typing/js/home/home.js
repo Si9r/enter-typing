@@ -5,11 +5,11 @@
     const primaryBtn = document.getElementById('hero-btn-primary');
     const secondaryBtn = document.getElementById('hero-btn-secondary');
     if (primaryBtn) {
-        primaryBtn.textContent = '타이핑 시작하기';
+        i18n.setText(primaryBtn, 'common.start_typing_2');
         primaryBtn.onclick = () => location.href = '/typing';
     }
     if (secondaryBtn) {
-        secondaryBtn.textContent = '퀴즈 풀어보기';
+        i18n.setText(secondaryBtn, 'typing.try_quiz');
         secondaryBtn.onclick = () => location.href = '/quiz';
     }
 })();
@@ -150,11 +150,31 @@ setTimeout(typeBg2Next, 1200);
 setTimeout(typeBg3Next, 200);
 
 // ── 인기 타이핑/추천 퀴즈 콘텐츠 로딩 ─────────────────
+let popularData = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        // Fetch popular typing contents
-        const typingRes = await fetch('/api/typing-contents?t=' + Date.now());
-        const typingData = await typingRes.json();
+        const [typingRes, quizRes] = await Promise.all([
+            fetch('/api/typing-contents?t=' + Date.now()),
+            fetch('/api/quiz-contents?t=' + Date.now()),
+        ]);
+        popularData = { typing: await typingRes.json(), quiz: await quizRes.json() };
+        renderPopular();
+    } catch (err) {
+        console.error('Failed to load popular contents', err);
+    }
+});
+
+// 언어를 바꾸면 받아 둔 데이터로 카드를 다시 그린다
+document.addEventListener('i18n:change', () => { if (popularData) renderPopular(); });
+
+function typeBadgeHTML(icon, key) {
+    return `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ${icon}"></i> ${i18n.t(key)}</div>`;
+}
+
+function renderPopular() {
+    {
+        const typingData = popularData.typing;
         if (typingData.success) {
             const sortedTyping = typingData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 4);
             const typingGrid = document.getElementById('popular-typing-grid');
@@ -163,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let badgeColor = 'pink';
                 if (item.genre === 'ANIME' || item.genre === '애니메이션' || item.genre === '팝송') badgeColor = 'blue';
                 else if (item.genre === '문학' || item.genre === '기타') badgeColor = 'green';
-                const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '가사 타이핑 연습하기');
+                const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || i18n.t('common.practice_typing_lyrics'));
                 const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
                 let totalSeconds = item.best_time || 0;
                 if (totalSeconds === 0 && item.timestamps) {
@@ -179,16 +199,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     } catch (e) { }
                 }
-                const m = Math.floor(totalSeconds / 60);
-                const s = totalSeconds % 60;
-                const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
+                const timeStr = i18n.duration(totalSeconds);
 
                 let thumbnailHTML = '';
-                const typeBadge = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ph-keyboard"></i> 타이핑</div>`;
+                const typeBadge = typeBadgeHTML('ph-keyboard', 'nav.typing');
                 if (item.youtube_id) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
                         ${typeBadge}
-                        <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                        <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative;">
@@ -197,11 +215,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 typingGrid.insertAdjacentHTML('beforeend', `
-                    <div class="card" onclick="location.href='/typing/${item.id}/play'">
+                    <div class="card" onclick="location.href='/typing/${Number(item.id)}/play'">
                         ${thumbnailHTML}
-                        <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-desc">${descPreview}</p>
+                        <div class="card-badge ${badgeColor}">${escapeHtml(i18n.genre(item.genre || 'JPOP'))}</div>
+                        <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                        <p class="card-desc">${escapeHtml(descPreview)}</p>
                         <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
                             <div>
                                 <span class="difficulty">${diffStars}</span>
@@ -214,9 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // Fetch popular quiz contents
-        const quizRes = await fetch('/api/quiz-contents?t=' + Date.now());
-        const quizData = await quizRes.json();
+        const quizData = popularData.quiz;
         if (quizData.success) {
             const sortedQuiz = quizData.data.sort((a, b) => (b.play_count || 0) - (a.play_count || 0)).slice(0, 3);
             const quizGrid = document.getElementById('popular-quiz-grid');
@@ -225,44 +241,44 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let badgeColor = 'pink';
                 if (item.genre === '영어' || item.genre === '일본어' || item.genre === 'ANIME') badgeColor = 'blue';
                 else if (item.genre === '상식' || item.genre === '역사' || item.genre === '문학') badgeColor = 'green';
-                const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || '퀴즈 풀기');
+                const descPreview = (item.description && item.description.length > 30) ? item.description.substring(0, 30) + '...' : (item.description || i18n.t('typing.solve_quiz'));
                 const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
                 const bestScore = item.best_score || 0;
 
                 let thumbnailHTML = '';
-                const typeBadge = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ph-question"></i> 퀴즈</div>`;
+                const typeBadge = typeBadgeHTML('ph-question', 'nav.quiz');
                 if (item.thumbnail_url) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
                         ${typeBadge}
-                        <img src="${item.thumbnail_url}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                        <img src="${escapeHtml(item.thumbnail_url)}" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else if (item.youtube_id) {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
                         ${typeBadge}
-                        <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                        <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                     </div>`;
                 } else {
                     thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative; background: var(--theme-bg-hover); display:flex; align-items:center; justify-content:center;">
                         ${typeBadge}
-                        <img src="/assets/logo_icon.png" alt="기본 썸네일" style="height: 60%; opacity: 0.5;">
+                        <img src="/assets/logo_icon.png" alt="${i18n.t('common.default_thumbnail')}" style="height: 60%; opacity: 0.5;">
                     </div>`;
                 }
 
                 quizGrid.insertAdjacentHTML('beforeend', `
-                    <div class="card" onclick="location.href='/quiz/${item.id}/play'">
+                    <div class="card" onclick="location.href='/quiz/${Number(item.id)}/play'">
                         ${thumbnailHTML}
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                            <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${item.genre || '퀴즈'}</div>
+                            <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${escapeHtml(item.genre ? i18n.genre(item.genre) : i18n.t('nav.quiz'))}</div>
                             <div style="font-size: 0.8rem; font-weight: 700; color: var(--theme-text-muted); background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--theme-border); display: flex; align-items: center; gap: 4px;">
-                                 ${item.quiz_count || 0}문제
+                                 ${i18n.t('common.n_questions', { count: item.quiz_count || 0 })}
                             </div>
                         </div>
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-desc">${descPreview}</p>
+                        <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                        <p class="card-desc">${escapeHtml(descPreview)}</p>
                         <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
                             <div>
                                 <span class="difficulty">${diffStars}</span>
-                                <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${bestScore}점</span>
+                                <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${i18n.t('common.n_points', { count: bestScore })}</span>
                                 <span class="play-count" style="margin-left: 10px; font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600;"><i class="ph-bold ph-play-circle" style="vertical-align: middle; margin-right: 3px;"></i> ${item.play_count || 0}</span>
                             </div>
                         </div>
@@ -270,10 +286,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `);
             });
         }
-    } catch (err) {
-        console.error('Failed to load popular contents', err);
     }
-});
+}
 
 function scrollSlider(id, direction) {
     const slider = document.getElementById(id);

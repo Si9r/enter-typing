@@ -63,21 +63,21 @@
 
     authGroup.innerHTML = `
       <div class="nav-profile-wrap" id="nav-profile-wrap">
-        <button class="nav-profile-btn" id="nav-profile-btn" aria-label="마이페이지">
-          <span class="nav-avatar">${avatarChar(user)}</span>
+        <button class="nav-profile-btn" id="nav-profile-btn" data-i18n-aria-label="nav.my_page" aria-label="${i18n.t('nav.my_page')}">
+          <span class="nav-avatar">${escapeHtml(avatarChar(user))}</span>
         </button>
         <div class="nav-profile-dropdown" id="nav-profile-dropdown">
           <div class="dropdown-user-info">
-            <span class="dropdown-avatar">${avatarChar(user)}</span>
+            <span class="dropdown-avatar">${escapeHtml(avatarChar(user))}</span>
             <div>
-              <div class="dropdown-name">${user.nickname || '유저'}</div>
-              <div class="dropdown-email">${user.email}</div>
+              <div class="dropdown-name">${escapeHtml(user.nickname || i18n.t('common.user'))}</div>
+              <div class="dropdown-email">${escapeHtml(user.email)}</div>
             </div>
           </div>
           <hr class="dropdown-divider">
-          <a class="dropdown-item" href="/profile"><i class="ph-fill ph-user"></i> 마이페이지</a>
+          <a class="dropdown-item" href="/profile"><i class="ph-fill ph-user"></i> <span data-i18n="nav.my_page">${i18n.t('nav.my_page')}</span></a>
           <hr class="dropdown-divider">
-          <button class="dropdown-item dropdown-logout" id="nav-logout-btn"><i class="ph-fill ph-door"></i> 로그아웃</button>
+          <button class="dropdown-item dropdown-logout" id="nav-logout-btn"><i class="ph-fill ph-door"></i> <span data-i18n="nav.logout">${i18n.t('nav.logout')}</span></button>
         </div>
       </div>
     `;
@@ -349,7 +349,7 @@
             </div>
             <div class="terms-modal-body" id="footer-modal-content"></div>
             <div class="terms-modal-footer">
-                <button class="btn-terms-modal-confirm" id="footer-modal-confirm-btn">확인</button>
+                <button class="btn-terms-modal-confirm" id="footer-modal-confirm-btn" data-i18n="nav.check">${i18n.t('nav.check')}</button>
             </div>
         </div>
       `;
@@ -366,7 +366,7 @@
     function openFooterModal(type) {
       const titleEl = document.getElementById('footer-modal-title');
       const contentEl = document.getElementById('footer-modal-content');
-      const lang = (typeof getCurrentLanguage === 'function') ? getCurrentLanguage() : 'ko';
+      const lang = i18n.getLang();
 
       if (type === 'terms') {
         const titles = { ko: '이용약관', en: 'Terms of Service', ja: '利用規約' };
@@ -438,7 +438,7 @@
           if (query) {
             location.href = '/search?q=' + encodeURIComponent(query);
           } else {
-            alert('검색어를 입력해주세요.');
+            alert(i18n.t('nav.please_enter_your_search_term'));
           }
         };
 

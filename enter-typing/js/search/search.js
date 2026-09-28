@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         // 검색어가 없을 경우
         document.getElementById('search-result-title').style.display = 'none';
         const emptyState = document.getElementById('empty-state');
-        emptyState.innerHTML = '<div style="font-size: 4rem; margin-bottom: 20px;"><i class="ph-bold ph-magnifying-glass"></i></div>검색어를 입력해 주세요.<br><span style="font-size: 0.95rem; color: var(--theme-text-muted); margin-top: 10px; display: inline-block;">상단 검색창에 곡명이나 아티스트를 입력하고 엔터를 누르세요!</span>';
+        emptyState.innerHTML = `<div style="font-size: 4rem; margin-bottom: 20px;"><i class="ph-bold ph-magnifying-glass"></i></div><span data-i18n="search.please_enter_a_search_term">${i18n.t('search.please_enter_a_search_term')}</span><br><span data-i18n="search.enter_a_song_or_artist_in" style="font-size: 0.95rem; color: var(--theme-text-muted); margin-top: 10px; display: inline-block;">${i18n.t('search.enter_a_song_or_artist_in')}</span>`;
         emptyState.style.display = 'block';
         return; // 통신하지 않고 종료
     }
@@ -51,7 +51,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// 언어를 바꾸면 마지막 검색 결과를 현재 언어로 다시 그린다
+let lastResults = null;
+document.addEventListener('i18n:change', () => { if (lastResults) renderCards(lastResults); });
+
 function renderCards(items) {
+    lastResults = items;
     const grid = document.getElementById('search-results-grid');
     const emptyState = document.getElementById('empty-state');
     grid.innerHTML = '';
@@ -71,11 +76,12 @@ function renderCards(items) {
 
         const descPreview = (item.description && item.description.length > 30)
             ? item.description.substring(0, 30) + '...'
-            : (item.description || (isQuiz ? '새로운 퀴즈에 도전해보세요!' : '가사 타이핑 연습하기'));
+            : (item.description || (isQuiz ? i18n.t('common.try_a_new_quiz') : i18n.t('common.practice_typing_lyrics')));
 
         const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
 
-        const typeBadgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ${isQuiz ? 'ph-question' : 'ph-keyboard'}"></i> ${isQuiz ? '퀴즈' : '타이핑'}</div>`;
+        const typeKey = isQuiz ? 'nav.quiz' : 'nav.typing';
+        const typeBadgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 4px; z-index: 2;"><i class="ph-bold ${isQuiz ? 'ph-question' : 'ph-keyboard'}"></i> <span data-i18n="${typeKey}">${i18n.t(typeKey)}</span></div>`;
         const thumbSrc = isQuiz
             ? (item.thumbnail_url || (item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg` : null))
             : (item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg` : null);
@@ -83,7 +89,7 @@ function renderCards(items) {
         let thumbnailHTML;
         if (thumbSrc) {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
-                <img src="${thumbSrc}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                <img src="${escapeHtml(thumbSrc)}" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
                 ${typeBadgeHTML}
             </div>`;
         } else {
@@ -94,7 +100,7 @@ function renderCards(items) {
 
         let footerRightHTML;
         if (isQuiz) {
-            footerRightHTML = `<span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px;"></i> ${item.best_score || 0}점</span>`;
+            footerRightHTML = `<span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px;"></i> ${i18n.t('common.n_points', { count: item.best_score || 0 })}</span>`;
         } else {
             let totalSeconds = item.best_time || 0;
             if (totalSeconds === 0 && item.timestamps) {
@@ -110,18 +116,16 @@ function renderCards(items) {
                     }
                 } catch (e) { }
             }
-            const m = Math.floor(totalSeconds / 60);
-            const s = totalSeconds % 60;
-            const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
+            const timeStr = i18n.duration(totalSeconds);
             footerRightHTML = `<span class="time" style="margin-left: 10px;"><i class="ph-bold ph-clock" style="vertical-align: middle; margin-right: 3px;"></i> ${timeStr}</span>`;
         }
 
         const cardHTML = `
-            <div class="card" onclick="openModal(${item.id}, '${item._type}')">
+            <div class="card" onclick="openModal(${Number(item.id)}, '${isQuiz ? 'quiz' : 'typing'}')">
                 ${thumbnailHTML}
-                <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
-                <h3 class="card-title">${item.title}</h3>
-                <p class="card-desc">${descPreview}</p>
+                <div class="card-badge ${badgeColor}">${escapeHtml(i18n.genre(item.genre || 'JPOP'))}</div>
+                <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                <p class="card-desc">${escapeHtml(descPreview)}</p>
                 <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
                     <div>
                         <span class="difficulty">${diffStars}</span>
@@ -151,8 +155,8 @@ async function openModal(id, type) {
         if (data.success) {
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-artist').innerText = data.artist || '-';
-            document.getElementById('modal-genre').innerText = data.genre || 'JPOP';
-            document.getElementById('modal-creator').innerText = data.creator_nickname || '엔터핑';
+            document.getElementById('modal-genre').innerText = i18n.genre(data.genre || 'JPOP');
+            document.getElementById('modal-creator').innerText = data.creator_nickname || i18n.t('nav.enterping');
 
             let badgeColor = 'pink';
             if (data.genre === '애니메이션' || data.genre === '팝송') badgeColor = 'blue';
@@ -163,26 +167,23 @@ async function openModal(id, type) {
 
             const diffValue = data.difficulty || 3;
             document.getElementById('modal-difficulty').innerHTML = `<i class=\"ph-fill ph-star\" style=\"color:var(--color-pink); vertical-align: middle; margin-right:4px;\"></i> X ${diffValue}`;
-            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${(data.play_count || 0)}회`;
+            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${i18n.t('common.n_times', { count: data.play_count || 0 })}`;
 
             const coverSrc = isQuiz
                 ? (data.thumbnail_url || (data.youtube_id ? `https://img.youtube.com/vi/${data.youtube_id}/hqdefault.jpg` : null))
                 : (data.youtube_id ? `https://img.youtube.com/vi/${data.youtube_id}/hqdefault.jpg` : null);
-            modalCover.innerHTML = coverSrc ? `<img src="${coverSrc}" alt="썸네일" style="width:100%;height:100%;object-fit:cover;">` : '';
+            modalCover.innerHTML = coverSrc ? `<img src="${escapeHtml(coverSrc)}" alt="${i18n.t('common.thumbnail')}" style="width:100%;height:100%;object-fit:cover;">` : '';
 
             if (isQuiz) {
-                bestTimeLabel.textContent = '최고 점수';
-                document.getElementById('modal-best-time').innerText = `${data.best_score || 0}점`;
-                startBtn.innerText = '▶ 퀴즈 시작하기';
+                bestTimeLabel.textContent = i18n.t('common.highest_score');
+                document.getElementById('modal-best-time').innerText = i18n.t('common.n_points', { count: data.best_score || 0 });
+                startBtn.innerText = i18n.t('common.start_quiz');
                 startBtn.onclick = () => location.href = '/quiz/' + id + '/play';
                 rankBtn.style.display = 'none';
             } else {
-                bestTimeLabel.textContent = '시간';
-                let mTotalSeconds = data.best_time || 0;
-                const mm = Math.floor(mTotalSeconds / 60);
-                const ms = mTotalSeconds % 60;
-                document.getElementById('modal-best-time').innerText = mm > 0 ? `${mm}분 ${ms}초` : `${ms}초`;
-                startBtn.innerText = '▶ 타이핑 시작하기';
+                bestTimeLabel.textContent = i18n.t('common.time');
+                document.getElementById('modal-best-time').innerText = i18n.duration(data.best_time || 0);
+                startBtn.innerText = i18n.t('common.start_typing');
                 startBtn.onclick = () => location.href = '/typing/' + id + '/play';
                 rankBtn.style.display = '';
                 rankBtn.onclick = () => location.href = '/ranking/songs?id=' + id;

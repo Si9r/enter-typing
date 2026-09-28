@@ -1,5 +1,11 @@
 let currentContentId = null;
 
+// 언어를 바꾸면 JS 로 그린 곡 목록과 랭킹을 다시 그린다
+document.addEventListener('i18n:change', async () => {
+    await loadSongList();
+    if (currentContentId) selectSong(currentContentId);
+});
+
 window.addEventListener('DOMContentLoaded', async () => {
     await loadSongList();
 
@@ -19,7 +25,7 @@ async function loadSongList() {
 
         if (data.success) {
             if (data.data.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">등록된 곡이 없습니다.</div>';
+                container.innerHTML = `<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">${i18n.t('ranking.no_songs_registered')}</div>`;
                 return;
             }
 
@@ -30,14 +36,14 @@ async function loadSongList() {
                     : `background: var(--theme-bg-hover, #f0f0f0);`;
                 const thumbInner = item.youtube_id
                     ? ''
-                    : `<img src="/assets/logo_icon.png" alt="기본 썸네일" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.5;">`;
+                    : `<img src="/assets/logo_icon.png" alt="${i18n.t('common.default_thumbnail')}" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.5;">`;
 
                 html += `
-                    <div class="song-item" id="song-item-${item.id}" onclick="selectSong(${item.id})">
+                    <div class="song-item" id="song-item-${Number(item.id)}" onclick="selectSong(${Number(item.id)})">
                         <div class="song-icon" style="${thumbStyle}">${thumbInner}</div>
                         <div class="song-info">
-                            <div class="song-item-title">${item.title}</div>
-                            <div class="song-item-artist">${item.artist || '아티스트 미상'}</div>
+                            <div class="song-item-title">${escapeHtml(item.title)}</div>
+                            <div class="song-item-artist">${escapeHtml(item.artist || i18n.t('common.unknown_artist'))}</div>
                         </div>
                     </div>
                 `;
@@ -61,7 +67,7 @@ async function selectSong(id) {
 
     document.getElementById('select-prompt').style.display = 'none';
     document.getElementById('content-header-container').style.display = 'block';
-    document.getElementById('ranking-list-container').innerHTML = '<div class="empty-state">로딩 중...</div>';
+    document.getElementById('ranking-list-container').innerHTML = `<div class="empty-state">${i18n.t('common.loading')}</div>`;
 
     currentContentId = id;
 
@@ -73,9 +79,9 @@ async function selectSong(id) {
         if (data.success) {
             // 상단 헤더 업데이트
             if (data.content_info) {
-                document.getElementById('header-title').innerText = data.content_info.title || '제목 없음';
+                document.getElementById('header-title').innerText = data.content_info.title || i18n.t('common.no_title');
                 document.getElementById('header-artist').innerText = data.content_info.artist || '-';
-                document.getElementById('header-genre').innerText = data.content_info.genre || '장르 미상';
+                document.getElementById('header-genre').innerText = data.content_info.genre || i18n.t('ranking.unknown_genre');
 
                 const headerThumb = document.getElementById('header-thumb');
                 if (data.content_info.youtube_id) {
@@ -83,7 +89,7 @@ async function selectSong(id) {
                     headerThumb.innerHTML = '';
                 } else {
                     headerThumb.style.backgroundImage = '';
-                    headerThumb.innerHTML = `<img src="/assets/logo_icon.png" alt="기본 썸네일" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.7;">`;
+                    headerThumb.innerHTML = `<img src="/assets/logo_icon.png" alt="${i18n.t('common.default_thumbnail')}" style="width: 60%; height: 60%; object-fit: contain; opacity: 0.7;">`;
                 }
             }
             document.getElementById('play-now-btn').onclick = () => location.href = '/typing/' + id + '/play';
@@ -93,7 +99,7 @@ async function selectSong(id) {
         }
     } catch (err) {
         console.error("랭킹 데이터 로드 실패", err);
-        document.getElementById('ranking-list-container').innerHTML = '<div class="empty-state" style="color:red;">데이터를 불러오는 데 실패했습니다.</div>';
+        document.getElementById('ranking-list-container').innerHTML = `<div class="empty-state" style="color:red;">${i18n.t('ranking.failed_to_load_data')}</div>`;
     }
 }
 
@@ -103,8 +109,8 @@ function renderRanking(list) {
         container.innerHTML = `
             <div class="empty-state">
                 <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
-                아직 이 곡을 플레이한 기록이 없습니다.<br>
-                지금 바로 첫 번째 기록의 주인공이 되어보세요!
+                ${i18n.t('ranking.no_song_records')}<br>
+                ${i18n.t('ranking.be_the_first')}
             </div>
         `;
         return;
@@ -125,15 +131,15 @@ function renderRanking(list) {
         html += `
             <div class="rank-item ${rankClass}">
                 <div class="rank-number">${item.rank}</div>
-                <div class="rank-avatar" style="background: ${avatarColor}">${item.nickname.charAt(0)}</div>
+                <div class="rank-avatar" style="background: ${avatarColor}">${escapeHtml(item.nickname.charAt(0))}</div>
                 <div class="rank-info-main">
-                    <div class="rank-name">${item.nickname}</div>
+                    <div class="rank-name">${escapeHtml(item.nickname)}</div>
                     <div class="rank-stats">
-                        <span>최고 타수: <strong>${item.wpm}WPM</strong></span>
-                        <span>정확도: <strong>${item.accuracy}%</strong></span>
+                        <span>${i18n.t('ranking.best_wpm')} <strong>${item.wpm}WPM</strong></span>
+                        <span>${i18n.t('ranking.accuracy')} <strong>${item.accuracy}%</strong></span>
                     </div>
                 </div>
-                <div class="rank-score">${item.score.toLocaleString()} 점</div>
+                <div class="rank-score">${i18n.t('common.n_points', { count: item.score.toLocaleString() })}</div>
                 <div class="rank-date">${dateStr}</div>
             </div>
         `;

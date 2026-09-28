@@ -14,6 +14,9 @@
  *   <span data-i18n="quiz.remaining" data-i18n-args='{"count": 3}'></span>  ← 문구 안의 {count} 치환
  * JS
  *   i18n.t('quiz.remaining', { count: 3 }); // 현재 언어 문구 (없으면 한국어 → 키 순으로 대체). 언제든 바로 사용 가능
+ *   i18n.setText(el, 'quiz.remaining', { count: 3 }); // 요소에 키를 지정 (언어 전환 시 자동 갱신)
+ *   i18n.genre('애니메이션');                // DB 에 한국어로 저장된 장르 등 고정값 → "Anime"
+ *   i18n.duration(185);                     // "3분 5초" / "3m 5s" / "3分5秒"
  *   document.addEventListener('i18n:change', rerender); // 언어를 바꿨을 때 JS 로 그린 화면을 다시 그리려면
  *   i18n.apply(element);                    // 동적으로 만든 요소 번역 (보통은 자동 감지되므로 불필요)
  *
@@ -82,6 +85,27 @@
         return interpolate(text, params);
     }
 
+    /** 초 → "3분 5초" / "3m 5s" / "3分5秒" (1분 미만이면 "5초") */
+    function duration(totalSeconds) {
+        const total = Math.max(0, Math.round(Number(totalSeconds) || 0));
+        const m = Math.floor(total / 60);
+        const s = total % 60;
+        return m > 0 ? t('common.duration_min_sec', { m, s }) : t('common.n_seconds', { count: s });
+    }
+
+    // DB 에 한국어로 저장되는 고정 분류값(장르, 기록 종류) → 번역 키. 사용자가 직접 입력한 값은 그대로 표시한다.
+    const FIXED_VALUES = {
+        '애니메이션': 'common.anime', '기타': 'common.etc', '팝송': 'common.pop_song', '문학': 'common.literature',
+        '영어': 'common.english', '일본어': 'common.japanese', '상식': 'common.common_sense', '역사': 'common.history_genre',
+        '타이핑': 'nav.typing', '퀴즈': 'nav.quiz', '실시간 대전': 'common.live_battle', '알 수 없음': 'common.unknown',
+    };
+
+    /** 장르 등 서버에 한국어로 저장된 고정값을 현재 언어로. 목록에 없는 값(JPOP, 사용자 입력)은 그대로. */
+    function genre(value) {
+        const key = FIXED_VALUES[String(value ?? '').trim()];
+        return key ? t(key) : (value ?? '');
+    }
+
     // ── 요소 번역 (data-i18n*) ─────────────────────────────
     function parseArgs(el) {
         const raw = el.getAttribute('data-i18n-args');
@@ -105,7 +129,7 @@
     function owns(current, key, params, last) {
         if (last !== undefined && current === last) return true;
         const n = normalize(current || '');
-        return n === '' || n === normalize(koDefault(key, params));
+        return n === '' || n === normalize(koDefault(key, params)) || n === normalize(t(key, params));
     }
 
     function ownsText(el) {
@@ -137,6 +161,16 @@
                 el._i18nAttrKeyLast[target] = v;
             }
         });
+    }
+
+    /** JS 에서 요소 문구를 키로 지정한다. 이후 언어를 바꾸면 자동으로 따라 바뀐다. */
+    function setText(el, key, params) {
+        if (!el) return;
+        el.setAttribute('data-i18n', key);
+        if (params) el.setAttribute('data-i18n-args', JSON.stringify(params));
+        else el.removeAttribute('data-i18n-args');
+        el.textContent = t(key, params);
+        el._i18nLast = el.textContent;
     }
 
     const I18N_SELECTOR = '[data-i18n],[data-i18n-placeholder],[data-i18n-title],[data-i18n-aria-label]';
@@ -348,8 +382,14 @@
         });
     }).finally(show);
 
+    // HTML 이스케이프: 사용자가 입력한 값(닉네임, 제목 등)을 innerHTML 에 넣기 전에 사용한다.
+    // 번역과는 별개지만, 모든 페이지에서 가장 먼저 로드되는 공통 스크립트라 여기서 제공한다.
+    window.escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
     // getText: 예전 코드가 부르던 이름 (LEGACY). 키와 한국어 문장 모두 받는다.
-    window.i18n = { t, apply, ready, setLanguage, getLang, SUPPORTED, getText: t };
+    window.i18n = { t, setText, duration, genre, apply, ready, setLanguage, getLang, SUPPORTED, getText: t };
     window.setLanguage = setLanguage;           // navbar 언어 선택 메뉴에서 사용
     window.i18nTranslate = legacyTranslate;     // LEGACY: 기존 JS 호환
     window.getCurrentLanguage = getLang;        // LEGACY: 예전 엔진의 전역 함수

@@ -154,7 +154,6 @@ STATIC_FILE_MAP = {
     "shared_typing_engine.js": "js/shared/typing_engine.js",
     "quiz_engine.js": "js/quiz/detail_engine.js",
     "i18n.js": "i18n.js",
-    "locales.json": "locales.json",
 }
 
 for _url_name, _disk_path in STATIC_FILE_MAP.items():

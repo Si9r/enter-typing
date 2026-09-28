@@ -184,6 +184,39 @@ uvicorn main:app --reload
 
 <br>
 
+## 🌐 다국어 (i18n)
+번역은 **키 기반**입니다. 문구는 `enter-typing/locales/{ko,en,ja}.json`에 네임스페이스별로 들어 있고, 엔진은 `enter-typing/i18n.js`입니다.
+
+```json
+// locales/ko.json
+{ "typing": { "current_position": "현재 입력 위치", "remaining": "남은 문제: {count}" } }
+```
+
+**HTML** — 요소 안의 한국어는 번역 파일을 불러오기 전에 보이는 기본값입니다.
+```html
+<span data-i18n="typing.current_position">현재 입력 위치</span>
+<input data-i18n-placeholder="search.placeholder" placeholder="곡명, 아티스트 검색">
+<span data-i18n="typing.remaining" data-i18n-args='{"count": 3}'></span>
+```
+`data-i18n`은 **자식 요소가 없는 요소**에만 붙이세요. 번역할 때 요소의 내용 전체를 바꿉니다. 아이콘과 문구가 함께 있으면 문구만 `<span>`으로 감싸세요.
+
+**JS**
+```js
+await i18n.ready;                          // 번역 파일 로딩 대기
+i18n.t('typing.remaining', { count: 3 });  // → "남은 문제: 3" / "Remaining: 3"
+```
+동적으로 추가한 요소의 `data-i18n`은 자동으로 번역됩니다.
+
+**규칙**
+- 키 이름: `네임스페이스.영어_snake_case`. 네임스페이스는 기능 이름(`typing`, `quiz`, `battle`, `profile`, `auth`, `ranking`, `notice`, `search`, `nav`)이고, 두 기능 이상에서 쓰면 `common`입니다.
+- 새 문구는 **세 언어 파일에 같은 키로** 추가합니다. 번역이 없으면 한국어가 표시됩니다.
+- 숫자 같은 값은 문장에 붙이지 말고 `{count}`처럼 인자로 넘깁니다. 언어마다 어순이 다르기 때문입니다.
+- 번역 파일을 수정하면 `i18n.js`의 `LOCALE_VERSION`을 올려야 사용자 브라우저 캐시가 갱신됩니다.
+
+**전환 중 호환**: 아직 키로 옮기지 않은 화면은, 화면의 한국어가 `ko.json`의 문구와 같으면 이전 방식대로 자동 번역됩니다. `i18nTranslate()`, `alert`/`confirm` 번역도 이 호환 기능입니다. 모든 화면을 옮기면 `i18n.js`의 `LEGACY` 부분을 삭제합니다.
+
+<br>
+
 ## 🚨 보안 주의사항 (Security Alerts)
 > [!WARNING]
 > * `.env` 파일은 절대 GitHub 등의 퍼블릭 저장소에 커밋하지 마세요!

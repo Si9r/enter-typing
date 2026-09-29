@@ -768,6 +768,7 @@
     "this_video_does_not_allow_playback": "動画所有者が他のウェブサイトでの再生（埋め込み）を許可していない映像です。別の映像を使用してください。",
     "thumbnail_image_optional": "サムネイル画像（選択）",
     "to_list": "←リストとして",
+    "total_count": "計{count}個",
     "unable_to_play_audio_stream_error": "⚠️再生不可（オーディオストリームエラー）",
     "unknown_quiz": "未知のクイズ",
     "unplayable": "⚠️ 再生できません（{reason}）",

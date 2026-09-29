@@ -768,6 +768,7 @@
     "this_video_does_not_allow_playback": "This video does not allow playback (embedding) on ​​other websites by the video owner. Please use a different video.",
     "thumbnail_image_optional": "Thumbnail image (optional)",
     "to_list": "← To list",
+    "total_count": "{count} total",
     "unable_to_play_audio_stream_error": "⚠️ Unable to play (audio stream error)",
     "unknown_quiz": "unknown quiz",
     "unplayable": "⚠️ Cannot play ({reason})",

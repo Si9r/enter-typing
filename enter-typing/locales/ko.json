@@ -768,6 +768,7 @@
     "this_video_does_not_allow_playback": "동영상 소유자가 다른 웹사이트에서의 재생(퍼가기)을 허용하지 않은 영상입니다. 다른 영상을 사용해 주세요.",
     "thumbnail_image_optional": "썸네일 이미지 (선택)",
     "to_list": "← 목록으로",
+    "total_count": "총 {count}개",
     "unable_to_play_audio_stream_error": "⚠️ 재생 불가 (오디오 스트림 에러)",
     "unknown_quiz": "알 수 없는 퀴즈",
     "unplayable": "⚠️ 재생 불가 ({reason})",

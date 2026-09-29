@@ -169,6 +169,16 @@
             gap: 12px;
         }
 
+        /* "등록된 퀴즈" 옆 개수 배지 */
+        .quiz-total-count {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--color-pink);
+            background: rgba(255, 182, 193, 0.18);
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+
         .editor-modal-header .section-title {
             margin-bottom: 0;
         }
@@ -648,7 +658,10 @@
 
         <!-- Registered Quizzes Grid -->
         <div class="registered-section">
-            <div data-i18n="quiz.registered_quiz" class="section-title" style="margin-bottom: 0">등록된 퀴즈</div>
+            <div class="section-title" style="margin-bottom: 0; display: flex; align-items: center; gap: 10px;">
+                <span data-i18n="quiz.registered_quiz">등록된 퀴즈</span>
+                <span id="quiz-total-count" class="quiz-total-count" data-i18n="quiz.total_count" data-i18n-args='{"count": 0}'>총 0개</span>
+            </div>
             <div id="quiz-card-grid" class="quiz-card-grid">
                 <div data-i18n="quiz.there_are_no_registered_quizzes_please" style="
               text-align: center;

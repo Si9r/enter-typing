@@ -417,6 +417,7 @@ function startAdding() {
 // Grid Rendering
 function renderGrid() {
     gridContainer.innerHTML = "";
+    i18n.setText(document.getElementById("quiz-total-count"), "quiz.total_count", { count: linesData.length });
 
     // Add new quiz card (always visible)
     const addCard = document.createElement("div");
@@ -460,11 +461,11 @@ function renderGrid() {
             <div class="time-range">⏱ ${formatTime(line.start)} ~ ${formatTime(line.end)}</div>
             ${questions}
             <div class="quiz-info"><span>${i18n.t('common.hint')}</span> ${escapeHtml(line.hint || "-")}</div>
-            <div class="del-icon" data-index="${index}" title="${i18n.t('nav.delete')}">️</div>
+            <div class="del-icon" data-index="${index}" title="${i18n.t('nav.delete')}"><i class="ph-bold ph-trash"></i></div>
         `;
 
         card.addEventListener("click", (e) => {
-            if (e.target.classList.contains("del-icon")) {
+            if (e.target.closest(".del-icon")) {
                 e.stopPropagation();
                 deleteLine(index);
                 return;

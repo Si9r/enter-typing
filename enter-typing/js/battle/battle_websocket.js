@@ -176,6 +176,7 @@ export function connectToBattleRoom(roomCode, password = "") {
                 break;
             case "game_start":
                 if (state.currentRoom) state.currentRoom.status = "playing"; // syncTimer 조건 통과용
+                state.quizQuestions = Array.isArray(data.quiz_questions) ? data.quiz_questions : null;
                 startGamePlay();
                 break;
             case "player_finished":
@@ -199,6 +200,11 @@ export function connectToBattleRoom(roomCode, password = "") {
                 break;
             case "quiz_chat":
                 addQuizOpponentChat(data.nickname, data.message, false);
+                break;
+            case "question_count_changed":
+                state.currentRoom = data.room;
+                updateWaitContentMeta();
+                appendSystemChat(i18n.t('battle.question_count_set', { count: data.room.question_count || data.room.question_total }));
                 break;
             case "content_selected":
                 state.currentRoom = data.room;

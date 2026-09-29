@@ -106,6 +106,23 @@ class RoomContentSelect(BaseModel):
     content_id: int
 
 
+class RoomQuestionCount(BaseModel):
+    count: Optional[int] = None  # None = 전체 문제
+
+
+# 퀴즈 대전에서 방장이 고를 수 있는 문제 수 (전체보다 적은 값만 유효)
+QUESTION_COUNT_OPTIONS = (10, 30, 50)
+
+
+def quiz_questions_of(content) -> list:
+    """퀴즈 콘텐츠의 문제(구간) 목록. 형식이 잘못됐으면 빈 목록."""
+    try:
+        data = json.loads(content.quiz_data or "[]")
+        return data if isinstance(data, list) else []
+    except (TypeError, ValueError):
+        return []
+
+
 # ════════════════════════════════════════════════════════════
 # API: 방 생성
 # POST /api/battle/rooms
@@ -129,6 +146,8 @@ async def create_battle_room(req: BattleRoomCreate, current_user: models.User = 
         "song_id": None,
         "song_title": None,
         "song_artist": None,
+        "question_total": None,   # 퀴즈 모드: 콘텐츠의 전체 문제 수
+        "question_count": None,   # 퀴즈 모드: 방장이 정한 출제 문제 수 (None = 전체)
         "is_private": req.is_private,
         "password_hash": get_password_hash(req.password) if req.is_private and req.password else None,
         "max_players": min(req.max_players, 4),
@@ -182,10 +201,40 @@ async def select_room_content(room_code: str, req: RoomContentSelect, current_us
         room_data["song_id"] = content.id
         room_data["song_title"] = content.title
         room_data["song_artist"] = content.artist if hasattr(content, "artist") else "알 수 없음"
+        # 콘텐츠가 바뀌면 문제 수 설정은 초기화한다
+        room_data["question_total"] = len(quiz_questions_of(content)) if req.mode == "quiz" else None
+        room_data["question_count"] = None
         await save_room_data(redis, room_code, room_data)
 
     await battle_manager.broadcast_all(room_code, {"type": "content_selected", "room": public_room_view(room_data)})
     await lobby_manager.broadcast_all("lobby", {"type": "lobby_update"})
+    return {"success": True, "room": public_room_view(room_data)}
+
+
+# ════════════════════════════════════════════════════════════
+# API: 방장 전용 - 퀴즈 대전 출제 문제 수 설정
+# POST /api/battle/rooms/{room_code}/question-count
+# ════════════════════════════════════════════════════════════
+@router.post("/api/battle/rooms/{room_code}/question-count")
+async def set_question_count(room_code: str, req: RoomQuestionCount, current_user: models.User = Depends(get_current_user)):
+    redis = await get_redis()
+
+    async with redis.lock(f"battle:lock:{room_code}", timeout=5):
+        room_data = await get_room_data(redis, room_code)
+        if not room_data:
+            raise HTTPException(status_code=404, detail="존재하지 않는 방입니다.")
+        if room_data["host"] != current_user.nickname:
+            raise HTTPException(status_code=403, detail="방장만 콘텐츠를 선택할 수 있습니다.")
+        total = room_data.get("question_total") or 0
+        valid = req.count is None or (req.count in QUESTION_COUNT_OPTIONS and req.count < total)
+        in_game = room_data.get("status") in ("syncing", "countdown", "playing")
+        if room_data.get("mode") != "quiz" or in_game or not valid:
+            raise HTTPException(status_code=400, detail="문제 수를 설정할 수 없습니다.")
+
+        room_data["question_count"] = req.count
+        await save_room_data(redis, room_code, room_data)
+
+    await battle_manager.broadcast_all(room_code, {"type": "question_count_changed", "room": public_room_view(room_data)})
     return {"success": True, "room": public_room_view(room_data)}
 
 
@@ -399,6 +448,14 @@ async def battle_websocket(
                     await websocket.send_json({"type": "error", "message": "아직 준비가 안 된 플레이어가 있습니다."})
                     continue
 
+                # 퀴즈 모드: 참가자 모두가 같은 문제를 같은 순서로 풀도록 서버에서 뽑아서 보낸다
+                quiz_questions = None
+                if room_data.get("mode") == "quiz":
+                    quiz = db.query(models.QuizContent).filter(models.QuizContent.id == room_data.get("song_id")).first()
+                    all_questions = quiz_questions_of(quiz) if quiz else []
+                    count = room_data.get("question_count") or len(all_questions)
+                    quiz_questions = random.sample(all_questions, min(count, len(all_questions)))
+
                 async def sync_and_start(r_code):
                     sync_timeout = 10.0
                     checked_time = 0.0
@@ -435,7 +492,8 @@ async def battle_websocket(
                             await battle_manager.broadcast_all(r_code, {
                                 "type": "game_start",
                                 "song_id": f_data["song_id"],
-                                "players": f_data["players"]
+                                "players": f_data["players"],
+                                "quiz_questions": quiz_questions,  # 퀴즈 모드에서만 값이 있음
                             })
 
                 room_data["status"] = "syncing"

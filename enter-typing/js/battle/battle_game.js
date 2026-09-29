@@ -661,7 +661,10 @@ function startQuizGameplay() {
     if (sendBtn) sendBtn.disabled = true;
 
     const selectedSong = state.selectedSong;
-    if (selectedSong && selectedSong.quiz_data) {
+    if (state.quizQuestions) {
+        // 서버가 뽑아 보낸 문제를 모든 참가자가 같은 순서로 푼다
+        quizData = state.quizQuestions;
+    } else if (selectedSong && selectedSong.quiz_data) {
         try {
             quizData = typeof selectedSong.quiz_data === 'string' ? JSON.parse(selectedSong.quiz_data) : selectedSong.quiz_data;
         } catch (e) {
@@ -676,7 +679,7 @@ function startQuizGameplay() {
     if (countDisplay) countDisplay.innerText = `${i18n.t('common.remaining_quizzes')} ${quizData.length}`;
 
     const infoTitle = document.getElementById("quiz-info-title");
-    if (infoTitle) infoTitle.innerText = selectedSong.title || i18n.t('common.loading');
+    if (infoTitle) infoTitle.innerText = (selectedSong && selectedSong.title) || state.currentRoom.song_title || i18n.t('common.loading');
 
     // Set up volume slider
     const volSlider = document.getElementById("quiz-volume-slider");

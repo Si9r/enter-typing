@@ -211,9 +211,64 @@ export function updateVideoInfoPanel() {
 
 // 대기실 상단 "선택된 콘텐츠" 미리보기의 종류 배지/난이도/제목 갱신 (databaseSongs/Quizzes
 // 캐시에 없어서 API로 뒤늦게 selectedSong을 채우는 fallback 경로에서도 재사용).
+// ── 퀴즈 대전: 출제 문제 수 (방장만 변경) ─────────────────────
+const QUESTION_COUNT_OPTIONS = [10, 30, 50];
+
+function renderQuestionCountControl() {
+    const currentRoom = state.currentRoom;
+    const anchor = document.getElementById("wait-song-title");
+    if (!anchor) return;
+    let row = document.getElementById("wait-question-count");
+    const total = currentRoom && currentRoom.mode === 'quiz' ? (currentRoom.question_total || 0) : 0;
+
+    // 문제가 적은 퀴즈나 타이핑 모드에서는 표시하지 않는다
+    if (total <= QUESTION_COUNT_OPTIONS[0]) {
+        if (row) row.remove();
+        return;
+    }
+    if (!row) {
+        row = document.createElement("div");
+        row.id = "wait-question-count";
+        row.style.cssText = "display:flex; align-items:center; gap:8px; margin-top:8px; font-size:0.85rem; font-weight:700; color:var(--color-battle-text-muted);";
+        anchor.parentElement.appendChild(row);
+    }
+
+    const count = currentRoom.question_count || total;
+    const label = `<span>${i18n.t('battle.question_count_label')}</span>`;
+    if (state.isHost) {
+        const options = QUESTION_COUNT_OPTIONS.filter((n) => n < total)
+            .map((n) => `<option value="${n}" ${n === currentRoom.question_count ? 'selected' : ''}>${i18n.t('common.n_questions', { count: n })}</option>`);
+        options.push(`<option value="" ${currentRoom.question_count ? '' : 'selected'}>${i18n.t('quiz.all_questions_n', { count: total })}</option>`);
+        row.innerHTML = `${label}<select id="wait-question-count-select" style="padding:4px 8px; border-radius:8px; font-weight:700;">${options.join('')}</select>`;
+        row.title = i18n.t('battle.question_count_random_hint');
+        row.querySelector("select").addEventListener("change", (e) => setQuestionCount(e.target.value ? Number(e.target.value) : null));
+    } else {
+        row.innerHTML = `${label}<strong style="color:var(--color-battle-text, inherit);">${count === total ? i18n.t('quiz.all_questions_n', { count: total }) : i18n.t('common.n_questions', { count })}</strong>`;
+        row.title = i18n.t('battle.question_count_random_hint');
+    }
+}
+
+async function setQuestionCount(count) {
+    try {
+        const res = await fetch(`/api/battle/rooms/${state.currentRoom.code}/question-count`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ count }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            alert(i18n.server(data.detail, 'server.invalid_question_count'));
+            renderQuestionCountControl(); // 선택을 서버 값으로 되돌림
+        }
+    } catch (e) {
+        console.error('문제 수 설정 실패:', e);
+    }
+}
+
 export function updateWaitContentMeta() {
     const currentRoom = state.currentRoom;
     if (!currentRoom) return;
+    renderQuestionCountControl();
 
     const titleEl = document.getElementById("wait-song-title");
     const badgeEl = document.getElementById("wait-content-type-badge");

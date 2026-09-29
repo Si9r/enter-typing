@@ -329,10 +329,10 @@
                   line-height: 1.2;
                   color: var(--theme-text-muted);
                   margin-bottom: 5px;
-                " data-i18n="common.highest_score">
-                            최고 점수
+                " data-i18n="quiz.questions_asked">
+                            출제 문제
                         </div>
-                        <div id="best-score"
+                        <div id="question-total"
                             style="font-size: 1.25rem; font-weight: 900; color: var(--theme-text-main);">0</div>
                     </div>
                 </div>
@@ -631,7 +631,7 @@
             </div>
             <div
                 style="font-size: 1.3rem; font-weight: bold; text-align: center; color: var(--color-pink); margin-bottom: 10px;">
-                <span data-i18n="nav.total">총</span> <span id="modal-total-score">0</span><span data-i18n="quiz.you_got_2_correct_answers">개의 정답을 맞췄습니다!</span>
+                <span id="modal-result-summary"></span>
             </div>
             <div id="modal-log-container" style="
                 flex: 1;

@@ -14,6 +14,7 @@ export const state = {
     myUser: { nickname: "나 (플레이어)", email: "guest@enterping.com", avatar: "나", ready: false, finished: false },
     battleSocket: null,
     opponents: {},
+    quizQuestions: null, // 퀴즈 대전: 게임 시작 때 서버가 뽑아서 보낸 문제 목록 (모든 참가자 동일)
 
     // YouTube 플레이어 (로비 미리보기 + 인게임 동기화 재생에 공용으로 쓰임)
     ytPlayer: null,

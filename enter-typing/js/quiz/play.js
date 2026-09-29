@@ -4,7 +4,9 @@ const contentId = contentIdMatch ? contentIdMatch[1] : null;
 let player = null;
 let quizData = [];
 let currentIndex = 0;
-let currentScore = 0;
+let currentScore = 0; // 맞힌 정답 수
+let currentCombo = 0;  // 연속으로 모든 정답을 맞힌 문제 수
+let playedCount = 0;   // 재생을 시작한 문제 수 (정답률 분모 기준)
 let quizTitle = "알 수 없는 퀴즈"; // 기록 저장용 값 (화면 표시용 아님)
 let currentGuessed = {};
 let isPlayingSegment = false;
@@ -34,7 +36,6 @@ async function initQuiz() {
         if (data.success) {
             quizTitle = data.title || "알 수 없는 퀴즈";
             quizData = JSON.parse(data.quiz_data || "[]");
-            document.getElementById("best-score").innerText = data.best_score || 0;
             updateQuizCountDisplay();
             if (quizData.length > QUESTION_COUNT_OPTIONS[0]) showQuestionCountPicker();
             if (quizData.length > 0 && quizData[0].youtube_id) {
@@ -163,6 +164,8 @@ function startQuiz() {
 
 function playSegment() {
     const item = quizData[currentIndex];
+    playedCount = Math.max(playedCount, currentIndex + 1);
+    updateAccuracyDisplay();
     currentGuessed = {};
     const questionKeys = Object.keys(item)
         .filter((key) => key.startsWith("question_"))
@@ -316,6 +319,7 @@ function handleChat() {
 
             currentScore += 1;
             document.getElementById('score').innerText = currentScore;
+            updateAccuracyDisplay();
 
             foundNew = true;
             break;
@@ -345,6 +349,8 @@ function checkSegmentComplete() {
     }
 
     if (allGuessed) {
+        currentCombo += 1;
+        updateAccuracyDisplay();
         player.pauseVideo();
         vinylRecord.classList.add("paused");
         clearInterval(checkInterval);
@@ -372,9 +378,32 @@ function checkSegmentComplete() {
     }
 }
 
+// ── 정답률: 지금까지 출제된 문제의 정답 중 맞힌 비율 (점수 대신 표시) ──
+function answerCount(item) {
+    return Object.keys(item || {})
+        .filter((key) => key.startsWith("question_"))
+        .reduce((sum, key) => sum + ((item[key].answer && item[key].answer.length) || 0), 0);
+}
+
+function totalAnswers(upToIndex) {
+    return quizData.slice(0, upToIndex).reduce((sum, item) => sum + answerCount(item), 0);
+}
+
+function accuracyRate(correct, total) {
+    return total > 0 ? Math.round((correct / total) * 100) : 0;
+}
+
+function updateAccuracyDisplay() {
+    // 재생을 시작한 문제들의 정답 수 기준 (아직 시작 전이면 "-")
+    document.getElementById("accuracy").innerText = playedCount > 0 ? accuracyRate(currentScore, totalAnswers(playedCount)) + "%" : "-";
+    document.getElementById("combo").innerText = currentCombo;
+    document.getElementById("question-total").innerText = quizData.length;
+}
+
 function updateQuizCountDisplay() {
     const display = document.getElementById("quiz-count-display");
     if (!display || quizData.length === 0) return;
+    updateAccuracyDisplay();
     const remaining = quizData.length - currentIndex;
     if (remaining > 0) {
         display.innerHTML = `<span>${i18n.t('common.remaining_quizzes')}</span> <span>${i18n.t('common.n_items', { count: remaining })}</span>`;
@@ -477,6 +506,7 @@ document.addEventListener("keydown", (e) => {
 
         chatInput.disabled = true;
         chatSendBtn.disabled = true;
+        currentCombo = 0;
 
         if (currentIndex >= quizData.length - 1) {
             addSystemChat(i18n.t('quiz.you_skipped_the_song_the_quiz'));
@@ -507,7 +537,10 @@ document
 
 function showQuizResult() {
     const modal = document.getElementById('quiz-result-modal');
-    document.getElementById('modal-total-score').innerText = currentScore;
+    const total = totalAnswers(quizData.length);
+    i18n.setText(document.getElementById('modal-result-summary'), 'quiz.result_summary', {
+        questions: quizData.length, correct: currentScore, total, rate: accuracyRate(currentScore, total),
+    });
 
     const logContainer = document.getElementById('modal-log-container');
     logContainer.innerHTML = '';

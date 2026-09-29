@@ -27,7 +27,7 @@ export function submitRoomPassword() {
 export function connectToBattleRoom(roomCode, password = "") {
     const token = localStorage.getItem('ep_user');
     if (!token) {
-        alert("로그인이 필요합니다.");
+        alert(i18n.t('common.login_is_required'));
         location.href = "/login";
         return;
     }
@@ -98,7 +98,7 @@ export function connectToBattleRoom(roomCode, password = "") {
                                     state.selectedSong = {
                                         id: data.id,
                                         title: data.title,
-                                        artist: data.artist || "알 수 없음",
+                                        artist: data.artist || i18n.t('common.unknown'),
                                         lines: data.lines || [],
                                         hiragana_lines: data.hiragana_lines || data.lines || [],
                                         romaji_lines: data.romaji_lines || [],
@@ -109,7 +109,7 @@ export function connectToBattleRoom(roomCode, password = "") {
                                         difficulty: data.difficulty || 3,
                                         play_count: data.play_count || 0,
                                         genre: data.genre || "",
-                                        creator_nickname: data.creator_nickname || "엔터핑"
+                                        creator_nickname: data.creator_nickname || i18n.t('nav.enterping')
                                     };
                                     console.log(`[Battle] fallback 조회 성공: ${data.title}`);
                                     updateVideoInfoPanel();
@@ -128,14 +128,14 @@ export function connectToBattleRoom(roomCode, password = "") {
                 break;
             case "player_joined":
                 state.opponents = data.players;
-                appendSystemChat(`${data.nickname}님이 입장하셨습니다.`);
+                appendSystemChat(i18n.t('battle.player_joined', { nickname: data.nickname }));
                 renderPlayersInLobby();
                 break;
             case "player_left":
                 state.opponents = data.players;
                 state.currentRoom.host = data.new_host;
                 state.isHost = state.currentRoom.host === state.myUser.nickname;
-                appendSystemChat(`${data.nickname}님이 퇴장하셨습니다.`);
+                appendSystemChat(i18n.t('battle.player_left', { nickname: data.nickname }));
                 updateReadyButton();
                 renderPlayersInLobby();
                 break;
@@ -145,7 +145,7 @@ export function connectToBattleRoom(roomCode, password = "") {
                     state.currentRoom.host = data.new_host;
                     state.isHost = state.currentRoom.host === state.myUser.nickname;
                 }
-                appendSystemChat(`${data.nickname}님이 대전 중 퇴장하셨습니다.`);
+                appendSystemChat(i18n.t('battle.player_left_mid_game', { nickname: data.nickname }));
                 if (state.currentRoom && state.currentRoom.status === "playing") {
                     renderLiveRanking();
                 }
@@ -180,7 +180,7 @@ export function connectToBattleRoom(roomCode, password = "") {
                 break;
             case "player_finished":
                 state.opponents = data.players;
-                appendSystemChat(`${data.nickname}님이 게임을 완료했습니다!`);
+                appendSystemChat(i18n.t('battle.player_finished', { nickname: data.nickname }));
                 renderLiveRanking();
                 break;
             case "game_end":
@@ -203,7 +203,7 @@ export function connectToBattleRoom(roomCode, password = "") {
             case "content_selected":
                 state.currentRoom = data.room;
                 state.selectedSong = null;
-                appendSystemChat(`방장이 콘텐츠를 선택했습니다: ${state.currentRoom.song_title}`);
+                appendSystemChat(i18n.t('battle.host_selected_content', { title: state.currentRoom.song_title }));
                 if (state.currentRoom.mode === 'quiz') {
                     const quizObj = state.databaseQuizzes.find(s => s.id === state.currentRoom.song_id);
                     if (quizObj) state.selectedSong = quizObj;
@@ -228,9 +228,9 @@ export function connectToBattleRoom(roomCode, password = "") {
             document.getElementById("modal-room-password").style.display = "flex";
             return;
         }
-        if (event.code === 4001) alert("인증에 실패했습니다.");
-        else if (event.code === 4003) alert("방이 가득 찼습니다.");
-        else if (event.code === 4004) alert("존재하지 않는 방입니다.");
+        if (event.code === 4001) alert(i18n.t('battle.authentication_failed'));
+        else if (event.code === 4003) alert(i18n.t('battle.the_room_is_full'));
+        else if (event.code === 4004) alert(i18n.t('battle.this_room_doesn_t_exist'));
 
         if (event.code !== 4005) {
             state.currentRoom = null;

@@ -17,7 +17,7 @@ export async function fetchBackendSongs() {
                 songs.push({
                     id: item.id,
                     title: item.title,
-                    artist: item.artist || "알 수 없음",
+                    artist: item.artist || i18n.t('common.unknown'),
                     lines: (item.lyrics || "").split('\n').filter(l => l.trim()),
                     hiragana_lines: (item.hiragana || "").split('\n').filter(l => l.trim()),
                     romaji_lines: (item.romaji || "").split('\n').filter(l => l.trim()),
@@ -26,7 +26,7 @@ export async function fetchBackendSongs() {
                     difficulty: item.difficulty || 3,
                     play_count: item.play_count || 0,
                     genre: item.genre || "",
-                    creator_nickname: item.creator_nickname || "엔터핑"
+                    creator_nickname: item.creator_nickname || i18n.t('nav.enterping')
                 });
             });
             state.databaseSongs = songs.filter(song => song.romaji_lines.length > 0 && song.lines.length > 0);
@@ -49,7 +49,7 @@ export async function fetchBackendQuizzes() {
             state.databaseQuizzes = data.data.map(item => ({
                 id: item.id,
                 title: item.title,
-                artist: item.artist || "알 수 없음",
+                artist: item.artist || i18n.t('common.unknown'),
                 genre: item.genre || "",
                 thumbnail_url: item.thumbnail_url || "/assets/vinyl.svg",
                 difficulty: item.difficulty || 3
@@ -79,7 +79,7 @@ function renderContentSelectorGrid() {
     const list = mode === "typing" ? state.databaseSongs : state.databaseQuizzes;
 
     if (list.length === 0) {
-        grid.innerHTML = "<div style='color: var(--theme-text-muted); grid-column: 1 / -1; text-align: center; padding: 40px;'>선택 가능한 콘텐츠가 없습니다.</div>";
+        grid.innerHTML = `<div style='color: var(--theme-text-muted); grid-column: 1 / -1; text-align: center; padding: 40px;'>${i18n.t('battle.no_selectable_content')}</div>`;
     } else {
         list.forEach(item => {
             const isSelected = state.currentRoom && state.currentRoom.song_id === item.id && state.currentRoom.mode === mode;
@@ -104,7 +104,7 @@ function renderContentSelectorGrid() {
                 <div style="width: 100%; height: 130px; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
                     <img src="${thumbSrc}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;" onerror="this.onerror=null; this.src='/assets/vinyl.svg'">
                     <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
-                        ${mode === 'typing' ? '타이핑' : '퀴즈'}
+                        ${mode === 'typing' ? i18n.t('nav.typing') : i18n.t('nav.quiz')}
                     </div>
                 </div>
                 <div style="padding: 16px;">
@@ -139,12 +139,12 @@ async function selectContentForRoom(item, mode) {
         });
         const data = await res.json();
         if (!data.success) {
-            alert(data.detail || "콘텐츠 선택에 실패했습니다.");
+            alert(data.detail || i18n.t('battle.content_select_failed'));
             return;
         }
         closeContentSelectorModal();
     } catch (e) {
-        alert("오류가 발생했습니다.");
+        alert(i18n.t('common.an_error_occurred'));
     }
 }
 
@@ -162,8 +162,8 @@ export function updateVideoInfoPanel() {
     const selectedSong = state.selectedSong;
     if (!selectedSong) return;
 
-    if (infoTitle) infoTitle.innerText = selectedSong.title || "제목 없음";
-    if (infoArtist) infoArtist.innerText = selectedSong.artist || "아티스트 미상";
+    if (infoTitle) infoTitle.innerText = selectedSong.title || i18n.t('common.no_title');
+    if (infoArtist) infoArtist.innerText = selectedSong.artist || i18n.t('common.unknown_artist');
     if (infoViews) infoViews.innerText = selectedSong.play_count || "0";
     if (timeEl) timeEl.innerText = "0";
 
@@ -174,11 +174,11 @@ export function updateVideoInfoPanel() {
             genres.forEach(g => {
                 const tagSpan = document.createElement("span");
                 tagSpan.style.cssText = "background: rgba(0,0,0,0.03); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; color: var(--color-battle-text-muted); border: 1.5px solid rgba(0,0,0,0.05);";
-                tagSpan.innerText = g;
+                tagSpan.innerText = i18n.genre(g);
                 infoTags.appendChild(tagSpan);
             });
         } else {
-            infoTags.innerHTML = '<span style="background: rgba(0,0,0,0.03); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; color: var(--color-battle-text-muted); border: 1.5px solid rgba(0,0,0,0.05);">태그 없음</span>';
+            infoTags.innerHTML = `<span style="background: rgba(0,0,0,0.03); padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; color: var(--color-battle-text-muted); border: 1.5px solid rgba(0,0,0,0.05);">${i18n.t('typing.no_tags')}</span>`;
         }
     }
 
@@ -189,21 +189,21 @@ export function updateVideoInfoPanel() {
         }
         if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "none";
 
-        if (infoCreator) infoCreator.innerText = "로딩 중...";
+        if (infoCreator) infoCreator.innerText = i18n.t('common.loading');
         fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${selectedSong.youtube_id}&format=json`)
             .then(res => res.json())
             .then(oEmbedData => {
                 if (infoCreator && oEmbedData.author_name) {
                     infoCreator.innerText = oEmbedData.author_name;
                 } else if (infoCreator) {
-                    infoCreator.innerText = selectedSong.creator_nickname || "엔터핑";
+                    infoCreator.innerText = selectedSong.creator_nickname || i18n.t('nav.enterping');
                 }
             })
             .catch(err => {
-                if (infoCreator) infoCreator.innerText = selectedSong.creator_nickname || "엔터핑";
+                if (infoCreator) infoCreator.innerText = selectedSong.creator_nickname || i18n.t('nav.enterping');
             });
     } else {
-        if (infoCreator) infoCreator.innerText = selectedSong.creator_nickname || "엔터핑";
+        if (infoCreator) infoCreator.innerText = selectedSong.creator_nickname || i18n.t('nav.enterping');
         if (infoThumbnail) infoThumbnail.style.display = "none";
         if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "flex";
     }
@@ -221,13 +221,13 @@ export function updateWaitContentMeta() {
 
     if (currentRoom.song_id) {
         titleEl.textContent = currentRoom.song_title;
-        badgeEl.textContent = currentRoom.mode === 'quiz' ? '퀴즈' : '타이핑';
+        badgeEl.textContent = currentRoom.mode === 'quiz' ? i18n.t('nav.quiz') : i18n.t('nav.typing');
         badgeEl.className = `content-type-badge ${currentRoom.mode === 'quiz' ? 'mode-quiz' : 'mode-typing'}`;
         const difficulty = (state.selectedSong && state.selectedSong.difficulty) || 3;
         diffEl.innerHTML = `<i class="ph-fill ph-star"></i> ${difficulty}`;
         diffEl.classList.add('visible');
     } else {
-        titleEl.textContent = state.isHost ? "콘텐츠를 선택해주세요" : "방장이 콘텐츠를 선택하는 중입니다...";
+        titleEl.textContent = state.isHost ? i18n.t('battle.please_select_content') : i18n.t('battle.the_host_is_selecting_content');
         badgeEl.textContent = "";
         badgeEl.className = "content-type-badge";
         diffEl.classList.remove('visible');
@@ -263,25 +263,25 @@ export function enterWaitingRoom() {
     const currentRoom = state.currentRoom;
     if (currentRoom.mode === 'quiz') {
         // Quiz mode doesn't need video info panel update in the same way, but let's clear it
-        document.getElementById("wait-room-title").textContent = currentRoom.title + " (퀴즈)";
+        document.getElementById("wait-room-title").textContent = currentRoom.title + i18n.t('common.quiz');
     } else {
         updateVideoInfoPanel();
         document.getElementById("wait-room-title").textContent = currentRoom.title;
     }
 
-    document.getElementById("wait-room-code").innerHTML = `코드: ${currentRoom.code} <span style="font-size: 0.85rem;"></span>`;
+    document.getElementById("wait-room-code").innerHTML = `${escapeHTML(i18n.t('battle.room_code', { code: currentRoom.code }))} <span style="font-size: 0.85rem;"></span>`;
 
     updateWaitContentMeta();
     updateWaitSongThumb();
 
     const selectBtn = document.getElementById("btn-select-content");
     selectBtn.style.display = state.isHost ? "flex" : "none";
-    selectBtn.title = currentRoom.song_id ? "콘텐츠 변경" : "콘텐츠 선택";
+    selectBtn.title = currentRoom.song_id ? i18n.t('battle.change_content') : i18n.t('battle.select_content');
 
     updateReadyButton();
 
     const chatMsgs = document.getElementById("chat-messages");
-    chatMsgs.innerHTML = `<div class="chat-bubble system">대전방(#${currentRoom.code})에 입장했습니다!</div>`;
+    chatMsgs.innerHTML = `<div class="chat-bubble system">${escapeHTML(i18n.t('battle.joined_room', { code: currentRoom.code }))}</div>`;
 
     renderPlayersInLobby();
 
@@ -299,7 +299,7 @@ export function copyRoomCode() {
         function showSuccess() {
             const el = document.getElementById("wait-room-code");
             const originalHTML = el.innerHTML;
-            el.innerHTML = `${window.i18nTranslate("복사되었습니다!")} <span style="font-size: 0.85rem;"></span>`;
+            el.innerHTML = `${i18n.t('battle.copied_2')} <span style="font-size: 0.85rem;"></span>`;
             setTimeout(() => {
                 el.innerHTML = originalHTML;
             }, 1500);
@@ -317,9 +317,9 @@ export function copyRoomCode() {
             textArea.select();
             try {
                 if (document.execCommand('copy')) showSuccess();
-                else alert("복사 실패. 수동으로 복사해주세요.");
+                else alert(i18n.t('battle.copy_failed_please_copy_manually'));
             } catch (err) {
-                alert("복사 기능이 지원되지 않는 브라우저입니다.");
+                alert(i18n.t('battle.your_browser_does_not_support_the'));
             }
             document.body.removeChild(textArea);
             return;
@@ -330,7 +330,7 @@ export function copyRoomCode() {
             showSuccess();
         }).catch(err => {
             console.error('복사 실패:', err);
-            alert("복사를 지원하지 않는 브라우저입니다.");
+            alert(i18n.t('battle.your_browser_does_not_support_copying'));
         });
     }
 }
@@ -338,7 +338,7 @@ export function copyRoomCode() {
 export function updateReadyButton() {
     const actionBtn = document.getElementById("btn-ready-start");
     if (state.isHost) {
-        actionBtn.textContent = "시작하기";
+        actionBtn.textContent = i18n.t('common.getting_started');
         actionBtn.className = "btn-battle btn-battle-primary";
         // 콘텐츠가 선택되어 있고, 나를 제외한 모두가 준비 완료했을 때만 시작 가능
         const hasContent = !!(state.currentRoom && state.currentRoom.song_id);
@@ -347,7 +347,7 @@ export function updateReadyButton() {
         actionBtn.style.opacity = canStart ? "1" : "0.6";
         actionBtn.style.pointerEvents = canStart ? "auto" : "none";
     } else {
-        actionBtn.textContent = state.myUser.ready ? "준비 해제" : "준비 완료";
+        actionBtn.textContent = state.myUser.ready ? i18n.t('battle.unready') : i18n.t('battle.ready');
         actionBtn.className = state.myUser.ready ? "btn-battle btn-battle-primary" : "btn-battle btn-battle-secondary";
         actionBtn.style.opacity = "1";
         actionBtn.style.pointerEvents = "auto";
@@ -381,17 +381,17 @@ export function renderPlayersInLobby() {
 
         let statusTag = '';
         if (p.is_host) {
-            statusTag = `<span class="player-status-tag host">방장</span>`;
+            statusTag = `<span class="player-status-tag host">${i18n.t('battle.host')}</span>`;
         } else if (p.ready) {
-            statusTag = `<span class="player-status-tag ready">준비 완료</span>`;
+            statusTag = `<span class="player-status-tag ready">${i18n.t('battle.ready')}</span>`;
         } else {
-            statusTag = `<span class="player-status-tag waiting">대기 중</span>`;
+            statusTag = `<span class="player-status-tag waiting">${i18n.t('common.waiting')}</span>`;
         }
 
         card.innerHTML = `
-            <div class="player-avatar-large" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${avatar}</div>
+            <div class="player-avatar-large" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${escapeHTML(avatar)}</div>
             <div class="player-info">
-                <div class="player-name">${p.nickname} ${isMe ? '(나)' : ''}</div>
+                <div class="player-name">${escapeHTML(p.nickname)} ${isMe ? i18n.t('battle.me') : ''}</div>
                 ${statusTag}
             </div>
         `;
@@ -402,7 +402,7 @@ export function renderPlayersInLobby() {
     for (let i = playerList.length; i < maxUsers; i++) {
         const card = document.createElement("div");
         card.className = "player-card empty-slot";
-        card.innerHTML = `<div> 대기 중...</div>`;
+        card.innerHTML = `<div> ${i18n.t('battle.waiting')}</div>`;
         grid.appendChild(card);
     }
 
@@ -433,7 +433,7 @@ export function appendUserChat(sender, message) {
     const container = document.getElementById("chat-messages");
     const bubble = document.createElement("div");
     bubble.className = "chat-bubble me";
-    bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender}</div>${escapeHTML(message)}`;
+    bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${escapeHTML(sender)}</div>${escapeHTML(message)}`;
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
 }
@@ -443,7 +443,7 @@ export function appendOpponentChat(sender, message) {
     if (!container) return;
     const bubble = document.createElement("div");
     bubble.className = "chat-bubble"; // no 'me' class means it's from opponent
-    bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender}</div>${escapeHTML(message)}`;
+    bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${escapeHTML(sender)}</div>${escapeHTML(message)}`;
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
 }
@@ -467,7 +467,7 @@ export function showSyncUI() {
     const overlay = document.getElementById("countdown-overlay");
     const countNum = document.getElementById("countdown-num");
     overlay.style.display = "flex";
-    countNum.innerHTML = `<span style="font-size:1.5rem;">영상 로딩 동기화 중...</span><br><span style="font-size:1rem;">다른 플레이어를 기다리고 있습니다.</span>`;
+    countNum.innerHTML = `<span style="font-size:1.5rem;">${i18n.t('battle.synchronizing_video_loading')}</span><br><span style="font-size:1rem;">${i18n.t('battle.waiting_for_other_players')}</span>`;
 }
 
 export function hideSyncUI() {
@@ -508,7 +508,7 @@ export function renderLiveRanking() {
         let rowOpacity = "1";
         let rowFilter = "none";
         if (p.disconnected) {
-            statusText = "기권 (나감)";
+            statusText = i18n.t('battle.abstain_exit');
             rowOpacity = "0.5";
             rowFilter = "grayscale(100%)";
         }
@@ -523,9 +523,9 @@ export function renderLiveRanking() {
             row.innerHTML = `
                 <div class="player-status-line">
                     <div class="player-row-left">
-                        <span class="rank-display" style="font-weight: 900; color: ${idx === 0 ? 'var(--color-battle-accent)' : '#fff'};">${idx + 1}등</span>
-                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${avatar}</div>
-                        <span class="player-mini-name">${p.nickname} ${isMe ? '(나)' : ''}</span>
+                        <span class="rank-display" style="font-weight: 900; color: ${idx === 0 ? 'var(--color-battle-accent)' : '#fff'};">${i18n.t('battle.rank_place', { rank: idx + 1 })}</span>
+                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${escapeHTML(avatar)}</div>
+                        <span class="player-mini-name">${escapeHTML(p.nickname)} ${isMe ? i18n.t('battle.me') : ''}</span>
                     </div>
                     <div class="player-row-right">
                         <span class="player-wpm-stat">${statusText}</span>
@@ -538,7 +538,7 @@ export function renderLiveRanking() {
             container.appendChild(row);
         } else {
             // Update existing element for smooth transition
-            row.querySelector('.rank-display').textContent = `${idx + 1}등`;
+            row.querySelector('.rank-display').textContent = i18n.t('battle.rank_place', { rank: idx + 1 });
             row.querySelector('.rank-display').style.color = idx === 0 ? 'var(--color-battle-accent)' : '#fff';
             row.querySelector('.player-wpm-stat').textContent = statusText;
             row.querySelector('.player-progress-bar-fill').style.width = `${p.progress}%`;
@@ -559,13 +559,13 @@ export function showResultsScreen(results) {
     const isQuizMode = state.currentRoom && state.currentRoom.mode === 'quiz';
     const thWpm = document.getElementById("result-th-wpm");
     const thAccuracy = document.getElementById("result-th-accuracy");
-    if (thWpm) thWpm.textContent = isQuizMode ? "정답 수" : "분당 타수(WPM)";
-    if (thAccuracy) thAccuracy.textContent = isQuizMode ? "정확도" : "정확도";
+    if (thWpm) thWpm.textContent = isQuizMode ? i18n.t('common.correct_answers') : i18n.t('battle.strokes_per_minute_wpm');
+    if (thAccuracy) thAccuracy.textContent = isQuizMode ? i18n.t('common.accuracy') : i18n.t('common.accuracy');
 
     if (results.length > 0) {
         document.getElementById("podium-1st-name").textContent = results[0].nickname;
         document.getElementById("podium-1st-wpm").innerHTML = `
-            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[0].score}점</div>
+            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${i18n.t('common.n_points', { count: results[0].score })}</div>
             ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[0].wpm} WPM</div>`}
         `;
         document.getElementById("podium-1st-avatar").textContent = results[0].nickname.charAt(0).toUpperCase();
@@ -577,7 +577,7 @@ export function showResultsScreen(results) {
         pod2.style.display = "flex";
         document.getElementById("podium-2nd-name").textContent = results[1].nickname;
         document.getElementById("podium-2nd-wpm").innerHTML = `
-            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[1].score}점</div>
+            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${i18n.t('common.n_points', { count: results[1].score })}</div>
             ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[1].wpm} WPM</div>`}
         `;
         document.getElementById("podium-2nd-avatar").textContent = results[1].nickname.charAt(0).toUpperCase();
@@ -591,7 +591,7 @@ export function showResultsScreen(results) {
         pod3.style.display = "flex";
         document.getElementById("podium-3rd-name").textContent = results[2].nickname;
         document.getElementById("podium-3rd-wpm").innerHTML = `
-            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${results[2].score}점</div>
+            <div style="font-weight: 800; color: var(--color-battle-primary); font-size: 0.95rem; margin-bottom: 2px;">${i18n.t('common.n_points', { count: results[2].score })}</div>
             ${isQuizMode ? "" : `<div style="font-size: 0.8rem; color: var(--color-battle-text-muted); font-weight: 600;">${results[2].wpm} WPM</div>`}
         `;
         document.getElementById("podium-3rd-avatar").textContent = results[2].nickname.charAt(0).toUpperCase();
@@ -614,24 +614,24 @@ export function showResultsScreen(results) {
                 <td style="font-weight:bold; color:#aaa">DNF</td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}; filter: grayscale(100%);">${p.nickname.charAt(0).toUpperCase()}</div>
-                        <span>${p.nickname} ${isMe ? '<strong>(나)</strong>' : ''} <span style="color:#ff4a68; font-size: 0.8rem;">(기권)</span></span>
+                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}; filter: grayscale(100%);">${escapeHTML(p.nickname.charAt(0).toUpperCase())}</div>
+                        <span>${escapeHTML(p.nickname)} ${isMe ? `<strong>${i18n.t('battle.me')}</strong>` : ''} <span style="color:#ff4a68; font-size: 0.8rem;">${i18n.t('battle.give_up')}</span></span>
                     </div>
                 </td>
-                <td colspan="3" style="text-align: center; color: #ff4a68; font-weight: bold;">중도 퇴장</td>
+                <td colspan="3" style="text-align: center; color: #ff4a68; font-weight: bold;">${i18n.t('battle.left_mid_game')}</td>
             `;
         } else {
             tr.innerHTML = `
-                <td style="font-weight:bold; color:${idx === 0 ? 'var(--color-battle-accent)' : ''}">${p.rank}등</td>
+                <td style="font-weight:bold; color:${idx === 0 ? 'var(--color-battle-accent)' : ''}">${i18n.t('battle.rank_place', { rank: p.rank })}</td>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${p.nickname.charAt(0).toUpperCase()}</div>
-                        <span>${p.nickname} ${isMe ? '<strong>(나)</strong>' : ''}</span>
+                        <div class="player-mini-avatar" style="${isMe ? 'background: linear-gradient(135deg, #ff7b8e, #ffd17b)' : ''}">${escapeHTML(p.nickname.charAt(0).toUpperCase())}</div>
+                        <span>${escapeHTML(p.nickname)} ${isMe ? `<strong>${i18n.t('battle.me')}</strong>` : ''}</span>
                     </div>
                 </td>
-                <td>${isQuizMode ? `<strong>${p.score}</strong>문제` : `<strong>${p.wpm}</strong> WPM`}</td>
+                <td>${isQuizMode ? i18n.t('common.n_questions', { count: `<strong>${Number(p.score) || 0}</strong>` }) : `<strong>${p.wpm}</strong> WPM`}</td>
                 <td>${isQuizMode ? `-` : `${p.accuracy}%`}</td>
-                <td>${p.score}점</td>
+                <td>${i18n.t('common.n_points', { count: p.score })}</td>
             `;
         }
         tbody.appendChild(tr);
@@ -648,7 +648,7 @@ export function switchView(viewId) {
 
 // ── 7. 방 나가기 / 이동 ──────────────────────────────────────────────
 export function leaveRoom() {
-    if (confirm("정말 대기실에서 퇴장하시겠습니까?")) {
+    if (confirm(i18n.t('battle.do_you_really_want_to_leave'))) {
         if (state.battleSocket) {
             state.battleSocket.close();
             state.battleSocket = null;
@@ -696,9 +696,9 @@ export function addQuizUserChat(sender, msg, isCorrect) {
     bubble.className = "chat-bubble me";
     if (isCorrect) {
         bubble.style.border = "2px solid #34a853";
-        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender} <span style="color:#34a853"></span></div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${escapeHTML(sender)} <span style="color:#34a853"></span></div>${escapeHTML(msg)}`;
     } else {
-        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${sender}</div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:#ffd17b">${escapeHTML(sender)}</div>${escapeHTML(msg)}`;
     }
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
@@ -711,9 +711,9 @@ export function addQuizOpponentChat(sender, msg, isCorrect) {
     bubble.className = 'chat-bubble';
     if (isCorrect) {
         bubble.style.border = '2px solid #1a73e8';
-        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender} <span style="color:#1a73e8"></span></div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${escapeHTML(sender)} <span style="color:#1a73e8"></span></div>${escapeHTML(msg)}`;
     } else {
-        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${sender}</div>${escapeHTML(msg)}`;
+        bubble.innerHTML = `<div class="chat-sender" style="color:var(--color-battle-accent)">${escapeHTML(sender)}</div>${escapeHTML(msg)}`;
     }
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
@@ -769,7 +769,7 @@ export function renderLiveRankingQuiz() {
         scoreLabel.style.fontSize = "0.95rem";
         scoreLabel.style.fontWeight = "bold";
         scoreLabel.style.color = isMe ? "var(--color-battle-primary)" : "var(--color-battle-text-muted)";
-        scoreLabel.innerText = `${p.score}점`;
+        scoreLabel.innerText = i18n.t('common.n_points', { count: p.score });
 
         row.appendChild(rankBadge);
         row.appendChild(nameLabel);

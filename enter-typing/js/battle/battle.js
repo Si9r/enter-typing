@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             state.myUser.avatar = state.myUser.nickname.charAt(0).toUpperCase();
         } catch (e) { }
     } else {
-        alert("로그인이 필요합니다.");
+        alert(i18n.t('common.login_is_required'));
         location.href = "/login";
         return;
     }

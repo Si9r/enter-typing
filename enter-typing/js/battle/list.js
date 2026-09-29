@@ -1,7 +1,7 @@
 let pendingRoomCode = null;
 
 function fmtMode(mode) {
-    return mode === 'quiz' ? '<span>퀴즈</span>' : (mode === 'typing' ? '<span>타이핑</span>' : null);
+    return mode === 'quiz' ? `<span>${i18n.t('nav.quiz')}</span>` : (mode === 'typing' ? `<span>${i18n.t('nav.typing')}</span>` : null);
 }
 
 async function loadRooms() {
@@ -10,25 +10,25 @@ async function loadRooms() {
         const data = await res.json();
         const grid = document.getElementById('room-grid');
         if (!data.success || data.rooms.length === 0) {
-            grid.innerHTML = '<div class="empty-rooms">현재 열린 방이 없습니다. 새 방을 만들어보세요!</div>';
+            grid.innerHTML = `<div class="empty-rooms">${i18n.t('battle.there_are_currently_no_open_rooms')}</div>`;
             return;
         }
         grid.innerHTML = data.rooms.map(room => {
             const modeLabel = fmtMode(room.mode);
-            const songLabel = modeLabel ? `${modeLabel}: ${room.song_title || '<span>곡 미정</span>'}` : '<span>콘텐츠 미정</span>';
+            const songLabel = modeLabel ? `${modeLabel}: ${room.song_title ? escapeHtml(room.song_title) : `<span>${i18n.t('battle.song_tbd')}</span>`}` : `<span>${i18n.t('battle.content_tbd')}</span>`;
             const lockedClass = room.is_private ? ' locked' : '';
             const lockIcon = room.is_private ? '<i class="ph-fill ph-lock"></i>' : '';
             const statusClass = room.status === 'playing' ? ' playing' : '';
-            const statusLabel = room.status === 'playing' ? '<span>게임중</span>' : '<span>대기중</span>';
+            const statusLabel = room.status === 'playing' ? `<span>${i18n.t('battle.playing')}</span>` : `<span>${i18n.t('battle.waiting_2')}</span>`;
             return `
-                <div class="room-card${lockedClass}" onclick="onRoomClick('${room.code}', ${room.is_private})">
+                <div class="room-card${lockedClass}" onclick="onRoomClick('${escapeHtml(room.code)}', ${room.is_private ? 'true' : 'false'})">
                     <div class="room-card-header">
-                        <span class="room-card-title">${room.title}</span>
+                        <span class="room-card-title">${escapeHtml(room.title)}</span>
                         <span>${lockIcon}</span>
                     </div>
-                    <div class="room-card-meta"><span>방장</span>: ${room.host} · ${songLabel}</div>
+                    <div class="room-card-meta"><span>${i18n.t('battle.host')}</span>: ${escapeHtml(room.host)} · ${songLabel}</div>
                     <div class="room-card-footer">
-                        <span>${room.player_count} / ${room.max_players}명</span>
+                        <span>${room.player_count} / ${i18n.t('common.n_people', { count: room.max_players })}</span>
                         <span class="room-card-status${statusClass}">${statusLabel}</span>
                     </div>
                 </div>
@@ -62,10 +62,10 @@ async function submitPassword() {
             sessionStorage.setItem('battle_room_pw', password);
             location.href = `/battle/${pendingRoomCode}`;
         } else {
-            alert(data.detail || '비밀번호가 올바르지 않습니다.');
+            alert(data.detail || i18n.t('battle.wrong_password'));
         }
     } catch (e) {
-        alert('비밀번호가 올바르지 않습니다.');
+        alert(i18n.t('battle.wrong_password'));
     }
 }
 
@@ -77,7 +77,7 @@ function closePasswordModal() {
 function joinByCode() {
     const code = document.getElementById('join-code-input').value.trim();
     if (code.length !== 4) {
-        alert('4자리 방 코드를 올바르게 입력해주세요!');
+        alert(i18n.t('battle.please_enter_the_4_digit_room'));
         return;
     }
     location.href = `/battle/${code}`;
@@ -85,7 +85,7 @@ function joinByCode() {
 
 function openCreateModal() {
     if (!(window.NavAuth && window.NavAuth.getUser())) {
-        alert('로그인이 필요한 서비스입니다.');
+        alert(i18n.t('common.this_service_requires_login'));
         location.href = '/login';
         return;
     }
@@ -107,13 +107,13 @@ function onPrivateToggle() {
 }
 
 async function submitCreateRoom() {
-    const title = document.getElementById('create-title').value.trim() || '즐거운 대전방';
+    const title = document.getElementById('create-title').value.trim() || '즐거운 대전방'; // 서버에 저장되는 방 제목 (번역하지 않음)
     const maxPlayers = parseInt(document.getElementById('create-max-players').value);
     const isPrivate = document.getElementById('create-is-private').checked;
     const password = document.getElementById('create-password').value;
 
     if (isPrivate && !password) {
-        alert('비밀방은 비밀번호를 입력해야 합니다.');
+        alert(i18n.t('battle.private_rooms_require_a_password'));
         return;
     }
 
@@ -130,10 +130,10 @@ async function submitCreateRoom() {
             if (isPrivate) sessionStorage.setItem('battle_room_pw', password);
             location.href = `/battle/${data.room_code}`;
         } else {
-            alert(data.detail || '방 생성에 실패했습니다.');
+            alert(data.detail || i18n.t('battle.room_creation_failed'));
         }
     } catch (e) {
-        alert('오류가 발생했습니다.');
+        alert(i18n.t('common.an_error_occurred'));
     }
 }
 

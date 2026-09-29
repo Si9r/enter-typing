@@ -99,18 +99,18 @@ function renderWaitingPhase() {
     const song = state.selectedSong;
     const totalLines = song.lines.filter(line => line !== "[END]").length;
     document.getElementById("game-stage-indicator").textContent = `${currentLineIndex + 1} / ${totalLines}`;
-    document.getElementById("game-kanji-display").textContent = window.i18nTranslate ? window.i18nTranslate("준비 중...") : "준비 중...";
+    document.getElementById("game-kanji-display").textContent = i18n.t('common.preparing');
     document.getElementById("game-next-display").textContent = song.lines[currentLineIndex] || "-";
     document.getElementById("game-lyric-display").innerHTML = "<span class='lyric-unit pending'><span class='hira-text'>-</span><span class='roma-text'><span>-</span></span></span>";
 
     const input = document.getElementById("game-typing-input");
     input.value = "";
     input.disabled = true;
-    input.placeholder = currentLineIndex === 0 ? window.i18nTranslate("전주 재생 중... 대기하세요 ⏳") : window.i18nTranslate("다음 가사 대기 중... ⏳");
+    input.placeholder = currentLineIndex === 0 ? i18n.t('battle.playing_intro_please_wait') : i18n.t('battle.waiting_for_next_lyrics');
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${window.i18nTranslate("곧 가사가 시작됩니다. 대기하세요...")}</span>`;
+        statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${i18n.t('battle.lyrics_starting_soon_please_wait')}</span>`;
     }
 
     battleTargetUnits = [];
@@ -305,12 +305,12 @@ function handleLineCompletion() {
     const input = document.getElementById("game-typing-input");
     if (input) {
         input.disabled = true;
-        input.placeholder = window.i18nTranslate("가사를 모두 입력했습니다. 대기 중... ⏳");
+        input.placeholder = i18n.t('battle.all_lyrics_entered_waiting');
     }
 
     const statusPanel = document.getElementById("game-status-panel");
     if (statusPanel) {
-        statusPanel.innerHTML = `<span class="success-text"> ${window.i18nTranslate("문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...")}</span>`;
+        statusPanel.innerHTML = `<span class="success-text"> ${i18n.t('common.sentence_completed_waiting_for_the_next')}</span>`;
     }
 
     calculateMyProgress();
@@ -344,7 +344,7 @@ export function startGamePlay() {
     const input = document.getElementById("game-typing-input");
     input.value = "";
     input.disabled = true; // 게임 시작 직후에는 무조건 잠금
-    input.placeholder = window.i18nTranslate("전주 재생 중... 대기하세요 ⏳");
+    input.placeholder = i18n.t('battle.playing_intro_please_wait');
     input.oninput = handleTypingInput;
 
     if (state.syncTimer) clearInterval(state.syncTimer);
@@ -413,7 +413,7 @@ function loadGameplayLine() {
     if (nextIdx < totalLines) {
         document.getElementById("game-next-display").textContent = song.lines[nextIdx];
     } else {
-        const lastMsg = window.i18nTranslate ? window.i18nTranslate("마지막 소절입니다!") : "마지막 소절입니다!";
+        const lastMsg = i18n.t('battle.this_is_the_last_section');
         document.getElementById("game-next-display").textContent = lastMsg;
     }
 
@@ -439,7 +439,7 @@ function highlightCurrentChar() {
     TypingEngine.highlightCurrentChar(lyricDisplay, battleTargetUnits, currentUnitIndex, currentBuffer);
 
     const statusPanel = document.getElementById("game-status-panel");
-    const successMsg = window.i18nTranslate ? window.i18nTranslate("완벽하게 입력했습니다! 다음 문장을 기다려 주세요.") : "완벽하게 입력했습니다! 다음 문장을 기다려 주세요.";
+    const successMsg = i18n.t('common.perfectly_typed_please_wait_for_the');
     TypingEngine.getStatusHTML(statusPanel, battleTargetUnits, currentUnitIndex, currentBuffer, `<span class="success-text">${successMsg}</span>`);
 }
 
@@ -616,7 +616,7 @@ function finishMyTypingGame() {
     if (state.syncTimer) clearInterval(state.syncTimer);
     const input = document.getElementById("game-typing-input");
     input.disabled = true;
-    input.value = "완료!";
+    input.value = i18n.t('common.complete');
 
     state.myUser.finished = true;
     const wpm = parseInt(document.getElementById("game-wpm").textContent) || 0;
@@ -650,7 +650,7 @@ function startQuizGameplay() {
 
     document.getElementById("quiz-my-score").innerText = "0";
     document.getElementById("quiz-my-combo").innerText = "0";
-    document.getElementById("quiz-chat-messages").innerHTML = `<div class="chat-bubble system" style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${window.i18nTranslate("퀴즈 대전이 시작되었습니다! 정답을 입력하면 자동으로 채점됩니다.")}</div>`;
+    document.getElementById("quiz-chat-messages").innerHTML = `<div class="chat-bubble system" style="align-self: center; background-color: rgba(255, 209, 123, 0.08); color: var(--color-battle-accent); border: 1px solid rgba(255, 209, 123, 0.15); padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">${i18n.t('battle.the_quiz_competition_has_begun_if')}</div>`;
 
     const inputField = document.getElementById("quiz-chat-input");
     if (inputField) {
@@ -673,10 +673,10 @@ function startQuizGameplay() {
     }
 
     const countDisplay = document.getElementById("quiz-count-display-battle");
-    if (countDisplay) countDisplay.innerText = `${window.i18nTranslate("남은 퀴즈:")} ${quizData.length}`;
+    if (countDisplay) countDisplay.innerText = `${i18n.t('common.remaining_quizzes')} ${quizData.length}`;
 
     const infoTitle = document.getElementById("quiz-info-title");
-    if (infoTitle) infoTitle.innerText = selectedSong.title || "로딩 중...";
+    if (infoTitle) infoTitle.innerText = selectedSong.title || i18n.t('common.loading');
 
     // Set up volume slider
     const volSlider = document.getElementById("quiz-volume-slider");
@@ -704,7 +704,7 @@ function startQuizGameplay() {
 function startQuizBattle() {
     if (quizData.length === 0) return;
     if (currentQuizIndex >= quizData.length) {
-        addQuizSystemChat(window.i18nTranslate("모든 문제가 끝났습니다."));
+        addQuizSystemChat(i18n.t('battle.all_problems_are_over'));
         return;
     }
 
@@ -782,7 +782,7 @@ function playQuizSegment() {
             if (vinylRecord) vinylRecord.classList.add("paused");
             quizIsPlayingSegment = false;
 
-            addQuizSystemChat(window.i18nTranslate("시간 초과! 잠시 후 다음 문제로 넘어갑니다."));
+            addQuizSystemChat(i18n.t('battle.time_out_we_ll_move_on'));
 
             currentQuizCombo = 0;
             const comboEl = document.getElementById("quiz-my-combo");
@@ -821,7 +821,7 @@ function setupQuizBoard(index) {
 
     const countDisplay = document.getElementById("quiz-count-display-battle");
     if (countDisplay) {
-        countDisplay.innerText = `남은 퀴즈: ${quizData.length - currentQuizIndex}`;
+        countDisplay.innerText = `${i18n.t('common.remaining_quizzes')} ${quizData.length - currentQuizIndex}`;
     }
     updateQuizAnswerBoard();
 }
@@ -850,7 +850,7 @@ function updateQuizAnswerBoard() {
     numBadge.style.fontSize = "0.8rem";
     numBadge.style.fontWeight = "900";
     numBadge.style.marginBottom = "8px";
-    numBadge.textContent = `문제 ${currentQuizIndex + 1} / ${quizData.length}`;
+    numBadge.textContent = i18n.t('battle.question_progress', { cur: currentQuizIndex + 1, total: quizData.length });
     headerDiv.appendChild(numBadge);
 
     // hint(제목) 토글 버튼 방식
@@ -862,7 +862,7 @@ function updateQuizAnswerBoard() {
         hintRow.style.marginTop = "6px";
 
         const hintBtn = document.createElement("button");
-        hintBtn.textContent = " 힌트 보기";
+        hintBtn.textContent = i18n.t('common.see_hints');
         hintBtn.style.cssText = "background: rgba(255,209,123,0.15); border: 1.5px solid rgba(255,209,123,0.4); color: #a07000; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: all 0.2s; flex-shrink: 0;";
 
         const hintText = document.createElement("span");
@@ -872,7 +872,7 @@ function updateQuizAnswerBoard() {
         hintBtn.onclick = () => {
             const isHidden = hintText.style.display === "none";
             hintText.style.display = isHidden ? "inline" : "none";
-            hintBtn.textContent = isHidden ? " 힌트 숨기기" : " 힌트 보기";
+            hintBtn.textContent = isHidden ? i18n.t('battle.hide_hint') : i18n.t('common.see_hints');
         };
 
         hintRow.appendChild(hintBtn);
@@ -896,7 +896,7 @@ function updateQuizAnswerBoard() {
         row.style.gap = "10px";
 
         const typeBadge = document.createElement("div");
-        typeBadge.textContent = question.question || question.type || "질문";
+        typeBadge.textContent = question.question || question.type || i18n.t('common.question_2');
         typeBadge.style.background = "var(--color-battle-primary)";
         typeBadge.style.color = "white";
         typeBadge.style.padding = "4px 10px";
@@ -1005,7 +1005,7 @@ export function sendQuizChatMessage() {
         }
 
         if (allGuessed) {
-            addQuizSystemChat("모든 정답을 맞췄습니다! 잠시 후 다음 문제로 넘어갑니다.");
+            addQuizSystemChat(i18n.t('battle.you_got_everything_correct_we_ll'));
             input.disabled = true;
             document.getElementById("quiz-chat-send-btn").disabled = true;
             state.myUser.progress = Math.min(100, Math.floor(((currentQuizIndex + 1) / quizData.length) * 100));
@@ -1042,7 +1042,7 @@ function finishQuizBattle() {
     if (quizCheckInterval) clearInterval(quizCheckInterval);
     if (state.ytPlayer && state.ytPlayer.pauseVideo) state.ytPlayer.pauseVideo();
 
-    addQuizSystemChat("모든 퀴즈가 종료되었습니다!");
+    addQuizSystemChat(i18n.t('battle.all_quizzes_have_ended'));
     const chatInput = document.getElementById("quiz-chat-input");
     if (chatInput) chatInput.disabled = true;
 
@@ -1102,7 +1102,7 @@ export function handleOpponentQuizAnswer(data) {
             }
 
             if (allGuessed) {
-                addQuizSystemChat("모든 정답을 맞췄습니다! 잠시 후 다음 문제로 넘어갑니다.");
+                addQuizSystemChat(i18n.t('battle.you_got_everything_correct_we_ll'));
                 const input = document.getElementById("quiz-chat-input");
                 if (input) input.disabled = true;
                 const sendBtn = document.getElementById("quiz-chat-send-btn");

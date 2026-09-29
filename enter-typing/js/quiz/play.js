@@ -14,6 +14,10 @@ let currentLoadedYoutubeId = null;
 let quizLogs = [];
 let hasIncrementedPlayCount = false;
 
+// 문제 수 선택: 전체 문제가 이보다 많으면 시작 전에 몇 문제를 풀지 고르게 한다
+const QUESTION_COUNT_OPTIONS = [10, 30, 50];
+let isChoosingQuestionCount = false;
+
 const chatMessages = document.getElementById("chat-messages");
 const chatInput = document.getElementById("chat-input");
 const chatSendBtn = document.getElementById("chat-send-btn");
@@ -32,6 +36,7 @@ async function initQuiz() {
             quizData = JSON.parse(data.quiz_data || "[]");
             document.getElementById("best-score").innerText = data.best_score || 0;
             updateQuizCountDisplay();
+            if (quizData.length > QUESTION_COUNT_OPTIONS[0]) showQuestionCountPicker();
             if (quizData.length > 0 && quizData[0].youtube_id) {
                 currentLoadedYoutubeId = quizData[0].youtube_id;
                 initYoutube(currentLoadedYoutubeId);
@@ -73,13 +78,63 @@ function onPlayerStateChange(event) {
 
 function onPlayerReady(event) {
     player.setVolume(document.getElementById("volume-slider").value);
+    // 문제 수를 고르는 중이면, 선택 후에 시작 안내를 보여준다
+    if (isChoosingQuestionCount) return;
     addSystemChat(
         i18n.t('quiz.audio_loading_complete_click_the_in'),
     );
 }
 
+// ── 문제 수 선택 패널 ─────────────────────────────────
+function shuffle(list) {
+    const arr = [...list];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function showQuestionCountPicker() {
+    const total = quizData.length;
+    const counts = QUESTION_COUNT_OPTIONS.filter((n) => n < total);
+    isChoosingQuestionCount = true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "question-count-picker";
+    overlay.style.cssText = "position:absolute; inset:0; z-index:30; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:rgba(0,0,0,0.55); backdrop-filter:blur(2px);";
+
+    const buttonStyle = "min-width:120px; padding:12px 20px; border:none; border-radius:12px; font-size:1rem; font-weight:800; cursor:pointer; background:var(--theme-bg-card); color:var(--theme-text-main); box-shadow:0 4px 12px rgba(0,0,0,0.15);";
+    const buttons = counts.map((n) => `<button type="button" data-count="${n}" data-i18n="common.n_questions" data-i18n-args='{"count": ${n}}' style="${buttonStyle}">${i18n.t('common.n_questions', { count: n })}</button>`);
+    buttons.push(`<button type="button" data-count="${total}" data-i18n="quiz.all_questions_n" data-i18n-args='{"count": ${total}}' style="${buttonStyle} background:var(--color-pink); color:#fff;">${i18n.t('quiz.all_questions_n', { count: total })}</button>`);
+
+    overlay.innerHTML = `
+        <div data-i18n="quiz.choose_question_count" style="color:#fff; font-size:1.3rem; font-weight:900;">${i18n.t('quiz.choose_question_count')}</div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:10px; max-width:90%;">${buttons.join('')}</div>
+        <div data-i18n="quiz.random_pick_hint" style="color:rgba(255,255,255,0.8); font-size:0.85rem;">${i18n.t('quiz.random_pick_hint')}</div>
+    `;
+    overlay.querySelectorAll("button[data-count]").forEach((btn) => {
+        btn.addEventListener("click", () => selectQuestionCount(Number(btn.dataset.count)));
+    });
+
+    // 레코드판이 있는 영역 위에 띄운다
+    const area = vinylRecord.closest(".vinyl-container").parentElement;
+    area.appendChild(overlay);
+}
+
+function selectQuestionCount(count) {
+    // 선택한 개수만큼 무작위로 뽑는다. 전체를 고르면 순서만 섞는다.
+    quizData = shuffle(quizData).slice(0, count);
+    isChoosingQuestionCount = false;
+    const overlay = document.getElementById("question-count-picker");
+    if (overlay) overlay.remove();
+    updateQuizCountDisplay();
+    addSystemChat(i18n.t('quiz.starting_with_n', { count: quizData.length }));
+}
+
 function startQuiz() {
     if (!player || quizData.length === 0) return;
+    if (isChoosingQuestionCount) return; // 문제 수를 먼저 골라야 한다
     if (currentIndex >= quizData.length) {
         addSystemChat(i18n.t('quiz.the_quiz_is_already_over'));
         return;

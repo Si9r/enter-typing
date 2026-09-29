@@ -111,7 +111,7 @@ export async function doAttend() {
             renderCalendar(curYear, curMonth);
             calculateStats();
         } else {
-            alert(resData.detail || i18n.t('profile.attendance_failed'));
+            alert(i18n.server(resData.detail, 'profile.attendance_failed'));
         }
     } catch (e) {
         console.error("출석체크 등록 도중 에러가 발생했습니다:", e);

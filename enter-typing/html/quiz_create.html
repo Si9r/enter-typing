@@ -517,7 +517,7 @@
     <header class="navbar">
         <div class="nav-left">
             <div class="logo" onclick="location.href = '/'">
-                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
+                <img data-i18n-alt="common.enterping_icon" src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
                 <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
@@ -616,7 +616,7 @@
                 <div class="crop-right">
                     <div class="setting-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
                         <span data-i18n="quiz.video_playback_settings">영상 재생 설정</span>
-                        <span id="current-time-display" style="font-size: 0.9rem; font-weight: bold; color: var(--color-blue);">현재: 0.00초</span>
+                        <span id="current-time-display" data-i18n="quiz.current_time" data-i18n-args='{"sec": "0.00"}' style="font-size: 0.9rem; font-weight: bold; color: var(--color-blue);">현재: 0.00초</span>
                     </div>
 
                     <div id="custom-slider" style="
@@ -671,7 +671,7 @@
                   border-radius: 3px 3px 0 0;
                   display: none;
                 " title="종료 시점"></div>
-                        <div id="slider-playhead" style="
+                        <div data-i18n-title="quiz.current_position" id="slider-playhead" style="
                   position: absolute;
                   top: 12px;
                   left: 0%;
@@ -850,8 +850,8 @@
             <div class="input-group">
                 <label data-i18n="quiz.thumbnail_image_optional" style="font-weight: 700; color: var(--theme-text-sub); font-size: 0.9rem">썸네일 이미지 (선택)</label>
                 <div class="custom-file-wrapper" style="display: flex; align-items: center; gap: 10px; margin-top: 5px; margin-bottom: 5px; width: 100%; padding: 6px; border: 1px solid var(--theme-border); border-radius: 6px; box-sizing: border-box;">
-                    <label for="thumbnail-file" style="cursor: pointer; padding: 6px 12px; background: var(--theme-bg-hover); color: var(--theme-text-main); border: 1px solid var(--theme-border); border-radius: 4px; font-weight: bold; font-size: 0.85rem;" data-i18n="파일 선택">파일 선택</label>
-                    <span id="thumbnail-file-name" style="font-size: 0.85rem; color: var(--theme-text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-i18n="선택된 파일 없음">선택된 파일 없음</span>
+                    <label for="thumbnail-file" style="cursor: pointer; padding: 6px 12px; background: var(--theme-bg-hover); color: var(--theme-text-main); border: 1px solid var(--theme-border); border-radius: 4px; font-weight: bold; font-size: 0.85rem;" data-i18n="quiz.choose_file">파일 선택</label>
+                    <span id="thumbnail-file-name" style="font-size: 0.85rem; color: var(--theme-text-muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" data-i18n="quiz.no_file_selected">선택된 파일 없음</span>
                     <input type="file" id="thumbnail-file" accept="image/*" style="display: none;" />
                 </div>
                 <script>
@@ -861,13 +861,7 @@
                             nameDisplay.textContent = this.files[0].name;
                             nameDisplay.removeAttribute('data-i18n');
                         } else {
-                            nameDisplay.textContent = '선택된 파일 없음';
-                            nameDisplay.setAttribute('data-i18n', '선택된 파일 없음');
-                            if (window.updateTranslations) {
-                                window.updateTranslations();
-                            } else if (typeof applyTranslations === 'function') {
-                                applyTranslations();
-                            }
+                            i18n.setText(nameDisplay, 'quiz.no_file_selected');
                         }
                     });
                 </script>

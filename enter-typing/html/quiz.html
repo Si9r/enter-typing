@@ -204,7 +204,7 @@
     <header class="navbar">
         <div class="nav-left">
             <div class="logo" onclick="location.href = '/'">
-                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
+                <img data-i18n-alt="common.enterping_icon" src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img" />
                 <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
@@ -256,7 +256,7 @@
         <div style="width: 100%; margin-bottom: 12px; display: flex; justify-content: flex-start;">
             <button onclick="history.back()" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--theme-bg-card); border: 2px solid var(--theme-border); border-radius: 999px; padding: 6px 16px; color: var(--theme-text-muted); font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='var(--color-pink)'; this.style.color='var(--color-pink)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 182, 193, 0.15)';" onmouseout="this.style.borderColor='var(--theme-border)'; this.style.color='var(--theme-text-muted)'; this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';">
                 <i class="ph-bold ph-caret-left" style="font-size: 1.1rem;"></i>
-                뒤로가기
+                <span data-i18n="common.back">뒤로가기</span>
             </button>
         </div>
 
@@ -440,7 +440,7 @@
               z-index: 20;
               box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             ">
-                    <span>남은 퀴즈</span>: -
+                    <span data-i18n="common.remaining_quizzes_label">남은 퀴즈</span>: -
                 </div>
 
                 <div class="vinyl-container" style="
@@ -541,7 +541,7 @@
             <!-- Bottom Right: Chat Area -->
             <div class="box-panel chat-panel" style="min-height: 0; height: auto;">
                 <div class="chat-messages" id="chat-messages">
-                    <div class="chat-bubble chat-system" data-i18n="엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.">
+                    <div class="chat-bubble chat-system" data-i18n="quiz.welcome_message">
                         엔터핑 음악 퀴즈에 오신 것을 환영합니다! 중앙의 '?' 버튼을 눌러 게임을 시작하세요.
                     </div>
                 </div>

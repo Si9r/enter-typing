@@ -99,7 +99,7 @@ export async function deleteMyTyping(id) {
             alert(i18n.t('common.it_has_been_deleted'));
             loadMyTypingContents(); // 목록 새로고침
         } else {
-            alert(resData.detail || i18n.t('common.deletion_failed'));
+            alert(i18n.server(resData.detail, 'common.deletion_failed'));
         }
     } catch (e) {
         console.error("삭제 중 오류가 발생했습니다:", e);
@@ -126,7 +126,7 @@ export async function deleteMyQuiz(id) {
             alert(i18n.t('common.it_has_been_deleted'));
             loadMyQuizContents(); // 목록 새로고침
         } else {
-            alert(resData.detail || i18n.t('common.deletion_failed'));
+            alert(i18n.server(resData.detail, 'common.deletion_failed'));
         }
     } catch (e) {
         console.error("삭제 중 오류가 발생했습니다:", e);

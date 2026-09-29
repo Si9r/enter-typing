@@ -115,7 +115,7 @@ document.getElementById('changeForm').addEventListener('submit', async function 
             sessionStorage.removeItem('change_pw_email'); // 세션 정리
             showSuccess();
         } else {
-            pwError.textContent = data.detail || i18n.t('auth.password_change_failed');
+            pwError.textContent = i18n.server(data.detail, 'auth.password_change_failed');
             pwError.classList.add('visible');
         }
     } catch (err) {

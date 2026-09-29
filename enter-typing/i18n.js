@@ -10,30 +10,26 @@
  * HTML
  *   <span data-i18n="typing.current_position">현재 입력 위치</span>   ← 안의 한국어는 로딩 전 기본값
  *   <input data-i18n-placeholder="search.placeholder" placeholder="곡명, 아티스트 검색">
- *   <button data-i18n-title="common.delete" title="삭제">
+ *   <button data-i18n-title="common.delete" title="삭제">   (data-i18n-alt, data-i18n-aria-label 도 같은 방식)
  *   <span data-i18n="quiz.remaining" data-i18n-args='{"count": 3}'></span>  ← 문구 안의 {count} 치환
+ *   <span translate="no">한국어</span>                                    ← 번역하지 않음
  * JS
  *   i18n.t('quiz.remaining', { count: 3 }); // 현재 언어 문구 (없으면 한국어 → 키 순으로 대체). 언제든 바로 사용 가능
  *   i18n.setText(el, 'quiz.remaining', { count: 3 }); // 요소에 키를 지정 (언어 전환 시 자동 갱신)
+ *   i18n.server(data.detail, 'common.error');  // 서버가 보낸 한국어 메시지 → 현재 언어 (없으면 기본 문구)
  *   i18n.genre('애니메이션');                // DB 에 한국어로 저장된 장르 등 고정값 → "Anime"
  *   i18n.duration(185);                     // "3분 5초" / "3m 5s" / "3分5秒"
  *   document.addEventListener('i18n:change', rerender); // 언어를 바꿨을 때 JS 로 그린 화면을 다시 그리려면
  *   i18n.apply(element);                    // 동적으로 만든 요소 번역 (보통은 자동 감지되므로 불필요)
- *
- * ── 이전 방식 호환 (전환 기간 동안만 유지) ──────────────────
- * 아직 키로 바꾸지 않은 화면을 위해, 화면의 한국어 문장이 ko.json 의 값과 정확히 같으면
- * 해당 키를 찾아 번역한다. window.i18nTranslate(한국어), alert/confirm 자동 번역도 이 방식이다.
- * 모든 화면을 키로 옮기면 LEGACY 표시가 붙은 부분을 삭제한다.
  */
 (function () {
-    if (window.i18n) return; // 여러 partial 에서 중복 포함돼도 한 번만 초기화
+    if (window.i18n) return; // 중복 포함돼도 한 번만 초기화
 
     const SUPPORTED = ['ko', 'en', 'ja'];
     const DEFAULT_LANG = 'ko';
     const LANG_LABELS = { ko: '한국어', en: 'English', ja: '日本語' };
 
-    const dicts = {};          // lang → { "ns.key": "문구" }
-    let legacyIndex = null;    // LEGACY: 한국어 문구 → 키
+    const dicts = {}; // lang → { "ns.key": "문구" }
 
     function getLang() {
         let lang = null;
@@ -73,15 +69,25 @@
         return text.replace(/\{(\w+)\}/g, (m, name) => (name in params ? String(params[name]) : m));
     }
 
+    // HTML 들여쓰기로 생긴 줄바꿈·연속 공백은 한 칸으로 정리해서 비교한다
+    const normalize = (text) => text.replace(/\s+/g, ' ').trim();
+
+    const warnedKeys = new Set();
+
     /** 키 → 현재 언어 문구. 현재 언어에 없으면 한국어, 그것도 없으면 키를 그대로 돌려준다. */
     function t(key, params) {
-        const lang = getLang();
-        const cur = dicts[lang] || {};
+        const cur = dicts[getLang()] || {};
         const ko = dicts.ko || {};
         let text;
-        if (key in cur) text = cur[key];          // 빈 문자열도 의도된 번역으로 취급
+        if (key in cur) text = cur[key]; // 빈 문자열도 의도된 번역으로 취급
         else if (key in ko) text = ko[key];
-        else return legacyTranslate(key);         // LEGACY: 키 대신 한국어 문장이 들어온 경우
+        else {
+            if (dicts.ko && !warnedKeys.has(key)) {
+                warnedKeys.add(key);
+                console.warn('[i18n] 번역 키가 없습니다:', key);
+            }
+            return key;
+        }
         return interpolate(text, params);
     }
 
@@ -106,6 +112,24 @@
         return key ? t(key) : (value ?? '');
     }
 
+    /**
+     * 서버(FastAPI)가 detail/message 로 보내는 한국어 문구를 현재 언어로 바꾼다.
+     * locales 의 server.* 문구와 같으면 번역하고, 모르는 문구는 그대로 보여준다.
+     * 문자열이 아니거나 비어 있으면(예: 422 검증 오류 배열) fallbackKey 문구를 쓴다.
+     */
+    let serverIndex = null;
+    function server(message, fallbackKey) {
+        if (typeof message !== 'string' || !message.trim()) return fallbackKey ? t(fallbackKey) : '';
+        if (!serverIndex) {
+            serverIndex = {};
+            Object.keys(dicts.ko || {}).forEach((key) => {
+                if (key.startsWith('server.')) serverIndex[normalize(dicts.ko[key])] = key;
+            });
+        }
+        const key = serverIndex[normalize(message)];
+        return key ? t(key) : message;
+    }
+
     // ── 요소 번역 (data-i18n*) ─────────────────────────────
     function parseArgs(el) {
         const raw = el.getAttribute('data-i18n-args');
@@ -113,17 +137,14 @@
         try { return JSON.parse(raw); } catch (e) { return undefined; }
     }
 
-    // HTML 들여쓰기로 생긴 줄바꿈·연속 공백은 한 칸으로 정리해서 비교한다
-    const normalize = (text) => text.replace(/\s+/g, ' ').trim();
-
     function koDefault(key, params) {
         const ko = dicts.ko || {};
-        return key in ko ? interpolate(ko[key], params) : key; // LEGACY: 키 자리에 한국어가 온 경우 그대로
+        return key in ko ? interpolate(ko[key], params) : key;
     }
 
     /**
      * 요소의 현재 값이 "번역 엔진이 관리하는 값"인지 판단한다.
-     * 한국어 기본값, 비어 있음, 또는 엔진이 마지막으로 넣은 번역일 때만 번역한다.
+     * 한국어 기본값, 비어 있음, 현재 언어 번역, 또는 엔진이 마지막으로 넣은 값일 때만 번역한다.
      * JS 가 내용을 채운 요소(예: "로딩 중..." → 목록)는 언어를 바꿔도 덮어쓰지 않는다.
      */
     function owns(current, key, params, last) {
@@ -137,7 +158,7 @@
         return !!key && el.children.length === 0 && owns(el.textContent, key, parseArgs(el), el._i18nLast);
     }
 
-    const ATTR_BINDINGS = [['data-i18n-placeholder', 'placeholder'], ['data-i18n-title', 'title'], ['data-i18n-aria-label', 'aria-label']];
+    const ATTR_BINDINGS = [['data-i18n-placeholder', 'placeholder'], ['data-i18n-title', 'title'], ['data-i18n-alt', 'alt'], ['data-i18n-aria-label', 'aria-label']];
 
     function ownsAttr(el, attr, target) {
         const key = el.getAttribute(attr);
@@ -146,6 +167,7 @@
     }
 
     function applyElement(el) {
+        if (el.closest('[translate="no"]')) return;
         const args = parseArgs(el);
         if (el.getAttribute('data-i18n') && ownsText(el)) {
             const v = t(el.getAttribute('data-i18n'), args);
@@ -173,160 +195,19 @@
         el._i18nLast = el.textContent;
     }
 
-    const I18N_SELECTOR = '[data-i18n],[data-i18n-placeholder],[data-i18n-title],[data-i18n-aria-label]';
+    const I18N_SELECTOR = '[data-i18n],[data-i18n-placeholder],[data-i18n-title],[data-i18n-alt],[data-i18n-aria-label]';
 
     function apply(root) {
         root = root || document.body;
-        if (!root) return;
-        if (root.nodeType === Node.ELEMENT_NODE && root.matches(I18N_SELECTOR)) applyElement(root);
-        if (root.querySelectorAll) root.querySelectorAll(I18N_SELECTOR).forEach(applyElement);
-        legacyScan(root);
+        if (!root || root.nodeType !== Node.ELEMENT_NODE) return;
+        if (root.matches(I18N_SELECTOR)) applyElement(root);
+        root.querySelectorAll(I18N_SELECTOR).forEach(applyElement);
         if (root === document.body || root === document.documentElement) {
             document.documentElement.lang = getLang();
             const titleKey = document.documentElement.getAttribute('data-i18n-doc-title');
             if (titleKey) document.title = t(titleKey);
         }
     }
-
-    // ── LEGACY: 한국어 문장 매칭 번역 ──────────────────────
-    // 숫자가 섞인 문구 (예: "3초", "5점") — 키 기반으로 옮기면 {count} 인자로 대체한다.
-    const LEGACY_PATTERNS = [
-        [/(\d+)\s*초/g, '$1s', '$1秒'],
-        [/(\d+)\s*분/g, '$1m', '$1分'],
-        [/([\d,]+)\s*점/g, '$1 pts', '$1点'],
-        [/(\d+)\s*회/g, '$1 plays', '$1回'],
-        [/(\d+)\s*명/g, '$1 players', '$1人'],
-        [/(\d+)\s*개/g, '$1 items', '$1個'],
-        [/(\d+)\s*문제/g, '$1 Qs', '$1問'],
-        [/([\d,]+)\s*승/g, '$1 wins', '$1勝'],
-        [/\(총\s*([\d,]+)\s*전\)/g, '(Total $1 plays)', '(計$1戦)'],
-        [/코드:\s*([\w\d]+)/g, 'Code: $1', 'コード：$1'],
-        [/대전방\(#([\w\d]+)\)에 입장했습니다!/g, 'Joined battle room (#$1)!', '対戦部屋(#$1)に入場しました！'],
-        [/(.+)\s\(나\)$/g, '$1 (Me)', '$1 (私)'],
-        [/남은 퀴즈:\s*(\d+)/g, 'Remaining: $1', '残り: $1'],
-        [/문제\s*(\d+)\s*\/\s*(\d+)/g, 'Q $1 / $2', '問題 $1 / $2'],
-    ];
-    const LEGACY_PATTERN_TEST = /(?:\d+|\d+,\d+)\s*(초|분|점|회|명|개|문제|승|전)|코드:\s*[\w\d]+|대전방\(#[\w\d]+\)에 입장했습니다!|\s\(나\)$|남은 퀴즈:\s*\d+|문제\s*\d+\s*\/\s*\d+/;
-
-    function getLegacyIndex() {
-        if (!legacyIndex && dicts.ko) {
-            legacyIndex = {};
-            Object.keys(dicts.ko).forEach((key) => {
-                const ko = normalize(dicts.ko[key]);
-                if (ko && !(ko in legacyIndex)) legacyIndex[ko] = key;
-            });
-        }
-        return legacyIndex || {};
-    }
-
-    function legacyTranslate(text) {
-        if (typeof text !== 'string') return text;
-        const trimmed = text.trim();
-        const lang = getLang();
-        const key = getLegacyIndex()[normalize(trimmed)];
-        let translated = trimmed;
-        if (key) {
-            const cur = dicts[lang] || {};
-            translated = key in cur ? cur[key] : dicts.ko[key];
-        } else if (lang !== 'ko' && LEGACY_PATTERN_TEST.test(trimmed)) {
-            const col = lang === 'en' ? 1 : 2;
-            LEGACY_PATTERNS.forEach((p) => { translated = translated.replace(p[0], p[col]); });
-        }
-        return trimmed ? text.replace(trimmed, translated) : text;
-    }
-
-    const legacyTextNodes = new Set();
-    const legacyAttrs = new Set();
-
-    function legacyTranslateNode(node) {
-        const v = legacyTranslate(node._i18nOriginal);
-        // characterData 변경은 childList 관찰 대상이 아니므로 무한 반복이 생기지 않는다
-        if (node.nodeValue !== v) node.nodeValue = v;
-        node._i18nLast = v;
-    }
-
-    function legacyTranslateAttrs(el) {
-        Object.keys(el._i18nAttrOriginal).forEach((attr) => {
-            const v = legacyTranslate(el._i18nAttrOriginal[attr]);
-            if (el.getAttribute(attr) !== v) el.setAttribute(attr, v);
-            el._i18nAttrLast[attr] = v;
-        });
-    }
-
-    function legacyTrackText(node) {
-        // JS 가 문구를 바꿨으면(마지막으로 번역한 값과 다르면) 새 문구를 원문으로 다시 등록한다
-        if (node._i18nOriginal !== undefined && node.nodeValue === node._i18nLast) return;
-        const parent = node.parentElement;
-        if (!parent || parent.closest('script,style,noscript,textarea,[translate="no"]')) return;
-        // 키로 관리 중인 요소는 건너뛴다. (JS 가 내용을 바꿔 키 관리에서 벗어났으면 이전 방식으로 번역)
-        const owner = parent.closest('[data-i18n]');
-        if (owner && ownsText(owner)) return;
-        const trimmed = normalize(node.nodeValue);
-        if (trimmed && (getLegacyIndex()[trimmed] || LEGACY_PATTERN_TEST.test(trimmed))) {
-            node._i18nOriginal = node.nodeValue;
-            legacyTextNodes.add(node);
-            legacyTranslateNode(node);
-        } else if (node._i18nOriginal !== undefined) {
-            // 번역 대상이 아닌 문구로 바뀌었으면 추적을 멈춘다 (언어 전환 시 덮어쓰지 않도록)
-            delete node._i18nOriginal;
-            legacyTextNodes.delete(node);
-        }
-    }
-
-    function legacyTrackAttrs(el) {
-        ['placeholder', 'title'].forEach((attr) => {
-            if (!el.hasAttribute(attr) || ownsAttr(el, 'data-i18n-' + attr, attr)) return;
-            el._i18nAttrOriginal = el._i18nAttrOriginal || {};
-            el._i18nAttrLast = el._i18nAttrLast || {};
-            const current = el.getAttribute(attr);
-            if (attr in el._i18nAttrOriginal && current === el._i18nAttrLast[attr]) return;
-            const v = current.trim();
-            if (v && getLegacyIndex()[normalize(v)]) {
-                el._i18nAttrOriginal[attr] = v;
-                legacyAttrs.add(el);
-                legacyTranslateAttrs(el);
-            } else if (attr in el._i18nAttrOriginal) {
-                // 번역 대상이 아닌 문구로 바뀌었으면 추적을 멈춘다 (언어 전환 시 덮어쓰지 않도록)
-                delete el._i18nAttrOriginal[attr];
-                if (!Object.keys(el._i18nAttrOriginal).length) legacyAttrs.delete(el);
-            }
-        });
-    }
-
-    /** root 아래에서 새로 발견한 한국어 문구만 번역한다. 한국어 화면에서는 할 일이 없으므로 건너뛴다. */
-    function legacyScan(root) {
-        if (!dicts.ko || getLang() === 'ko') return;
-        if (root.nodeType === Node.TEXT_NODE) {
-            legacyTrackText(root);
-        } else if (root.nodeType === Node.ELEMENT_NODE) {
-            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-            let n;
-            while ((n = walker.nextNode())) legacyTrackText(n);
-            legacyTrackAttrs(root);
-            root.querySelectorAll('[placeholder],[title]').forEach(legacyTrackAttrs);
-        }
-    }
-
-    /** 언어를 바꿀 때 이미 번역해 둔 문구 전체를 새 언어로 다시 번역한다 (한국어로 되돌리기 포함). */
-    function legacyRetranslateAll() {
-        // 번역해 둔 뒤 JS 가 문구를 바꾼 경우(한국어 화면에서는 감시하지 않음)를 먼저 반영하고 다시 번역한다
-        [...legacyTextNodes].forEach((node) => {
-            if (!node.isConnected) legacyTextNodes.delete(node);
-            else if (node.nodeValue === node._i18nLast) legacyTranslateNode(node);
-            else legacyTrackText(node);
-        });
-        [...legacyAttrs].forEach((el) => {
-            if (!el.isConnected) { legacyAttrs.delete(el); return; }
-            legacyTrackAttrs(el);
-            if (legacyAttrs.has(el)) legacyTranslateAttrs(el);
-        });
-    }
-
-    // LEGACY: alert/confirm 에 넘긴 한국어 문장 자동 번역
-    const originalAlert = window.alert.bind(window);
-    const originalConfirm = window.confirm.bind(window);
-    window.alert = (msg) => originalAlert(typeof msg === 'string' ? legacyTranslate(msg) : msg);
-    window.confirm = (msg) => originalConfirm(typeof msg === 'string' ? legacyTranslate(msg) : msg);
 
     // ── 언어 전환 / 초기화 ─────────────────────────────────
     function updateLanguageSelectorUI() {
@@ -335,7 +216,7 @@
     }
 
     async function loadCurrent() {
-        await loadDict('ko'); // 기본값 및 이전 방식 매칭에 항상 필요
+        await loadDict('ko'); // 번역이 없을 때 쓰는 기본값
         const lang = getLang();
         if (lang !== 'ko') await loadDict(lang);
     }
@@ -344,16 +225,14 @@
         if (!SUPPORTED.includes(lang)) return;
         try { localStorage.setItem('ep_lang', lang); } catch (e) { /* 저장소 차단 */ }
         await loadCurrent();
-        legacyRetranslateAll();
         apply(document.body);
         updateLanguageSelectorUI();
         document.dispatchEvent(new CustomEvent('i18n:change', { detail: { lang } }));
     }
 
-    // 한국어가 아니면 번역이 끝날 때까지 화면을 숨겨 깜빡임을 줄인다. (실패해도 3초 뒤에는 반드시 표시)
-    const hide = getLang() !== 'ko';
+    // 한국어가 아니면 첫 번역이 끝날 때까지 화면을 숨겨 한국어가 잠깐 보이는 것을 막는다. (3초 뒤에는 반드시 표시)
     const show = () => { document.documentElement.style.visibility = ''; };
-    if (hide) {
+    if (getLang() !== 'ko') {
         document.documentElement.style.visibility = 'hidden';
         setTimeout(show, 3000);
     }
@@ -366,19 +245,16 @@
         apply(document.body);
         updateLanguageSelectorUI();
 
-        // 나중에 추가되는 요소(카드, 모달, 채팅 등)도 자동 번역
+        // 나중에 추가되는 요소(카드, 모달, 채팅 등)와 키/인자 변경도 자동 번역
         new MutationObserver((mutations) => {
             mutations.forEach((m) => {
                 if (m.type === 'childList') m.addedNodes.forEach((n) => apply(n));
-                else if (m.type === 'characterData') legacyScan(m.target);
-                else if (m.attributeName.startsWith('data-i18n')) applyElement(m.target);
-                else { applyElement(m.target); legacyScan(m.target); } // JS 가 placeholder/title 을 바꾼 경우
+                else applyElement(m.target);
             });
         }).observe(document.body, {
-            childList: true, subtree: true, characterData: true,
-            attributes: true,
+            childList: true, subtree: true, attributes: true,
             attributeFilter: ['data-i18n', 'data-i18n-args', 'data-i18n-placeholder', 'data-i18n-title',
-                'data-i18n-aria-label', 'placeholder', 'title'],
+                'data-i18n-alt', 'data-i18n-aria-label', 'placeholder', 'title', 'alt'],
         });
     }).finally(show);
 
@@ -388,9 +264,6 @@
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-    // getText: 예전 코드가 부르던 이름 (LEGACY). 키와 한국어 문장 모두 받는다.
-    window.i18n = { t, setText, duration, genre, apply, ready, setLanguage, getLang, SUPPORTED, getText: t };
-    window.setLanguage = setLanguage;           // navbar 언어 선택 메뉴에서 사용
-    window.i18nTranslate = legacyTranslate;     // LEGACY: 기존 JS 호환
-    window.getCurrentLanguage = getLang;        // LEGACY: 예전 엔진의 전역 함수
+    window.i18n = { t, server, setText, duration, genre, apply, ready, setLanguage, getLang, SUPPORTED };
+    window.setLanguage = setLanguage; // navbar 언어 선택 메뉴에서 사용
 })();

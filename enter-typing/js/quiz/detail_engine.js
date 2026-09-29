@@ -29,7 +29,7 @@ async function loadQuizData() {
     const res = await fetch(`/api/quizzes/${quizId}`);
     if (!res.ok) throw new Error(i18n.t('quiz.quiz_not_found'));
     const data = await res.json();
-    if (!data.success) throw new Error(data.detail || i18n.t('common.error'));
+    if (!data.success) throw new Error(i18n.server(data.detail, 'common.error'));
 
     quizData = data;
 
@@ -118,7 +118,7 @@ async function playCurrentVideo(autoplay = false) {
         
         const res = await fetch(`/api/youtube-audio/${videoId}`);
         const data = await res.json();
-        if (!data.success) throw new Error(data.message || i18n.t('quiz.extraction_failed'));
+        if (!data.success) throw new Error(i18n.server(data.message, 'quiz.extraction_failed'));
         
         audioUrlCache[videoId] = data.url;
         isAudioLoading = false;

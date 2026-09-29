@@ -111,7 +111,7 @@ async function checkEmailDuplicate() {
             if (data.exists) {
                 emailInput.classList.add('error');
                 emailInput.classList.remove('valid');
-                errEl.textContent = data.message;
+                errEl.textContent = i18n.server(data.message);
                 errEl.classList.add('visible');
                 okEl.classList.remove('visible');
                 isEmailChecked = false;
@@ -119,7 +119,7 @@ async function checkEmailDuplicate() {
                 emailInput.classList.remove('error');
                 emailInput.classList.add('valid');
                 errEl.classList.remove('visible');
-                okEl.textContent = data.message;
+                okEl.textContent = i18n.server(data.message);
                 okEl.classList.add('visible');
                 isEmailChecked = true;
             }
@@ -160,7 +160,7 @@ async function checkNicknameDuplicate() {
             if (data.exists) {
                 nameInput.classList.add('error');
                 nameInput.classList.remove('valid');
-                errEl.textContent = data.message;
+                errEl.textContent = i18n.server(data.message);
                 errEl.classList.add('visible');
                 okEl.classList.remove('visible');
                 isNicknameChecked = false;
@@ -168,7 +168,7 @@ async function checkNicknameDuplicate() {
                 nameInput.classList.remove('error');
                 nameInput.classList.add('valid');
                 errEl.classList.remove('visible');
-                okEl.textContent = data.message;
+                okEl.textContent = i18n.server(data.message);
                 okEl.classList.add('visible');
                 isNicknameChecked = true;
             }
@@ -277,7 +277,7 @@ document.getElementById('signupForm').addEventListener('submit', function (e) {
                     const emailInput = document.getElementById('signup-email');
                     const emailError = document.getElementById('email-error');
                     emailInput.classList.add('error');
-                    emailError.textContent = data.detail || i18n.t('auth.membership_registration_failed_please_tr');
+                    emailError.textContent = i18n.server(data.detail, 'auth.membership_registration_failed_please_tr');
                     emailError.classList.add('visible');
                 }
             })

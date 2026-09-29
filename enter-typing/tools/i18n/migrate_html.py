@@ -9,7 +9,7 @@
       <button>로그인</button>  →  <button data-i18n="nav.login">로그인</button>
 - 아이콘 등 다른 요소와 섞여 있으면 문구만 <span data-i18n> 으로 감싼다.
       <a><i class="ph"></i> 공지</a>  →  <a><i class="ph"></i> <span data-i18n="nav.notice">공지</span></a>
-- placeholder / title 속성은 data-i18n-placeholder / data-i18n-title 을 붙인다.
+- placeholder / title / alt 속성은 data-i18n-placeholder / data-i18n-title / data-i18n-alt 를 붙인다.
 - 예전 형식 data-i18n="한국어" 는 키로 바꾼다.
 - <title> 은 <html data-i18n-doc-title="키"> 로 옮긴다.
 ko.json 의 문구와 (공백 정리 후) 정확히 같은 문구만 변환한다. 나머지는 이전 방식 호환 기능이 처리한다.
@@ -117,13 +117,13 @@ def migrate(path, index, dry_run):
     for el in p.elements:
         # 예전 형식 data-i18n="한국어" → 키
         legacy = el.attrs.get("data-i18n")
-        if legacy and "." not in legacy and normalize(legacy) in index:
+        if legacy and re.search(r"[가-힣]", legacy) and normalize(legacy) in index:
             key = index[normalize(legacy)]
             m = re.search(r'data-i18n=(["\'])(.*?)\1', el.tag_text, re.S)
             edits.append((el.start + m.start(2), len(m.group(2)), key))
             log.append(f"  attr  data-i18n={legacy!r} → {key}")
 
-        for attr in ("placeholder", "title"):
+        for attr in ("placeholder", "title", "alt"):
             value = el.attrs.get(attr)
             if value and f"data-i18n-{attr}" not in el.attrs and normalize(value) in index:
                 key = index[normalize(value)]

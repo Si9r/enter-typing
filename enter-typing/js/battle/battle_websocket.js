@@ -52,7 +52,7 @@ export function connectToBattleRoom(roomCode, password = "") {
 
         switch (data.type) {
             case "error":
-                alert(data.message);
+                alert(i18n.server(data.message));
                 break;
             case "room_state":
                 state.currentRoom = data.room;

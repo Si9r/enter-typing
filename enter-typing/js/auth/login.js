@@ -64,7 +64,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             }
         } else {
             passwordInput.classList.add('error');
-            passwordError.textContent = data.detail || i18n.t('auth.your_email_or_password_is_incorrect');
+            passwordError.textContent = i18n.server(data.detail, 'auth.your_email_or_password_is_incorrect');
             passwordError.classList.add('visible');
         }
     } catch (err) {

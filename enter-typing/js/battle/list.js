@@ -62,7 +62,7 @@ async function submitPassword() {
             sessionStorage.setItem('battle_room_pw', password);
             location.href = `/battle/${pendingRoomCode}`;
         } else {
-            alert(data.detail || i18n.t('battle.wrong_password'));
+            alert(i18n.server(data.detail, 'battle.wrong_password'));
         }
     } catch (e) {
         alert(i18n.t('battle.wrong_password'));
@@ -130,7 +130,7 @@ async function submitCreateRoom() {
             if (isPrivate) sessionStorage.setItem('battle_room_pw', password);
             location.href = `/battle/${data.room_code}`;
         } else {
-            alert(data.detail || i18n.t('battle.room_creation_failed'));
+            alert(i18n.server(data.detail, 'battle.room_creation_failed'));
         }
     } catch (e) {
         alert(i18n.t('common.an_error_occurred'));

@@ -58,7 +58,7 @@ document.getElementById('emailForm').addEventListener('submit', async function (
 
         if (!res.ok) {
             emailInput.classList.add('error');
-            emailError.textContent = data.detail || i18n.t('auth.sending_failed_please_try_again');
+            emailError.textContent = i18n.server(data.detail, 'auth.sending_failed_please_try_again');
             emailError.classList.add('visible');
             return;
         }
@@ -168,7 +168,7 @@ document.getElementById('codeForm').addEventListener('submit', async function (e
             goStep(3);
         } else {
             codeInput.classList.add('error');
-            codeError.textContent = data.detail || i18n.t('auth.the_authentication_number_is_incorrect');
+            codeError.textContent = i18n.server(data.detail, 'auth.the_authentication_number_is_incorrect');
             codeError.classList.add('visible');
         }
     } catch (err) {

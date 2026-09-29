@@ -183,7 +183,7 @@ export async function resetTypoStats() {
         const res = await fetch('/api/typo-stats', { method: 'DELETE' });
         const data = await res.json();
         if (res.ok && data.success) {
-            alert(data.message);
+            alert(i18n.server(data.message));
             // Reload both stats
             loadProfileAnalysis();
             const sel = document.getElementById('content-selector');

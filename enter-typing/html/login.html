@@ -359,7 +359,7 @@
             document.documentElement.setAttribute('data-theme', 'dark');
         }
         if (localStorage.getItem('ep_user')) {
-            alert('이미 로그인 한 상태입니다.');
+            alert(i18n.t('auth.already_logged_in'));
             location.href = '/';
         }
     </script>
@@ -371,7 +371,7 @@
     <header class="navbar">
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
-                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
+                <img data-i18n-alt="common.enterping_icon" src="/assets/logo_icon.png" alt="엔터핑 아이콘" class="logo-img">
                 <span data-i18n="nav.enterping" class="logo-text">엔터핑</span>
             </div>
             <nav class="nav-links">
@@ -404,7 +404,7 @@
         <div class="auth-card">
             <!-- 로고 -->
             <a href="/" class="auth-logo">
-                <img src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:38px;width:auto;">
+                <img data-i18n-alt="common.enterping_icon" src="/assets/logo_icon.png" alt="엔터핑 아이콘" style="height:38px;width:auto;">
                 <span data-i18n="nav.enterping">엔터핑</span>
             </a>
 

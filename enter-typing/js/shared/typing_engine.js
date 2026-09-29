@@ -392,7 +392,7 @@ function highlightCurrentChar(container, units, currentUnitIndex, currentBuffer)
 function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, completeMessage = i18n.t('typing.input_completed')) {
   if (!statusPanel) return "";
   if (!units || currentUnitIndex >= units.length) {
-    statusPanel.innerHTML = window.i18nTranslate ? window.i18nTranslate(completeMessage) : completeMessage;
+    statusPanel.innerHTML = completeMessage;
     return statusPanel.innerHTML;
   }
 

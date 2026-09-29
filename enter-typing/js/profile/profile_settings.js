@@ -112,17 +112,17 @@ export async function checkNewNicknameDuplicate() {
         const data = await res.json();
         if (res.ok) {
             if (data.exists) {
-                showMErr('m-new-nick-err', data.message);
+                showMErr('m-new-nick-err', i18n.server(data.message));
                 input.classList.add('error');
                 isModalNicknameChecked = false;
             } else {
-                okEl.textContent = data.message;
+                okEl.textContent = i18n.server(data.message);
                 okEl.classList.add('visible');
                 input.classList.add('valid');
                 isModalNicknameChecked = true;
             }
         } else {
-            showMErr('m-new-nick-err', data.detail || i18n.t('profile.duplicate_check_failed'));
+            showMErr('m-new-nick-err', i18n.server(data.detail, 'profile.duplicate_check_failed'));
             input.classList.add('error');
             isModalNicknameChecked = false;
         }
@@ -184,7 +184,7 @@ export async function submitChangeNickname() {
             // 네비게이션 바 등 동기화를 위해 페이지 새로고침
             location.reload();
         } else {
-            showMErr('m-new-nick-err', data.detail || i18n.t('common.change_failed'));
+            showMErr('m-new-nick-err', i18n.server(data.detail, 'common.change_failed'));
         }
     } catch (e) {
         alert(i18n.t('common.unable_to_connect_to_server'));
@@ -244,7 +244,7 @@ export async function submitChangePassword() {
             closeEditModal();
             location.href = '/login';
         } else {
-            showMErr('m-new-pw-err', data.detail || i18n.t('common.change_failed'));
+            showMErr('m-new-pw-err', i18n.server(data.detail, 'common.change_failed'));
         }
     } catch (e) {
         alert(i18n.t('common.unable_to_connect_to_server'));
@@ -282,7 +282,7 @@ export async function submitDeleteAccount() {
             alert(i18n.t('profile.membership_withdrawal_has_been_completed'));
             location.href = '/';
         } else {
-            showMErr('m-del-pw-err', data.detail || i18n.t('profile.withdrawal_failed'));
+            showMErr('m-del-pw-err', i18n.server(data.detail, 'profile.withdrawal_failed'));
         }
     } catch (e) {
         alert(i18n.t('common.unable_to_connect_to_server'));

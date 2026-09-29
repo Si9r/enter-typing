@@ -204,9 +204,17 @@ uvicorn main:app --reload
 
 **JS**
 ```js
-i18n.t('typing.remaining', { count: 3 });  // → "남은 문제: 3" / "Remaining: 3"
+i18n.t('typing.remaining', { count: 3 });        // → "남은 문제: 3" / "Remaining: 3"
+i18n.setText(el, 'typing.remaining', { count }); // 요소에 키 지정 (언어를 바꾸면 자동 갱신)
+i18n.server(data.detail, 'common.error');        // 서버가 보낸 한국어 메시지 → 현재 언어 (배열·빈 값이면 기본 문구)
+i18n.genre(item.genre);                          // DB에 한국어로 저장된 장르 → "Anime" 등
+i18n.duration(185);                              // "3분 5초" / "3m 5s" / "3分5秒"
+escapeHtml(item.title);                          // 사용자 입력값을 innerHTML에 넣을 때는 반드시 이스케이프
+document.addEventListener('i18n:change', rerender); // 언어 전환 시 JS로 그린 목록 다시 그리기
 ```
-동적으로 추가한 요소의 `data-i18n`은 자동으로 번역됩니다.
+동적으로 추가한 요소의 `data-i18n`은 자동으로 번역됩니다. 없는 키를 쓰면 브라우저 콘솔에 경고가 한 번 표시됩니다.
+
+**번역하면 안 되는 값**: 서버로 보내거나 비교에 쓰는 한국어 값(장르 `'애니메이션'`, 필터 상태 `'전체'`, 기록 저장용 제목 등)은 번역하지 말고 그대로 두세요. 화면에 보여줄 때만 `i18n.genre()` 등으로 바꿉니다.
 
 **규칙**
 - 키 이름: `네임스페이스.영어_snake_case`. 네임스페이스는 기능 이름(`typing`, `quiz`, `battle`, `profile`, `auth`, `ranking`, `notice`, `search`, `nav`)이고, 두 기능 이상에서 쓰면 `common`입니다.
@@ -214,8 +222,15 @@ i18n.t('typing.remaining', { count: 3 });  // → "남은 문제: 3" / "Remainin
 - 숫자 같은 값은 문장에 붙이지 말고 `{count}`처럼 인자로 넘깁니다. 언어마다 어순이 다르기 때문입니다.
 - 번역 파일은 서버가 `/i18n-bundle.js`로 묶어 모든 페이지 `<head>`에서 먼저 불러옵니다. 그래서 JS 어디서든 `i18n.t()`를 바로 쓸 수 있습니다. 파일이 바뀌면 ETag가 바뀌어 브라우저가 자동으로 새로 받습니다.
 - 언어 이름처럼 번역하면 안 되는 문구는 `translate="no"`를 붙입니다.
+- 서버의 오류 메시지(`HTTPException(detail=...)`)를 새로 추가하면 `server.*` 네임스페이스에 같은 한국어 문구로 키를 추가하세요. 그래야 `i18n.server()`가 번역합니다.
 
-**전환 중 호환**: 아직 키로 옮기지 않은 화면은, 화면의 한국어가 `ko.json`의 문구와 같으면 이전 방식대로 자동 번역됩니다. `i18nTranslate()`, `alert`/`confirm` 번역도 이 호환 기능입니다. 모든 화면을 옮기면 `i18n.js`의 `LEGACY` 부분을 삭제합니다.
+**도구** (`enter-typing/tools/i18n/`)
+```bash
+python tools/i18n/add_key.py quiz.retry "다시 풀기" "Try again" "もう一度解く"   # 세 언어 파일에 키 추가
+python tools/i18n/rename_key.py nav.fury profile.weekday_tue --en Tue --ja 火   # 키 이름 변경 + HTML/JS 사용처 수정
+python tools/i18n/migrate_html.py              # ko.json 에 있는 HTML 문구에 data-i18n 자동 부착 (여러 번 실행해도 안전)
+python tools/i18n/migrate_js.py --report js/x.js  # JS 의 한국어 문자열 분류 (esprima 필요)
+```
 
 <br>
 

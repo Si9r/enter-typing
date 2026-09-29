@@ -563,7 +563,7 @@ thumbnailFile.addEventListener("change", async (e) => {
             thumbnailPreview.style.backgroundImage = `url(${data.url})`;
             thumbnailPreview.style.display = "block";
         } else {
-            alert(i18n.t('quiz.image_upload_failed') + data.detail);
+            alert(i18n.t('quiz.image_upload_failed') + i18n.server(data.detail, 'common.unknown_error'));
         }
     } catch (err) {
         console.error(err);
@@ -627,7 +627,7 @@ document
                 alert(editContentId ? i18n.t('quiz.your_quiz_has_been_successfully_edited') : i18n.t('quiz.saved_successfully'));
                 location.href = "/quiz";
             } else {
-                alert(data.detail || i18n.t('quiz.save_failed'));
+                alert(i18n.server(data.detail, 'quiz.save_failed'));
             }
         } catch (err) {
             console.error(err);

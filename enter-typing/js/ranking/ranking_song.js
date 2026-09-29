@@ -81,7 +81,7 @@ async function selectSong(id) {
             if (data.content_info) {
                 document.getElementById('header-title').innerText = data.content_info.title || i18n.t('common.no_title');
                 document.getElementById('header-artist').innerText = data.content_info.artist || '-';
-                document.getElementById('header-genre').innerText = data.content_info.genre || i18n.t('ranking.unknown_genre');
+                document.getElementById('header-genre').innerText = data.content_info.genre ? i18n.genre(data.content_info.genre) : i18n.t('ranking.unknown_genre');
 
                 const headerThumb = document.getElementById('header-thumb');
                 if (data.content_info.youtube_id) {

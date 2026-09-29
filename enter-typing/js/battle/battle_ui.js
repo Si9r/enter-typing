@@ -139,7 +139,7 @@ async function selectContentForRoom(item, mode) {
         });
         const data = await res.json();
         if (!data.success) {
-            alert(data.detail || i18n.t('battle.content_select_failed'));
+            alert(i18n.server(data.detail, 'battle.content_select_failed'));
             return;
         }
         closeContentSelectorModal();

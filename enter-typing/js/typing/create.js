@@ -348,7 +348,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
             alert(editId ? i18n.t('common.fixed_successfully') : i18n.t('typing.you_have_registered_successfully'));
             location.href = editId ? 'profile' : '/typing';
         } else {
-            alert(i18n.t(editId ? 'typing.edit_failed_detail' : 'typing.register_failed_detail', { message: data.detail || i18n.t('common.unknown_error') }));
+            alert(i18n.t(editId ? 'typing.edit_failed_detail' : 'typing.register_failed_detail', { message: i18n.server(data.detail, 'common.unknown_error') }));
         }
     } catch (err) {
         console.error(err);

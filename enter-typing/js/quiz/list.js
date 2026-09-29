@@ -57,11 +57,11 @@ async function deleteQuizContent(id) {
             allQuizContents = allQuizContents.filter(item => item.id !== id);
             renderCards();
         } else {
-            alert(i18n.t('common.deletion_failed_2') + (data.message || i18n.t('common.unknown_error')));
+            alert(i18n.t('common.deletion_failed_2') + (i18n.server(data.message, 'common.unknown_error')));
         }
     } catch (err) {
         console.error('Failed to delete content', err);
-        alert(err.message || i18n.t('common.deletion_failed_due_to_a_server'));
+        alert(i18n.server(err.message, 'common.deletion_failed_due_to_a_server'));
     }
 }
 

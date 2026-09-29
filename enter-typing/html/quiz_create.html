@@ -102,9 +102,59 @@
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             border: 2px solid var(--theme-border);
-            display: none;
+            display: flex;
             flex-direction: column;
             gap: 30px;
+        }
+
+        /* 퀴즈 편집 모달: 등록된 카드 목록 위에 띄운다 */
+        .editor-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 1500; /* 상단 네비게이션 바(1000)보다 위 */
+        }
+
+        .editor-modal.open {
+            display: flex;
+        }
+
+        .editor-modal .editor-main {
+            width: min(1200px, 100%);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .editor-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .editor-modal-header .section-title {
+            margin-bottom: 0;
+        }
+
+        .editor-modal-close {
+            border: none;
+            background: transparent;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--theme-text-muted);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .editor-modal-close:hover {
+            background: var(--theme-bg-hover);
+            color: var(--theme-text-main);
         }
 
         .section-title {
@@ -580,9 +630,13 @@
             </div>
         </div>
 
-        <!-- Main Editor (Cropping & Answer) -->
-        <div class="editor-main">
-            <div data-i18n="quiz.cut_video" class="section-title">영상 잘라내기</div>
+        <!-- Main Editor (Cropping & Answer) — 모달 -->
+        <div class="editor-modal" id="editor-modal">
+        <div class="editor-main" role="dialog" aria-modal="true">
+            <div class="editor-modal-header">
+                <div data-i18n="quiz.cut_video" class="section-title">영상 잘라내기</div>
+                <button type="button" class="editor-modal-close" id="btn-close-editor" data-i18n-title="common.close_modal" title="닫기">✕</button>
+            </div>
 
             <div class="crop-area">
                 <!-- Left: Video Area -->
@@ -804,6 +858,7 @@
                 <button data-i18n="nav.check" class="btn btn-pink" id="btn-confirm-edit">확인</button>
                 <button data-i18n="common.cancel" class="btn btn-outline" id="btn-cancel-edit">취소</button>
             </div>
+        </div>
         </div>
     </div>
 

@@ -3,6 +3,8 @@ let linesData = [];
 let editingIndex = -1;
 let youtubePlayer = null;
 let isPlayerReady = false;
+let playerGeneration = 0;   // 플레이어를 초기화할 때마다 증가 (늦게 생성된 이전 플레이어를 버리기 위함)
+let pendingSeekSec = null;  // 수정 모드: 영상이 준비되면 이동할 구간 시작 시간
 let currentThumbnailUrl = null;
 
 // DOM Elements
@@ -158,17 +160,31 @@ ytInput.addEventListener("change", () => {
     if (youtubePlayer) {
         youtubePlayer.loadVideoById(vid);
     } else {
+        const generation = playerGeneration;
         document.getElementById("youtube-player").innerHTML = "";
         YouTubeManager.createPlayer("youtube-player", {
             height: "100%",
             width: "100%",
             videoId: vid,
-            playerVars: { playsinline: 1, origin: window.location.origin },
+            // 수정 모드면 해당 구간 시작 위치부터 재생되도록 한다 (재생 전 seekTo 는 위치가 반영되지 않음)
+            playerVars: { playsinline: 1, origin: window.location.origin, ...(pendingSeekSec !== null ? { start: Math.floor(pendingSeekSec) } : {}) },
             events: {
-                onReady: () => (isPlayerReady = true),
+                onReady: (e) => {
+                    if (generation !== playerGeneration) return;
+                    isPlayerReady = true;
+                    if (pendingSeekSec !== null) {
+                        e.target.seekTo(pendingSeekSec, true);
+                        pendingSeekSec = null;
+                    }
+                },
                 onError: onPlayerError,
             },
         }).then((createdPlayer) => {
+            // 그사이 모달이 닫혀 초기화됐다면, 늦게 만들어진 플레이어는 버린다
+            if (generation !== playerGeneration) {
+                try { createdPlayer.destroy(); } catch (e) { /* 이미 제거됨 */ }
+                return;
+            }
             youtubePlayer = createdPlayer;
         });
     }
@@ -354,9 +370,47 @@ setInterval(() => {
     }
 }, 100);
 
+// ── 편집 모달 ─────────────────────────────────────────
+const editorModal = document.getElementById("editor-modal");
+const PLAYER_PLACEHOLDER = document.getElementById("youtube-player").innerHTML;
+
+function isEditorOpen() {
+    return editorModal.classList.contains("open");
+}
+
+function openEditor() {
+    editorModal.classList.add("open");
+    document.body.style.overflow = "hidden";
+}
+
+function closeEditor() {
+    resetForm();
+    renderGrid();
+}
+
+/** 유튜브 플레이어를 완전히 제거하고 URL 입력칸을 비운다 (다음 등록창에 이전 영상이 남지 않도록). */
+function resetVideo() {
+    playerGeneration++;
+    pendingSeekSec = null;
+    if (youtubePlayer) {
+        try { youtubePlayer.destroy(); } catch (e) { /* 이미 제거됨 */ }
+    }
+    youtubePlayer = null;
+    isPlayerReady = false;
+    document.getElementById("video-container").innerHTML = `<div id="youtube-player">${PLAYER_PLACEHOLDER}</div>`;
+    ytInput.value = "";
+    ytInput.style.borderColor = "var(--theme-border)";
+    urlErrorMsg.style.display = "none";
+}
+
+document.getElementById("btn-close-editor").addEventListener("click", closeEditor);
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isEditorOpen()) closeEditor();
+});
+
 function startAdding() {
     resetForm();
-    document.querySelector(".editor-main").style.display = "flex";
+    openEditor();
     renderGrid();
 }
 
@@ -367,10 +421,7 @@ function renderGrid() {
     // Add new quiz card (always visible)
     const addCard = document.createElement("div");
     addCard.className = "quiz-add-card";
-    if (
-        editingIndex === -1 &&
-        document.querySelector(".editor-main").style.display === "flex"
-    ) {
+    if (editingIndex === -1 && isEditorOpen()) {
         addCard.style.borderColor = "var(--color-pink)";
         addCard.style.color = "var(--color-pink)";
     }
@@ -482,7 +533,10 @@ function startEditing(index) {
 
     quizHintInput.value = line.hint || "";
 
+    // 수정할 문제의 영상을 새로 불러오고, 준비되면 구간 시작 위치로 이동
+    resetVideo();
     if (line.youtube_id) {
+        pendingSeekSec = line.start;
         ytInput.value = "https://youtu.be/" + line.youtube_id;
         ytInput.dispatchEvent(new Event("change"));
     }
@@ -490,13 +544,7 @@ function startEditing(index) {
     btnAddQuiz.style.display = "none";
     btnConfirmEdit.style.display = "inline-block";
 
-    // Show editor
-    document.querySelector(".editor-main").style.display = "flex";
-
-    // Seek video if available
-    if (youtubePlayer && isPlayerReady && line.youtube_id) {
-        setTimeout(() => youtubePlayer.seekTo(line.start), 500);
-    }
+    openEditor();
 
     renderGrid();
 }
@@ -527,7 +575,10 @@ function resetForm() {
     btnAddQuiz.style.display = "flex"; // It's flex in style
     btnConfirmEdit.style.display = "none";
 
-    document.querySelector(".editor-main").style.display = "none";
+    // 등록/취소/닫기 후에는 영상을 끊고 모달을 닫는다
+    resetVideo();
+    editorModal.classList.remove("open");
+    document.body.style.overflow = "";
 }
 
 // Settings Modal

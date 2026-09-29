@@ -753,6 +753,8 @@
     "saved_successfully": "クイズを保存しました！",
     "set_correct_answer_information": "正解情報の設定",
     "set_the_section_to_be_used": "クイズとして使用する区間を下のスライダーや時間入力欄で設定した後、正解単語とヒントを入力してください。",
+    "skip_key_hint": "💡 「]」キーを押すと現在の問題をスキップします。",
+    "skipped_answers": "正解 — {answers}",
     "solo_play": "ソロプレイ",
     "song_title": "曲のタイトル",
     "start_from_current_location": "現地で開始",

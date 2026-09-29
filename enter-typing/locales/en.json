@@ -753,6 +753,8 @@
     "saved_successfully": "Your quiz has been saved!",
     "set_correct_answer_information": "Set correct answer information",
     "set_the_section_to_be_used": "Set the section to be used as a quiz in the slider or time input box below, then enter the answer word and hint.",
+    "skip_key_hint": "💡 Press the ']' key to skip the current question.",
+    "skipped_answers": "Answers — {answers}",
     "solo_play": "solo play",
     "song_title": "song title",
     "start_from_current_location": "Start from current location",

@@ -753,6 +753,8 @@
     "saved_successfully": "퀴즈가 성공적으로 저장되었습니다!",
     "set_correct_answer_information": "정답 정보 설정",
     "set_the_section_to_be_used": "퀴즈로 사용할 구간을 아래 슬라이더나 시간 입력칸에서 설정한 뒤, 정답 단어와 힌트를 입력하세요.",
+    "skip_key_hint": "💡 ']' 키를 누르면 현재 문제를 건너뜁니다.",
+    "skipped_answers": "정답 공개 — {answers}",
     "solo_play": "솔로 플레이",
     "song_title": "노래 제목",
     "start_from_current_location": "현위치에서 시작",

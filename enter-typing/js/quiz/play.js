@@ -6,6 +6,7 @@ let quizData = [];
 let currentIndex = 0;
 let currentScore = 0; // 맞힌 정답 수
 let currentCombo = 0;  // 연속으로 모든 정답을 맞힌 문제 수
+let skipHintShown = false; // ']' 스킵 안내는 첫 문제 시작 때 한 번만
 let playedCount = 0;   // 재생을 시작한 문제 수 (정답률 분모 기준)
 let quizTitle = "알 수 없는 퀴즈"; // 기록 저장용 값 (화면 표시용 아님)
 let currentGuessed = {};
@@ -166,6 +167,10 @@ function playSegment() {
     const item = quizData[currentIndex];
     playedCount = Math.max(playedCount, currentIndex + 1);
     updateAccuracyDisplay();
+    if (!skipHintShown) {
+        skipHintShown = true;
+        addSystemChat(i18n.t('quiz.skip_key_hint'));
+    }
     currentGuessed = {};
     const questionKeys = Object.keys(item)
         .filter((key) => key.startsWith("question_"))
@@ -491,6 +496,24 @@ chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") handleChat();
 });
 
+// 스킵할 때 보여줄, 아직 맞히지 못한 정답 ("가수: YOASOBI / 요아소비 · 제목: 夜に駆ける")
+function missedAnswersText(item) {
+    return Object.keys(item || {})
+        .filter((key) => key.startsWith("question_"))
+        .sort()
+        .map((key) => {
+            const question = item[key];
+            const guessed = currentGuessed[`guessed_${key}`] || [];
+            const missed = (question.answer || [])
+                .filter((_, i) => guessed[i] === null || guessed[i] === undefined)
+                .map((group) => group.split(",").map((v) => v.trim()).filter(Boolean).join(" / "));
+            if (missed.length === 0) return null;
+            return `${question.question || i18n.t('common.question_2')}: ${missed.join(", ")}`;
+        })
+        .filter(Boolean)
+        .join(" · ");
+}
+
 document.addEventListener("keydown", (e) => {
     if (
         e.key === "]" &&
@@ -507,6 +530,9 @@ document.addEventListener("keydown", (e) => {
         chatInput.disabled = true;
         chatSendBtn.disabled = true;
         currentCombo = 0;
+
+        const missed = missedAnswersText(quizData[currentIndex]);
+        if (missed) addSystemChat(i18n.t('quiz.skipped_answers', { answers: missed }));
 
         if (currentIndex >= quizData.length - 1) {
             addSystemChat(i18n.t('quiz.you_skipped_the_song_the_quiz'));

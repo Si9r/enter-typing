@@ -26,11 +26,11 @@ function createQuestionRow(data = {}) {
 
     row.innerHTML = `
   <div style="display:flex;gap:10px;align-items:flex-start;">
-    <input type="text" class="question-label" placeholder="질문 예: 가수, 제목, 애니메이션" value="${data.question || ""
+    <input type="text" class="question-label" placeholder="${i18n.t('quiz.example_questions_singer_title_animation')}" value="${escapeHtml(data.question || "")
         }" style="flex:1;padding:12px;border:1px solid var(--theme-border);border-radius:8px;outline:none;" />
-    <button type="button" class="btn-remove-question" style="background:#ff6b6b;color:white;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">삭제</button>
+    <button type="button" class="btn-remove-question" style="background:#ff6b6b;color:white;border:none;border-radius:8px;padding:10px 14px;cursor:pointer;">${i18n.t('nav.delete')}</button>
   </div>
-  <textarea class="question-answer" placeholder="정답을 입력하세요. 쉼표로 동의어, 줄바꿈으로 다른 정답 옵션을 구분합니다." style="width:100%;min-height:80px;padding:12px;border:1px solid var(--theme-border);border-radius:8px;outline:none;resize:vertical;">${data.answer || ""
+  <textarea class="question-answer" placeholder="${i18n.t('quiz.please_enter_the_correct_answer_separate')}" style="width:100%;min-height:80px;padding:12px;border:1px solid var(--theme-border);border-radius:8px;outline:none;resize:vertical;">${escapeHtml(data.answer || "")
         }</textarea>
 `;
 
@@ -38,7 +38,7 @@ function createQuestionRow(data = {}) {
         .querySelector(".btn-remove-question")
         .addEventListener("click", () => {
             if (dynamicQuestionsContainer.children.length <= 1) {
-                alert("최소 하나의 질문이 필요합니다.");
+                alert(i18n.t('quiz.at_least_one_question_is_required'));
                 return;
             }
             row.remove();
@@ -148,7 +148,7 @@ ytInput.addEventListener("change", () => {
     const vid = extractVideoId(ytInput.value);
     if (!vid) {
         ytInput.style.borderColor = "#ff4d4d";
-        urlErrorMsg.textContent = "유효한 유튜브 링크를 입력해주세요.";
+        urlErrorMsg.textContent = i18n.t('quiz.please_enter_a_valid_youtube_link');
         urlErrorMsg.style.display = "block";
         return;
     }
@@ -175,25 +175,25 @@ ytInput.addEventListener("change", () => {
 });
 
 function onPlayerError(event) {
-    let errorMsg = "알 수 없는 오류가 발생했습니다.";
+    let errorMsg = i18n.t('quiz.an_unknown_error_occurred');
     switch (event.data) {
         case 2:
-            errorMsg = "잘못된 유튜브 영상 ID입니다. 링크를 확인해 주세요.";
+            errorMsg = i18n.t('quiz.invalid_youtube_video_id_please_check');
             break;
         case 5:
-            errorMsg = "HTML5 플레이어에서 재생할 수 없는 영상입니다.";
+            errorMsg = i18n.t('quiz.this_video_cannot_be_played_on');
             break;
         case 100:
             errorMsg =
-                "동영상을 찾을 수 없습니다. 삭제되었거나 비공개 처리된 영상일 수 있습니다.";
+                i18n.t('quiz.video_not_found_the_video_may');
             break;
         case 101:
         case 150:
             errorMsg =
-                "동영상 소유자가 다른 웹사이트에서의 재생(퍼가기)을 허용하지 않은 영상입니다. 다른 영상을 사용해 주세요.";
+                i18n.t('quiz.this_video_does_not_allow_playback');
             break;
     }
-    urlErrorMsg.textContent = `동영상 로드 실패: ${errorMsg}`;
+    urlErrorMsg.textContent = i18n.t('quiz.video_load_failed', { message: errorMsg });
     urlErrorMsg.style.display = "block";
     ytInput.style.borderColor = "#ff4d4d";
 }
@@ -295,7 +295,7 @@ function updateThumbs() {
 
     const currentTimeDisplay = document.getElementById("current-time-display");
     if (currentTimeDisplay) {
-        currentTimeDisplay.textContent = `현재: ${currSec.toFixed(2)}초`;
+        currentTimeDisplay.textContent = i18n.t('quiz.current_time', { sec: currSec.toFixed(2) });
     }
 
     const startPct = Math.min(
@@ -400,16 +400,16 @@ function renderGrid() {
                 const answerText = Array.isArray(q.answer)
                     ? q.answer.join(", ")
                     : q.answer || "";
-                return `<div class="quiz-info"><span>${q.question || "질문"}</span> ${answerText || "-"}</div>`;
+                return `<div class="quiz-info"><span>${escapeHtml(q.question || i18n.t('common.question_2'))}</span> ${escapeHtml(answerText || "-")}</div>`;
             })
             .join("");
 
         card.innerHTML = `
-            ${thumbnailUrl ? `<img src="${thumbnailUrl}" class="card-thumbnail" alt="thumbnail">` : `<div class="card-thumbnail" style="display:flex; align-items:center; justify-content:center; color: var(--theme-text-muted); font-size: 0.9rem;">No Image</div>`}
+            ${thumbnailUrl ? `<img src="${escapeHtml(thumbnailUrl)}" class="card-thumbnail" alt="thumbnail">` : `<div class="card-thumbnail" style="display:flex; align-items:center; justify-content:center; color: var(--theme-text-muted); font-size: 0.9rem;">No Image</div>`}
             <div class="time-range">⏱ ${formatTime(line.start)} ~ ${formatTime(line.end)}</div>
             ${questions}
-            <div class="quiz-info"><span>힌트</span> ${line.hint || "-"}</div>
-            <div class="del-icon" data-index="${index}" title="삭제">️</div>
+            <div class="quiz-info"><span>${i18n.t('common.hint')}</span> ${escapeHtml(line.hint || "-")}</div>
+            <div class="del-icon" data-index="${index}" title="${i18n.t('nav.delete')}">️</div>
         `;
 
         card.addEventListener("click", (e) => {
@@ -433,12 +433,12 @@ function handleAddOrUpdate() {
 
     const youtube_id = extractVideoId(ytInput.value);
     if (!youtube_id)
-        return alert("현재 문제에 해당하는 유튜브 URL을 입력해주세요.");
+        return alert(i18n.t('quiz.please_enter_the_youtube_url_correspondi'));
 
     if (questions.length === 0)
-        return alert("최소 1개 이상의 질문과 정답을 입력해주세요.");
+        return alert(i18n.t('quiz.please_enter_at_least_one_question'));
     if (start >= end && end !== 0)
-        return alert("종료 시간은 시작 시간보다 커야 합니다.");
+        return alert(i18n.t('quiz.the_end_time_must_be_greater'));
 
     const quizItem = {
         start,
@@ -507,7 +507,7 @@ btnCancelEdit.addEventListener("click", () => {
 });
 
 function deleteLine(index) {
-    if (confirm("정말 이 퀴즈를 삭제하시겠습니까?")) {
+    if (confirm(i18n.t('quiz.are_you_sure_you_want_to'))) {
         linesData.splice(index, 1);
         if (editingIndex === index) resetForm();
         else if (editingIndex > index) editingIndex--;
@@ -563,11 +563,11 @@ thumbnailFile.addEventListener("change", async (e) => {
             thumbnailPreview.style.backgroundImage = `url(${data.url})`;
             thumbnailPreview.style.display = "block";
         } else {
-            alert("이미지 업로드에 실패했습니다: " + data.detail);
+            alert(i18n.t('quiz.image_upload_failed') + data.detail);
         }
     } catch (err) {
         console.error(err);
-        alert("이미지 업로드 중 오류가 발생했습니다.");
+        alert(i18n.t('quiz.an_error_occurred_while_uploading_the'));
     }
 });
 
@@ -580,12 +580,12 @@ document
     .getElementById("btn-save")
     .addEventListener("click", async () => {
         const title = document.getElementById("title").value.trim();
-        if (!title) return alert("동영상 제목을 입력해주세요.");
+        if (!title) return alert(i18n.t('common.please_enter_the_video_title'));
         if (linesData.length === 0)
-            return alert("최소 1개 이상의 퀴즈를 추가해주세요.");
+            return alert(i18n.t('quiz.please_add_at_least_one_quiz'));
 
         const youtube_id = linesData[0].youtube_id;
-        if (!youtube_id) return alert("유효한 유튜브 URL이 필요합니다.");
+        if (!youtube_id) return alert(i18n.t('quiz.a_valid_youtube_url_is_required'));
 
         const artist = document.getElementById("artist").value.trim();
         const genre = document.getElementById("genre").value;
@@ -597,7 +597,7 @@ document
         );
 
         if (!localStorage.getItem("ep_user")) {
-            alert("로그인이 필요합니다.");
+            alert(i18n.t('common.login_is_required'));
             location.href = "/login";
             return;
         }
@@ -624,14 +624,14 @@ document
             });
             const data = await res.json();
             if (data.success) {
-                alert(editContentId ? "퀴즈가 성공적으로 수정되었습니다!" : "퀴즈가 성공적으로 저장되었습니다!");
+                alert(editContentId ? i18n.t('quiz.your_quiz_has_been_successfully_edited') : i18n.t('quiz.saved_successfully'));
                 location.href = "/quiz";
             } else {
-                alert(data.detail || "저장에 실패했습니다.");
+                alert(data.detail || i18n.t('quiz.save_failed'));
             }
         } catch (err) {
             console.error(err);
-            alert("서버 통신 오류가 발생했습니다.");
+            alert(i18n.t('quiz.a_server_communication_error_occurred'));
         }
     });
 
@@ -639,7 +639,7 @@ document
 async function loadEditData() {
     const editCurrentUser = window.NavAuth && window.NavAuth.getUser();
     if (!editCurrentUser) {
-        alert('로그인이 필요한 서비스입니다.');
+        alert(i18n.t('common.this_service_requires_login'));
         location.href = '/login';
         return;
     }
@@ -650,7 +650,7 @@ async function loadEditData() {
         if (data.success) {
             const isOwner = editCurrentUser.id === data.creator_id;
             if (!isOwner && !editCurrentUser.is_admin) {
-                alert('수정 권한이 없습니다.');
+                alert(i18n.t('typing.no_edit_permission'));
                 location.href = '/quiz';
                 return;
             }
@@ -672,11 +672,11 @@ async function loadEditData() {
             }
             renderGrid();
         } else {
-            alert("퀴즈 정보를 불러오는데 실패했습니다.");
+            alert(i18n.t('quiz.failed_to_load_quiz_information'));
         }
     } catch (err) {
         console.error(err);
-        alert("서버 오류가 발생했습니다.");
+        alert(i18n.t('common.a_server_error_occurred'));
     }
 }
 

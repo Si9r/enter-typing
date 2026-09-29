@@ -18,7 +18,7 @@ let timerStarted = false; // 타이머가 시작되었는지 확인하는 플래
 const pathMatch = location.pathname.match(/^\/quiz\/(\d+)\/?$/);
 const quizIdStr = pathMatch ? pathMatch[1] : null;
 if (!quizIdStr) {
-    alert("존재하지 않는 퀴즈입니다.");
+    alert(i18n.t('quiz.this_is_a_non_existent_quiz'));
     location.href = '/quiz';
 }
 const quizId = parseInt(quizIdStr);
@@ -27,9 +27,9 @@ const quizId = parseInt(quizIdStr);
 async function loadQuizData() {
   try {
     const res = await fetch(`/api/quizzes/${quizId}`);
-    if (!res.ok) throw new Error('퀴즈를 찾을 수 없습니다.');
+    if (!res.ok) throw new Error(i18n.t('quiz.quiz_not_found'));
     const data = await res.json();
-    if (!data.success) throw new Error(data.detail || '오류');
+    if (!data.success) throw new Error(data.detail || i18n.t('common.error'));
 
     quizData = data;
 
@@ -44,8 +44,8 @@ async function loadQuizData() {
     const overlay = document.getElementById('loading-overlay');
     if(overlay) {
         overlay.innerHTML = `
-        <p style="color:#fff;font-size:1.1rem;"> ${err.message}</p>
-        <button onclick="location.href='/quiz'" style="margin-top:16px;background: var(--theme-bg-card);color:#6C3FE8;border:none;border-radius:12px;padding:10px 24px;font-weight:800;cursor:pointer;">목록으로 돌아가기</button>
+        <p style="color:#fff;font-size:1.1rem;"> ${escapeHtml(err.message)}</p>
+        <button onclick="location.href='/quiz'" style="margin-top:16px;background: var(--theme-bg-card);color:#6C3FE8;border:none;border-radius:12px;padding:10px 24px;font-weight:800;cursor:pointer;">${i18n.t('quiz.back_to_list')}</button>
         `;
     }
   }
@@ -63,7 +63,7 @@ audioPlayer.addEventListener('timeupdate', () => {
         document.getElementById('record-wrap').classList.remove('spinning');
         updatePlaybackStatus();
         if (!answered) {
-            document.getElementById('playback-status').textContent = '⏹ [재생 완료] - 다시 클릭해 재생';
+            document.getElementById('playback-status').textContent = i18n.t('quiz.playback_complete_click_again_to_play');
         }
     }
 });
@@ -76,7 +76,7 @@ audioPlayer.addEventListener('pause', () => {
 
 audioPlayer.addEventListener('error', (e) => {
     console.error("Audio Load Error:", e);
-    document.getElementById('playback-status').textContent = `⚠️ 재생 불가 (오디오 스트림 에러)`;
+    document.getElementById('playback-status').textContent = i18n.t('quiz.unplayable', { reason: i18n.t('quiz.audio_stream_error') });
     document.getElementById('playback-status').className = 'playback-status';
     document.getElementById('record-wrap').classList.remove('spinning');
     isPlaying = false;
@@ -103,6 +103,7 @@ function extractVideoId(url) {
 
 // 추출된 스트림 URL 캐싱 객체
 const audioUrlCache = {};
+let isAudioLoading = false; // 오디오 스트림을 불러오는 중인지 (상태 표시를 덮어쓰지 않기 위해)
 
 async function playCurrentVideo(autoplay = false) {
   const q = quizData.questions[currentQ];
@@ -112,13 +113,15 @@ async function playCurrentVideo(autoplay = false) {
   try {
     // 이미 스트림 URL을 불러온 적이 있는지 확인
     if (!audioUrlCache[videoId]) {
-        document.getElementById('playback-status').textContent = '⏳ 오디오 불러오는 중...';
+        document.getElementById('playback-status').textContent = i18n.t('quiz.loading_audio');
+        isAudioLoading = true;
         
         const res = await fetch(`/api/youtube-audio/${videoId}`);
         const data = await res.json();
-        if (!data.success) throw new Error(data.message || "추출 실패");
+        if (!data.success) throw new Error(data.message || i18n.t('quiz.extraction_failed'));
         
         audioUrlCache[videoId] = data.url;
+        isAudioLoading = false;
     }
     
     // 이전에 재생 중이던 것이 있다면 중지
@@ -130,7 +133,7 @@ async function playCurrentVideo(autoplay = false) {
     audioPlayer.onloadedmetadata = () => {
         audioPlayer.currentTime = q.start_time;
         if (autoplay) {
-          document.getElementById('playback-status').textContent = '▶ [재생중]';
+          document.getElementById('playback-status').textContent = i18n.t('quiz.playing');
           document.getElementById('playback-status').className = 'playback-status playing';
           isPlaying = true;
           document.getElementById('record-wrap').classList.add('spinning');
@@ -143,7 +146,8 @@ async function playCurrentVideo(autoplay = false) {
 
   } catch(e) { 
       console.error('오디오 로드 실패:', e); 
-      document.getElementById('playback-status').textContent = `⚠️ 재생 불가 (${e.message})`;
+      isAudioLoading = false;
+      document.getElementById('playback-status').textContent = i18n.t('quiz.unplayable', { reason: e.message });
   }
 }
 
@@ -159,13 +163,13 @@ function loadQuestionUI() {
   document.getElementById('album-thumb').className = 'album-thumb';
   document.getElementById('info-title').textContent = '???';
   document.getElementById('info-title').className = 'info-value info-hidden';
-  const tags = quizData.category ? quizData.category.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '<span class="tag">기타</span>';
+  const tags = quizData.category ? quizData.category.split(',').map(t => `<span class="tag">${escapeHtml(i18n.genre(t.trim()))}</span>`).join('') : `<span class="tag">${i18n.t('common.etc')}</span>`;
   document.getElementById('info-tags').innerHTML = tags;
   
   // 입력창 및 버튼 초기화
   const input = document.getElementById('answer-input');
   input.value = '';
-  input.placeholder = '정답을 입력하세요...';
+  input.placeholder = i18n.t('quiz.please_enter_the_correct_answer');
   input.disabled = false;
   
   document.getElementById('submit-btn').disabled = false;
@@ -177,9 +181,9 @@ function loadQuestionUI() {
 
   // 힌트 초기화
   document.getElementById('hint-box').style.display = 'none';
-  document.getElementById('hint-box').textContent = q.hint || '힌트 없음';
+  document.getElementById('hint-box').textContent = q.hint || i18n.t('quiz.no_hint');
   document.getElementById('hint-btn').disabled = false;
-  document.getElementById('hint-btn').textContent = ' 힌트 보기';
+  document.getElementById('hint-btn').textContent = i18n.t('common.see_hints');
 
   // UI 초기화
   document.getElementById('record-wrap').classList.remove('spinning');
@@ -211,13 +215,13 @@ function updatePlaybackStatus() {
   const statusEl = document.getElementById('playback-status');
   if (!statusEl) return;
   // 스트리밍 불러오는 중일때는 덮어쓰지 않음
-  if (statusEl.textContent.includes('불러오는 중')) return;
+  if (isAudioLoading) return;
 
   if (isPlaying) {
-    statusEl.textContent = '▶ [재생중]';
+    statusEl.textContent = i18n.t('quiz.playing');
     statusEl.className = 'playback-status playing';
   } else {
-    statusEl.textContent = '⏸ [일시정지]';
+    statusEl.textContent = i18n.t('quiz.pause');
     statusEl.className = 'playback-status';
   }
 }
@@ -227,7 +231,7 @@ window.showHint = function() {
   const box = document.getElementById('hint-box');
   box.style.display = 'block';
   btn.disabled = true;
-  btn.textContent = '힌트 확인됨';
+  btn.textContent = i18n.t('quiz.hint_confirmed');
 }
 
 function normalizeAnswer(str) {
@@ -253,7 +257,7 @@ function processResult(isPass, userRaw = '') {
     if (!userRaw) return;
     const blockedRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
     if (blockedRegex.test(userRaw)) {
-        alert("한국어는 정답으로 인정되지 않습니다. 일본어(히라가나/가타카나/한자) 또는 영어(로마자)로 입력해주세요.");
+        alert(i18n.t('quiz.korean_is_not_accepted_as_the'));
         input.value = '';
         input.focus();
         return;
@@ -297,35 +301,35 @@ function processResult(isPass, userRaw = '') {
   // 상태별 분기 처리
   if (isPass) {
     thumb.textContent = '⏭️';
-    banner.textContent = `⏭️ 패스! 정답: ${q.answer}`;
+    banner.textContent = i18n.t('quiz.pass_banner', { answer: q.answer });
     banner.style.background = 'linear-gradient(135deg,#888,#aaa)';
     
     item.className = 'log-item wrong';
     item.style.borderLeftColor = '#aaa';
     item.style.color = '#777';
-    item.textContent = `Q${currentQ + 1}. [패스] 다음 문제로 넘어갑니다. (정답: ${q.answer})`;
+    item.textContent = i18n.t('quiz.pass_log', { n: currentQ + 1, answer: q.answer });
   } else if (isCorrect) {
     thumb.textContent = '';
     correctCount++;
     let earnedScore = 100;
     score += earnedScore;
     
-    banner.textContent = ` 정답입니다! +${earnedScore}점`;
+    banner.textContent = ' ' + i18n.t('quiz.correct_banner', { score: earnedScore });
     banner.style.background = 'linear-gradient(135deg,#52c41a,#73d13d)';
     
     item.className = 'log-item correct';
-    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 정답 `;
+    item.textContent = i18n.t('quiz.correct_log', { n: currentQ + 1, answer: userRaw });
   } else {
     thumb.textContent = '';
-    banner.textContent = ` 오답! 정답: ${q.answer}`;
+    banner.textContent = ' ' + i18n.t('quiz.wrong_banner', { answer: q.answer });
     banner.style.background = 'linear-gradient(135deg,#ff4d4f,#ff7875)';
     
     item.className = 'log-item wrong';
-    item.textContent = `Q${currentQ + 1}. 나의 답: "${userRaw}" → 오답  (정답: ${q.answer})`;
+    item.textContent = i18n.t('quiz.wrong_log', { n: currentQ + 1, answer: userRaw, correct: q.answer });
   }
 
   document.getElementById('record-wrap').classList.remove('spinning');
-  document.getElementById('playback-status').textContent = '⏹ [대기]';
+  document.getElementById('playback-status').textContent = i18n.t('quiz.wait');
   document.getElementById('playback-status').className = 'playback-status';
 
   log.appendChild(item);
@@ -334,7 +338,7 @@ function processResult(isPass, userRaw = '') {
   document.getElementById('stat-correct').textContent = correctCount;
   document.getElementById('stat-score').textContent = score;
   input.value = '';
-  input.placeholder = '다음 문제로...';
+  input.placeholder = i18n.t('quiz.on_to_the_next_problem');
 
   // 1.8초 뒤 다음 문제
   setTimeout(() => {
@@ -359,22 +363,22 @@ window.passQuestion = function() {
 
 async function endQuiz() {
   document.getElementById('answer-input').disabled = true;
-  document.getElementById('answer-input').placeholder = '퀴즈가 모두 종료되었습니다.';
+  document.getElementById('answer-input').placeholder = i18n.t('quiz.all_quizzes_have_ended');
   document.getElementById('submit-btn').disabled = true;
   document.getElementById('pass-btn').disabled = true;
   document.getElementById('hint-btn').disabled = true;
   document.getElementById('record-wrap').classList.remove('spinning');
   document.getElementById('record-icon').textContent = '';
-  document.getElementById('record-hint').textContent = '퀴즈 완료!';
+  document.getElementById('record-hint').textContent = i18n.t('quiz.quiz_completed');
   const banner = document.getElementById('result-banner');
   banner.style.display = 'block';
   banner.style.background = 'linear-gradient(135deg,#6C3FE8,#FF8FAB)';
-  banner.innerHTML = ` 완료! ${quizData.questions.length}문제 중 ${correctCount}개 정답 · ${score}점
+  banner.innerHTML = ` ${i18n.t('quiz.finish_summary', { total: quizData.questions.length, correct: correctCount, score })}
     <div style="margin-top:12px; display:flex; gap:10px; justify-content:center;">
-        <button onclick="location.reload()" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background: var(--theme-bg-card); color:#6C3FE8;">다시 풀기</button>
-        <button onclick="location.href='/quiz'" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:rgba(255,255,255,0.2); color:#fff;">목록으로</button>
+        <button onclick="location.reload()" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background: var(--theme-bg-card); color:#6C3FE8;">${i18n.t('quiz.retry')}</button>
+        <button onclick="location.href='/quiz'" style="padding:8px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer; background:rgba(255,255,255,0.2); color:#fff;">${i18n.t('common.to_list')}</button>
     </div>`;
-  document.getElementById('stat-cur').textContent = '완료!';
+  document.getElementById('stat-cur').textContent = i18n.t('common.complete');
 
   if (localStorage.getItem('ep_user') && quizData) {
       try {
@@ -399,7 +403,7 @@ async function endQuiz() {
 document.addEventListener('DOMContentLoaded', () => {
     // 닉네임 표시
     const userStr = localStorage.getItem('ep_user');
-    const nick = userStr ? JSON.parse(userStr).nickname : '나';
+    const nick = userStr ? JSON.parse(userStr).nickname : i18n.t('nav.me');
     const playerEl = document.getElementById('player-name');
     if(playerEl) playerEl.textContent = nick;
 

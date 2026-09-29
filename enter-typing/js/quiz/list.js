@@ -2,7 +2,7 @@ const modal = document.getElementById('detail-modal');
 
 // 페이지 로드 시 콘텐츠 불러오기
 let allQuizContents = [];
-let currentCategory = '전체';
+let currentCategory = '전체'; // 필터 상태값 (화면 표시용 아님)
 let currentSort = 'recent';
 let displayLimit = 30;
 
@@ -39,7 +39,7 @@ function updateCategoryButtons() {
 }
 
 async function deleteQuizContent(id) {
-    if (!confirm('정말로 이 퀴즈 콘텐츠를 삭제하시겠습니까?')) return;
+    if (!confirm(i18n.t('quiz.are_you_sure_you_want_to_2'))) return;
 
     try {
         const response = await fetch(`/api/quiz-contents/${id}`, {
@@ -47,23 +47,25 @@ async function deleteQuizContent(id) {
         });
 
         if (!response.ok) {
-            if (response.status === 401) throw new Error('로그인이 필요합니다.');
-            if (response.status === 403) throw new Error('삭제 권한이 없습니다.');
+            if (response.status === 401) throw new Error(i18n.t('common.login_is_required'));
+            if (response.status === 403) throw new Error(i18n.t('common.you_do_not_have_permission_to'));
         }
 
         const data = await response.json();
         if (data.success) {
-            alert('성공적으로 삭제되었습니다.');
+            alert(i18n.t('common.deleted_successfully'));
             allQuizContents = allQuizContents.filter(item => item.id !== id);
             renderCards();
         } else {
-            alert('삭제에 실패했습니다: ' + (data.message || '알 수 없는 오류'));
+            alert(i18n.t('common.deletion_failed_2') + (data.message || i18n.t('common.unknown_error')));
         }
     } catch (err) {
         console.error('Failed to delete content', err);
-        alert(err.message || '서버 오류로 삭제에 실패했습니다.');
+        alert(err.message || i18n.t('common.deletion_failed_due_to_a_server'));
     }
 }
+
+document.addEventListener('i18n:change', () => renderCards());
 
 function renderCards() {
     const grid = document.getElementById('card-grid');
@@ -89,7 +91,7 @@ function renderCards() {
 
         const descPreview = (item.description && item.description.length > 30)
             ? item.description.substring(0, 30) + '...'
-            : (item.description || '새로운 퀴즈에 도전해보세요!');
+            : (item.description || i18n.t('common.try_a_new_quiz'));
 
         const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
         const bestScore = item.best_score || 0;
@@ -97,35 +99,35 @@ function renderCards() {
         let thumbnailHTML = '';
         if (item.thumbnail_url) {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
-                <img src="${item.thumbnail_url}" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                <img src="${escapeHtml(item.thumbnail_url)}" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
             </div>`;
         } else if (item.youtube_id) {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
-                <img src="https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                <img src="https://img.youtube.com/vi/${escapeHtml(item.youtube_id)}/mqdefault.jpg" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
             </div>`;
         } else {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative; background: var(--theme-bg-hover); display:flex; align-items:center; justify-content:center;">
-                <img src="/assets/logo_icon.png" alt="기본 썸네일" style="height: 60%; opacity: 0.5;">
+                <img src="/assets/logo_icon.png" alt="${i18n.t('common.default_thumbnail')}" style="height: 60%; opacity: 0.5;">
             </div>`;
         }
 
         const cardHTML = `
-            <div class="card" onclick="openModal(${item.id})">
+            <div class="card" onclick="openModal(${Number(item.id)})">
                 ${thumbnailHTML}
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                    <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${item.genre || 'JPOP'}</div>
+                    <div class="card-badge ${badgeColor}" style="margin-bottom: 0;">${escapeHtml(i18n.genre(item.genre || 'JPOP'))}</div>
                     <div style="font-size: 0.8rem; font-weight: 700; color: var(--theme-text-muted); background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--theme-border); display: flex; align-items: center; gap: 4px;">
-                         ${item.quiz_count || 0}문제
+                         ${i18n.t('common.n_questions', { count: item.quiz_count || 0 })}
                     </div>
                 </div>
-                <h3 class="card-title">${item.title}</h3>
-                <p class="card-desc">${descPreview}</p>
+                <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                <p class="card-desc">${escapeHtml(descPreview)}</p>
                 <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
                     <div>
                         <span class="difficulty">${diffStars}</span>
-                        <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${bestScore}점</span>
+                        <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-target" style="vertical-align: middle; margin-right: 3px; color: var(--color-blue);"></i> ${i18n.t('common.n_points', { count: bestScore })}</span>
                     </div>
-                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteQuizContent(${item.id})">삭제</button>` : ''}
+                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteQuizContent(${Number(item.id)})">${i18n.t('nav.delete')}</button>` : ''}
                 </div>
             </div>
         `;
@@ -175,8 +177,8 @@ async function openModal(id) {
         if (data.success) {
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-artist').innerText = data.artist || '-';
-            document.getElementById('modal-genre').innerText = data.genre || 'JPOP';
-            document.getElementById('modal-creator').innerText = data.creator_nickname || '엔터핑';
+            document.getElementById('modal-genre').innerText = i18n.genre(data.genre || 'JPOP');
+            document.getElementById('modal-creator').innerText = data.creator_nickname || i18n.t('nav.enterping');
 
             let badgeColor = 'pink';
             if (data.genre === '애니메이션' || data.genre === '팝송') badgeColor = 'blue';
@@ -188,14 +190,14 @@ async function openModal(id) {
 
             const diffValue = data.difficulty || 3;
             document.getElementById('modal-difficulty').innerHTML = `<i class=\"ph-fill ph-star\" style=\"color:var(--color-pink); vertical-align: middle; margin-right:4px;\"></i> X ${diffValue}`;
-            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${(data.play_count || 0)}회`;
-            document.getElementById('modal-best-score').innerHTML = `<i class=\"ph-bold ph-target\" style=\"color:var(--color-blue); vertical-align: middle; margin-right:4px;\"></i> ${(data.best_score || 0)}점`;
+            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${i18n.t('common.n_times', { count: data.play_count || 0 })}`;
+            document.getElementById('modal-best-score').innerHTML = `<i class=\"ph-bold ph-target\" style=\"color:var(--color-blue); vertical-align: middle; margin-right:4px;\"></i> ${i18n.t('common.n_points', { count: data.best_score || 0 })}`;
 
-            document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 퀴즈를 시작해보세요!`;
+            document.getElementById('modal-desc').innerText = data.description || i18n.t('quiz.start_quiz_with', { artist: data.artist || '', title: data.title || '' });
 
             const detailCover = document.querySelector('.detail-cover');
             if (data.thumbnail_url) {
-                detailCover.style.backgroundImage = `url('${data.thumbnail_url}')`;
+                detailCover.style.backgroundImage = `url('${encodeURI(data.thumbnail_url)}')`;
                 detailCover.style.backgroundSize = 'cover';
                 detailCover.style.backgroundPosition = 'center';
                 detailCover.innerText = '';
@@ -213,7 +215,7 @@ async function openModal(id) {
         }
     } catch (error) {
         console.error("Failed to fetch quiz content details", error);
-        document.getElementById('modal-desc').innerText = "콘텐츠를 불러오지 못했습니다. API가 연결되어 있지 않을 수 있습니다.";
+        document.getElementById('modal-desc').innerText = i18n.t('quiz.the_content_failed_to_load_the');
         document.getElementById('modal-start-btn').onclick = () => location.href = `/quiz/${id}/play`;
     }
 }

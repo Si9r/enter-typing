@@ -5,7 +5,7 @@ let player = null;
 let quizData = [];
 let currentIndex = 0;
 let currentScore = 0;
-let quizTitle = "알 수 없는 퀴즈";
+let quizTitle = "알 수 없는 퀴즈"; // 기록 저장용 값 (화면 표시용 아님)
 let currentGuessed = {};
 let isPlayingSegment = false;
 let isPausedManually = false;
@@ -21,7 +21,7 @@ const vinylRecord = document.getElementById("vinyl-record");
 
 async function initQuiz() {
     if (!contentId) {
-        addSystemChat("퀴즈 ID가 유효하지 않습니다.");
+        addSystemChat(i18n.t('quiz.quiz_id_is_invalid'));
         return;
     }
     try {
@@ -39,13 +39,13 @@ async function initQuiz() {
                 currentLoadedYoutubeId = data.youtube_id;
                 initYoutube(currentLoadedYoutubeId);
             } else {
-                addSystemChat("유튜브 영상 정보가 없습니다.");
+                addSystemChat(i18n.t('quiz.there_is_no_youtube_video_information'));
             }
         } else {
-            addSystemChat("퀴즈 데이터를 불러오지 못했습니다.");
+            addSystemChat(i18n.t('quiz.quiz_data_failed_to_load'));
         }
     } catch (err) {
-        addSystemChat("서버 에러가 발생했습니다.");
+        addSystemChat(i18n.t('common.a_server_error_has_occurred'));
     }
 }
 
@@ -74,14 +74,14 @@ function onPlayerStateChange(event) {
 function onPlayerReady(event) {
     player.setVolume(document.getElementById("volume-slider").value);
     addSystemChat(
-        window.i18nTranslate("음원 로딩이 완료되었습니다. 가운데 '?' 를 클릭해 시작하세요!"),
+        i18n.t('quiz.audio_loading_complete_click_the_in'),
     );
 }
 
 function startQuiz() {
     if (!player || quizData.length === 0) return;
     if (currentIndex >= quizData.length) {
-        addSystemChat(window.i18nTranslate("퀴즈가 이미 끝났습니다."));
+        addSystemChat(i18n.t('quiz.the_quiz_is_already_over'));
         return;
     }
 
@@ -251,11 +251,11 @@ function handleChat() {
         if (matchedIndex !== -1 && guessedArray[matchedIndex] === null) {
             guessedArray[matchedIndex] = matchedAnswer;
             updateBoardItem(key, matchedIndex, matchedAnswer);
-            addSystemChat(window.i18nTranslate("정답입니다!") + ` (${question.question || window.i18nTranslate("질문")})`);
+            addSystemChat(i18n.t('quiz.correct_msg') + ` (${question.question || i18n.t('common.question_2')})`);
 
             quizLogs.push({
                 quizIndex: currentIndex + 1,
-                questionLabel: question.question || "질문",
+                questionLabel: question.question || i18n.t('common.question_2'),
                 matchedAnswer: matchedAnswer
             });
 
@@ -299,14 +299,14 @@ function checkSegmentComplete() {
         chatSendBtn.disabled = true;
 
         if (currentIndex >= quizData.length - 1) {
-            addSystemChat(window.i18nTranslate("모든 정답을 맞췄습니다! 퀴즈가 모두 끝났습니다! 축하합니다"));
+            addSystemChat(i18n.t('quiz.you_got_everything_correct_the_quiz'));
             currentIndex++;
             updateQuizCountDisplay();
             saveQuizHistory();
             showQuizResult();
         } else {
             addSystemChat(
-                window.i18nTranslate("모든 정답을 맞췄습니다! 3초 후 다음 문제로 넘어갑니다."),
+                i18n.t('quiz.you_got_everything_correct_after_3'),
             );
             setTimeout(() => {
                 currentIndex++;
@@ -322,9 +322,9 @@ function updateQuizCountDisplay() {
     if (!display || quizData.length === 0) return;
     const remaining = quizData.length - currentIndex;
     if (remaining > 0) {
-        display.innerHTML = `<span>${window.i18nTranslate("남은 퀴즈:") || "남은 퀴즈:"}</span> <span>${remaining}${window.i18nTranslate("개") || "개"}</span>`;
+        display.innerHTML = `<span>${i18n.t('common.remaining_quizzes')}</span> <span>${i18n.t('common.n_items', { count: remaining })}</span>`;
     } else {
-        display.innerHTML = `<span>${window.i18nTranslate("퀴즈 완료!") || "퀴즈 완료!"}</span>`;
+        display.innerHTML = `<span>${i18n.t('quiz.quiz_completed')}</span>`;
     }
 }
 
@@ -351,7 +351,7 @@ function updateAnswerBoard() {
         itemEl.setAttribute("data-question-key", key);
         itemEl.innerHTML = `
             <div style="font-size: 1.15rem; font-weight: bold; color: var(--theme-text-main);">
-                ${question.question || "질문"}<br>
+                ${escapeHtml(question.question || i18n.t('common.question_2'))}<br>
                 <span style="color: var(--color-pink); display: inline-block; margin-top: 5px;">${displayText || "-"}</span>
             </div>
         `;
@@ -424,13 +424,13 @@ document.addEventListener("keydown", (e) => {
         chatSendBtn.disabled = true;
 
         if (currentIndex >= quizData.length - 1) {
-            addSystemChat(window.i18nTranslate("노래를 스킵하셨습니다. 퀴즈가 모두 끝났습니다! 축하합니다"));
+            addSystemChat(i18n.t('quiz.you_skipped_the_song_the_quiz'));
             currentIndex++;
             updateQuizCountDisplay();
             saveQuizHistory();
             showQuizResult();
         } else {
-            addSystemChat(window.i18nTranslate("노래를 스킵하셨습니다. 다음 문제로 넘어갑니다."));
+            addSystemChat(i18n.t('quiz.you_skipped_the_song_let_s'));
             setTimeout(() => {
                 currentIndex++;
                 updateQuizCountDisplay();
@@ -458,7 +458,7 @@ function showQuizResult() {
     logContainer.innerHTML = '';
 
     if (quizLogs.length === 0) {
-        logContainer.innerHTML = `<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">${window.i18nTranslate("맞춘 정답이 없습니다")}</div>`;
+        logContainer.innerHTML = `<div style="text-align:center; color: var(--theme-text-muted); padding: 20px;">${i18n.t('quiz.no_correct_answers')}</div>`;
     } else {
         // Group by quizIndex
         const grouped = {};
@@ -473,13 +473,13 @@ function showQuizResult() {
 
             const header = document.createElement('div');
             header.style.cssText = "font-weight: 800; font-size: 1.05rem; color: var(--theme-text-main); margin-bottom: 12px; border-bottom: 1px dashed var(--theme-border); padding-bottom: 8px;";
-            header.innerText = `${window.i18nTranslate("문제")} ${qIdx}`;
+            header.innerText = i18n.t('quiz.question_n', { n: qIdx });
             groupDiv.appendChild(header);
 
             grouped[qIdx].forEach(log => {
                 const itemDiv = document.createElement('div');
                 itemDiv.style.cssText = "font-size: 0.95rem; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;";
-                itemDiv.innerHTML = `<span style="color: var(--theme-text-muted); line-height: 1.4; word-break: keep-all;">Q. ${log.questionLabel}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${log.matchedAnswer}</span>`;
+                itemDiv.innerHTML = `<span style="color: var(--theme-text-muted); line-height: 1.4; word-break: keep-all;">Q. ${escapeHtml(log.questionLabel)}</span> <span style="font-weight:bold; color: var(--color-pink); font-size: 1.05rem; padding-left: 10px;">${escapeHtml(log.matchedAnswer)}</span>`;
                 groupDiv.appendChild(itemDiv);
             });
 

@@ -325,8 +325,11 @@ async function fetchTypingContent(contentId) {
       const infoViews = document.getElementById("info-views");
       const infoTags = document.getElementById("info-tags");
 
-      if (infoTitle) infoTitle.innerText = data.title || "제목 없음";
-      if (infoArtist) infoArtist.innerText = data.artist || "아티스트 미상";
+      if (infoTitle) {
+          infoTitle.innerText = data.title || i18n.t('common.no_title');
+          infoTitle.dataset.raw = data.title || ''; // 기록 저장용 원본 (화면 표시는 번역될 수 있음)
+      }
+      if (infoArtist) infoArtist.innerText = data.artist || i18n.t('common.unknown_artist');
       if (infoViews) infoViews.innerText = data.play_count || "0";
       
       if (infoTags) {
@@ -336,11 +339,12 @@ async function fetchTypingContent(contentId) {
               genres.forEach(g => {
                   const tagSpan = document.createElement("span");
                   tagSpan.style.cssText = "background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: var(--theme-text-main); border: 1px solid var(--theme-border);";
-                  tagSpan.innerText = g;
+                  tagSpan.innerText = i18n.genre(g);
+                  tagSpan.dataset.genre = g; // 기록 저장용 원본 장르값
                   infoTags.appendChild(tagSpan);
               });
           } else {
-              infoTags.innerHTML = '<span style="background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: var(--theme-text-main); border: 1px solid var(--theme-border);">태그 없음</span>';
+              infoTags.innerHTML = `<span data-i18n="typing.no_tags" style="background: var(--theme-bg-hover); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; color: var(--theme-text-main); border: 1px solid var(--theme-border);">${i18n.t('typing.no_tags')}</span>`;
           }
       }
 
@@ -351,21 +355,21 @@ async function fetchTypingContent(contentId) {
           }
           if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "none";
           
-          if (infoCreator) infoCreator.innerText = "로딩 중...";
+          if (infoCreator) infoCreator.innerText = i18n.t('common.loading');
           fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${currentYoutubeId}&format=json`)
             .then(res => res.json())
             .then(oEmbedData => {
                 if (infoCreator && oEmbedData.author_name) {
                     infoCreator.innerText = oEmbedData.author_name;
                 } else if (infoCreator) {
-                    infoCreator.innerText = data.creator_nickname || "엔터핑";
+                    infoCreator.innerText = data.creator_nickname || i18n.t('nav.enterping');
                 }
             })
             .catch(err => {
-                if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+                if (infoCreator) infoCreator.innerText = data.creator_nickname || i18n.t('nav.enterping');
             });
       } else {
-          if (infoCreator) infoCreator.innerText = data.creator_nickname || "엔터핑";
+          if (infoCreator) infoCreator.innerText = data.creator_nickname || i18n.t('nav.enterping');
           if (infoThumbnail) infoThumbnail.style.display = "none";
           if (infoAvatarPlaceholder) infoAvatarPlaceholder.style.display = "flex";
       }
@@ -382,17 +386,17 @@ async function fetchTypingContent(contentId) {
         if (container) container.style.display = "none";
         if (controls) controls.style.display = "block";
         if (statusPanel) {
-          statusPanel.innerHTML = '<span style="color: #c92a2a; font-weight: bold;">타이핑 영역을 클릭하면 게임이 시작됩니다!</span>';
+          statusPanel.innerHTML = `<span data-i18n="typing.click_to_start" style="color: #c92a2a; font-weight: bold;">${i18n.t('typing.click_to_start')}</span>`;
         }
       }
     } else {
       console.error("Failed to load content.");
       if (statusPanel)
-        statusPanel.innerText = "콘텐츠를 불러오는 데 실패했습니다.";
+        statusPanel.innerText = i18n.t('typing.failed_to_load_content');
     }
   } catch (error) {
     console.error(error);
-    if (statusPanel) statusPanel.innerText = "서버 에러가 발생했습니다.";
+    if (statusPanel) statusPanel.innerText = i18n.t('common.a_server_error_has_occurred');
   }
 }
 
@@ -402,7 +406,7 @@ function renderWaitingPhase() {
     stageIndicator.innerText = `${currentLineIndex + 1} / ${totalStages}`;
   }
   if (kanjiDisplay) {
-    kanjiDisplay.innerText = "준비 중...";
+    kanjiDisplay.innerText = i18n.t('common.preparing');
   }
   if (nextPreviewDisplay) {
     nextPreviewDisplay.innerHTML = `-`;
@@ -415,7 +419,7 @@ function renderWaitingPhase() {
     typingInput.disabled = true;
   }
   if (statusPanel) {
-    statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${window.i18nTranslate("전주 재생 중... 곧 가사가 시작됩니다.")}</span>`;
+    statusPanel.innerHTML = `<span style="color: var(--theme-text-main);">${i18n.t('typing.playing_intro_lyrics_will_start_soon')}</span>`;
   }
   targetUnits = [];
   currentBuffer = "";
@@ -502,7 +506,7 @@ function handleLineCompletion() {
   if (typingInput) typingInput.disabled = true;
   if (statusPanel) {
     statusPanel.innerHTML =
-      '<span class="success-text"> 문장을 모두 입력했습니다. 다음 문장까지 기다리는 중...</span>';
+      `<span class="success-text"> <span data-i18n="common.sentence_completed_waiting_for_the_next">${i18n.t('common.sentence_completed_waiting_for_the_next')}</span></span>`;
   }
 }
 
@@ -660,7 +664,7 @@ function endGame(completed = false) {
   }
 
   if (statusPanel) {
-    statusPanel.innerHTML = '<span class="success-text"> 모든 타이핑이 종료되었습니다!</span>';
+    statusPanel.innerHTML = `<span class="success-text"> <span data-i18n="typing.all_typing_finished">${i18n.t('typing.all_typing_finished')}</span></span>`;
   }
 
   const resultModal = document.getElementById("resultModal");
@@ -699,7 +703,7 @@ function endGame(completed = false) {
         if (topTypoList) {
             topTypoList.innerHTML = "";
             if (topTypos.length === 0) {
-                topTypoList.innerHTML = "<div style='text-align: center; color: var(--theme-text-muted); margin-top: 20px;'>오타가 없습니다! 완벽해요 </div>";
+                topTypoList.innerHTML = `<div style='text-align: center; color: var(--theme-text-muted); margin-top: 20px;'>${i18n.t('typing.no_typos_perfect')}</div>`;
             } else {
                 topTypos.forEach((item, idx) => {
                     const row = document.createElement("div");
@@ -716,7 +720,7 @@ function endGame(completed = false) {
                     rankSpan.style.fontWeight = "bold";
                     rankSpan.style.color = idx < 3 ? "var(--color-pink)" : "#777";
                     rankSpan.style.fontSize = "0.85rem";
-                    rankSpan.innerText = `${idx + 1}위`;
+                    rankSpan.innerText = i18n.t('common.rank_n', { rank: idx + 1 });
 
                     const wordSpan = document.createElement("span");
                     wordSpan.style.fontWeight = "bold";
@@ -728,7 +732,7 @@ function endGame(completed = false) {
                     countSpan.style.fontWeight = "bold";
                     countSpan.style.color = "#e67700";
                     countSpan.style.fontSize = "0.9rem";
-                    countSpan.innerText = `${item[1]}회`;
+                    countSpan.innerText = i18n.t('common.n_times', { count: item[1] });
 
                     row.appendChild(rankSpan);
                     row.appendChild(wordSpan);
@@ -746,7 +750,7 @@ function endGame(completed = false) {
         for (let i = 0; i <= maxLinePlayed; i++) {
            const errors = groupedTypos[i] || [];
            const units = allTargetUnits[i] || [];
-           const lineText = contentLines[i] || "알 수 없는 구간";
+           const lineText = contentLines[i] || i18n.t('typing.unknown_section');
            
            const sectionDiv = document.createElement("div");
            sectionDiv.style.marginBottom = "10px";
@@ -789,13 +793,13 @@ function endGame(completed = false) {
                let ss = s % 60;
                timeStr = `<span style="color: var(--color-pink); font-weight: bold; margin-right: 6px; font-size: 0.95rem;">[${m < 10 ? '0' : ''}${m}:${ss < 10 ? '0' : ''}${ss}]</span>`;
            }
-           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${timeStr}[구간 ${i + 1}] <span style="font-weight: normal; color: var(--theme-text-muted); margin-left: 10px;">${coloredLineHtml}</span></span>`;
+           let titleHtml = `<span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">${timeStr}${i18n.t('typing.section_n', { n: i + 1 })} <span style="font-weight: normal; color: var(--theme-text-muted); margin-left: 10px;">${coloredLineHtml}</span></span>`;
            if (errors.length === 0) {
-              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">(완벽함! )</span>`;
+              titleHtml += `<span style="color: #2b8a3e; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">${i18n.t('typing.section_perfect')}</span>`;
            } else {
               let typingErrors = errors.filter(e => e.type === 'typing').length;
               let timeoutErrors = errors.filter(e => e.type === 'timeout').length;
-              titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">오타 ${typingErrors} / 시간초과 ${timeoutErrors}</span>`;
+              titleHtml += `<span style="color: #e67700; font-size: 0.85rem; margin-left: 15px; white-space: nowrap; flex-shrink: 0;">${i18n.t('typing.section_error_summary', { typos: typingErrors, timeouts: timeoutErrors })}</span>`;
            }
            sectionHeader.innerHTML = `<div style="display: flex; align-items: center; width: 100%; overflow: hidden; justify-content: space-between;">${titleHtml}</div><span class="toggle-arrow" style="font-size: 0.8rem; color: var(--theme-text-muted); margin-left: 10px; flex-shrink: 0;">▼</span>`;
 
@@ -841,7 +845,7 @@ function endGame(completed = false) {
                analysisLabel.style.fontWeight = "bold";
                analysisLabel.style.color = "var(--theme-text-muted)";
                analysisLabel.style.marginBottom = "4px";
-               analysisLabel.innerText = "오타 상세 분석:";
+               analysisLabel.innerText = i18n.t('typing.detailed_analysis_of_typos');
                detailsDiv.appendChild(analysisLabel);
 
                const ul = document.createElement("ul");
@@ -854,9 +858,9 @@ function endGame(completed = false) {
                   const li = document.createElement("li");
                   li.style.marginBottom = "2px";
                   if (t.type === 'typing') {
-                    li.innerHTML = `「${escapeHTML(t.word)}」 오타: <span style="color: #e67700; font-weight: bold;">'${escapeHTML(t.typed)}'</span> (정답: <strong>${escapeHTML(t.expected)}</strong>)`;
+                    li.innerHTML = `「${escapeHTML(t.word)}」 ${i18n.t('typing.typo_label')} <span style="color: #e67700; font-weight: bold;">'${escapeHTML(t.typed)}'</span> (${i18n.t('typing.correct_answer_label')} <strong>${escapeHTML(t.expected)}</strong>)`;
                   } else if (t.type === 'timeout') {
-                    li.innerHTML = `<span style="color: #c92a2a; font-weight: bold;">[시간 초과]</span> 미입력: <strong>${escapeHTML(t.missedText)}</strong>`;
+                    li.innerHTML = `<span style="color: #c92a2a; font-weight: bold;">${i18n.t('typing.timeout_tag')}</span> ${i18n.t('typing.missed_label')} <strong>${escapeHTML(t.missedText)}</strong>`;
                   }
                   ul.appendChild(li);
                });
@@ -865,7 +869,7 @@ function endGame(completed = false) {
                const perfectMsg = document.createElement("div");
                perfectMsg.style.fontSize = "0.9rem";
                perfectMsg.style.color = "#2b8a3e";
-               perfectMsg.innerText = "이 구간은 완벽하게 입력했습니다!";
+               perfectMsg.innerText = i18n.t('typing.this_section_was_entered_perfectly');
                detailsDiv.appendChild(perfectMsg);
            }
            
@@ -889,11 +893,12 @@ function endGame(completed = false) {
     if (localStorage.getItem("ep_user")) {
       const finalWpm = parseInt(document.getElementById("final-wpm").innerText) || 0;
       const finalAcc = parseFloat(document.getElementById("final-accuracy").innerText) || 0;
-      const title = document.getElementById("info-title").innerText || "알 수 없는 곡";
+      // 서버(DB)에는 번역되지 않은 원본 값을 저장한다
+      const title = document.getElementById("info-title").dataset.raw || "알 수 없는 곡";
       const tagsContainer = document.getElementById("info-tags");
       let genre = "타이핑";
-      if (tagsContainer && tagsContainer.children.length > 0) {
-          genre = tagsContainer.children[0].innerText;
+      if (tagsContainer && tagsContainer.children.length > 0 && tagsContainer.children[0].dataset.genre) {
+          genre = tagsContainer.children[0].dataset.genre;
       }
       
       fetch("/api/typing-history", {
@@ -1008,7 +1013,7 @@ function highlightCurrentChar() {
  * 상태 패널(Status Panel)에 업데이트하여 화면에 표시하는 함수입니다.
  */
 function updateStatus() {
-  TypingEngine.getStatusHTML(statusPanel, targetUnits, currentUnitIndex, currentBuffer, '<span class="success-text"> 완벽하게 입력했습니다! 다음 문장을 기다려 주세요.</span>');
+  TypingEngine.getStatusHTML(statusPanel, targetUnits, currentUnitIndex, currentBuffer, `<span class="success-text"> ${i18n.t('common.perfectly_typed_please_wait_for_the')}</span>`);
 }
 
 
@@ -1058,7 +1063,7 @@ typingInput.addEventListener("input", (e) => {
     const expectedCharStr = currentUnit.validInputs.join(" / ");
     typoDetails.push({
       lineIndex: currentLineIndex,
-      lineText: contentLines[currentLineIndex] || "알 수 없는 구간",
+      lineText: contentLines[currentLineIndex] || i18n.t('typing.unknown_section'),
       type: 'typing',
       unitIndex: currentUnitIndex,
       word: currentUnit.text,
@@ -1207,7 +1212,7 @@ function forceSkipToNextLine() {
     let missedText = currentText.substring(currentIndex);
     typoDetails.push({
       lineIndex: currentLineIndex,
-      lineText: contentLines[currentLineIndex] || "알 수 없는 구간",
+      lineText: contentLines[currentLineIndex] || i18n.t('typing.unknown_section'),
       type: 'timeout',
       startUnitIndex: currentUnitIndex,
       missedText: missedText,

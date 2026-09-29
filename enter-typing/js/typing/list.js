@@ -2,7 +2,7 @@ const modal = document.getElementById('detail-modal');
 
 // 페이지 로드 시 콘텐츠 불러오기
 let allTypingContents = [];
-let currentCategory = '전체';
+let currentCategory = '전체'; // 필터 상태값 (화면 표시용 아님)
 let currentSort = 'recent';
 let displayLimit = 30;
 
@@ -45,7 +45,7 @@ function loadMore() {
 }
 
 async function deleteTypingContent(id) {
-    if (!confirm('정말로 이 타이핑 콘텐츠를 삭제하시겠습니까?')) return;
+    if (!confirm(i18n.t('typing.are_you_sure_you_want_to_2'))) return;
 
     try {
         const response = await fetch(`/api/typing-contents/${id}`, {
@@ -53,23 +53,25 @@ async function deleteTypingContent(id) {
         });
 
         if (!response.ok) {
-            if (response.status === 401) throw new Error('로그인이 필요합니다.');
-            if (response.status === 403) throw new Error('삭제 권한이 없습니다.');
+            if (response.status === 401) throw new Error(i18n.t('common.login_is_required'));
+            if (response.status === 403) throw new Error(i18n.t('common.you_do_not_have_permission_to'));
         }
 
         const data = await response.json();
         if (data.success) {
-            alert('성공적으로 삭제되었습니다.');
+            alert(i18n.t('common.deleted_successfully'));
             allTypingContents = allTypingContents.filter(item => item.id !== id);
             renderCards();
         } else {
-            alert('삭제에 실패했습니다: ' + (data.message || '알 수 없는 오류'));
+            alert(i18n.t('common.deletion_failed_2') + (data.message || i18n.t('common.unknown_error')));
         }
     } catch (err) {
         console.error('Failed to delete content', err);
-        alert(err.message || '서버 오류로 삭제에 실패했습니다.');
+        alert(err.message || i18n.t('common.deletion_failed_due_to_a_server'));
     }
 }
+
+document.addEventListener('i18n:change', () => renderCards());
 
 function renderCards() {
     const grid = document.getElementById('card-grid');
@@ -95,7 +97,7 @@ function renderCards() {
 
         const descPreview = (item.description && item.description.length > 30)
             ? item.description.substring(0, 30) + '...'
-            : (item.description || '가사 타이핑 연습하기');
+            : (item.description || i18n.t('common.practice_typing_lyrics'));
 
         const diffStars = `<i class="ph-fill ph-star" style="color:var(--color-pink); vertical-align: middle;"></i> ${item.difficulty || 3}`;
         let totalSeconds = item.best_time || 0;
@@ -112,14 +114,12 @@ function renderCards() {
                 }
             } catch (e) { }
         }
-        const m = Math.floor(totalSeconds / 60);
-        const s = totalSeconds % 60;
-        const timeStr = m > 0 ? `${m}분 ${s}초` : `${s}초`;
+        const timeStr = i18n.duration(totalSeconds);
 
         let thumbnailHTML = '';
         if (item.youtube_id) {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; position: relative;">
-                <img src="https://img.youtube.com/vi/${item.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
+                <img src="https://img.youtube.com/vi/${escapeHtml(item.youtube_id)}/hqdefault.jpg" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover; display: block;" class="card-thumb">
             </div>`;
         } else {
             thumbnailHTML = `<div style="margin: -25px -25px 15px -25px; border-radius: 20px 20px 0 0; overflow: hidden; height: 160px; background: linear-gradient(135deg, var(--color-pink), var(--color-blue)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
@@ -128,18 +128,18 @@ function renderCards() {
         }
 
         const cardHTML = `
-            <div class="card" onclick="openModal(${item.id})">
+            <div class="card" onclick="openModal(${Number(item.id)})">
                 ${thumbnailHTML}
-                <div class="card-badge ${badgeColor}">${item.genre || 'JPOP'}</div>
-                <h3 class="card-title">${item.title}</h3>
-                <p class="card-desc">${descPreview}</p>
+                <div class="card-badge ${badgeColor}">${escapeHtml(i18n.genre(item.genre || 'JPOP'))}</div>
+                <h3 class="card-title">${escapeHtml(item.title)}</h3>
+                <p class="card-desc">${escapeHtml(descPreview)}</p>
                 <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: auto;">
                     <div>
                         <span class="difficulty">${diffStars}</span>
                         <span class="time" style="margin-left: 10px;"><i class="ph-bold ph-clock" style="vertical-align: middle; margin-right: 3px;"></i> ${timeStr}</span>
                         <span class="play-count" style="margin-left: 10px; font-size: 0.85rem; color: var(--theme-text-muted); font-weight: 600;"><i class="ph-bold ph-play-circle" style="vertical-align: middle; margin-right: 3px;"></i> ${item.play_count || 0}</span>
                     </div>
-                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${item.id})">삭제</button>` : ''}
+                    ${canManage(item) ? `<button class="btn" style="background: var(--color-pink); color: white; padding: 5px 12px; font-size: 0.8rem; border-radius: 20px; white-space: nowrap; flex-shrink: 0; min-width: fit-content; border: none; cursor: pointer; font-weight: 700;" onclick="event.stopPropagation(); deleteTypingContent(${Number(item.id)})">${i18n.t('nav.delete')}</button>` : ''}
                 </div>
             </div>
         `;
@@ -181,12 +181,12 @@ async function openModal(id) {
         if (data.success) {
             document.getElementById('modal-title').innerText = data.title;
             document.getElementById('modal-artist').innerText = data.artist || '-';
-            document.getElementById('modal-genre').innerText = data.genre || 'JPOP';
-            document.getElementById('modal-creator').innerText = data.creator_nickname || '엔터핑';
+            document.getElementById('modal-genre').innerText = i18n.genre(data.genre || 'JPOP');
+            document.getElementById('modal-creator').innerText = data.creator_nickname || i18n.t('nav.enterping');
 
             const modalCover = document.getElementById('modal-cover');
             if (data.youtube_id) {
-                modalCover.innerHTML = `<img src="https://img.youtube.com/vi/${data.youtube_id}/hqdefault.jpg" alt="썸네일" style="width: 100%; height: 100%; object-fit: cover;">`;
+                modalCover.innerHTML = `<img src="https://img.youtube.com/vi/${escapeHtml(data.youtube_id)}/hqdefault.jpg" alt="${i18n.t('common.thumbnail')}" style="width: 100%; height: 100%; object-fit: cover;">`;
             } else {
                 modalCover.innerHTML = '';
             }
@@ -201,7 +201,7 @@ async function openModal(id) {
 
             const diffValue = data.difficulty || 3;
             document.getElementById('modal-difficulty').innerHTML = `<i class=\"ph-fill ph-star\" style=\"color:var(--color-pink); vertical-align: middle; margin-right:4px;\"></i> X ${diffValue}`;
-            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${(data.play_count || 0)}회`;
+            document.getElementById('modal-play-count').innerHTML = `<i class=\"ph-bold ph-play-circle\" style=\"vertical-align: middle; margin-right:4px;\"></i> ${i18n.t('common.n_times', { count: data.play_count || 0 })}`;
 
             let mTotalSeconds = data.best_time || 0;
             if (mTotalSeconds === 0 && data.timestamps) {
@@ -217,18 +217,16 @@ async function openModal(id) {
                     }
                 } catch (e) { }
             }
-            const mm = Math.floor(mTotalSeconds / 60);
-            const ms = mTotalSeconds % 60;
-            document.getElementById('modal-best-time').innerText = mm > 0 ? `${mm}분 ${ms}초` : `${ms}초`;
+            document.getElementById('modal-best-time').innerText = i18n.duration(mTotalSeconds);
 
-            document.getElementById('modal-desc').innerText = data.description || `${data.artist || ''}의 '${data.title}' 가사로 타자 연습을 시작해보세요!`;
+            document.getElementById('modal-desc').innerText = data.description || i18n.t('typing.start_practice_with_song_short', { artist: data.artist || '', title: data.title || '' });
 
             document.getElementById('modal-start-btn').onclick = () => location.href = `/typing/${id}/play`;
             document.getElementById('modal-rank-btn').onclick = () => location.href = `ranking/songs?id=${id}`;
         }
     } catch (error) {
         console.error("Failed to fetch typing content details", error);
-        document.getElementById('modal-desc').innerText = "콘텐츠를 불러오지 못했습니다.";
+        document.getElementById('modal-desc').innerText = i18n.t('common.the_content_failed_to_load');
     }
 }
 

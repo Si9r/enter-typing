@@ -28,7 +28,7 @@ function extractVideoId(url) {
 
 document.getElementById('btn-load-yt').addEventListener('click', () => {
     const vid = extractVideoId(ytInput.value);
-    if (!vid) return alert("유효한 유튜브 URL을 입력하세요.");
+    if (!vid) return alert(i18n.t('typing.please_enter_a_valid_youtube_url'));
 
     if (youtubePlayer) {
         youtubePlayer.loadVideoById(vid);
@@ -52,18 +52,18 @@ document.getElementById('btn-sync-time').addEventListener('click', () => {
         const time = youtubePlayer.getCurrentTime();
         lineTimeInput.value = time.toFixed(2);
     } else {
-        alert("유튜브 영상을 먼저 불러와 주세요.");
+        alert(i18n.t('typing.please_load_the_youtube_video_first'));
     }
 });
 
 // Auto Convert Lyrics
 document.getElementById('btn-auto-convert').addEventListener('click', async () => {
     const lyrics = lineLyricsInput.value.trim();
-    if (!lyrics) return alert('가사 텍스트를 먼저 입력해주세요.');
+    if (!lyrics) return alert(i18n.t('typing.please_enter_the_lyrics_text_first'));
 
     const btn = document.getElementById('btn-auto-convert');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '⏳ 변환 중...';
+    btn.innerHTML = i18n.t('typing.converting');
     btn.disabled = true;
 
     try {
@@ -77,11 +77,11 @@ document.getElementById('btn-auto-convert').addEventListener('click', async () =
             lineHiraganaInput.value = data.hiragana;
 
         } else {
-            alert('변환에 실패했습니다.');
+            alert(i18n.t('typing.conversion_failed'));
         }
     } catch (err) {
         console.error(err);
-        alert('변환 API 호출 중 오류가 발생했습니다.');
+        alert(i18n.t('typing.an_error_occurred_while_calling_the'));
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
@@ -91,7 +91,7 @@ document.getElementById('btn-auto-convert').addEventListener('click', async () =
 // Line Rendering
 function renderTable() {
     if (linesData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px;">등록된 가사가 없습니다. 오른쪽 입력창에서 가사를 추가해주세요.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--theme-text-muted); padding: 30px;">${i18n.t('typing.no_lyrics_yet')}</td></tr>`;
         return;
     }
 
@@ -107,13 +107,13 @@ function renderTable() {
         tr.innerHTML = `
             <td style="text-align: center; color: var(--theme-text-muted);">${index + 1}</td>
             <td style="font-weight: bold; color: var(--color-pink);">${line.time.toFixed(2)}</td>
-            ${line.lyrics === '[END]' ? '<td colspan="2" style="text-align: center; font-weight: bold; color: #e67700;">[타이핑 종료 지점]</td>' : `
-            <td>${line.lyrics}</td>
-            <td>${line.hiragana}</td>
+            ${line.lyrics === '[END]' ? `<td colspan="2" style="text-align: center; font-weight: bold; color: #e67700;">${i18n.t('typing.end_of_typing')}</td>` : `
+            <td>${escapeHtml(line.lyrics)}</td>
+            <td>${escapeHtml(line.hiragana)}</td>
             `}
             <td style="text-align: center;">
-                <span class="action-icon edit-icon" data-index="${index}" title="수정">✏️</span>
-                <span class="action-icon del-icon" data-index="${index}" title="삭제">🗑️</span>
+                <span class="action-icon edit-icon" data-index="${index}" title="${i18n.t('common.edit')}">✏️</span>
+                <span class="action-icon del-icon" data-index="${index}" title="${i18n.t('nav.delete')}">🗑️</span>
             </td>
         `;
 
@@ -147,7 +147,7 @@ function renderTable() {
 // Add Line
 document.getElementById('btn-end-here').addEventListener('click', () => {
     const time = parseFloat(lineTimeInput.value);
-    if (isNaN(time)) return alert("종료할 시간을 먼저 입력하거나 ⏱️싱크 버튼으로 가져와주세요.");
+    if (isNaN(time)) return alert(i18n.t('typing.please_enter_the_end_time_first'));
     linesData.push({ time, lyrics: "[END]", hiragana: "[END]" });
     resetForm();
     renderTable();
@@ -158,7 +158,7 @@ btnAddLine.addEventListener('click', () => {
     const lyrics = lineLyricsInput.value.trim();
     const hiragana = lineHiraganaInput.value.trim();
 
-    if (!lyrics || !hiragana) return alert("가사, 읽기를 모두 입력해주세요.");
+    if (!lyrics || !hiragana) return alert(i18n.t('typing.please_enter_all_lyrics_and_reading'));
 
     linesData.push({ time, lyrics, hiragana });
     resetForm();
@@ -191,7 +191,7 @@ btnUpdateLine.addEventListener('click', () => {
     const lyrics = lineLyricsInput.value.trim();
     const hiragana = lineHiraganaInput.value.trim();
 
-    if (!lyrics || !hiragana) return alert("가사, 읽기를 모두 입력해주세요.");
+    if (!lyrics || !hiragana) return alert(i18n.t('typing.please_enter_all_lyrics_and_reading'));
 
     linesData[editingIndex] = { time, lyrics, hiragana };
     resetForm();
@@ -206,8 +206,8 @@ btnCancelEdit.addEventListener('click', () => {
 const btnClearAll = document.getElementById('btn-clear-all');
 if (btnClearAll) {
     btnClearAll.addEventListener('click', () => {
-        if (linesData.length === 0) return alert('삭제할 항목이 없습니다.');
-        if (confirm('등록된 모든 가사 싱크 목록을 삭제하시겠습니까?')) {
+        if (linesData.length === 0) return alert(i18n.t('typing.there_is_nothing_to_delete'));
+        if (confirm(i18n.t('typing.do_you_want_to_delete_all'))) {
             linesData = [];
             resetForm();
             renderTable();
@@ -216,7 +216,7 @@ if (btnClearAll) {
 }
 
 function deleteLine(index) {
-    if (confirm("정말 이 줄을 삭제하시겠습니까?")) {
+    if (confirm(i18n.t('typing.are_you_sure_you_want_to'))) {
         linesData.splice(index, 1);
         if (editingIndex === index) resetForm();
         else if (editingIndex > index) editingIndex--;
@@ -249,10 +249,10 @@ if (editId) {
     const editCurrentUser = window.NavAuth && window.NavAuth.getUser();
 
     if (!editCurrentUser) {
-        alert('로그인이 필요한 서비스입니다.');
+        alert(i18n.t('common.this_service_requires_login'));
         location.href = '/login';
     } else {
-        document.getElementById('btn-save').innerHTML = " 수정하기";
+        document.getElementById('btn-save').innerHTML = i18n.t('typing.edit_2');
 
         fetch(`/api/typing-content/${editId}`)
             .then(res => res.json())
@@ -261,7 +261,7 @@ if (editId) {
 
                 const isOwner = editCurrentUser.id === data.creator_id;
                 if (!isOwner && !editCurrentUser.is_admin) {
-                    alert('수정 권한이 없습니다.');
+                    alert(i18n.t('typing.no_edit_permission'));
                     location.href = '/typing';
                     return;
                 }
@@ -300,10 +300,10 @@ if (editId) {
 // Save Content
 document.getElementById('btn-save').addEventListener('click', async () => {
     const title = document.getElementById('title').value.trim();
-    if (!title) return alert("동영상 제목을 입력해주세요.");
-    if (linesData.length === 0) return alert("최소 1줄 이상의 가사를 추가해주세요.");
+    if (!title) return alert(i18n.t('common.please_enter_the_video_title'));
+    if (linesData.length === 0) return alert(i18n.t('typing.please_add_at_least_one_line'));
 
-    const artist = document.getElementById('artist').value.trim() || '알 수 없음';
+    const artist = document.getElementById('artist').value.trim() || i18n.t('common.unknown');
     const genre = document.getElementById('genre').value;
     const description = document.getElementById('description').value.trim();
     const difficulty = parseInt(document.getElementById('difficulty').value, 10);
@@ -330,7 +330,7 @@ document.getElementById('btn-save').addEventListener('click', async () => {
     };
 
     try {
-        if (!localStorage.getItem('ep_user')) return alert('로그인이 필요한 서비스입니다.');
+        if (!localStorage.getItem('ep_user')) return alert(i18n.t('common.this_service_requires_login'));
 
         const method = editId ? 'PUT' : 'POST';
         const endpoint = editId ? `/api/typing-contents/${editId}` : '/api/typing-contents';
@@ -345,14 +345,14 @@ document.getElementById('btn-save').addEventListener('click', async () => {
 
         const data = await response.json();
         if (data.success) {
-            alert(editId ? '성공적으로 수정되었습니다!' : '성공적으로 등록되었습니다!');
+            alert(editId ? i18n.t('common.fixed_successfully') : i18n.t('typing.you_have_registered_successfully'));
             location.href = editId ? 'profile' : '/typing';
         } else {
-            alert((editId ? '수정에' : '등록에') + ' 실패했습니다: ' + (data.detail || '알 수 없는 오류'));
+            alert(i18n.t(editId ? 'typing.edit_failed_detail' : 'typing.register_failed_detail', { message: data.detail || i18n.t('common.unknown_error') }));
         }
     } catch (err) {
         console.error(err);
-        alert('서버와 통신 중 오류가 발생했습니다.');
+        alert(i18n.t('typing.an_error_occurred_while_communicating_wi'));
     }
 });
 

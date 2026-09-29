@@ -8,17 +8,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data.success) {
             document.querySelector('.detail-title').innerText = data.title;
             document.querySelector('.detail-artist').innerText = data.artist;
-            document.querySelector('.card-badge').innerText = data.genre || 'JPOP';
+            document.querySelector('.card-badge').innerText = i18n.genre(data.genre || 'JPOP');
 
             const diffValue = data.difficulty || 3;
             document.getElementById('detail-difficulty').innerHTML = ` X ${diffValue}`;
-            document.getElementById('detail-play-count').innerText = (data.play_count || 0) + '회';
-            document.getElementById('detail-best-time').innerText = (data.best_time || 0) + '초';
+            i18n.setText(document.getElementById('detail-play-count'), 'common.n_times', { count: data.play_count || 0 });
+            i18n.setText(document.getElementById('detail-best-time'), 'common.n_seconds', { count: data.best_time || 0 });
 
             if (data.description) {
                 document.querySelector('.detail-desc').innerText = data.description;
             } else {
-                document.querySelector('.detail-desc').innerText = `${data.artist}의 '${data.title}' 가사로 일본어 타자 연습을 시작해보세요!`;
+                i18n.setText(document.querySelector('.detail-desc'), 'typing.start_practice_with_song', { artist: data.artist || '', title: data.title || '' });
             }
 
             if (data.youtube_id) {

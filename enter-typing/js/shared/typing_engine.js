@@ -389,7 +389,7 @@ function highlightCurrentChar(container, units, currentUnitIndex, currentBuffer)
  * @param {string} completeMessage - 입력 완료 시 표시할 메시지
  * @returns {string} 상태 패널에 설정될 HTML/Text 문자열
  */
-function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, completeMessage = "입력 완료!") {
+function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, completeMessage = i18n.t('typing.input_completed')) {
   if (!statusPanel) return "";
   if (!units || currentUnitIndex >= units.length) {
     statusPanel.innerHTML = window.i18nTranslate ? window.i18nTranslate(completeMessage) : completeMessage;
@@ -398,14 +398,14 @@ function getStatusHTML(statusPanel, units, currentUnitIndex, currentBuffer, comp
 
   const currentUnit = units[currentUnitIndex];
   if (!currentUnit) {
-    const defaultMsg = window.i18nTranslate ? window.i18nTranslate("입력할 항목을 준비 중입니다.") : "입력할 항목을 준비 중입니다.";
+    const defaultMsg = i18n.t('typing.preparing_input_items');
     statusPanel.innerText = defaultMsg;
     return defaultMsg;
   }
 
-  const locCurrentPos = window.i18nTranslate ? window.i18nTranslate("현재 입력 위치:") : "현재 입력 위치:";
-  const locTyping = window.i18nTranslate ? window.i18nTranslate("입력 중...") : "입력 중...";
-  const locCombo = window.i18nTranslate ? window.i18nTranslate("입력된 조합:") : "입력된 조합:";
+  const locCurrentPos = i18n.t('typing.current_input');
+  const locTyping = i18n.t('typing.typing');
+  const locCombo = i18n.t('typing.typed');
 
   let htmlStr = "";
   if (currentBuffer === "") {

@@ -1534,3 +1534,13 @@ body {
         padding: 40px 20px;
     }
 }
+
+/* 집중 모드 (타이핑·퀴즈 플레이 화면): 위 네비게이션 바를 숨긴다.
+   navbar.js 는 그대로 실행해 로그인 상태 확인 등은 유지한다. main 의 margin-top 은 인라인 스타일이라 !important 로 덮는다. */
+body.focus-mode > .navbar {
+    display: none;
+}
+
+body.focus-mode > main {
+    margin-top: 24px !important;
+}

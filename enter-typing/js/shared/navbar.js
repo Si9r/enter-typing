@@ -484,7 +484,15 @@
   }
 
   /* 외부에서 사용 가능하도록 노출 */
-  window.NavAuth = { getUser, setUser, clearUser, logout };
+  // 같은 사이트에서 들어왔으면 이전 페이지로, 링크로 바로 들어왔으면 fallback 으로 이동
+  function goBack(fallback) {
+    let fromSite = false;
+    try { fromSite = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) { /* 잘못된 referrer */ }
+    if (fromSite && history.length > 1) history.back();
+    else location.href = fallback || '/';
+  }
+
+  window.NavAuth = { getUser, setUser, clearUser, logout, goBack };
   verifySession();
 })();
 

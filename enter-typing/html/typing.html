@@ -8,7 +8,7 @@
     <script src="/i18n.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>타이핑 연습 - 엔터핑</title>
-    <link rel="stylesheet" href="/style.css?v=1.0.4">
+    <link rel="stylesheet" href="/style.css?v=1.0.5">
     <link rel="stylesheet" href="/typing.css?v=2.2.0">
     <style>
         /* 가사 표시 설정 패널: 버튼 왼쪽에 띄운다. 영상 패널(overflow: hidden)에 잘리지 않도록 fixed 로 두고,
@@ -116,7 +116,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
-<body>
+<body class="focus-mode">
     <header class="navbar">
         <div class="nav-left">
             <div class="logo" onclick="location.href='/'">
@@ -146,13 +146,13 @@
         </div>
     </header>
 
-    <script src="/navbar.js?v=2.0.0"></script>
+    <script src="/navbar.js?v=2.1.0"></script>
 
     <main style="margin-top: 90px; flex: 1; padding: 0 40px; display: flex; flex-direction: column; width: 100%; max-width: 1400px; margin-left: auto; margin-right: auto; margin-bottom: 0;">
         
         <!-- 뒤로가기 버튼 -->
         <div style="width: 100%; margin-bottom: 12px; display: flex; justify-content: flex-start;">
-            <button onclick="history.back()" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--theme-bg-card); border: 2px solid var(--theme-border); border-radius: 999px; padding: 6px 16px; color: var(--theme-text-muted); font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='var(--color-pink)'; this.style.color='var(--color-pink)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 182, 193, 0.15)';" onmouseout="this.style.borderColor='var(--theme-border)'; this.style.color='var(--theme-text-muted)'; this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';">
+            <button onclick="NavAuth.goBack('/typing')" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--theme-bg-card); border: 2px solid var(--theme-border); border-radius: 999px; padding: 6px 16px; color: var(--theme-text-muted); font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='var(--color-pink)'; this.style.color='var(--color-pink)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 182, 193, 0.15)';" onmouseout="this.style.borderColor='var(--theme-border)'; this.style.color='var(--theme-text-muted)'; this.style.transform='none'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.02)';">
                 <i class="ph-bold ph-caret-left" style="font-size: 1.1rem;"></i>
                 <span data-i18n="common.back">뒤로가기</span>
             </button>

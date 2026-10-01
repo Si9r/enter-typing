@@ -232,6 +232,8 @@ h1 {
 .sentence-display {
   display: block;
   width: 100%;
+  /* 세로 flex 패널 안에서 눌리지 않게 한다 (글자를 키우면 다음 줄과 겹치던 문제 방지) */
+  flex-shrink: 0;
   white-space: pre-wrap;
   text-align: center;
   min-height: 60px;
@@ -241,23 +243,24 @@ h1 {
   word-break: keep-all;
 }
 
+/* 가사 표시 설정(TypingEngine.displaySettings)으로 조절되는 값. 기본값은 기존 디자인과 같다. */
 .sentence-display .lyric-unit {
   transition: all 0.15s ease;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 4px;
+  padding: 0 var(--ep-unit-gap, 4px);
   border-radius: 4px;
   vertical-align: bottom;
 }
 
 .sentence-display .hira-text {
-  font-size: 1.5rem;
+  font-size: var(--ep-hira-size, 1.5rem);
   line-height: 1.2;
 }
 
 .sentence-display .roma-text {
-  font-size: 0.9rem;
+  font-size: var(--ep-roma-size, 0.9rem);
   line-height: 1.2;
   margin-top: 4px;
   opacity: 0.8;

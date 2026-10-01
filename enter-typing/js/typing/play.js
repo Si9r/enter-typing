@@ -1451,3 +1451,37 @@ if (pauseOverlay) {
     }
   });
 }
+
+// ── 가사 표시 설정 (글자 간격·히라가나/로마자 크기) ─────────────
+(function initDisplaySettings() {
+  const btn = document.getElementById("display-settings-btn");
+  const panel = document.getElementById("display-settings-panel");
+  if (!btn || !panel || !window.TypingEngine || !TypingEngine.displaySettings) return;
+  const ds = TypingEngine.displaySettings;
+  const fields = {
+    gap: { input: document.getElementById("ds-gap"), label: document.getElementById("ds-gap-val"), format: (v) => v + "px" },
+    hira: { input: document.getElementById("ds-hira"), label: document.getElementById("ds-hira-val"), format: (v) => Math.round((v / ds.DEFAULTS.hira) * 100) + "%" },
+    roma: { input: document.getElementById("ds-roma"), label: document.getElementById("ds-roma-val"), format: (v) => Math.round((v / ds.DEFAULTS.roma) * 100) + "%" },
+  };
+
+  function render(settings) {
+    Object.entries(fields).forEach(([key, f]) => {
+      f.input.value = settings[key];
+      f.label.textContent = f.format(settings[key]);
+    });
+  }
+
+  Object.entries(fields).forEach(([key, f]) => {
+    // 슬라이더를 움직이는 즉시 가사에 반영
+    f.input.addEventListener("input", () => render(ds.set({ [key]: Number(f.input.value) })));
+  });
+  document.getElementById("ds-reset").addEventListener("click", () => render(ds.reset()));
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) render(ds.get());
+  });
+  panel.addEventListener("click", (e) => e.stopPropagation());
+  document.addEventListener("click", () => { panel.hidden = true; });
+})();

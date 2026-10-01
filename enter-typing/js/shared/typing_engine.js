@@ -490,9 +490,61 @@ function createKeyTypoCollector() {
   };
 }
 
+/**
+ * 가사 표시 설정 (글자 간격, 히라가나/로마자 크기).
+ * localStorage 에 저장해 타이핑·대전 화면 모두에 적용한다. CSS 변수로 반영된다 (css/typing.css).
+ */
+const displaySettings = (function () {
+  const STORAGE_KEY = "ep_typing_display";
+  const DEFAULTS = { gap: 4, hira: 1.5, roma: 0.9 }; // px, rem, rem
+  const LIMITS = { gap: [0, 12], hira: [1.0, 2.4], roma: [0.6, 1.3] };
+
+  function clamp(key, value) {
+    const [min, max] = LIMITS[key];
+    const n = Number(value);
+    return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : DEFAULTS[key];
+  }
+
+  function get() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (e) { /* 저장소 차단 */ }
+    return {
+      gap: clamp("gap", saved.gap ?? DEFAULTS.gap),
+      hira: clamp("hira", saved.hira ?? DEFAULTS.hira),
+      roma: clamp("roma", saved.roma ?? DEFAULTS.roma),
+    };
+  }
+
+  function apply(settings) {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement.style;
+    root.setProperty("--ep-unit-gap", settings.gap + "px");
+    root.setProperty("--ep-hira-size", settings.hira + "rem");
+    root.setProperty("--ep-roma-size", settings.roma + "rem");
+  }
+
+  function set(changes) {
+    const next = { ...get(), ...changes };
+    Object.keys(next).forEach((k) => { next[k] = clamp(k, next[k]); });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (e) { /* 저장소 차단 */ }
+    apply(next);
+    return next;
+  }
+
+  function reset() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* 저장소 차단 */ }
+    apply(DEFAULTS);
+    return { ...DEFAULTS };
+  }
+
+  if (typeof window !== "undefined") apply(get());
+  return { get, set, reset, DEFAULTS, LIMITS };
+})();
+
 // 브라우저 전역 범위에 노출
 if (typeof window !== "undefined") {
   window.TypingEngine = {
+    displaySettings,
     romajiTable,
     combinationRules,
     parseKanaToTargetUnits,

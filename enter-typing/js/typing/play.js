@@ -1452,7 +1452,7 @@ if (pauseOverlay) {
   });
 }
 
-// ── 가사 표시 설정 (글자 간격·히라가나/로마자 크기) ─────────────
+// ── 가사 표시 설정 (글자 간격·히라가나/로마자 크기·정렬) ─────────────
 (function initDisplaySettings() {
   const btn = document.getElementById("display-settings-btn");
   const panel = document.getElementById("display-settings-panel");
@@ -1464,12 +1464,19 @@ if (pauseOverlay) {
     roma: { input: document.getElementById("ds-roma"), label: document.getElementById("ds-roma-val"), format: (v) => Math.round((v / ds.DEFAULTS.roma) * 100) + "%" },
   };
 
+  const alignButtons = document.querySelectorAll("#ds-align button");
+
   function render(settings) {
     Object.entries(fields).forEach(([key, f]) => {
       f.input.value = settings[key];
       f.label.textContent = f.format(settings[key]);
     });
+    alignButtons.forEach((b) => b.classList.toggle("active", b.dataset.align === settings.align));
   }
+
+  alignButtons.forEach((b) => {
+    b.addEventListener("click", () => render(ds.set({ align: b.dataset.align })));
+  });
 
   Object.entries(fields).forEach(([key, f]) => {
     // 슬라이더를 움직이는 즉시 가사에 반영
@@ -1477,11 +1484,26 @@ if (pauseOverlay) {
   });
   document.getElementById("ds-reset").addEventListener("click", () => render(ds.reset()));
 
+  // 버튼 왼쪽에, 아래 끝을 버튼에 맞춰 띄우되 화면 밖으로 나가지 않게 한다
+  function place() {
+    const b = btn.getBoundingClientRect();
+    const margin = 8;
+    const left = Math.max(margin, b.left - 12 - panel.offsetWidth);
+    const top = Math.min(window.innerHeight - margin - panel.offsetHeight, b.bottom - panel.offsetHeight);
+    panel.style.left = left + "px";
+    panel.style.top = Math.max(margin, top) + "px";
+  }
+
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     panel.hidden = !panel.hidden;
-    if (!panel.hidden) render(ds.get());
+    if (!panel.hidden) {
+      render(ds.get());
+      place();
+    }
   });
   panel.addEventListener("click", (e) => e.stopPropagation());
   document.addEventListener("click", () => { panel.hidden = true; });
+  window.addEventListener("resize", () => { if (!panel.hidden) place(); });
+  window.addEventListener("scroll", () => { if (!panel.hidden) place(); }, { passive: true });
 })();

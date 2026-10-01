@@ -235,7 +235,7 @@ h1 {
   /* 세로 flex 패널 안에서 눌리지 않게 한다 (글자를 키우면 다음 줄과 겹치던 문제 방지) */
   flex-shrink: 0;
   white-space: pre-wrap;
-  text-align: center;
+  text-align: var(--ep-lyric-align, center);
   min-height: 60px;
   font-size: 1.5rem;
   line-height: 1.8;

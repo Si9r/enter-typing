@@ -21,6 +21,12 @@ let hasIncrementedPlayCount = false;
 const QUESTION_COUNT_OPTIONS = [10, 30, 50];
 let isChoosingQuestionCount = false;
 
+// 문제를 다 맞힌 뒤: 음악을 바로 끊지 않고 잠시 이어 튼 뒤(끝부분은 서서히 줄임) 멈추고, 조금 쉬었다가 다음 문제로
+const PLAY_OUT_MS = 2000;   // 다 맞힌 뒤 음악을 이어서 트는 시간
+const FADE_OUT_MS = 700;    // 그중 마지막에 소리를 줄이는 시간
+const NEXT_GAP_MS = 1000;   // 음악이 멈춘 뒤 다음 문제까지 쉬는 시간 (PLAY_OUT_MS 와 합쳐 3초 = 안내 문구)
+let playOutTimer = null;
+
 const chatMessages = document.getElementById("chat-messages");
 const chatInput = document.getElementById("chat-input");
 const chatSendBtn = document.getElementById("chat-send-btn");
@@ -206,6 +212,7 @@ function playSegment() {
     }
 
     clearInterval(checkInterval);
+    clearInterval(playOutTimer);
     const progressCircle = document.getElementById("vinyl-progress");
     if (progressCircle) {
         progressCircle.style.strokeDashoffset = "264"; // reset
@@ -356,10 +363,6 @@ function checkSegmentComplete() {
     if (allGuessed) {
         currentCombo += 1;
         updateAccuracyDisplay();
-        player.pauseVideo();
-        vinylRecord.classList.add("paused");
-        clearInterval(checkInterval);
-        isPlayingSegment = false;
 
         chatInput.disabled = true;
         chatSendBtn.disabled = true;
@@ -370,17 +373,58 @@ function checkSegmentComplete() {
             updateQuizCountDisplay();
             saveQuizHistory();
             showQuizResult();
+            playOutAndStop(null);
         } else {
             addSystemChat(
                 i18n.t('quiz.you_got_everything_correct_after_3'),
             );
-            setTimeout(() => {
-                currentIndex++;
-                updateQuizCountDisplay();
-                playSegment();
-            }, 3000);
+            playOutAndStop(() => {
+                setTimeout(() => {
+                    currentIndex++;
+                    updateQuizCountDisplay();
+                    playSegment();
+                }, NEXT_GAP_MS);
+            });
         }
     }
+}
+
+/**
+ * 정답을 다 맞힌 뒤 음악을 PLAY_OUT_MS 동안 이어 틀고, 마지막 FADE_OUT_MS 동안 소리를 줄여 멈춘다.
+ * 이미 멈춰 있었다면(일시정지·구간 끝) 같은 시간만 기다린다. 멈춘 뒤 onStopped 를 부른다.
+ */
+function playOutAndStop(onStopped) {
+    const wasPlaying = isPlayingSegment;
+    clearInterval(checkInterval); // 구간 끝에서 멈추는 처리도 끈다 (정답 후에는 구간을 조금 넘겨도 된다)
+    clearInterval(playOutTimer);
+    isPlayingSegment = false;
+
+    const volume = Number(document.getElementById("volume-slider").value);
+    const stop = () => {
+        clearInterval(playOutTimer);
+        playOutTimer = null;
+        player.pauseVideo();
+        player.setVolume(document.getElementById("volume-slider").value); // 다음 재생을 위해 원래 음량으로 되돌린다
+        vinylRecord.classList.add("paused");
+        if (onStopped) onStopped();
+    };
+
+    if (!wasPlaying) {
+        player.pauseVideo();
+        vinylRecord.classList.add("paused");
+        playOutTimer = setInterval(stop, PLAY_OUT_MS);
+        return;
+    }
+
+    const startedAt = Date.now();
+    playOutTimer = setInterval(() => {
+        const left = PLAY_OUT_MS - (Date.now() - startedAt);
+        if (left <= 0) {
+            stop();
+        } else if (left < FADE_OUT_MS) {
+            player.setVolume(Math.round(volume * (left / FADE_OUT_MS)));
+        }
+    }, 50);
 }
 
 // ── 정답률: 지금까지 출제된 문제의 정답 중 맞힌 비율 (점수 대신 표시) ──
@@ -525,6 +569,7 @@ document.addEventListener("keydown", (e) => {
         if (player && player.pauseVideo) player.pauseVideo();
         vinylRecord.classList.add("paused");
         clearInterval(checkInterval);
+        clearInterval(playOutTimer);
         isPlayingSegment = false;
 
         chatInput.disabled = true;

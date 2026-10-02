@@ -22,9 +22,9 @@ const QUESTION_COUNT_OPTIONS = [10, 30, 50];
 let isChoosingQuestionCount = false;
 
 // 문제를 다 맞힌 뒤: 음악을 바로 끊지 않고 잠시 이어 튼 뒤(끝부분은 서서히 줄임) 멈추고, 조금 쉬었다가 다음 문제로
-const PLAY_OUT_MS = 2000;   // 다 맞힌 뒤 음악을 이어서 트는 시간
-const FADE_OUT_MS = 700;    // 그중 마지막에 소리를 줄이는 시간
-const NEXT_GAP_MS = 1000;   // 음악이 멈춘 뒤 다음 문제까지 쉬는 시간 (PLAY_OUT_MS 와 합쳐 3초 = 안내 문구)
+const PLAY_OUT_MS = 3000;   // 다 맞힌 뒤 음악을 이어서 트는 시간
+const FADE_OUT_MS = 1400;    // 그중 마지막에 소리를 줄이는 시간
+const NEXT_GAP_MS = 1500;   // 음악이 멈춘 뒤 다음 문제까지 쉬는 시간 (안내 문구는 '잠시 후'라 시간을 바꿔도 된다)
 let playOutTimer = null;
 
 const chatMessages = document.getElementById("chat-messages");
@@ -256,6 +256,16 @@ function addUserChat(msg) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+// 한 정답 안의 동의어 구분자: 쉼표(,), 일본어 쉼표(、), 전각 쉼표(，)
+const SYNONYM_SEPARATOR = /[,、，]/;
+
+/** 정답 한 칸의 동의어 목록. 、 가 들어간 제목(예: "さよなら、またいつか！")도 통째로 입력하면 맞도록 원문 전체도 포함한다. */
+function synonymsOf(answerGroup) {
+    const parts = answerGroup.split(SYNONYM_SEPARATOR).map((v) => v.trim()).filter(Boolean);
+    const whole = answerGroup.trim();
+    return parts.includes(whole) ? parts : [...parts, whole];
+}
+
 function normalizeString(str) {
     if (!str) return "";
     return str.toLowerCase().replace(/\s+/g, "");
@@ -269,7 +279,7 @@ function checkAnswerMatch(targetAnswer, normInput) {
         : [targetAnswer];
     for (let ansGroup of answers) {
         // Each array element may contain comma-separated variations
-        const variations = ansGroup.split(",").map((v) => v.trim());
+        const variations = synonymsOf(ansGroup);
         for (let ans of variations) {
             if (normalizeString(ans) === normInput) {
                 return true;
@@ -306,7 +316,7 @@ function handleChat() {
         let matchedAnswer = null;
         for (let i = 0; i < question.answer.length; i++) {
             const ansGroup = question.answer[i];
-            const variations = ansGroup.split(",").map((v) => v.trim());
+            const variations = synonymsOf(ansGroup);
             const found = variations.find(
                 (ans) => normalizeString(ans) === normText,
             );
@@ -550,7 +560,7 @@ function missedAnswersText(item) {
             const guessed = currentGuessed[`guessed_${key}`] || [];
             const missed = (question.answer || [])
                 .filter((_, i) => guessed[i] === null || guessed[i] === undefined)
-                .map((group) => group.split(",").map((v) => v.trim()).filter(Boolean).join(" / "));
+                .map((group) => group.split(SYNONYM_SEPARATOR).map((v) => v.trim()).filter(Boolean).join(" / "));
             if (missed.length === 0) return null;
             return `${question.question || i18n.t('common.question_2')}: ${missed.join(", ")}`;
         })

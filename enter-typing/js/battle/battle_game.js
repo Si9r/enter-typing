@@ -6,6 +6,15 @@ import {
     addQuizSystemChat, addQuizUserChat, addQuizOpponentChat, renderLiveRankingQuiz
 } from './battle_ui.js';
 
+// 퀴즈 정답 한 칸의 동의어 구분자: 쉼표(,), 일본어 쉼표(、), 전각 쉼표(，)
+const QUIZ_SYNONYM_SEPARATOR = /[,、，]/;
+
+/** 정답 한 칸의 동의어를 비교용(소문자, 공백 제거)으로 돌려준다. 、 가 들어간 제목도 통째로 입력하면 맞도록 원문 전체도 포함한다. */
+function quizSynonymsOf(answerGroup) {
+    const norm = (v) => v.trim().toLowerCase().replace(/\s+/g, "");
+    return [...answerGroup.split(QUIZ_SYNONYM_SEPARATOR).map(norm).filter(Boolean), norm(answerGroup)];
+}
+
 // ── YouTube 플레이어 초기화 ────────────────────────────────────────
 export function initYoutubePlayer() {
     YouTubeManager.createPlayer('youtube-player', {
@@ -964,9 +973,9 @@ export function sendQuizChatMessage() {
 
             for (let i = 0; i < answers.length; i++) {
                 if (guessedArray[i] === null) {
-                    const synonyms = answers[i].split(",").map(s => s.trim().toLowerCase().replace(/\s+/g, ""));
+                    const synonyms = quizSynonymsOf(answers[i]);
                     if (synonyms.includes(normalizedInput)) {
-                        guessedArray[i] = answers[i].split(",")[0].trim();
+                        guessedArray[i] = answers[i].split(QUIZ_SYNONYM_SEPARATOR)[0].trim();
                         correctFound = true;
                     }
                 }
@@ -1085,9 +1094,9 @@ export function handleOpponentQuizAnswer(data) {
             if (!guessedArray) continue;
             for (let i = 0; i < answers.length; i++) {
                 if (guessedArray[i] === null) {
-                    const synonyms = answers[i].split(",").map(s => s.trim().toLowerCase().replace(/\s+/g, ""));
+                    const synonyms = quizSynonymsOf(answers[i]);
                     if (synonyms.includes(normalizedInput)) {
-                        guessedArray[i] = answers[i].split(",")[0].trim();
+                        guessedArray[i] = answers[i].split(QUIZ_SYNONYM_SEPARATOR)[0].trim();
                         boardUpdated = true;
                     }
                 }

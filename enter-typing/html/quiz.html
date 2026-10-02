@@ -130,6 +130,42 @@
             border-top-right-radius: 8px;
         }
 
+        /* 채팅 스크롤바: 트랙(배경 영역)은 숨기고 얇은 막대만 표시 */
+        /* Firefox 전용. 크롬·엣지는 이 표준 속성이 있으면 아래 ::-webkit-scrollbar 스타일을 무시하고
+           화살표가 달린 기본 막대를 그리므로, ::-webkit-scrollbar 를 모르는 브라우저에만 적용한다. */
+        @supports not selector(::-webkit-scrollbar) {
+            .chat-messages {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.25) transparent;    /* 막대색 / 트랙색 */
+            }
+
+            [data-theme="dark"] .chat-messages {
+                scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+            }
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 8px 0; /* 둥근 모서리 밖으로 막대가 나가지 않도록 */
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 999px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        [data-theme="dark"] .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
         .chat-bubble {
             max-width: 80%;
             padding: 10px 14px;

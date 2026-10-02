@@ -131,9 +131,17 @@
         }
 
         /* 모달 스크롤바: 트랙(배경 영역)은 숨기고 얇은 막대만 표시 */
-        .editor-modal .editor-main {
-            scrollbar-width: thin;                               /* Firefox */
-            scrollbar-color: rgba(0, 0, 0, 0.25) transparent;    /* Firefox: 막대색 / 트랙색 */
+        /* Firefox 전용. 크롬·엣지는 이 표준 속성이 있으면 아래 ::-webkit-scrollbar 스타일을 무시하고
+           화살표가 달린 기본 막대를 그리므로, ::-webkit-scrollbar 를 모르는 브라우저에만 적용한다. */
+        @supports not selector(::-webkit-scrollbar) {
+            .editor-modal .editor-main {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(0, 0, 0, 0.25) transparent;    /* 막대색 / 트랙색 */
+            }
+
+            [data-theme="dark"] .editor-modal .editor-main {
+                scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+            }
         }
 
         .editor-modal .editor-main::-webkit-scrollbar {
@@ -152,10 +160,6 @@
 
         .editor-modal .editor-main::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 0, 0, 0.4);
-        }
-
-        [data-theme="dark"] .editor-modal .editor-main {
-            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
         }
 
         [data-theme="dark"] .editor-modal .editor-main::-webkit-scrollbar-thumb {

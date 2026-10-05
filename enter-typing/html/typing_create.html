@@ -296,6 +296,205 @@
             color: var(--theme-text-muted);
         }
 
+        /* ── 일괄 입력 / 탭 싱크 ── */
+        .lines-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .lines-toolbar .left,
+        .lines-toolbar .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .unsynced-badge {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #e67700;
+            background: rgba(255, 146, 43, 0.12);
+            border-radius: 999px;
+            padding: 3px 10px;
+        }
+
+        .lines-status {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-pink);
+        }
+
+        .lines-table td.unsynced {
+            color: #e67700;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .lines-table tr.sync-current {
+            background: rgba(255, 154, 158, 0.18);
+            box-shadow: inset 4px 0 0 var(--color-pink);
+        }
+
+        #bulk-modal .modal-content {
+            max-width: 640px;
+        }
+
+        #bulk-lyrics {
+            width: 100%;
+            min-height: 280px;
+            padding: 12px;
+            border: 1.5px solid var(--theme-border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            background: var(--theme-bg-card);
+            color: var(--theme-text-main);
+        }
+
+        #bulk-lyrics:focus {
+            border-color: var(--color-pink);
+        }
+
+        .bulk-mode {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--theme-text-sub);
+        }
+
+        .bulk-mode[hidden] {
+            display: none;
+        }
+
+        .bulk-mode label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .bulk-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bulk-footer .count {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--theme-text-muted);
+        }
+
+        /* 탭 싱크 진행 바: 화면 아래에 고정 (영상은 위, 가사 표는 아래에 있으므로 스크롤 없이 보이도록) */
+        .tap-sync-bar {
+            position: fixed;
+            left: 50%;
+            bottom: 20px;
+            transform: translateX(-50%);
+            width: min(880px, calc(100% - 32px));
+            background: var(--theme-bg-card);
+            border: 2px solid var(--color-pink);
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 900;
+        }
+
+        /* 진행 바가 표의 마지막 줄을 가리지 않도록 아래 여백 확보 */
+        body.tap-syncing .editor-bottom {
+            margin-bottom: 260px;
+        }
+
+        .tap-sync-bar[hidden] {
+            display: none;
+        }
+
+        .tap-sync-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--theme-text-muted);
+        }
+
+        .tap-sync-progress {
+            color: var(--color-pink);
+        }
+
+        .tap-sync-now {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--theme-text-main);
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .tap-sync-now small {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--theme-text-muted);
+        }
+
+        .tap-sync-next {
+            font-size: 0.9rem;
+            color: var(--theme-text-muted);
+            word-break: break-word;
+        }
+
+        .tap-sync-warning {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #e03131;
+        }
+
+        .tap-sync-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tap-sync-controls .spacer {
+            flex: 1;
+        }
+
+        .tap-sync-controls select {
+            padding: 6px 8px;
+            border: 1.5px solid var(--theme-border);
+            border-radius: 8px;
+            background: var(--theme-bg-card);
+            color: var(--theme-text-main);
+            font-weight: 700;
+        }
+
+        .tap-sync-controls .offset-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--theme-text-sub);
+        }
+
+        .tap-sync-keys {
+            font-size: 0.78rem;
+            color: var(--theme-text-muted);
+        }
+
         /* 다크모드 대응 */
         [data-theme="dark"] .editor-top-bar input,
         [data-theme="dark"] .time-row input,
@@ -426,9 +625,17 @@
         </div>
 
         <!-- Bottom: Lines Table -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 data-i18n="typing.list_of_registered_lyrics" style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
-            <button data-i18n="typing.delete_all" class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
+        <div class="lines-toolbar">
+            <div class="left">
+                <h3 data-i18n="typing.list_of_registered_lyrics" style="font-size: 1.1rem; color: var(--theme-text-main); font-weight: 700; margin: 0;">등록된 가사 목록</h3>
+                <span class="unsynced-badge" id="unsynced-badge" hidden></span>
+                <span class="lines-status" id="lines-status"></span>
+            </div>
+            <div class="right">
+                <button data-i18n="typing.bulk_input" class="toolbar-btn" id="btn-bulk-input" style="padding: 6px 12px; font-size: 0.9rem;">📋 일괄 입력</button>
+                <button data-i18n="typing.tap_sync" data-i18n-title="typing.tap_sync_desc" class="toolbar-btn" id="btn-tap-sync" title="영상을 들으며 Space를 눌러 줄마다 시작 시간을 찍습니다." style="padding: 6px 12px; font-size: 0.9rem; color: var(--color-pink); border-color: var(--color-pink);">⏱️ 탭 싱크</button>
+                <button data-i18n="typing.delete_all" class="toolbar-btn" id="btn-clear-all" style="color: #ff4a68; border-color: #ff4a68; padding: 6px 12px; font-size: 0.9rem;">전체 삭제</button>
+            </div>
         </div>
         <div class="editor-bottom">
             <table class="lines-table" id="lines-table">
@@ -463,6 +670,9 @@
             </div>
 
             <div style="font-size: 0.95rem; color: var(--theme-text-main); line-height: 1.6;">
+                <p style="background: var(--theme-bg-hover); border-radius: 10px; padding: 10px 12px;"><strong data-i18n="typing.guide_quick_title">⚡ 빠르게 만들기</strong><br>
+                    <span data-i18n="typing.guide_quick_desc">가사 목록의 📋 일괄 입력으로 가사 전체를 한 번에 붙여넣고, ⏱️ 탭 싱크를 눌러 영상을 들으며 줄이 시작될 때마다 Space를 누르세요. 아래 1~4단계를 한 번에 끝낼 수 있습니다.</span></p>
+
                 <p><strong data-i18n="common.n1_load_video">1. 영상 불러오기</strong><br>
                     <span data-i18n="typing.enter_the_url_of_the_youtube">YouTube 영상의 URL을 입력하고</span> <code data-i18n="common.load">불러오기</code> <span data-i18n="typing.press_the_button_to_import_the">버튼을 눌러 영상을 가져옵니다.</span></p>
 
@@ -540,8 +750,48 @@
         </div>
     </div>
 
+    <!-- 가사 일괄 입력 모달 -->
+    <div class="modal-overlay" id="bulk-modal">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <span data-i18n="typing.bulk_input_title">가사 일괄 입력</span>
+                <span class="close-modal" id="close-bulk">✕</span>
+            </div>
+            <p data-i18n="typing.bulk_input_desc" style="margin: 0; font-size: 0.9rem; color: var(--theme-text-sub); line-height: 1.5;">가사 전체를 붙여넣으세요. 한 줄이 한 소절이 되고 빈 줄은 무시됩니다. 읽기(히라가나)는 자동으로 변환됩니다.</p>
+            <textarea id="bulk-lyrics" data-i18n-placeholder="typing.bulk_placeholder" placeholder="가사를 붙여넣으세요 (한 줄 = 한 소절)" spellcheck="false"></textarea>
+            <div class="bulk-mode" id="bulk-mode" hidden>
+                <label><input type="radio" name="bulk-mode" value="append" checked> <span data-i18n="typing.bulk_append">기존 가사 뒤에 추가</span></label>
+                <label><input type="radio" name="bulk-mode" value="replace"> <span data-i18n="typing.bulk_replace">기존 가사를 모두 바꾸기</span></label>
+            </div>
+            <div class="bulk-footer">
+                <span class="count" id="bulk-count"></span>
+                <button data-i18n="typing.bulk_apply" class="toolbar-btn btn-primary" id="btn-bulk-apply" style="justify-content: center; padding: 10px 20px;">변환해서 추가</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 탭 싱크 진행 바 -->
+    <div class="tap-sync-bar" id="tap-sync-bar" hidden>
+        <div class="tap-sync-head">
+            <span data-i18n="typing.tap_now">지금 찍을 줄</span>
+            <span class="tap-sync-progress" id="tap-sync-progress"></span>
+        </div>
+        <div class="tap-sync-now" id="tap-sync-now"></div>
+        <div class="tap-sync-next" id="tap-sync-next"></div>
+        <div class="tap-sync-warning" id="tap-sync-warning" data-i18n="typing.tap_iframe_warning" hidden>키 입력이 영상으로 들어가고 있습니다. 영상 바깥을 한 번 클릭해주세요.</div>
+        <div class="tap-sync-controls">
+            <button class="toolbar-btn btn-primary" id="btn-tap-stamp" style="padding: 8px 18px;"><span data-i18n="typing.tap_stamp">찍기</span>&nbsp;<kbd>Space</kbd></button>
+            <button class="toolbar-btn" id="btn-tap-undo"><span data-i18n="typing.tap_undo">되돌리기</span></button>
+            <span class="spacer"></span>
+            <label class="offset-label" for="tap-offset" data-i18n-title="typing.tap_offset_hint" title="누른 순간보다 이만큼 앞당겨 기록합니다. 시간이 늦게 찍히면 늘려주세요."><span data-i18n="typing.tap_offset">반응 보정</span></label>
+            <select id="tap-offset"></select>
+            <button class="toolbar-btn" id="btn-tap-exit"><span data-i18n="typing.tap_exit">끝내기</span></button>
+        </div>
+        <div class="tap-sync-keys" data-i18n="typing.tap_keys_hint">Space 찍기 · Backspace 되돌리기 · Esc 끝내기 · 표의 줄을 누르면 그 줄부터</div>
+    </div>
+
     <script src="/js/shared/youtube_manager.js?v=1.0.0"></script>
-    <script src="/js/typing/create.js"></script>
+    <script src="/js/typing/create.js?v=2"></script>
 </body>
 
 </html>

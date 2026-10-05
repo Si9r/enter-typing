@@ -116,7 +116,10 @@
                     <p data-i18n="battle.choose_a_room_to_join_or" style="color: var(--theme-text-muted); margin-top: 8px; font-weight: 500;">참가할 방을 고르거나, 새 방을 직접 만들어보세요!</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <input data-i18n-placeholder="battle.code" type="text" id="join-code-input" placeholder="코드 4자리" maxlength="4"
+                    <!-- 브라우저 자동완성(아이디·입력 기록) 방지: autocomplete=off + 포커스 전까지 readonly. 방 코드는 숫자 4자리라 모바일은 숫자 키패드 -->
+                    <input data-i18n-placeholder="battle.code" type="text" id="join-code-input" name="room-code" placeholder="코드 4자리" maxlength="4"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="numeric"
+                        data-lpignore="true" data-1p-ignore readonly onfocus="this.removeAttribute('readonly')"
                         style="padding: 10px 16px; border-radius: 30px; border: 1.5px solid var(--theme-border); width: 130px; text-align: center; font-weight: 800; letter-spacing: 3px; background: var(--theme-bg-card); color: var(--theme-text-main);"
                         onkeydown="if(event.key==='Enter') joinByCode()">
                     <button data-i18n="battle.join_by_code" class="btn btn-outline" style="border-radius: 30px; padding: 10px 22px;" onclick="joinByCode()">코드 참가</button>

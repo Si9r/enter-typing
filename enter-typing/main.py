@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 import models
 from database import engine
-from routers import auth, battle, convert, pages, profile, quiz_content, ranking, typing_content, typo_stats
+from routers import auth, battle, convert, pages, profile, quiz_content, ranking, typing_content, typo_stats, youtube
 
 # 새 테이블만 자동 생성한다. 기존 테이블의 컬럼 변경/삭제는 `python migrate.py` 로 수동 실행한다.
 models.Base.metadata.create_all(bind=engine)
@@ -63,4 +63,5 @@ app.include_router(convert.router)
 app.include_router(typo_stats.router)
 app.include_router(profile.router)
 app.include_router(battle.router)
+app.include_router(youtube.router)
 app.include_router(pages.router)  # 페이지 라우팅은 가장 마지막에 등록 (범용 /{page}.html 라우트 포함)

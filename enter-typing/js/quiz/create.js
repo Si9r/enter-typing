@@ -115,16 +115,8 @@ btnConfirmEdit.style.display = "none";
 resetQuestionForm();
 
 function extractVideoId(url) {
-    try {
-        const urlObj = new URL(url);
-        if (urlObj.hostname.includes("youtube.com"))
-            return urlObj.searchParams.get("v");
-        if (urlObj.hostname.includes("youtu.be"))
-            return urlObj.pathname.slice(1);
-    } catch (e) {
-        return null;
-    }
-    return null;
+    // parseYoutubeLink 는 create_links.js 에 있다 (watch / youtu.be / shorts / embed / live 링크 지원)
+    return parseYoutubeLink((url || "").trim()).id;
 }
 
 function formatTime(seconds) {
@@ -176,6 +168,7 @@ ytInput.addEventListener("change", () => {
                         e.target.seekTo(pendingSeekSec, true);
                         pendingSeekSec = null;
                     }
+                    warnIfSegmentExceedsVideo();
                 },
                 onError: onPlayerError,
             },
@@ -189,6 +182,22 @@ ytInput.addEventListener("change", () => {
         });
     }
 });
+
+function videoDuration() {
+    if (!youtubePlayer || !isPlayerReady || typeof youtubePlayer.getDuration !== "function") return 0;
+    return youtubePlayer.getDuration() || 0;
+}
+
+/** 구간(특히 링크로 만든 기본 구간)이 영상 길이를 넘으면 알려 준다. */
+function warnIfSegmentExceedsVideo() {
+    const duration = videoDuration();
+    if (!duration) return;
+    const end = parseTime(endTimeInput.value);
+    if (end > duration) {
+        urlErrorMsg.textContent = i18n.t("quiz.segment_exceeds_video", { duration: formatTime(duration) });
+        urlErrorMsg.style.display = "block";
+    }
+}
 
 function onPlayerError(event) {
     let errorMsg = i18n.t('quiz.an_unknown_error_occurred');
@@ -432,8 +441,10 @@ function renderGrid() {
     });
     gridContainer.appendChild(addCard);
 
-    // Sort lines by start time
-    linesData.sort((a, b) => a.start - b.start);
+    // 영상이 처음 나온 순서대로 묶고, 같은 영상 안에서는 시작 시간순 (여러 영상을 섞어도 카드가 엉뚱하게 움직이지 않게)
+    const videoOrder = new Map();
+    linesData.forEach((l) => { if (!videoOrder.has(l.youtube_id)) videoOrder.set(l.youtube_id, videoOrder.size); });
+    linesData.sort((a, b) => (videoOrder.get(a.youtube_id) - videoOrder.get(b.youtube_id)) || (a.start - b.start));
 
     linesData.forEach((line, index) => {
         const card = document.createElement("div");
@@ -457,6 +468,7 @@ function renderGrid() {
             .join("");
 
         card.innerHTML = `
+            ${line.needs_review ? `<span class="review-badge">${i18n.t('quiz.needs_review')}</span>` : ""}
             ${thumbnailUrl ? `<img src="${escapeHtml(thumbnailUrl)}" class="card-thumbnail" alt="thumbnail">` : `<div class="card-thumbnail" style="display:flex; align-items:center; justify-content:center; color: var(--theme-text-muted); font-size: 0.9rem;">No Image</div>`}
             <div class="time-range">⏱ ${formatTime(line.start)} ~ ${formatTime(line.end)}</div>
             ${questions}
@@ -491,6 +503,9 @@ function handleAddOrUpdate() {
         return alert(i18n.t('quiz.please_enter_at_least_one_question'));
     if (start >= end && end !== 0)
         return alert(i18n.t('quiz.the_end_time_must_be_greater'));
+    const duration = videoDuration();
+    if (duration && start >= duration)
+        return alert(i18n.t('quiz.start_beyond_video', { duration: formatTime(duration) }));
 
     const quizItem = {
         start,
@@ -671,7 +686,7 @@ document
                     youtube_id,
                     thumbnail_url: currentThumbnailUrl,
                     difficulty,
-                    quiz_data: JSON.stringify(linesData),
+                    quiz_data: JSON.stringify(linesData.map(({ needs_review, ...item }) => item)),
                 }),
             });
             const data = await res.json();
